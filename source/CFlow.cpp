@@ -1,5 +1,5 @@
-#include "../Hierarchy/Entity.hpp"
-#include "../Hierarchy/CRuntime.hpp"
+#include "Entity.hpp"
+#include "CRuntime.hpp"
 #include "CFlow.hpp"
 #include "MissingFlow.hpp"
 

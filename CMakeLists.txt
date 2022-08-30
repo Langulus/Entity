@@ -1,31 +1,36 @@
-add_subdirectory(Test)
+cmake_minimum_required(VERSION 3.22)
+include(cmake/FetchLangulusModule.cmake)
+project(Langulus_Entity)
 
-project(PCFramework)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(LANGULUS_FEATURE_MANAGED_MEMORY ON CACHE BOOL "Managed memory feature")
+set(LANGULUS_FEATURE_MANAGED_REFLECTION ON CACHE BOOL "Managed reflection feature")
+set(LANGULUS_ENABLE_SAFE_MODE ON CACHE BOOL "Safe mode enabled by default")
 
-add_definitions(-DPC_EXPORT_PCFW)
+add_definitions(-DLANGULUS_ENABLE_FEATURE_MANAGED_MEMORY)
+add_definitions(-DLANGULUS_ENABLE_FEATURE_MANAGED_REFLECTION)
 
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SOURCE_FILES)
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/Containers SOURCE_FILES)
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/Hierarchy SOURCE_FILES)
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/Flow SOURCE_FILES)
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/Utilities SOURCE_FILES)
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/Modules SOURCE_FILES)
+# Check if this project is built as standalone, or a part of something else
+if (PROJECT_IS_TOP_LEVEL)
+	fetch_langulus_module(Core)
+	fetch_langulus_module(Logger)
+	fetch_langulus_module(RTTI)
+	fetch_langulus_module(Anyness)
+	fetch_langulus_module(Flow)
 
-add_library(PCFramework SHARED ${SOURCE_FILES})
-
-target_include_directories(PCFramework
-	PRIVATE		${CMAKE_CURRENT_SOURCE_DIR}
-	INTERFACE	${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-
-if(NOT PC_OS STREQUAL "Win")
-	set(PC_ADDITIONAL_PCFW_RUNTIMES dl 
-		CACHE STRING "Libraries to link against if not building PCFW on Windows")
+    enable_testing()
+	add_subdirectory(test)
 endif()
 
-target_link_libraries(PCFramework 
-	PUBLIC PCMath PCMemory Flow
-	PRIVATE ${PC_ADDITIONAL_PCFW_RUNTIMES}
-)
+# Build and install Entity library
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/source SOURCE_FILES)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/source/modules SOURCE_FILES)
+add_library(Langulus.Entity ${SOURCE_FILES})
 
-install(TARGETS PCFramework DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+target_include_directories(Langulus.Entity PUBLIC include)
+target_link_libraries(Langulus.Entity PUBLIC Langulus.Flow)
+
+if (MSVC)
+    target_compile_options(Langulus.Entity PRIVATE /utf-8)
+endif()

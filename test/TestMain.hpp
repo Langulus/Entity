@@ -1,6 +1,6 @@
 #pragma once
-#include <PCFW.hpp>
-using namespace PCFW;
+#include <Langulus.Entity.hpp>
+using namespace Langulus::Entity;
 
 #include <map>
 

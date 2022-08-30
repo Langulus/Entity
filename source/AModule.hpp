@@ -1,7 +1,7 @@
 #pragma once
-#include "AContext.hpp"
+#include "Resolvable.hpp"
 
-namespace PCFW
+namespace Langulus::Entity
 {
 
 	/// Predeclarations																			
@@ -10,7 +10,7 @@ namespace PCFW
 	struct ModuleInfo;
 
 	/// Library handle																			
-	using PCLIB = pcptr;
+	using PCLIB = intptr_t;
 
 	/// Entry and exit templates																
 	/// The module entry point receives the current system and a handle to		
@@ -24,8 +24,7 @@ namespace PCFW
 	///																								
 	///	ABSTRACT MODULE																		
 	///																								
-	class LANGULUS_MODULE(FRAMEWORK) AModule : public AContext {
-		REFLECT(AModule);
+	class AModule : public Resolvable {
 	public:
 		AModule(DMeta, CRuntime*, PCLIB) noexcept;
 
@@ -53,14 +52,13 @@ namespace PCFW
 		NOD() static const ModuleInfo& INFO(PCLIB);
 		NOD() PCLIB GetHandle() const noexcept;
 
-		PC_GET(Runtime);
-
 	private:
 		// Reference to the actual module, as loaded by the OS				
 		PCLIB	mLibraryHandle = 0;
 		// Runtime that owns the module instance									
 		Own<CRuntime*> mRuntime;
 	};
+
 
 	///																								
 	///	Module information																	
@@ -77,6 +75,7 @@ namespace PCFW
 		// Module abstract type															
 		DataID mAbstractModule = DataID::Of<AModule>;
 	};
+
 
 	/// Convenience macro for implementing module entry and exit points			
 	#define LANGULUS_DEFINE_MODULE(module) \
@@ -103,4 +102,4 @@ namespace PCFW
 			LANGULUS_EXPORT() void LANGULUS_MODULE_DESTROYER ();\
 		}
 
-} // namespace PCFW
+} // namespace Langulus::Entity

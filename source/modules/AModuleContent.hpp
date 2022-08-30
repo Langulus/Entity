@@ -1,6 +1,6 @@
 #pragma once
-#include "../Hierarchy/AModule.hpp"	
-#include "../Hierarchy/AUnit.hpp"
+#include "../AModule.hpp"	
+#include "../AUnit.hpp"
 
 namespace PCFW
 {
@@ -189,7 +189,7 @@ namespace PCFW
 	///																								
 	/// Represents the frequency at which stuff is precomputed at runtime		
 	///																								
-	class LANGULUS_MODULE(FRAMEWORK) RefreshRate : public TNamed<RefreshRate, pcu8, false> {
+	class RefreshRate : public TNamed<RefreshRate, pcu8, false> {
 		REFLECT(RefreshRate);
 
 		enum Enum : pcu8 {

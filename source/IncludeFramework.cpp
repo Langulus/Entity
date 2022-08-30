@@ -1,4 +1,4 @@
-#include "include/PCFW.hpp"
+/*#include "include/PCFW.hpp"
 
 PC_MONOPOLIZE_MEMORY(0)
 
@@ -24,3 +24,4 @@ namespace PCFW
 	}
 
 } // namespace PCFW
+*/

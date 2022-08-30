@@ -1,4 +1,4 @@
-#include "include/PCFW.hpp"
+/*#include "include/PCFW.hpp"
 
 namespace PCFW
 {
@@ -32,12 +32,6 @@ namespace PCFW
 			REFLECT_ABILITY(Create),
 			REFLECT_CONVERSIONS(GASM,Debug)
 		REFLECT_END_ABILITIES
-		/*REFLECT_BEGIN_MEMBERS
-			REFLECT_MEMBER_TRAIT(mOwner, Owner),
-			REFLECT_MEMBER_TRAIT(mChildren, Child),
-			REFLECT_MEMBER_TRAIT(mUnits, Unit),
-			REFLECT_MEMBER_TRAIT(mTraits, Trait)
-		REFLECT_END_MEMBERS*/
 	REFLECT_END
 
 	REFLECT_BEGIN(AUnit)
@@ -887,3 +881,4 @@ namespace PCFW
 	}
 
 } // namespace PCFW
+*/

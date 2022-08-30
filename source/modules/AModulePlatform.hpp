@@ -1,6 +1,6 @@
 #pragma once
-#include "../Hierarchy/AModule.hpp"	
-#include "../Hierarchy/AUnit.hpp"
+#include "../AModule.hpp"	
+#include "../AUnit.hpp"
 
 namespace PCFW
 {

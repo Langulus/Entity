@@ -6,17 +6,17 @@
 #define ENTITY_CREATION_VERBOSE_SELF(a) //pcLogSelfVerbose << a
 #define ENTITY_SELECTION_VERBOSE_SELF(a) //pcLogSelfVerbose << a
 
-namespace PCFW
+namespace Langulus::Entity
 {
 
 	///																								
-	///	ENTITY																					
+	///	Entity																					
 	///																								
-	/// An entity can be anything - physical or not. Its functionality comes	
-	/// from its components (units) and children/owner components. An entity	
-	/// is an aggregate of traits, units, and other entities.						
+	///	The primary composed type. Its functionality comes from its units		
+	/// and children/owner's units. An entity is an aggregate of traits,			
+	/// units, and other entities.															
 	///																								
-	class LANGULUS_MODULE(FRAMEWORK) Entity : public AContext {
+	class Entity : public Resolvable {
 		void ResetRuntime(CRuntime* = nullptr);
 		Any CreateDependencies(DMeta);
 
@@ -25,7 +25,7 @@ namespace PCFW
 		//	Hierarchy																		
 		TAny<Entity*> mChildren;
 		// Units																				
-		TAny<AUnit*> mUnits;
+		TAny<A::Unit*> mUnits;
 		// Traits																			
 		TAny<Trait> mTraits;
 		// Runtime shortcut																
@@ -35,33 +35,30 @@ namespace PCFW
 		bool mRefreshRequired = false;
 
 	public:
-		REFLECT(Entity);
 		Entity(Entity* = nullptr) noexcept;
 		Entity(const Entity&) = delete;
 		Entity(Entity&&) noexcept;
 
-		PC_VERB(Do);
-		PC_VERB(Select);
-		PC_VERB(Create);
+		void Do(Verb&);
+		void Select(Verb&);
+		void Create(Verb&);
 
-		bool DoInHierarchy(Verb&, SeekStyle = SeekStyle::UpToHere);
+		template<SeekStyle SEEK = SeekStyle::UpToHere>
+		bool DoInHierarchy(Verb&);
+
 		bool DoAIAD(const Text&);
 		Any DoGASM(const GASM&);
 		void Update(PCTime);
 		void Reset();
 
 		NOD() Text GetID() const;
-		PC_GET(Owner);
-		PC_GET(Children);
-		PC_GET(Units);
-		PC_GET(Traits);
 
 		NOD() bool operator == (const Entity&) const;
 		NOD() bool operator != (const Entity&) const;
 
 		NOD() explicit operator Debug() const;
-		NOD() explicit operator GASM() const;
 
+	public:
 		///																							
 		///	UNIT MANAGEMENT																	
 		///																							
@@ -174,6 +171,6 @@ namespace PCFW
 		void DumpHierarchy() const;
 	};
 
-} // namespace PCFW
+} // namespace Langulus::Entity
 
 #include "Entity.inl"
