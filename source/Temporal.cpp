@@ -1,12 +1,12 @@
 #include "Entity.hpp"
-#include "CRuntime.hpp"
+#include "Runtime.hpp"
 #include "CFlow.hpp"
 #include "MissingFlow.hpp"
 
 #define PC_CFLOW_VERBOSE(a) pcLogVerbose << a
 #define PC_CFLOW_VERBOSE_TAB(a) ScopedTab tab; pcLogVerbose << a << tab
 
-namespace PCFW
+namespace Langulus::Entity
 {
 
 	Pasts FindPastPoints(Any&);

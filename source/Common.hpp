@@ -1,5 +1,6 @@
 #pragma once
 #include <Langulus.Flow.hpp>
+#include <chrono>
 
 namespace Langulus::Entity
 {
@@ -9,5 +10,8 @@ namespace Langulus::Entity
 	using ::Langulus::Flow::Construct;
 	using ::Langulus::Flow::Charge;
 	using ::Langulus::Flow::SeekStyle;
+
+	using TimePoint = ::std::chrono::steady_clock::time_point;
+	using Time = ::std::chrono::steady_clock::duration;
 
 } //namespace Langulus::Entity

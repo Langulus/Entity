@@ -11,12 +11,17 @@ namespace Langulus::Entity
 	///																								
 	struct Resolvable {
 	protected:
-		const DMeta mClassType;
-		const Offset mClassOffset;
+		DMeta mClassType;
+		Offset mClassOffset;
 
 	public:
 		Resolvable() = delete;
+		Resolvable(const Resolvable&) noexcept = default;
+		Resolvable(Resolvable&&) noexcept = default;
 		Resolvable(DMeta) noexcept;
+
+		Resolvable& operator = (const Resolvable&) noexcept = default;
+		Resolvable& operator = (Resolvable&&) noexcept = default;
 
 		NOD() bool CastsTo(DMeta) const noexcept;
 		template<CT::Data T>

@@ -1,28 +1,25 @@
 #include "Entity.hpp"
-#include "CRuntime.hpp"
-#include "AUnit.hpp"
-#include "../Flow/CFlow.hpp"
-#include "../Modules/AModuleAI.hpp"
+#include "Runtime.hpp"
 
-namespace PCFW
+namespace Langulus::Entity
 {
 
 	/// Construct as a child																	
 	///	@param parent - the owner of the entity										
 	Entity::Entity(Entity* parent) noexcept
-		: AContext {MetaData::Of<Entity>()}
+		: Resolvable {MetaData::Of<Entity>()}
 		, mOwner {parent}
 		, mRuntime {parent ? parent->GetRuntime() : nullptr} {}
 
 	/// Move constructor																			
 	///	@param other - move that entity													
 	Entity::Entity(Entity&& other) noexcept
-		: AContext {pcForward<AContext>(other)}
-		, mOwner {pcMove(other.mOwner)}
-		, mChildren {pcMove(other.mChildren)}
-		, mUnits {pcMove(other.mUnits)}
-		, mTraits {pcMove(other.mTraits)}
-		, mRuntime {pcMove(other.mRuntime)} {
+		: Resolvable {Forward<Resolvable>(other)}
+		, mOwner {Move(other.mOwner)}
+		, mChildren {Move(other.mChildren)}
+		, mUnits {Move(other.mUnits)}
+		, mTraits {Move(other.mTraits)}
+		, mRuntime {Move(other.mRuntime)} {
 		// Remap children																	
 		for (auto child : mChildren)
 			child->mOwner = this;
@@ -41,69 +38,52 @@ namespace PCFW
 
 	/// Convert to text, by writing a short name or address							
 	Entity::operator Debug() const {
-		GASM result;
-		auto name = GetName();
+		const auto name = GetName();
 		if (!name.IsEmpty()) {
+			Debug result;
 			result += "#";
-			result += pcSerialize<Debug>(name);
+			result += name;
+			return result;
 		}
-		else {
-			result += ClassMeta()->GetToken();
-			result += GASM::OpenScope;
-			result += GetID();
-			result += GASM::CloseScope;
-		}
-
-		return result;
-	}
-
-	/// Serialize entire hierarchy to GASM as nested constructs						
-	Entity::operator GASM() const {
-		GASM result;
-		result += ClassMeta()->GetToken();
-		result += GASM::OpenScope;
-		result += "<TODO serialize hierarchy>";
-		result += GASM::CloseScope;
-		return result;
+		else return Resolvable::operator Debug();
 	}
 
 	/// Dump the entity's hierarchy in log													
 	void Entity::DumpHierarchy() const {
-		ScopedTab tab;
-		pcLogVerbose << "** " << *this << tab;
+		const auto tab = Logger::Verbose() << "** " << *this << Logger::Tabs {};
 
 		if (!mTraits.IsEmpty()) {
-			pcLogVerbose << ".. contains " << mTraits.GetCount() << " traits";
+			Logger::Verbose() << ".. contains " << mTraits.GetCount() << " traits";
 			for (auto& trait : mTraits)
-				pcLogVerbose << ". " << trait;
+				Logger::Verbose() << ". " << trait;
 		}
 
 		if (!mUnits.IsEmpty()) {
-			pcLogVerbose << "++ contains " << mUnits.GetCount() << " units";
+			Logger::Verbose() << "++ contains " << mUnits.GetCount() << " units";
 			for (auto unit : mUnits)
-				pcLogVerbose << "+ " << unit;
+				Logger::Verbose() << "+ " << unit;
 		}
 
 		if (!mChildren.IsEmpty()) {
-			pcLogVerbose << "** contains " << mChildren.GetCount() << " child entities";
+			Logger::Verbose() << "** contains " << mChildren.GetCount() << " child entities";
 			for (auto child : mChildren)
 				child->DumpHierarchy();
 		}
 	}
 
-	/// Find a flow component that can parse GASM, and execute it					
-	///	@param code - the GASM code to execute											
-	///	@return true if the GASM was executed successfully							
-	Any Entity::DoGASM(const GASM& code) {
+	/// Execute a piece of code in the closest possible flow driver				
+	///	@param code - the code to execute												
+	///	@return the results of the code													
+	Any Entity::RunCode(const Flow::Code& code) {
 		if (code.IsEmpty())
 			return {};
 
 		// Execute code																	
 		Any parsed = code.Parse();
-		Any context { GetBlock() };
+		Any context {GetBlock()};
 		Any output;
-		if (!Verb::ExecuteScope(context, parsed, output)) {
-			pcLogSelfError << "DoGASM failed to execute " << parsed;
+		if (!Flow::Execute(context, parsed, output)) {
+			Logger::Error() << "DoGASM failed to execute " << parsed;
 			return {};
 		}
 
@@ -113,12 +93,13 @@ namespace PCFW
 	/// Find an AIAD component that can process speech and interpret text		
 	///	@param text - text to execute														
 	///	@return true if the text was successfully executed							
-	bool Entity::DoAIAD(const Text& text) {
+	Any Entity::RunSpeech(const Text& text) {
 		if (text.IsEmpty())
 			return true;
 
+		//TODO do this with higher level functions, entity should never know anything about units
 		// Find an AI interpreter and a flow										
-		auto mind = SeekUnit<AUnitAI>(SeekStyle::UpToHere);
+		/*auto mind = SeekUnit<AUnitAI>(SeekStyle::UpToHere);
 		if (!mind) {
 			pcLogSelfError << "No AI unit found - can't parse natural speech: \"" << text << "\"";
 			return false;
@@ -136,14 +117,16 @@ namespace PCFW
 		// Execute the flow																
 		auto classBlock = GetBlock();
 		flow->Execute(classBlock);
-		return true;
+		return true;*/
 	}
 
 	/// Update all children's CRuntime/CFlow components								
 	/// This is used for the purpose of a main loop, but also supports sub		
 	/// systems and multiple system instantiations with different environments	
 	///	@param dt - delta time that has passed between updates					
-	void Entity::Update(PCTime dt) {
+	void Entity::Update(Time dt) {
+		// Keep a flow inside the runtime?
+		/*
 		auto thisBlock = GetBlock();
 		for (auto unit : mUnits) {
 			if (unit->IsClassIrrelevant())
@@ -175,7 +158,7 @@ namespace PCFW
 			if (child->IsClassIrrelevant())
 				continue;
 			child->Update(dt);
-		}
+		}*/
 	}
 
 	/// Reset the entity, clearing all children, units, traits						

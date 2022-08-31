@@ -6,11 +6,8 @@ namespace Langulus::Entity
 	/// Some predeclarations																	
 
 	class Entity;
-	class CRuntime;
-}
+	class Runtime;
 
-namespace Langulus::Entity::A
-{
 
 	///																								
 	///	An abstract unit																		
@@ -42,7 +39,7 @@ namespace Langulus::Entity::A
 	public:
 		virtual void Refresh() {}
 
-		NOD() CRuntime* GetRuntime(const Index& = IndexFirst);
+		NOD() Runtime* GetRuntime(const Index& = IndexFirst);
 
 		template<CT::Trait T>
 		Trait SeekTrait() const;
@@ -60,7 +57,7 @@ namespace Langulus::Entity::A
 		void ReplaceOwner(Entity*, Entity*);
 	};
 
-} // namespace Langulus::Entity::A
+} // namespace Langulus::Entity
 
 
 namespace Langulus::CT
@@ -68,8 +65,8 @@ namespace Langulus::CT
 
 	/// Any type that inherits A::Unit is considered a unit							
 	template<class T>
-	concept Unit = DerivedFrom<T, ::Langulus::Entity::A::Unit>;
+	concept Unit = DerivedFrom<T, ::Langulus::Entity::Unit>;
 
 } // namespace Langulus::CT
 
-#include "AUnit.inl"
+#include "Unit.inl"

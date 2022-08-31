@@ -1,30 +1,29 @@
 #pragma once
-#include "AModule.hpp"
-#include "AUnit.hpp"
-#include "../Containers/TMap.hpp"
+#include "Module.hpp"
+#include "Unit.hpp"
 
-namespace PCFW
+namespace Langulus::Entity
 {
 
 	class AFile;
 	class AFolder;
-	  
+
+
 	///																								
 	///	RUNTIME COMPONENT																		
 	///																								
 	/// Handles loading and unloading of modules, dispatches verbs to modules	
 	/// Handles overall system state and console input									
 	///																								
-	class LANGULUS_MODULE(FRAMEWORK) CRuntime : public AUnit {
-		REFLECT(CRuntime);
+	class Runtime {
 	public:
-		CRuntime();
-		CRuntime(CRuntime&&) noexcept = default;
-		~CRuntime();
+		Runtime();
+		Runtime(Runtime&&) noexcept = default;
+		~Runtime();
 
 	public:
-		PCLIB LoadPCLIB(const Path&);
-		void UnloadPCLIB(PCLIB);
+		SharedLibrary LoadPCLIB(const Path&);
+		void UnloadPCLIB(SharedLibrary);
 
 		void InstantiateModule(const Construct&, TAny<AModule*>&);
 
@@ -33,9 +32,9 @@ namespace PCFW
 		NOD() Ptr<AModule> GetModule(const Text&);
 		NOD() Ptr<const AModule> GetModule(const Text&) const;
 
-		void Update(PCTime);
+		void Update(Time);
 
-		NOD() pcptr GetNumberOfActiveWindows() const;
+		NOD() Count GetNumberOfActiveWindows() const;
 		NOD() AFile* GetFile(const Path&);
 		NOD() AFolder* GetFolder(const Path&);
 
@@ -44,9 +43,9 @@ namespace PCFW
 
 	private:
 		// Loaded modules, sorted by priority										
-		TMap<real, TAny<AModule*>> mModules;
+		TMap<Real, TAny<AModule*>> mModules;
 		// Double protection for loaded libraries									
-		TMap<Text, PCLIB> mLibraries;
+		TMap<Text, SharedLibrary> mLibraries;
 	};
 
-} // namespace PCFW
+} // namespace Langulus::Entity

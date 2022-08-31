@@ -1,62 +1,52 @@
-namespace PCFW
+#pragma once
+#include "Entity.hpp"
+
+namespace Langulus::Entity
 {
-
-	/// Get an entity identifier if not PC_PARANOID										
-	///	@return a hex of the entity's pointer if not paranoid						
-	inline Text Entity::GetID() const {
-		#if LANGULUS_DEBUG() && PC_PARANOID == PC_DISABLED
-			return pcToHex(this);
-		#else
-			return "...";
-		#endif
-	}
-
-	inline bool Entity::operator != (const Entity& other) const {
-		return !(*this == other);
-	}
 
 	/// Remove all units that are derived from the provided type					
 	///	@tparam T - the type of units to remove										
 	///	@return the number of removed units												
-	template<Unit T>
-	pcptr Entity::RemoveUnits() {
-		static const auto metaT = MetaData::Of<T>();
-		pcptr removed = 0;
-		for (pcptr i = 0; i < mUnits.GetCount(); ++i) {
-			auto unit = mUnits[i];
-			if (unit->ClassInterpretsAs(metaT)) {
-				ENTITY_VERBOSE_SELF(*unit << " removed");
+	template<CT::Unit T>
+	Count Entity::RemoveUnits() {
+		const auto found = mUnits.FindKeyIndex(MetaData::Of<T>());
+		if (found) {
+			auto& list = mUnits.GetValue(found);
+			for (auto unit : list) {
+				ENTITY_VERBOSE_SELF(unit << " removed");
 				unit->mOwners.Remove(this);
-				removed += mUnits.RemoveIndex(i);
-				--i;
 			}
+
+			const auto removed = list.GetCount();
+			mUnits.RemoveIndex(found);
+			mRefreshRequired = true;
+			return removed;
 		}
 
-		if (removed)
-			mRefreshRequired = true;
-		return removed;
+		return 0;
 	}
 
 	/// Gather all units of a specific static type										
 	///	@param seek - where to seek for these units									
 	///	@return a container filled with the matches									
-	template<Unit T>
-	TAny<const pcDecay<T>*> Entity::GatherUnits(SeekStyle seek) const {
-		return GatherUnits(seek, MetaData::Of<pcDecay<T>>());
+	template<CT::Unit T>
+	TAny<const Decay<T>*> Entity::GatherUnits(SeekStyle seek) const {
+		return GatherUnits(seek, MetaData::Of<Decay<T>>());
 	}
 
 	/// Create a unit by static type and arguments, relying on producers			
 	/// in the hierarchy																			
 	///	@return the newly created unit if able to create it						
-	template<Unit T, class ... ARGUMENTS>
-	pcDecay<T>* Entity::CreateUnit(ARGUMENTS&&...arguments) {
-		TAny<AUnit*> produced;
-		auto request = Construct::From<pcDecay<T>>();
+	template<CT::Unit T, class ... ARGUMENTS>
+	Decay<T>* Entity::CreateUnit(ARGUMENTS&&...arguments) {
+		TAny<Unit*> produced;
+		auto request = Construct::From<Decay<T>>();
 		if constexpr (sizeof...(arguments) > 0)
-			(request << ... << pcForward<ARGUMENTS>(arguments));
+			(request << ... << Forward<ARGUMENTS>(arguments));
 		CreateUnitInner(request, produced);
-		SAFETY(if (produced.IsEmpty()) throw Except::BadConstruction());
-		return produced.As<pcDecay<T>*>();
+		SAFETY(if (produced.IsEmpty())
+			Throw<Except::Construct>("Cad unit creation in Entity::CreateUnit"));
+		return produced.As<Decay<T>*>();
 	}
 
 	/// Find a unit by type and index from the hierarchy								
@@ -64,7 +54,7 @@ namespace PCFW
 	///	@param unit - the type of the unit to seek for								
 	///	@param offset - the index of the unit to return								
 	///	@return the unit if found, or nullptr otherwise								
-	inline const AUnit* Entity::SeekUnit(SeekStyle seek, DMeta unit, const Index& offset) const {
+	inline const Unit* Entity::SeekUnit(SeekStyle seek, DMeta unit, const Index& offset) const {
 		return const_cast<Entity*>(this)->SeekUnit(seek, unit, offset);
 	}
 
@@ -72,57 +62,57 @@ namespace PCFW
 	///	@param seek - where to seek for the unit										
 	///	@param offset - the index of the unit to return								
 	///	@return the unit if found, or nullptr otherwise								
-	template<Unit T>
-	const pcDecay<T>* Entity::SeekUnit(SeekStyle seek, const Index& offset) const {
-		return static_cast<const pcDecay<T>*>(
-			SeekUnit(seek, MetaData::Of<pcDecay<T>>(), offset));
+	template<CT::Unit T>
+	const Decay<T>* Entity::SeekUnit(SeekStyle seek, const Index& offset) const {
+		return static_cast<const Decay<T>*>(
+			SeekUnit(seek, MetaData::Of<Decay<T>>(), offset));
 	}
 
 	/// Find a unit by index and static type from the hierarchy						
 	///	@param seek - where to seek for the unit										
 	///	@param offset - the index of the unit to return								
 	///	@return the unit if found, or nullptr otherwise								
-	template<Unit T>
-	pcDecay<T>* Entity::SeekUnit(SeekStyle seek, const Index& offset) {
-		return static_cast<pcDecay<T>*>(
-			SeekUnit(seek, MetaData::Of<pcDecay<T>>(), offset));
+	template<CT::Unit T>
+	Decay<T>* Entity::SeekUnit(SeekStyle seek, const Index& offset) {
+		return static_cast<Decay<T>*>(
+			SeekUnit(seek, MetaData::Of<Decay<T>>(), offset));
 	}
 
-	inline const AUnit* Entity::GetUnit(DMeta type, const Index& offset) const {
+	inline const Unit* Entity::GetUnit(DMeta type, const Index& offset) const {
 		return const_cast<Entity*>(this)->GetUnit(type, offset);
 	}
 
-	template<Unit T>
-	pcDecay<T>* Entity::GetUnit(const Index& offset) {
-		return static_cast<pcDecay<T>*>(
-			GetUnit(MetaData::Of<pcDecay<T>>(), offset));
+	template<CT::Unit T>
+	Decay<T>* Entity::GetUnit(const Index& offset) {
+		return static_cast<Decay<T>*>(
+			GetUnit(MetaData::Of<Decay<T>>(), offset));
 	}
 
-	template<Unit T>
-	const pcDecay<T>* Entity::GetUnit(const Index& offset) const {
-		return static_cast<const pcDecay<T>*>(
-			GetUnit(MetaData::Of<pcDecay<T>>(), offset));
+	template<CT::Unit T>
+	const Decay<T>* Entity::GetUnit(const Index& offset) const {
+		return static_cast<const Decay<T>*>(
+			GetUnit(MetaData::Of<Decay<T>>(), offset));
 	}
 
-	inline const AUnit* Entity::GetUnit(const Text& name, const Index& offset) const {
+	inline const Unit* Entity::GetUnit(const Text& name, const Index& offset) const {
 		return const_cast<Entity*>(this)->GetUnit(name, offset);
 	}
 
-	template<Unit T>
-	pcDecay<T>* Entity::GetUnitT(const Text& name, const Index& offset) {
-		return static_cast<pcDecay<T>*>(GetUnit(name, offset));
+	template<CT::Unit T>
+	Decay<T>* Entity::GetUnitT(const Text& name, const Index& offset) {
+		return static_cast<Decay<T>*>(GetUnit(name, offset));
 	}
 
-	template<RTTI::ReflectedTrait TRAIT, RTTI::ReflectedData DATA>
-	Trait* Entity::AddTrait(const DATA& data) {
-		return AddTrait(Trait::From<TRAIT, DATA>(data));
+	template<CT::Trait T, CT::Data D>
+	Trait* Entity::AddTrait(const D& data) {
+		return AddTrait(Trait::From<T, D>(data));
 	}
 
 	inline bool Entity::GetTrait(TMeta trait, Trait& output, const Index& offset) const {
 		return const_cast<Entity*>(this)->GetTrait(trait, output, offset);
 	}
 
-	template<RTTI::ReflectedData T>
+	template<CT::Data T>
 	bool Entity::SeekValue(SeekStyle seek, TMeta trait, T& value) const {
 		Trait found;
 		if (!SeekTrait(seek, trait, found) || found.IsEmpty())
@@ -132,14 +122,14 @@ namespace PCFW
 		return true;
 	}
 
-	template<RTTI::ReflectedTrait TRAIT, RTTI::ReflectedData DATA>
-	bool Entity::SeekValue(SeekStyle seek, DATA& value) const {
-		static const auto tmeta = TraitID::Of<TRAIT>.GetMeta();
+	template<CT::Trait T, CT::Data D>
+	bool Entity::SeekValue(SeekStyle seek, D& value) const {
+		static const auto tmeta = MetaTrait::Of<T>();
 		Trait found;
 		if (!SeekTrait(seek, tmeta, found) || found.IsEmpty())
 			return false;
 
-		value = found.AsCast<DATA>();
+		value = found.AsCast<D>();
 		return true;
 	}
 
@@ -151,18 +141,18 @@ namespace PCFW
 	///	@tparam TRAIT - the trait to search for										
 	///	@param offset - the offset of the trait to return							
 	///	@return the trait or nullptr if none found									
-	template<RTTI::ReflectedTrait TRAIT>
+	template<CT::Trait T>
 	Trait* Entity::GetLocalTrait(const Index& offset) {
-		return GetLocalTrait(TraitID::Of<TRAIT>.GetMeta(), offset);
+		return GetLocalTrait(MetaTrait::Of<T>(), offset);
 	}
 
 	/// Get local trait by static type and offset										
 	///	@tparam TRAIT - the trait to search for										
 	///	@param offset - the offset of the trait to return							
 	///	@return the trait or nullptr if none found									
-	template<RTTI::ReflectedTrait TRAIT>
+	template<CT::Trait T>
 	const Trait* Entity::GetLocalTrait(const Index& offset) const {
-		return const_cast<Entity&>(*this).GetLocalTrait<TRAIT>(offset);
+		return const_cast<Entity&>(*this).GetLocalTrait<T>(offset);
 	}
 
 	/// Get child entity by offset															
@@ -182,19 +172,19 @@ namespace PCFW
 
 	/// Get a trait by scanning owners and other units									
 	///	@return the trait																		
-	template<RTTI::ReflectedTrait TRAIT>
-	Trait AUnit::SeekTrait() const {
-		SuccessTrap satisfied;
+	template<CT::Trait T>
+	Trait Unit::SeekTrait() const {
+		bool satisfied {};
 		Trait output;
-		static const auto traitMeta = TraitID::Of<TRAIT>.GetMeta();
+		static const auto data = MetaTrait::Of<T>();
 		for (auto context : mOwners) {
-			bool found = context->SeekTrait(SeekStyle::UpToHere, traitMeta, output);
+			bool found = context->SeekTrait(SeekStyle::UpToHere, data, output);
 			if (found && satisfied) {
-				pcLogSelfWarning << "Multiple " << traitMeta->GetToken() << " traits found in hierarchy";
-				pcLogSelfWarning << "Each sequential trait will overwrite the result";
+				Logger::Warning() << "Multiple " << data << " traits found in hierarchy";
+				Logger::Warning() << "Each sequential trait will overwrite the result";
 			}
 
-			satisfied = found;
+			satisfied |= found;
 		}
 
 		return output;
@@ -204,20 +194,20 @@ namespace PCFW
 	///	@param trait - the trait to seek for											
 	///	@param value - [out] value to set if trait was found						
 	///	@return true if anything was written to value								
-	template<RTTI::ReflectedData DATA>
-	bool AUnit::SeekValue(TMeta trait, DATA& value) const {
-		SuccessTrap satisfied;
+	template<CT::Data D>
+	bool Unit::SeekValue(TMeta trait, D& value) const {
+		bool satisfied {};
 		for (auto context : mOwners) {
 			bool found = context->SeekValue(SeekStyle::UpToHere, trait, value);
 			if (found && satisfied) {
-				pcLogSelfWarning << "Multiple " << trait->GetToken() << " traits found in hierarchy";
-				pcLogSelfWarning << "Each sequential trait will overwrite the result";
+				Logger::Warning() << "Multiple " << trait << " traits found in hierarchy";
+				Logger::Warning() << "Each sequential trait will overwrite the result";
 			}
 
-			satisfied = found;
+			satisfied |= found;
 		}
 
 		return satisfied;
 	}
 
-} // namespace PCFW
+} // namespace Langulus::Entity

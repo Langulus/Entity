@@ -10,13 +10,13 @@ namespace Langulus::Entity
 	struct ModuleInfo;
 
 	/// Library handle																			
-	using PCLIB = intptr_t;
+	using SharedLibrary = intptr_t;
 
 	/// Entry and exit templates																
 	/// The module entry point receives the current system and a handle to		
 	/// the shared library																		
 	using ModuleLinkPointPtr = void (*)();
-	using ModuleCreatePointPtr = AModule* (*)(CRuntime*, PCLIB);
+	using ModuleCreatePointPtr = AModule* (*)(CRuntime*, SharedLibrary);
 	using ModuleInfoPointPtr = const ModuleInfo& (*)();
 	using ModuleExitPointPtr = void (*)();
 
@@ -24,37 +24,37 @@ namespace Langulus::Entity
 	///																								
 	///	ABSTRACT MODULE																		
 	///																								
-	class AModule : public Resolvable {
+	class Module : public Resolvable {
 	public:
-		AModule(DMeta, CRuntime*, PCLIB) noexcept;
+		Module(DMeta, CRuntime*, SharedLibrary) noexcept;
 
 		/// Never allow construction of uninitialized modules							
-		AModule() = delete;
-		AModule(const AModule&) = delete;
-		AModule(AModule&&) = delete;
+		Module() = delete;
+		Module(const Module&) = delete;
+		Module(Module&&) = delete;
 		
-		AModule& operator = (const AModule&) noexcept = default;
-		AModule& operator = (AModule&&) noexcept = default;
+		Module& operator = (const Module&) noexcept = default;
+		Module& operator = (Module&&) noexcept = default;
 
 	public:
-		virtual void Update(PCTime) = 0;
+		virtual void Update(Time) = 0;
 
 	public:
-		NOD() static PCLIB LOAD(
+		NOD() static SharedLibrary LOAD(
 			const Path&, 
 			ModuleLinkPointPtr&, 
 			ModuleInfoPointPtr&, 
 			ModuleExitPointPtr&
 		);
 
-		NOD() static Ptr<AModule> CREATE(const Ptr<CRuntime>&, PCLIB);
-		static void UNLOAD(PCLIB);
-		NOD() static const ModuleInfo& INFO(PCLIB);
-		NOD() PCLIB GetHandle() const noexcept;
+		NOD() static Ptr<Module> CREATE(const Ptr<CRuntime>&, SharedLibrary);
+		static void UNLOAD(SharedLibrary);
+		NOD() static const ModuleInfo& INFO(SharedLibrary);
+		NOD() SharedLibrary GetHandle() const noexcept;
 
 	private:
 		// Reference to the actual module, as loaded by the OS				
-		PCLIB	mLibraryHandle = 0;
+		SharedLibrary	mLibraryHandle = 0;
 		// Runtime that owns the module instance									
 		Own<CRuntime*> mRuntime;
 	};
@@ -64,22 +64,22 @@ namespace Langulus::Entity
 	///	Module information																	
 	///																								
 	struct ModuleInfo {
-		// Priority of the module														
-		pcr32 mPriority = 0;
+		// Define the order in which module updates, relative to others	
+		Real mPriority = 0;
 		// Name of the module															
-		LiteralText mName;
+		Token mName;
 		// Information about the module												
-		LiteralText mInfo;
+		Token mInfo;
 		// Module file depo																
-		LiteralText mDepository;
+		Token mDepository;
 		// Module abstract type															
-		DataID mAbstractModule = DataID::Of<AModule>;
+		DMeta mCategory {};
 	};
 
 
 	/// Convenience macro for implementing module entry and exit points			
 	#define LANGULUS_DEFINE_MODULE(module) \
-		AModule* LANGULUS_MODULE_CREATOR (CRuntime* system, PCFW::PCLIB handle) {\
+		AModule* LANGULUS_MODULE_CREATOR (CRuntime* system, PCFW::SharedLibrary handle) {\
 			static_assert(!pcIsAbstract<module>, "Langulus module " #module " is abstract, have you forgotten to define its interface?"); \
 			return new module(system, handle);\
 		}\
@@ -97,7 +97,7 @@ namespace Langulus::Entity
 		const PCFW::ModuleInfo gsModuleInfo = {prio, name, info, depo, DataID::Of<abst>};\
 		extern "C" {\
 			LANGULUS_EXPORT() void LANGULUS_MODULE_LINKER ();\
-			LANGULUS_EXPORT() AModule* LANGULUS_MODULE_CREATOR (CRuntime*, PCFW::PCLIB);\
+			LANGULUS_EXPORT() AModule* LANGULUS_MODULE_CREATOR (CRuntime*, PCFW::SharedLibrary);\
 			LANGULUS_EXPORT() const PCFW::ModuleInfo& LANGULUS_MODULE_INFO ();\
 			LANGULUS_EXPORT() void LANGULUS_MODULE_DESTROYER ();\
 		}
