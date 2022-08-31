@@ -10,27 +10,32 @@ namespace Langulus::Entity
 
 
 	///																								
-	///	RUNTIME COMPONENT																		
+	///	Runtime																					
 	///																								
-	/// Handles loading and unloading of modules, dispatches verbs to modules	
-	/// Handles overall system state and console input									
+	///	Handles loading and unloading of modules, dispatches verbs to			
+	/// modules, handles overall system state and console input. Overall, it	
+	/// takes care of the minimally required OS aspect of running a program.	
+	///	You can view a Runtime as a single process inside Langulus. You can	
+	/// create infinite nested subprocesses in any Entity. Each new runtime		
+	/// will act as the environment for that Entity, as well as all of its		
+	/// children, modules, units, etc.														
 	///																								
-	class Runtime {
+	class Runtime final {
 	public:
 		Runtime();
 		Runtime(Runtime&&) noexcept = default;
 		~Runtime();
 
 	public:
-		SharedLibrary LoadPCLIB(const Path&);
-		void UnloadPCLIB(SharedLibrary);
+		SharedLibrary LoadSharedLibrary(const Path&);
+		void UnloadSharedLibrary(SharedLibrary);
 
-		void InstantiateModule(const Construct&, TAny<AModule*>&);
+		Module* InstantiateModule(const Construct&);
 
-		NOD() Ptr<AModule> GetModule(DMeta);
-		NOD() Ptr<const AModule> GetModule(DMeta) const;
-		NOD() Ptr<AModule> GetModule(const Text&);
-		NOD() Ptr<const AModule> GetModule(const Text&) const;
+		NOD() Module* GetModule(DMeta);
+		NOD() const Module* GetModule(DMeta) const;
+		NOD() Module* GetModule(const Token&);
+		NOD() const Module* GetModule(const Token&) const;
 
 		void Update(Time);
 
@@ -39,13 +44,19 @@ namespace Langulus::Entity
 		NOD() AFolder* GetFolder(const Path&);
 
 	private:
-		NOD() Ptr<AModule> CreateModule(DMeta);
+		// Loaded shared libraries, indexed by filename							
+		// This is a static registry - all Runtimes use the same shared	
+		// library objects, but manage their own module instantiations		
+		static THashMap<Path, SharedLibrary> mLibraries;
 
-	private:
-		// Loaded modules, sorted by priority										
-		TMap<Real, TAny<AModule*>> mModules;
-		// Double protection for loaded libraries									
-		TMap<Text, SharedLibrary> mLibraries;
+		// Instantiated modules, sorted by priority								
+		TMap<Real, TAny<Module*>> mModules;
+		// Instantiated modules, indexed by library handles					
+		THashMap<SharedLibrary, TAny<Module*>> mInstantiations;
+		// Instantiated modules, indexed by concrete type						
+		THashMap<DMeta, TAny<Module*>> mConcreteModules;
+		// Instantiated modules, indexed by category								
+		THashMap<DMeta, TAny<Module*>> mCategories;
 	};
 
 } // namespace Langulus::Entity

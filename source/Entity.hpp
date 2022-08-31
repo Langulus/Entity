@@ -6,6 +6,42 @@
 #define ENTITY_CREATION_VERBOSE_SELF(a) //pcLogSelfVerbose << a
 #define ENTITY_SELECTION_VERBOSE_SELF(a) //pcLogSelfVerbose << a
 
+namespace Langulus::Traits
+{
+
+	/// Trait trait, used to access traits in aggregate types, like Entity		
+	struct Trait : public StaticTrait<Trait> {
+		using StaticTrait::StaticTrait;
+		using StaticTrait::operator =;
+	};
+
+	/// Runtime trait, used to access runtime interface in hierarchy				
+	struct Runtime : public StaticTrait<Runtime> {
+		using StaticTrait::StaticTrait;
+		using StaticTrait::operator =;
+	};
+
+	/// Unit trait, used to access units in aggregate types, like Entity			
+	struct Unit : public StaticTrait<Unit> {
+		using StaticTrait::StaticTrait;
+		using StaticTrait::operator =;
+	};
+
+	/// Child trait, used to access children in hierarchies							
+	struct Child : public StaticTrait<Child> {
+		using StaticTrait::StaticTrait;
+		using StaticTrait::operator =;
+	};
+
+	/// Parent trait, used to access parents in hierarchies							
+	struct Parent : public StaticTrait<Parent> {
+		using StaticTrait::StaticTrait;
+		using StaticTrait::operator =;
+	};
+
+} // namespace Langulus::Traits
+
+
 namespace Langulus::Entity
 {
 
@@ -16,7 +52,7 @@ namespace Langulus::Entity
 	/// and children/owner's units. An entity is an aggregate of traits,			
 	/// units, and other entities.															
 	///																								
-	class Entity : public Resolvable {
+	class Entity final : public Resolvable {
 	protected:
 		void ResetRuntime(Runtime* = nullptr);
 		Any CreateDependencies(DMeta);
@@ -24,7 +60,7 @@ namespace Langulus::Entity
 		// The entity's parent															
 		Ptr<Entity> mOwner;
 		//	Hierarchy																		
-		TAny<Entity*> mChildren;
+		TAny<Entity> mChildren;
 		// Units																				
 		THashMap<DMeta, TAny<Unit*>> mUnits;
 		// Traits																			
@@ -98,11 +134,11 @@ namespace Langulus::Entity
 		template<CT::Unit T>
 		NOD() const Decay<T>* GetUnit(const Index& = IndexFirst) const;
 
-		NOD() const Unit* GetUnit(const Text&, const Index& = IndexFirst) const;
-		NOD() Unit* GetUnit(const Text&, const Index& = IndexFirst);
+		NOD() const Unit* GetUnit(const Token&, const Index& = IndexFirst) const;
+		NOD() Unit* GetUnit(const Token&, const Index& = IndexFirst);
 
 		template<CT::Unit T>
-		NOD() Decay<T>* GetUnitT(const Text&, const Index& = IndexFirst);
+		NOD() Decay<T>* GetUnitAs(const Token&, const Index& = IndexFirst);
 
 
 		///																							
@@ -113,8 +149,8 @@ namespace Langulus::Entity
 		template<CT::Trait, CT::Data D>
 		Trait* AddTrait(const D&);
 
-		void RemoveTrait(TMeta);
-		void RemoveTrait(const Trait&);
+		Count RemoveTrait(TMeta);
+		Count RemoveTrait(const Trait&);
 
 		NOD() Count HasTraits(TMeta) const;
 		NOD() Count HasTraits(const Trait&) const;
@@ -162,8 +198,8 @@ namespace Langulus::Entity
 		NOD() Entity* GetChild(const Index&);
 		NOD() const Entity* GetChild(const Index&) const;
 
-		NOD() Entity* GetChild(const Text&, const Index&);
-		NOD() const Entity* GetChild(const Text&, const Index&) const;
+		NOD() Entity* GetChild(const Token&, const Index&);
+		NOD() const Entity* GetChild(const Token&, const Index&) const;
 
 		NOD() bool IsFamilyOf(const Entity&) const;
 

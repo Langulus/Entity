@@ -94,13 +94,13 @@ namespace Langulus::Entity
 			GetUnit(MetaData::Of<Decay<T>>(), offset));
 	}
 
-	inline const Unit* Entity::GetUnit(const Text& name, const Index& offset) const {
-		return const_cast<Entity*>(this)->GetUnit(name, offset);
+	inline const Unit* Entity::GetUnit(const Token& token, const Index& offset) const {
+		return const_cast<Entity*>(this)->GetUnit(token, offset);
 	}
 
 	template<CT::Unit T>
-	Decay<T>* Entity::GetUnitT(const Text& name, const Index& offset) {
-		return static_cast<Decay<T>*>(GetUnit(name, offset));
+	Decay<T>* Entity::GetUnitAs(const Token& token, const Index& offset) {
+		return static_cast<Decay<T>*>(GetUnit(token, offset));
 	}
 
 	template<CT::Trait T, CT::Data D>
@@ -166,7 +166,7 @@ namespace Langulus::Entity
 	///	@param name - the name trait to search for									
 	///	@param offset - the offset of the matching entity to return				
 	///	@return the child or nullptr if none found									
-	inline const Entity* Entity::GetChild(const Text& name, const Index& offset) const {
+	inline const Entity* Entity::GetChild(const Token& name, const Index& offset) const {
 		return const_cast<Entity*>(this)->GetChild(name, offset);
 	}
 

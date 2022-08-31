@@ -5,28 +5,19 @@ namespace Langulus::Entity
 {
 
 	/// Predeclarations																			
-	class AModule;
-	class CRuntime;
-	struct ModuleInfo;
 
-	/// Library handle																			
-	using SharedLibrary = intptr_t;
-
-	/// Entry and exit templates																
-	/// The module entry point receives the current system and a handle to		
-	/// the shared library																		
-	using ModuleLinkPointPtr = void (*)();
-	using ModuleCreatePointPtr = AModule* (*)(CRuntime*, SharedLibrary);
-	using ModuleInfoPointPtr = const ModuleInfo& (*)();
-	using ModuleExitPointPtr = void (*)();
+	class Module;
+	class Runtime;
 
 
 	///																								
-	///	ABSTRACT MODULE																		
+	///	External module interface															
 	///																								
 	class Module : public Resolvable {
 	public:
-		Module(DMeta, CRuntime*, SharedLibrary) noexcept;
+		Module(DMeta classid, Runtime* runtime) noexcept
+			: Resolvable {classid}
+			, mRuntime {runtime} {}
 
 		/// Never allow construction of uninitialized modules							
 		Module() = delete;
@@ -36,44 +27,39 @@ namespace Langulus::Entity
 		Module& operator = (const Module&) noexcept = default;
 		Module& operator = (Module&&) noexcept = default;
 
+		struct ModuleInfo {
+			// Define the order in which module updates, relative to others
+			Real mPriority = 0;
+			// Name of the module														
+			Token mName;
+			// Information about the module											
+			Token mInfo;
+			// Relative module dedicated file folder, under Data/Modules/	
+			Token mDepository;
+			// Module abstract type														
+			DMeta mCategory {};
+		};
+
+		using EntryPoint = void (*)();
+		using CreatePoint = Module* (*)(Runtime*, const Any&);
+		using InfoPoint = const ModuleInfo& (*)();
+		using ExitPoint = void (*)();
+
 	public:
 		virtual void Update(Time) = 0;
 
-	public:
-		NOD() static SharedLibrary LOAD(
-			const Path&, 
-			ModuleLinkPointPtr&, 
-			ModuleInfoPointPtr&, 
-			ModuleExitPointPtr&
-		);
-
-		NOD() static Ptr<Module> CREATE(const Ptr<CRuntime>&, SharedLibrary);
-		static void UNLOAD(SharedLibrary);
-		NOD() static const ModuleInfo& INFO(SharedLibrary);
-		NOD() SharedLibrary GetHandle() const noexcept;
-
 	private:
-		// Reference to the actual module, as loaded by the OS				
-		SharedLibrary	mLibraryHandle = 0;
 		// Runtime that owns the module instance									
-		Own<CRuntime*> mRuntime;
+		Runtime* mRuntime;
 	};
 
-
-	///																								
-	///	Module information																	
-	///																								
-	struct ModuleInfo {
-		// Define the order in which module updates, relative to others	
-		Real mPriority = 0;
-		// Name of the module															
-		Token mName;
-		// Information about the module												
-		Token mInfo;
-		// Module file depo																
-		Token mDepository;
-		// Module abstract type															
-		DMeta mCategory {};
+	/// Library handle																			
+	struct SharedLibrary {
+		intptr_t mHandle {};
+		Module::EntryPoint mEntry;
+		Module::CreatePoint mCreator;
+		Module::InfoPoint mInfo;
+		Module::ExitPoint mExit;
 	};
 
 
