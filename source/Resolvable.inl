@@ -89,4 +89,16 @@ namespace Langulus::Entity
 		return Block {DataState::Static, mClassType, 1, offsetd};
 	}
 
+	/// Invoke a verb on the resolved type													
+	///	@tparam DISPATCH - whether to allow custom dispatchers					
+	///	@tparam DEFAULT - whether to allow default/stateless verbs on fail	
+	///	@tparam V - type of verb to run (deducible)									
+	///	@param verb - the verb to execute in this resolved type					
+	///	@return true if verb was satisfied												
+	template<bool DISPATCH, bool DEFAULT, CT::Verb V>
+	bool Resolvable::Run(V& verb) {
+		auto environment = GetBlock();
+		return Flow::DispatchFlat<false, DISPATCH, DEFAULT>(environment, verb);
+	}
+
 } // namespace Langulus::Entity

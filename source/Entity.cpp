@@ -1,6 +1,12 @@
 #include "Entity.hpp"
 #include "Runtime.hpp"
 
+#define ENTITY_VERBOSE_SELF(a)				//Logger::Verbose() << this << ": "<< a
+#define ENTITY_VERBOSE(a)						//Logger::Append() << a
+#define ENTITY_CREATION_VERBOSE_SELF(a)	//Logger::Verbose() << this << ": " <<a
+#define ENTITY_SELECTION_VERBOSE_SELF(a)	//Logger::Verbose() << this << ": " <<a
+
+
 namespace Langulus::Entity
 {
 
@@ -35,7 +41,9 @@ namespace Langulus::Entity
 	///	@return true if entities are functionally same, that is, they have	
 	///			  the exact same behavior (actual state is ignored)				
 	bool Entity::operator == (const Entity& other) const {
-		return mChildren == other.mChildren && mUnits == other.mUnits && mTraits == other.mTraits;
+		return mChildren == other.mChildren
+			&& mUnits == other.mUnits
+			&& mTraits == other.mTraits;
 	}
 
 	/// Convert to text, by writing a short name or address							
@@ -76,10 +84,10 @@ namespace Langulus::Entity
 		}
 	}
 
-	/// Execute a piece of code in the closest possible temporal flow				
+	/// Execute a piece of langulus Code in the closest possible temporal flow	
 	///	@param code - the code to execute												
 	///	@return the results of the code													
-	Any Entity::RunCode(const Flow::Code& code) {
+	Any Entity::Run(const Code& code) {
 		if (code.IsEmpty())
 			return {};
 
@@ -89,7 +97,8 @@ namespace Langulus::Entity
 
 		Any output;
 		if (!parsed.Execute(context, output)) {
-			Logger::Error() << "RunCode failed to execute " << parsed;
+			Logger::Error()
+				<< "RunCode failed to execute: [" << parsed << ']';
 			return {};
 		}
 
@@ -100,31 +109,29 @@ namespace Langulus::Entity
 	/// This function completely relies on external modules							
 	///	@param text - text to execute														
 	///	@return true if the text was successfully executed							
-	Any Entity::RunSpeech(const Text& text) {
+	Any Entity::Run(const Lingua& text) {
 		if (text.IsEmpty())
-			return true;
+			return {};
 
-		//TODO do this with higher level functions, entity should never know anything about units
-		// Find an AI interpreter and a flow										
-		/*auto mind = SeekUnit<AUnitAI>(SeekStyle::UpToHere);
-		if (!mind) {
-			pcLogSelfError << "No AI unit found - can't parse natural speech: \"" << text << "\"";
-			return false;
+		if (!GetFlow()) {
+			Logger::Error()
+				<< "Message not interpreted due to lack of temporal flow: ["
+				<< text << ']';
+			return {};
 		}
 
-		// Interpret the text into a flow											
-		auto flow = SeekUnit<CFlow>(SeekStyle::UpToHere);
-		if (!flow) {
-			pcLogSelfError << "No CFlow unit found - can't build temporal flows";
-			return false;
+		// Create message objects from the hierarchy, and try					
+		// interpreting them to executable scopes									
+		auto messages = CreateData<Lingua>();
+		auto interpreter = Verbs::InterpretTo<Flow::Scope>();
+		if (!Flow::DispatchFlat(messages, interpreter)) {
+			Logger::Error()
+				<< "Messages failed to interpret: " << messages;
+			return {};
 		}
-
-		mind->DoAIAD(text, *flow);
 
 		// Execute the flow																
-		auto classBlock = GetBlock();
-		flow->Execute(classBlock);
-		return true;*/
+		return Run(interpreter.GetOutput());
 	}
 
 	/// Update all children's Runtime(s) and Temporal(s)								
@@ -199,18 +206,38 @@ namespace Langulus::Entity
 	///	@param offset - offset of result to use										
 	///	@return true if anything was found												
 	bool Entity::GetTrait(TMeta id, Trait& output, const Index& offset) {
-		return GetTrait(Trait(id), output, offset);
+		return GetTrait(Trait {id}, output, offset);
 	}
 
 	/// Get a trait from this entity's trait list										
 	///	@param id - the trait to search for												
-	///	@param offset - the index of the trait we seek								
+	///	@param index - the index of the trait we seek								
 	///	@return a pointer to the trait, or nullptr if not found					
-	Trait* Entity::GetLocalTrait(TMeta id, const Index& offset) {
-		const auto found = mTraits.FindKeyIndex(id);
-		if (found)
-			return &mTraits.GetValue(found)[offset];
-		return nullptr;
+	Trait* Entity::GetLocalTrait(TMeta id, const Index& index) {
+		if (id) {
+			// Search a typed trait														
+			const auto found = mTraits.FindKeyIndex(id);
+			if (found)
+				return &mTraits.GetValue(found)[index];
+			return nullptr;
+		}
+
+		// Search trait by index														
+		Trait* found {};
+		if (index.IsArithmetic()) {
+			auto offset = index.GetOffset();
+			mTraits.ForEachValue([&](TAny<Trait>& list) noexcept {
+				if (offset < list.GetCount()) {
+					found = &list[offset];
+					return false;
+				}
+
+				offset -= list.GetCount();
+				return true;
+			});
+		}
+
+		return found;
 	}
 
 	/// Get a trait from the entity's trait list	(const)								
@@ -221,79 +248,65 @@ namespace Langulus::Entity
 		return const_cast<Entity&>(*this).GetLocalTrait(id, offset);
 	}
 
-	/// Get a trait by trait contents														
+	/// Get a trait by type and contents													
 	///	@param id - trait to match															
 	///	@param output - [out] result of the search									
 	///	@param offset - offset of result to use										
 	///	@return true if anything was found												
-	bool Entity::GetTrait(const Trait& id, Trait& output, const Index& offset) {
-		if (!id.GetTrait() || id.TraitIs<Traits::Trait>()) {
-			// Type is invalid, so use only offset									
-			if (offset.IsValid() && offset < mTraits.GetCount()) {
-				output = mTraits[offset];
+	bool Entity::GetTrait(const Trait& id, Trait& output, const Index& index) {
+		if (id.GetTrait()) {
+			if (id.TraitIs<Traits::Unit>()) {
+				// Get a component														
+				auto unit = GetUnit(nullptr, index);
+				if (unit) {
+					output = Traits::Unit {unit};
+					return true;
+				}
+
+				return false;
+			}
+			else if (id.TraitIs<Traits::Child>()) {
+				// Get a child entity													
+				auto child = GetChild(index);
+				if (child) {
+					output = Traits::Child {child};
+					return true;
+				}
+
+				return false;
+			}
+			else if (id.TraitIs<Traits::Runtime>()) {
+				// Get the nearest runtime												
+				output = Traits::Runtime {mRuntime};
 				return true;
 			}
-
-			return false;
-		}
-		else if (id.TraitIs<Traits::Runtime>()) {
-			// Get the nearest system component										
-			auto system = GetRuntime(offset);
-			if (system) {
-				output = Traits::Runtime {system};
+			else if (id.TraitIs<Traits::Parent>()) {
+				// Get the parent															
+				output = Traits::Parent {mOwner.Get()};
 				return true;
 			}
-
-			return false;
-		}
-		else if (id.TraitIs<Traits::Unit>()) {
-			// Get a component															
-			auto unit = GetUnit(nullptr, offset);
-			if (unit) {
-				output = Traits::Unit {unit};
-				return true;
-			}
-
-			return false;
-		}
-		else if (id.TraitIs<Traits::Child>()) {
-			// Get a child entity														
-			auto child = GetChild(offset);
-			if (child) {
-				output = Traits::Child {child};
-				return true;
-			}
-
-			return false;
 		}
 
-		// If type is valid, seek the offsetted trait							
-		output = id;
-
-		// First check traits															
-		if (offset.IsSpecial())
-			Throw<Except::Access>("Can't get trait with bad offset");
-
-		auto found = GetLocalTrait(id.GetTrait(), offset);
+		// Check dynamic traits in the entity										
+		auto found = GetLocalTrait(id.GetTrait(), index);
 		if (found) {
 			output = *found;
 			return true;
 		}
 
 		// Then check each unit's static traits									
-		pcptr idx = static_cast<pcptr>(offset);
-		for (auto unit : mUnits) {
-			auto t = unit->GetBlock().GetMember(id.GetTraitMeta(), idx);
-			if (t.IsAllocated()) {
-				output = t;
-				return true;
+		mUnits.ForEachValue([&](Unit* unit) {
+			auto t = unit->GetMember(id.GetTrait(), index);
+			if (!t.IsEmpty()) {
+				output = Trait {id.GetTrait(), t};
+				return;
 			}
-		}
+		});
 
 		// Finally, check this entity's static traits							
-		auto t = GetBlock().GetMember(id.GetTraitMeta(), idx);
-		if (t.IsAllocated()) {
-			output = t;
+		auto t = GetMember(id.GetTrait(), index);
+		if (!t.IsEmpty()) {
+			output = Trait {id.GetTrait(), t};
 			return true;
 		}
 
@@ -306,33 +319,31 @@ namespace Langulus::Entity
 	///	@param type - the type of the unit												
 	///	@param offset - the unit index to seek											
 	///	@return the unit if found, or nullptr if not									
-	Unit* Entity::GetUnit(DMeta type, const Index& offset) {
-		if (!type && offset.IsValid())
-			return mUnits[offset];
-
-		// If type is valid, seek the offsetted component						
-		if (offset.IsReverse()) {
-			Index matches = -1;
-			for (Unit* unit : mUnits.Reverse()) {
-				if (unit->ClassInterpretsAs(type)) {
-					if (offset == matches)
-						return unit;
-					--matches;
-				}
-			}
-		}
-		else {
-			Index matches = 0;
-			for (Unit* unit : mUnits) {
-				if (unit->ClassInterpretsAs(type)) {
-					if (offset == matches)
-						return unit;
-					++matches;
-				}
-			}
+	Unit* Entity::GetUnit(DMeta id, const Index& index) {
+		if (id) {
+			// Search a typed trait														
+			const auto found = mUnits.FindKeyIndex(id);
+			if (found)
+				return mUnits.GetValue(found)[index];
+			return nullptr;
 		}
 
-		return nullptr;
+		// Search unit by index															
+		Unit* found {};
+		if (index.IsArithmetic()) {
+			auto offset = index.GetOffset();
+			mUnits.ForEachValue([&](TAny<Unit*>& list) noexcept {
+				if (offset < list.GetCount()) {
+					found = list[offset];
+					return false;
+				}
+
+				offset -= list.GetCount();
+				return true;
+			});
+		}
+
+		return found;
 	}
 
 	/// Get a unit by token and offset														
@@ -347,7 +358,7 @@ namespace Langulus::Entity
 	///	@param id - the index to pick														
 	///	@return the child entity, or nullptr of none was found					
 	Entity* Entity::GetChild(const Index& id) {
-		return mChildren[id];
+		return &mChildren[id];
 	}
 
 	/// Get child by name and offset (searches for Traits::Name in children)	
@@ -356,10 +367,10 @@ namespace Langulus::Entity
 	///	@return the child entity, or nullptr of none was found					
 	Entity* Entity::GetChild(const Token& name, const Index& offset) {
 		Index matches = 0;
-		for (auto child : mChildren) {
-			if (child->GetName() == name) {
+		for (auto& child : mChildren) {
+			if (child.GetName() == name) {
 				if (matches == offset)
-					return child;
+					return &child;
 				++matches;
 			}
 		}
@@ -367,39 +378,55 @@ namespace Langulus::Entity
 		return nullptr;
 	}
 
-	/// Do a cascading runtime shortcut reset												
+	/// Do a cascading runtime reset - all children that do not have own			
+	/// runtime, will incorporate the provided one										
+	///	@param newrt - the new runtime to set											
 	void Entity::ResetRuntime(Runtime* newrt) {
+		if (mOwnRuntime)
+			return;
+
 		mRuntime = newrt;
-		for (auto child : mChildren)
-			child->ResetRuntime(newrt);
+		for (auto& child : mChildren)
+			child.ResetRuntime(newrt);
+	}
+
+	/// Do a cascading temporal flow reset - all children that do not have own	
+	/// flow, will incorporate the provided one											
+	///	@param newrt - the new flow to set												
+	void Entity::ResetFlow(Temporal* newflow) {
+		if (mOwnFlow)
+			return;
+
+		mFlow = newflow;
+		for (auto& child : mChildren)
+			child.ResetFlow(newflow);
 	}
 
 	/// Add a new unit to the entity 														
-	/// You can duplicate units, as long as they have unique addresses			
+	/// Adding units, coupled with different runtimes is not allowed				
+	/// You can not duplicate unit pointers												
 	///	@param unit - the unit to add														
 	///	@return 1 if unit has been added													
 	Count Entity::AddUnit(Unit* unit) {
-		if (mUnits.Find(unit) != uiNone)
+		// Check if pointer is already registered									
+		const auto foundType = mUnits.FindKeyIndex(unit->GetType());
+		if (foundType && mUnits.GetValue(foundType).Find(unit))
 			return 0;
+
+		// We must guarantee, that no unit is coupled to entities with		
+		// different runtimes!															
+		for (auto owners : unit->mOwners) {
+			if (owners->GetRuntime() != GetRuntime())
+				Throw<Except::Access>(
+					"Coupling a unit to multiple runtimes is not allowed");
+		}
 
 		// Log self before unit being added, it might change name			
 		ENTITY_VERBOSE_SELF("");
 		unit->mOwners << this;
-		mUnits << unit;
-		unit->Reference(1);
-
-		// Do the second creation stage for the unit								
-		unit->Refresh();
-		
-		// And notify the owner, that all their components should be		
-		// notified about the newly added unit										
+		mUnits[unit->GetType()] << unit;
 		mRefreshRequired = true;
-
-		ENTITY_VERBOSE(mUnits.Last() << " added");
-		ENTITY_VERBOSE(" (now " << *this << ")");
-
-		if (unit->ClassIs<CRuntime>())
-			ResetRuntime(dynamic_cast<CRuntime*>(unit));
+		ENTITY_VERBOSE(unit << " added");
 		return 1;
 	}
 
@@ -407,40 +434,41 @@ namespace Langulus::Entity
 	///	@param unit - unit to remove from the entity									
 	///	@return 1 if unit has been removed												
 	Count Entity::RemoveUnit(Unit* unit) {
-		ENTITY_VERBOSE_SELF(unit << " removed");
-		const auto removed = mUnits.Remove(unit);
-		if (removed > 0) {
-			if (unit->ClassIs<CRuntime>())
-				ResetRuntime();
+		const auto foundType = mUnits.FindKeyIndex(unit->GetType());
+		if (foundType) {
+			const auto removed = mUnits.GetValue(foundType).RemoveValue(unit);
+			if (removed) {
+				// Decouple before unit is destroyed								
+				unit->mOwners.Remove(this);
 
-			unit->Reference(-1);
-
-			// Log self before unit being removed, it might change name		
-			unit->mOwners.Remove(this);
-
-			// Notify all other units in the owner of the change				
-			mRefreshRequired = true;
-			ENTITY_VERBOSE(" (now " << *this << ")");
+				// Notify all other units about the environment change		
+				mRefreshRequired = true;
+				ENTITY_VERBOSE_SELF(unit << " removed");
+			}
 		}
 
-		return removed;
+		return 0;
 	}
 
 	/// Replace one unit instance with another - used when moving units			
+	///	@attention assumes both units are different and not nullptr				
 	///	@param replaceThis - the unit to replace										
 	///	@param withThis - the unit to replace with									
 	void Entity::ReplaceUnit(Unit* replaceThis, Unit* withThis) {
-		if (replaceThis == withThis || !replaceThis || !withThis)
+		const auto foundType = mUnits.FindKeyIndex(replaceThis->GetType());
+		if (!foundType)
 			return;
 
-		auto found = mUnits.Find(replaceThis);
-		if (found.IsSpecial())
+		auto& list = mUnits.GetValue(foundType);
+		const auto foundUnit = list.Find(replaceThis);
+		if (!foundUnit)
 			return;
-		
-		auto element = mUnits[pcptr(found.mIndex)];
-		element->Reference(-1);
-		element = withThis;
-		withThis->Reference(1);
+
+		list[foundUnit] = withThis;
+		replaceThis->mOwners.Remove(this);
+		withThis->mOwners << this;
+		mRefreshRequired = true;
+		ENTITY_VERBOSE_SELF(replaceThis << " replaced with " << withThis);
 	}
 
 	/// Count the number of matching units in this entity								
@@ -449,72 +477,6 @@ namespace Langulus::Entity
 	Count Entity::HasUnits(DMeta type) const {
 		const auto found = mUnits.FindKeyIndex(type);
 		return found ? mUnits.GetValue(found).GetCount() : 0;
-	}
-
-	/// Collects all units of the given description inside the hierarchy			
-	///	@param seek - the seeking style													
-	///	@param meta - the unit to seek for												
-	///	@return the gathered units															
-	Any Entity::GatherUnits(SeekStyle seek, DMeta meta) const {
-		Any result;
-
-		// Seek here if requested														
-		if (seek & SeekStyle::Here) {
-			for (auto unit : mUnits) {
-				if (unit->ClassInterpretsAs(meta))
-					result << unit;
-			}
-		}
-
-		// Seek in parents up to root, if requested								
-		if (seek & SeekStyle::Backward && mOwner) {
-			Any inParents = mOwner->GatherUnits(SeekStyle::UpToHere, meta);
-			result.SmartPush(inParents);
-		}
-
-		// Seek children, if requested												
-		if (seek & SeekStyle::Forward) {
-			for (const auto child : mChildren) {
-				Any inChildren = child->GatherUnits(SeekStyle::DownFromHere, meta);
-				result.SmartPush(inChildren);
-			}
-		}
-
-		return result;
-	}
-
-	/// Find a unit, searching into the hierarchy										
-	///	@param seek - the seeking style													
-	///	@param meta - the unit to seek for												
-	///	@param offset - unit offset to take												
-	///	@return the found unit, or nullptr if no such unit was found			
-	Unit* Entity::SeekUnit(SeekStyle seek, DMeta meta, const Index& offset) {
-		Unit* result = nullptr;
-
-		// Seek here if requested														
-		if (seek & SeekStyle::Here) {
-			result = GetUnit(meta, offset);
-			if (result)
-				return result;
-		}
-
-		// Seek in parents up to root, if requested								
-		if (seek & SeekStyle::Backward && mOwner) {
-			result = mOwner->SeekUnit(SeekStyle::UpToHere, meta, offset);
-			if (result)
-				return result;
-		}
-
-		// Seek children, if requested												
-		if (seek & SeekStyle::Forward) {
-			for (auto child : mChildren) {
-				result = child->SeekUnit(SeekStyle::DownFromHere, meta, offset);
-				if (result)
-					return result;
-			}
-		}
-
-		return nullptr;
 	}
 
 	/// Add a new trait to the universal entity 											
@@ -585,55 +547,10 @@ namespace Langulus::Entity
 		return counter;
 	}
 
-	/// Find a trait, searching into the hierarchy (const)							
-	///	@param seek - direction to search at											
-	///	@param var - the trait to search for											
-	///	@param output - found traits go there											
-	///	@param offset - the offset to apply												
-	///	@return true if anything matching was found									
-	bool Entity::SeekTrait(SeekStyle seek, TMeta var, Trait& output, const Index& offset) const {
-		// Seek here if requested														
-		if (seek & SeekStyle::Here && GetTrait(var, output))
-			return true;
-
-		// Seek in parents up to root, if requested								
-		if (seek & SeekStyle::Above && mOwner) {
-			if (mOwner->SeekTrait(SeekStyle::UpToHere, var, output, offset))
-				return true;
-		}
-
-		// Seek children, if requested												
-		if (seek & SeekStyle::Below) {
-			for (const auto child : mChildren) {
-				if (child->SeekTrait(SeekStyle::DownFromHere, var, output, offset))
-					return true;
-			}
-		}
-
-		return false;
-	}
-
-	/// Find a trait, searching into the hierarchy										
-	///	@param seek - direction to search at											
-	///	@param var - the trait to search for											
-	///	@param output - found traits go there											
-	///	@param offset - the offset to apply												
-	///	@return true if anything matching was found									
-	bool Entity::SeekTrait(SeekStyle seek, TMeta var, Trait& output, const Index& offset) {
-		return const_cast<const Entity*>(this)->SeekTrait(seek, var, output, offset);
-	}
-
-	/// Get a runtime component from the hierarchy										
-	///	@param offset - the unit offset													
-	///	@return the pointer to the runtime component									
-	Runtime* Entity::GetRuntime(const Index& offset) {
-		if (offset == uiFirst && mRuntime)
-			return mRuntime;
-
-		auto result = SeekUnit<CRuntime>(SeekStyle::UpToHere, offset);
-		if (result && offset == uiFirst)
-			mRuntime = result;
-		return result;
+	/// Get the current runtime																
+	///	@return the pointer to the runtime 												
+	Runtime* Entity::GetRuntime() {
+		return mRuntime.Get();
 	}
 
 	/// Add/overwrite entity's name trait													
@@ -651,56 +568,28 @@ namespace Langulus::Entity
 	///	@return the name, or empty string if no such trait was found here		
 	Text Entity::GetName() const {
 		Text name;
-		if (!SeekValue<Traits::Name>(SeekStyle::Here, name))
+		if (!SeekValue<SeekStyle::Here, Traits::Name>(name))
 			return {};
 		return name;
 	}
 
-	/// Execute verb in hierarchy																
-	///	@param doWhat - the verb to execute												
-	///	@param seek - where in the hierarchy to execute								
-	///	@return true if succesfully executed											
-	bool Entity::DoInHierarchy(Verb& doWhat, SeekStyle seek) {
-		// Execute in owners directly													
-		if (seek & SeekStyle::Here) {
-			Do(doWhat);
-			if (doWhat.IsDone())
-				return true;
-		}
-
-		// Execute in parents up to root, if requested							
-		if (seek & SeekStyle::Above && mOwner) {
-			mOwner->DoInHierarchy(doWhat, SeekStyle::UpToHere);
-			if (doWhat.IsDone())
-				return true;
-		}
-
-		// Execute in children, if requested										
-		if (seek & SeekStyle::Below) {
-			for (auto child : mChildren) {
-				child->DoInHierarchy(doWhat, SeekStyle::DownFromHere);
-				if (doWhat.IsDone())
-					return true;
-			}
-		}
-
-		return doWhat.IsDone();
-	}
-
-	/// Custom dispatcher, relfected via CT::Dispatcher								
+	/// Custom dispatcher, reflected via CT::Dispatcher								
 	/// Entity is a composite type, and its behavior depends on the coupled		
-	/// units, so the custom dispatcher executes verbs inside these units		
+	/// units, so the custom dispatcher forwards verbs to these units				
 	///	@param verb - any verb																
 	void Entity::Do(Verb& verb) {
-		// Dispatch to this first, using reflected and default verbs		
-		auto thisBlock = GetBlock();
-		if (Verb::DispatchFlat(thisBlock, verb, false, false))
+		// Dispatch to entity first, using reflected and default verbs,	
+		// but disallowing custom dispatch, because we're currently in it	
+		// and there's a potential for infinite regress							
+		if (Resolvable::Run<false>(verb))
 			return;
 
 		// If verb is still not satisfied, dispatch to ALL units				
-		Verb verbCopy {verb};
-		if (Flow::DispatchFlat(mUnits, verbCopy.ShortCircuit(false)))
-			verb << Abandon(verbCopy.GetOutput());
+		mUnits.ForEachValue([&](Unit* unit) {
+			Verb local {verb};
+			if (unit->Run(local.ShortCircuit(false)))
+				verb << Abandon(local.GetOutput());
+		});
 	}
 
 	/// Create/Destroy stuff inside entity's context									
@@ -715,47 +604,48 @@ namespace Langulus::Entity
 		TAny<Entity*> createdChildren;
 
 		const auto create = [&](const Construct& construct) {
-			const auto count = pcptr(construct.GetCharge().mMass);
-			for (pcptr i = 0; i < count; ++i) {
+			const auto count = static_cast<Count>(construct.GetCharge().mMass);
+			for (Offset i = 0; i < count; ++i) {
 				if (count != 1) {
-					ENTITY_CREATION_VERBOSE_SELF(ccYellow 
+					ENTITY_CREATION_VERBOSE_SELF(Logger::Yellow 
 						<< "Charged creation - creating " << i + 1 << " of " << count);
 				}
 
 				if (construct.Is<Entity>())
 					CreateChild(construct, createdChildren);
-				else if (construct.InterpretsAs<AUnit>())
+				else if (construct.CastsTo<Unit>())
 					CreateUnitInner(construct, createdUnits);
-				else if (construct.InterpretsAs<AModule>())
-					GetRuntime()->InstantiateModule(construct, createdModules);
+				else if (construct.CastsTo<Module>()) {
+					auto created = GetRuntime()->InstantiateModule(construct);
+					if (created)
+						createdModules << created;
+				}
 			}
 		};
 
 		// Scan the request																
 		verb.ForEachDeep([&](const Block& group) {
 			group.ForEach(
-				[this, &createdTraits](const Trait& trait) {
+				[&](const Trait& trait) {
 					ENTITY_CREATION_VERBOSE_SELF(
-						"Creating: " << ccYellow << trait);
+						"Creating: " << Logger::Yellow << trait);
 					createdTraits << AddTrait(trait);
 				},
-				[this, &create](const Construct& construct) {
+				[&](const Construct& construct) {
 					if (construct.GetCharge().mMass > 0) {
 						ENTITY_CREATION_VERBOSE_SELF(
-							"Creating: " << ccYellow << construct);
+							"Creating: " << Logger::Yellow << construct);
 						create(construct);
 					}
-					else TODO();
 				},
-				[this, &create](const MetaData* type) {
+				[&](const MetaData* type) {
 					ENTITY_CREATION_VERBOSE_SELF(
-						"Creating: " << ccYellow << type->mToken);
+						"Creating: " << Logger::Yellow << type->mToken);
 					create(Construct(type));
 				}
 			);
 		});
 
-		// Output and satisfy verb														
 		verb << createdTraits;
 		verb << createdUnits;
 		verb << createdModules;
@@ -802,30 +692,29 @@ namespace Langulus::Entity
 			if (construct.Is<Entity>()) {
 				// Find an entity containing construct arguments				
 				// Start with this one													
-				auto selector = Verb::From<Verbs::Select>({}, construct.GetAll());
+				auto selector = Verbs::Select {construct.GetArgument()};
 				Select(selector);
 				if (!selector.GetOutput().IsEmpty()) {
 					selectedEntities << this;
 					return true;
 				}
 			}
-			else if (construct.InterpretsAs<AUnit>()) {
+			else if (construct.CastsTo<Unit>()) {
 				// Find a unit containing construct arguments					
-				if (!selectUnit(construct.GetMeta()))
+				if (!selectUnit(construct.GetType()))
 					return false;
 
 				// selectedComponents has been populated with results			
 				// Filter them additionally by construct arguments				
-				TAny<AUnit*> filteredSelectedComponents;
+				TAny<Unit*> filteredSelectedComponents;
 				for (auto& unit : selectedUnits) {
 					bool localMismatch = false;
 					auto unitBlock = unit->GetBlock();
-					construct.GetAll().ForEachDeep([&](const Block& part) {
-						for (pcptr i = 0; i < part.GetCount(); ++i) {
+					construct.ForEachDeep([&](const Block& part) {
+						for (Offset i = 0; i < part.GetCount(); ++i) {
 							auto element = part.GetElementResolved(i);
-							auto selector = Verb::From<Verbs::Select>({}, element);
-							Verb::DispatchFlat(unitBlock, selector);
-							if (selector.GetOutput().IsEmpty()) {
+							auto selector = Verbs::Select {element};
+							if (!Flow::DispatchFlat(unitBlock, selector)) {
 								// Abort on first failure								
 								localMismatch = true;
 								return false;
@@ -842,7 +731,7 @@ namespace Langulus::Entity
 				}
 
 				// Substitute the selected units with the filtered ones		
-				selectedUnits = pcMove(filteredSelectedComponents);
+				selectedUnits = Move(filteredSelectedComponents);
 			}
 
 			return false;
@@ -870,19 +759,19 @@ namespace Langulus::Entity
 		if (!mismatch) {
 			// We're not seeking an entity, but components/traits				
 			if (!selectedTraits.IsEmpty()) {
-				ENTITY_SELECTION_VERBOSE_SELF(ccGreen 
+				ENTITY_SELECTION_VERBOSE_SELF(Logger::Green 
 					<< "Trait(s) selected: " << selectedTraits);
 				verb << selectedTraits;
 			}
 
 			if (!selectedUnits.IsEmpty()) {
-				ENTITY_SELECTION_VERBOSE_SELF(ccGreen 
+				ENTITY_SELECTION_VERBOSE_SELF(Logger::Green
 					<< "Unit(s) selected: " << selectedUnits);
 				verb << selectedUnits;
 			}
 
 			if (!selectedEntities.IsEmpty()) {
-				ENTITY_SELECTION_VERBOSE_SELF(ccGreen 
+				ENTITY_SELECTION_VERBOSE_SELF(Logger::Green
 					<< "Entity(s) selected: " << selectedEntities);
 				verb << selectedEntities;
 			}
@@ -896,17 +785,16 @@ namespace Langulus::Entity
 	/// Create a child entity via default-construction									
 	///	@return the instance of the child												
 	Entity* Entity::CreateChild() {
-		auto newEntity = Ptr<Entity>::New(this);
-		mChildren << newEntity;
-		ENTITY_VERBOSE_SELF(newEntity << " added");
-		return newEntity;
+		mChildren.Emplace(this);
+		ENTITY_VERBOSE_SELF(mChildren.Last() << " added");
+		return &mChildren.Last();
 	}
 
 	/// Create a child entity via move-construction										
 	///	@param initializer - the entity to move										
 	///	@return the instance of the child												
 	Entity* Entity::CreateChild(Entity&& initializer) {
-		auto newEntity = Ptr<Entity>::New(pcForward<Entity>(initializer));
+		auto newEntity = Ptr<Entity>::New(Forward<Entity>(initializer));
 		mChildren << newEntity;
 		ENTITY_VERBOSE_SELF(newEntity << " added");
 		return newEntity;

@@ -32,6 +32,16 @@ namespace Langulus::Entity
 			owner->Select(verb);
 	}
 
+	/// Get the runtime																			
+	///	@attention assumes units are correctly coupled and coupling to			
+	///				  different runtimes is never allowed by Entity					
+	///	@return a pointer to the runtime, if available								
+	Runtime* Unit::GetRuntime() noexcept {
+		for (auto owner : mOwners)
+			return owner->GetRuntime();
+		return nullptr;
+	}
+
 	/// Move operator																				
 	///	@param other - unit to move														
 	Unit& Unit::operator = (Unit&& other) noexcept {
@@ -63,32 +73,14 @@ namespace Langulus::Entity
 	}
 
 	/// Replace one owner instance with another (used when moving entities)		
+	///	@attention assumes both pointers are different, and not nullptr		
+	///	@attention - internal function, should be called from Entity			
 	///	@param replaceThis - owner to replace											
 	///	@param withThis - entity to replace it with									
 	void Unit::ReplaceOwner(Entity* replaceThis, Entity* withThis) {
-		if (replaceThis == withThis || !replaceThis || !withThis)
-			return;
-
 		const auto found = mOwners.Find(replaceThis);
 		if (found)
 			mOwners[found] = withThis;
-	}
-
-	/// Get the runtime																			
-	///	@param index - the index of the runtime we seek								
-	///	@return a pointer to the runtime if available								
-	Runtime* Unit::GetRuntime(const Index& index) {
-		if (index == IndexFirst && !mOwners.IsEmpty())
-			return mOwners[0]->GetRuntime();
-
-		Runtime* result = nullptr;
-		for (auto owner : mOwners) {
-			result = owner->GetRuntime(index);
-			if (result)
-				break;
-		}
-
-		return result;
 	}
 
 } // namespace Langulus::Entity

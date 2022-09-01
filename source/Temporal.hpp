@@ -1,8 +1,11 @@
 #pragma once
-#include "Unit.hpp"
+#include "Resolvable.hpp"
 
 namespace Langulus::Entity
 {
+
+	using Flow::Scope;
+
 
 	///																								
 	///	Temporal flow																			
@@ -25,21 +28,23 @@ namespace Langulus::Entity
 	///																								
 	class Temporal final {
 	private:
-		Temporal* mParent;
+		Temporal* mParent {};
 
 		// Increments on each call to Update()										
-		TimePoint mPreviousTime;
-		TimePoint mCurrentTime;
+		TimePoint mPreviousTime = InvalidTimePoint;
+		TimePoint mCurrentTime = InvalidTimePoint;
 
-		// Flow duration in moments, due to verbs added to time stacks		
-		Time mDuration {};
+		// Accumulated flow duration													
+		Time mDuration = InvalidTime;
 
 		// Priority stack																	
-		Any mPriorityStack;
+		Scope mPriorityStack;
+
 		// Verb temporal stack - flows that trigger at given time			
-		THashMap<Time, Temporal*> mTimeStack;
+		TMap<TimePoint, Temporal> mTimeStack;
+
 		// Verb frequency stack - flows that trigger periodically			
-		THashMap<Time, Temporal*> mFrequencyStack;
+		THashMap<Time, Temporal> mFrequencyStack;
 
 	public:
 		Temporal(const Temporal&) = delete;
@@ -61,7 +66,7 @@ namespace Langulus::Entity
 
 		void Reset();
 		void Update(Block&, Time);
-		void Execute(Block&, Time timeOffset = {}, Time timePeriod = {});
+		void Execute(Block&, TimePoint = {}, Time = {});
 	};
 
 } // namespace Langulus::Entity

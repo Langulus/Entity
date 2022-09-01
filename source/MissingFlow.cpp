@@ -39,7 +39,7 @@ namespace Langulus::Entity
 			return true;
 
 		for (auto type : GetFilter()) {
-			if (content.CastsTo(type))
+			if (content.CastsToMeta(type))
 				return true;
 		}
 

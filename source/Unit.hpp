@@ -19,6 +19,8 @@ namespace Langulus::Entity
 	///																								
 	class Unit : public Resolvable {
 	protected:
+		friend class Entity;
+
 		// Entities that are coupled with this unit								
 		TAny<Entity*> mOwners;
 
@@ -39,19 +41,20 @@ namespace Langulus::Entity
 	public:
 		virtual void Refresh() {}
 
-		NOD() Runtime* GetRuntime(const Index& = IndexFirst);
+		NOD() Runtime* GetRuntime() noexcept;
 
-		template<CT::Trait T>
+		template<CT::Trait T, SeekStyle = SeekStyle::UpToHere>
 		Trait SeekTrait() const;
 
-		template<CT::Data T>
+		template<SeekStyle = SeekStyle::UpToHere, CT::Data T>
 		bool SeekValue(TMeta, T&) const;
-
-		template<CT::Trait T, CT::Data D>
+		template<SeekStyle = SeekStyle::UpToHere, CT::Trait T, CT::Data D>
 		bool SeekValue(D&) const;
 
 		template<SeekStyle SEEK = SeekStyle::UpToHere>
 		bool DoInHierarchy(Verb&);
+
+	protected:
 		void Couple(Entity*);
 		void Decouple(Entity*);
 		void ReplaceOwner(Entity*, Entity*);

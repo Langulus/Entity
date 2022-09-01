@@ -3,6 +3,7 @@
 
 #define VERBOSE_TEMPORAL(a) Logger::Verbose() << a
 #define VERBOSE_TEMPORAL_TAB(a) const auto tab = Logger::Verbose() << a << Logger::Tabs{}
+#define VERBOSE_FUTURE(a) 
 
 namespace Langulus::Entity
 {
@@ -92,10 +93,11 @@ namespace Langulus::Entity
 					Any& filter = part.Get<Any>(0);
 					Any content = part.Get<Any>(1);
 
-					if (filter.GetCount() == 1 && !content.Is(filter.Get<DMeta>())) {
-						Logger::Verbose() << "Finalizing " << content << " to " << filter.Get<DMeta>();
-						auto finalized = Any::From(filter.Get<DMeta>());
-						finalized.Allocate(1, true);
+					const auto meta = filter.Get<DMeta>();
+					if (filter.GetCount() == 1 && !content.Is(meta)) {
+						Logger::Verbose() << "Finalizing " << content << " to " << meta;
+						auto finalized = Any::FromMeta(meta);
+						finalized.Allocate<true>(1);
 
 						auto catenator = Verbs::Catenate {content};
 						if (Flow::DispatchFlat<false>(finalized, catenator)) {
@@ -133,7 +135,7 @@ namespace Langulus::Entity
 	///	@param context - the context to execute any verbs							
 	///	@param dt - delta time																
 	void Temporal::Update(Block& context, Time dt) {
-		if (mCurrentTime == 0) {
+		if (mCurrentTime == InvalidTimePoint) {
 			// If we're at the beginning of time - prepare for execution	
 			// This will omit any compilation-stage junk that remains in	
 			// the priority stack - we no longer need it							
@@ -154,7 +156,7 @@ namespace Langulus::Entity
 			//																					
 			Any output;
 			Any localContext {context};
-			if (!Verb::ExecuteScope(localContext, mPriorityStack, output)) {
+			if (!mPriorityStack.Execute(localContext, output)) {
 				// oh-oh - an error occurs												
 				Throw<Except::Flow>("Update failed");
 			}
@@ -181,7 +183,7 @@ namespace Langulus::Entity
 				<< "Flow after execution " << mPriorityStack);
 		}
 
-		if (dt == 0) {
+		if (dt == InvalidTime) {
 			// Avoid updating anything else, if no time had passed			
 			return;
 		}
@@ -191,61 +193,51 @@ namespace Langulus::Entity
 		mCurrentTime += dt;
 
 		// Execute flows that occur periodically									
-		mFrequencyStack.ForEachPair([&](Time& time, Temporal& flow) {
-			if (flow.IsClassDisabled())
-				return;
+		for (auto pair : mFrequencyStack) {
+			pair.mValue.mDuration += dt;
+			if (pair.mValue.mDuration >= pair.mKey) {
+				// Time to execute the periodic flow								
+				pair.mValue.mPreviousTime = mPreviousTime;
+				pair.mValue.mCurrentTime = mCurrentTime;
+				pair.mValue.mDuration -= pair.mKey;
 
-			// Accumulate time in each subflow										
-			flow.mPreviousTime = flow.mCurrentTime;
-			flow.mCurrentTime += dt;
-
-			// Check if it is time to execute a periodic flow					
-			if (flow.mCurrentTime >= time) {
-				// Rewind the flow so that it executes again						
-				const auto remainder = flow.mCurrentTime - time;
-				flow.Reset();
-
-				// ... and execute														
-				flow.Update(context, remainder);
+				// Update the flow														
+				// It might have periodic flows inside								
+				pair.mValue.Update(context, pair.mKey);
 			}
-		});
+		}
 
 		// Execute flows that occur after a given point in time				
-		mTimeStack.ForEachPair([&](Time& time, Temporal& flow) {
-			if (time > mCurrentTime)
-				return false;
+		for (auto pair : mTimeStack) {
+			if (mCurrentTime < pair.mKey)
+				// The time stack is sorted, so no point in continuing		
+				break;
 
 			// Update the time flow														
 			// It might have periodic flows inside									
-			flow.Update(context, dt);
-			return true;
-		});
+			pair.mValue.Update(context, dt);
+		}
 	}
 
 	/// Execute the whole flow in a specific context									
 	///	@param context - context to execute in											
 	///	@param timeOffset - time offset to set before execution					
 	///	@param timePeriod - the period to execute										
-	void Temporal::Execute(Block& context, const PCTime timeOffset, const PCTime timePeriod) {
-		mTimeFromInit = timeOffset;
+	void Temporal::Execute(Block& context, const TimePoint timeOffset, const Time timePeriod) {
+		mCurrentTime = mPreviousTime = timeOffset;
 		Update(context, timePeriod);
 	}
 
 	/// Merge a flow																				
 	///	@param other - the flow to merge with this one								
-	void Temporal::Merge(const CFlow& other) {
-		mPriorityStack.SmartPush(other.mPriorityStack);
-		other.mTimeStack.ForEachPair([&](const PCTime& time, const CFlow& flow) {
-			auto found = mTimeStack.FindKey(time);
-			if (found.IsSpecial()) {
-				// Create a new flow for that time								
-				auto newFlow = Ptr<CFlow>::New(this);
-				mTimeStack.Add(time, newFlow.Get());
-				found = mTimeStack.GetCount() - 1;
-			}
-
-			mTimeStack.GetValue(pcptr(found.mIndex))->Merge(flow);
-		});
+	void Temporal::Merge(const Temporal& other) {
+		mPriorityStack += other.mPriorityStack;
+		for (auto pair : other.mTimeStack) {
+			const auto found = mTimeStack.FindKey(pair.mKey);
+			if (!found)
+				mTimeStack.Insert(pair.mKey, Temporal {this});
+			mTimeStack[pair.mKey].Merge(pair.mValue);
+		};
 	}
 
 	/// Find past points inside a scope														
@@ -326,8 +318,6 @@ namespace Langulus::Entity
 		return result;
 	}
 
-	#define PC_FIND_FUTURE_VERBOSE(a) 
-
 	/// Find future points inside a scope													
 	///	@param scope - the scope to analyze												
 	///	@param priority - the priority under which the scope falls				
@@ -339,7 +329,7 @@ namespace Langulus::Entity
 		const auto pushToFutures = [&]() {
 			// Check if scope is a missing future									
 			if (!scope.IsPast() && scope.IsMissing()) {
-				PC_FIND_FUTURE_VERBOSE(pcLogInput 
+				VERBOSE_FUTURE(Logger::Input()
 					<< "Pushed future point (priority " 
 					<< priority << "): " << scope);
 				auto newPoint = Ptr<MissingPoint>::New(priority, ReinterpretCast<Any>(&scope));
@@ -357,9 +347,9 @@ namespace Langulus::Entity
 			// Scope is deep																
 			// There is no escape from this scope once entered					
 			if (scope.IsOr() && scope.GetCount() > 1) {
-				PC_FIND_FUTURE_VERBOSE(ScopedTab tab; pcLogSpecial 
+				VERBOSE_FUTURE(const auto tab = Logger::Special()
 					<< "Scanning deep fork for future points (<= priority " 
-					<< priority << "): " << scope << tab);
+					<< priority << "): " << scope << Logger::Tabs {});
 
 				// DEEP OR																	
 				// An OR scope represents branches inside the flow				
@@ -384,7 +374,7 @@ namespace Langulus::Entity
 					fork.mRoot = ReinterpretCast<Any>(&scope);
 					fork.mIdentity = ReinterpretCast<Any>(scope);
 					fork.mDedicatedIdentity = false;
-					PC_FIND_FUTURE_VERBOSE(pcLogInput 
+					VERBOSE_FUTURE(Logger::Input()
 						<< "Fork with " << fork.mBranches.GetCount() 
 						<< " branches inserted at priority " << priority);
 					auto newPoint = Ptr<MissingPoint>::New(priority, Ptr<Any>::New(Move(fork)));
@@ -392,8 +382,8 @@ namespace Langulus::Entity
 				}
 			}
 			else {
-				PC_FIND_FUTURE_VERBOSE(ScopedTab tab; pcLogSpecial 
-					<< "Scanning scope for future points (<= priority " 
+				VERBOSE_FUTURE(const auto tab = Logger::Special()
+					<< "Scanning scope for future points (<= priority "
 					<< priority << "): " << scope << tab);
 
 				// DEEP AND																	
@@ -405,11 +395,11 @@ namespace Langulus::Entity
 						result.InsertBlock(Move(branchFuturePoints));
 				});
 
-				if (priority != noPriority && priority > localPriorityFeedback && localPriorityFeedback != Charge::MinPriority) {
+				if (priority != NoPriority && priority > localPriorityFeedback && localPriorityFeedback != Charge::MinPriority) {
 					// The end of an AND scope is always considered a future	
 					// if priority changed on the boundary							
-					PC_FIND_FUTURE_VERBOSE(pcLogInput 
-						<< "Pushed priority-boundary future point due to transition from priority " 
+					VERBOSE_FUTURE(Logger::Input()
+						<< "Pushed priority-boundary future point due to transition from priority "
 						<< priority << " to " << localPriorityFeedback << ": " << scope);
 					auto newPoint = Ptr<MissingPoint>::New(priority, ReinterpretCast<Any>(&scope));
 					result << newPoint.Get();
@@ -425,14 +415,13 @@ namespace Langulus::Entity
 
 		// If this is reached, then scope is flat									
 		if (scope.IsOr() && scope.GetCount() > 1) {
-			ScopedTab tab;
-			pcLogSpecial 
+			const auto tab = Logger::Special()
 				<< "Scanning flat fork for future points (<= priority " 
-				<< priority << "): " << scope << tab;
+				<< priority << "): " << scope << Logger::Tabs {};
 
 			// FLAT OR																		
 			Fork fork;
-			for (pcptr i = 0; i < scope.GetCount(); ++i) {
+			for (Offset i = 0; i < scope.GetCount(); ++i) {
 				auto branch = scope.GetElementResolved(i);
 				auto branchFuturePoints = FindFuturePoints(
 					branch, priority, localPriorityFeedback);
@@ -443,7 +432,7 @@ namespace Langulus::Entity
 			if (!fork.mBranches.IsEmpty()) {
 				fork.mRoot = ReinterpretCast<Any>(&scope);
 				fork.mDedicatedIdentity = true;
-				PC_FIND_FUTURE_VERBOSE(pcLogInput 
+				VERBOSE_FUTURE(Logger::Input()
 					<< "Fork with " << fork.mBranches.GetCount() 
 					<< " branches inserted at priority " << priority);
 				auto newPoint = Ptr<MissingPoint>::New(priority, Ptr<Any>::New(Move(fork)));
@@ -518,8 +507,9 @@ namespace Langulus::Entity
 			if (content.IsOr() && content.GetCount() > 1) {
 				// Content is deep OR													
 				// First do a dry-run to check how many branches we'll need	
-				TAny<pcptr> anticipatedBranches;
-				pcptr counter = 0;
+				TAny<Count> anticipatedBranches;
+
+				Count counter {};
 				content.ForEach([&](const Block& subscope) {
 					if (InnerPush<true, true>(futures, subscope, branchOut))
 						anticipatedBranches << counter;
@@ -540,7 +530,7 @@ namespace Langulus::Entity
 					// Make future point a fork, if not a fork yet,				
 					// pushing each subpack to a separate branch					
 					auto& branch = content.Get<Block>(anticipatedBranches[index]);
-					PC_CFLOW_VERBOSE_TAB(ccYellow << "INSERTING BRANCH: " << branch);
+					VERBOSE_TEMPORAL_TAB(Logger::Yellow << "INSERTING BRANCH: " << branch);
 					InnerPush<ATTEMPT, true>(futures, branch, true);
 				}
 
@@ -561,8 +551,8 @@ namespace Langulus::Entity
 		if (content.IsOr() && content.GetCount() > 1) {
 			// Scope is flat OR															
 			// First do a dry-run to check how many branches we'll need		
-			TAny<pcptr> anticipatedBranches;
-			for (pcptr i = 0; i < content.GetCount(); ++i) {
+			TAny<Count> anticipatedBranches;
+			for (Offset i = 0; i < content.GetCount(); ++i) {
 				if (InnerPush<true, true>(futures, content.GetElementResolved(i), branchOut))
 					anticipatedBranches << i;
 			};
@@ -581,7 +571,7 @@ namespace Langulus::Entity
 				// Make future point a fork, if not a fork yet,					
 				// pushing each subpack to a separate branch						
 				auto branch = content.GetElement(anticipatedBranches[index]);
-				PC_CFLOW_VERBOSE_TAB(ccYellow << "INSERTING BRANCH: " << branch);
+				VERBOSE_TEMPORAL_TAB(Logger::Yellow << "INSERTING BRANCH: " << branch);
 				InnerPush<ATTEMPT, true>(futures, branch, true);
 			}
 
@@ -608,7 +598,7 @@ namespace Langulus::Entity
 					}
 					else {
 						// Push the element												
-						Any wrappedElement { element };
+						Any wrappedElement {element};
 						done = future->FilterAndInsert<ATTEMPT, CLONE>(wrappedElement, FindPastPoints);
 					}
 				}
@@ -634,21 +624,21 @@ namespace Langulus::Entity
 		if (scope.IsEmpty())
 			return true;
 
-		PC_CFLOW_VERBOSE_TAB(this << ": Pushing: " << scope);
+		VERBOSE_TEMPORAL_TAB(this << ": Pushing: " << scope);
 
 		// Collect all future points inside the priority stack				
 		// those points might or might not have filters;						
 		// all the points are paired with a priority if contained in		
 		// verbs																				
-		real smallestPriority = noPriority;
-		auto futures = FindFuturePoints(mPriorityStack, noPriority, smallestPriority);
+		auto smallestPriority = NoPriority;
+		auto futures = FindFuturePoints(mPriorityStack, NoPriority, smallestPriority);
 
 		// Always push entire priority stack as the last option				
-		auto newPoint = Ptr<MissingPoint>::New(noPriority, &mPriorityStack);
+		auto newPoint = Ptr<MissingPoint>::New(NoPriority, &mPriorityStack);
 		futures << newPoint.Get();
 
 		#if LANGULUS_DEBUG()
-			PC_CFLOW_VERBOSE(ccPurple << "=================");
+			VERBOSE_TEMPORAL(Logger::Purple << "=================");
 			for (const auto future : futures)
 				future->Dump();
 		#endif

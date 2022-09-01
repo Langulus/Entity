@@ -1,8 +1,43 @@
 #pragma once
 #include "Entity.hpp"
 
+#define ENTITY_VERBOSE_SELF(a)				//Logger::Verbose() << this << ": "<< a
+#define ENTITY_VERBOSE(a)						//Logger::Append() << a
+#define ENTITY_CREATION_VERBOSE_SELF(a)	//Logger::Verbose() << this << ": " <<a
+#define ENTITY_SELECTION_VERBOSE_SELF(a)	//Logger::Verbose() << this << ": " <<a
+
 namespace Langulus::Entity
 {
+	
+	/// Execute verb in the hierarchy														
+	///	@tparam SEEK - where in the hierarchy to execute							
+	///	@param verb - the verb to execute												
+	///	@return true if succesfully executed											
+	template<SeekStyle SEEK>
+	bool Entity::DoInHierarchy(Verb& verb) {
+		// Execute in owners directly													
+		if constexpr (SEEK & SeekStyle::Here) {
+			Do(verb);
+			if (verb.IsDone())
+				return true;
+		}
+
+		// Execute in parents up to root, if requested							
+		if constexpr (SEEK & SeekStyle::Above) {
+			if (mOwner && mOwner->DoInHierarchy<SeekStyle::UpToHere>(verb))
+				return true;
+		}
+
+		// Execute in children, if requested										
+		if constexpr (SEEK & SeekStyle::Below) {
+			for (auto& child : mChildren) {
+				if (child.DoInHierarchy<SeekStyle::DownFromHere>(verb))
+					return true;
+			}
+		}
+
+		return false;
+	}
 
 	/// Remove all units that are derived from the provided type					
 	///	@tparam T - the type of units to remove										
@@ -27,26 +62,78 @@ namespace Langulus::Entity
 	}
 
 	/// Gather all units of a specific static type										
-	///	@param seek - where to seek for these units									
 	///	@return a container filled with the matches									
-	template<CT::Unit T>
-	TAny<const Decay<T>*> Entity::GatherUnits(SeekStyle seek) const {
-		return GatherUnits(seek, MetaData::Of<Decay<T>>());
+	template<CT::Unit T, SeekStyle SEEK>
+	TAny<const Decay<T>*> Entity::GatherUnits() const {
+		return GatherUnits<SEEK>(MetaData::Of<Decay<T>>());
+	}
+	
+	/// Collects all units of the given type inside the hierarchy					
+	///	@tparam SEEK - where in the hierarchy are we seeking in?					
+	///	@param meta - the units to seek for												
+	///	@return the gathered units that match the type								
+	template<SeekStyle SEEK>
+	Any Entity::GatherUnits(DMeta meta) const {
+		Any result;
+
+		// Seek here if requested														
+		if constexpr (SEEK & SeekStyle::Here) {
+			for (auto unit : mUnits) {
+				if (unit->CastsTo(meta))
+					result << unit;
+			}
+		}
+
+		// Seek in parents up to root, if requested								
+		if constexpr (SEEK & SeekStyle::Above && mOwner) {
+			auto inParents = mOwner->GatherUnits<SeekStyle::UpToHere>(meta);
+			result.SmartPush(Abandon(inParents));
+		}
+
+		// Seek children, if requested												
+		if constexpr (SEEK & SeekStyle::Below) {
+			for (const auto& child : mChildren) {
+				auto inChildren = child.GatherUnits<SeekStyle::DownFromHere>(meta);
+				result.SmartPush(Abandon(inChildren));
+			}
+		}
+
+		return result;
 	}
 
-	/// Create a unit by static type and arguments, relying on producers			
-	/// in the hierarchy																			
-	///	@return the newly created unit if able to create it						
-	template<CT::Unit T, class ... ARGUMENTS>
-	Decay<T>* Entity::CreateUnit(ARGUMENTS&&...arguments) {
-		TAny<Unit*> produced;
-		auto request = Construct::From<Decay<T>>();
-		if constexpr (sizeof...(arguments) > 0)
-			(request << ... << Forward<ARGUMENTS>(arguments));
-		CreateUnitInner(request, produced);
-		SAFETY(if (produced.IsEmpty())
-			Throw<Except::Construct>("Cad unit creation in Entity::CreateUnit"));
-		return produced.As<Decay<T>*>();
+	/// Find a specific unit, searching into the hierarchy							
+	///	@tparam SEEK - where in the hierarchy are we seeking in?					
+	///	@param meta - the unit to seek for												
+	///	@param offset - which of the matches to return								
+	///	@return the found unit, or nullptr if no such unit was found			
+	template<SeekStyle SEEK>
+	Unit* Entity::SeekUnit(DMeta meta, const Index& offset) {
+		Unit* result = nullptr;
+
+		// Seek here if requested														
+		if constexpr (SEEK & SeekStyle::Here) {
+			result = GetUnit(meta, offset);
+			if (result)
+				return result;
+		}
+
+		// Seek in parents up to root, if requested								
+		if constexpr (SEEK & SeekStyle::Above && mOwner) {
+			result = mOwner->SeekUnit<SeekStyle::UpToHere>(meta, offset);
+			if (result)
+				return result;
+		}
+
+		// Seek children, if requested												
+		if constexpr (SEEK & SeekStyle::Below) {
+			for (auto& child : mChildren) {
+				result = child.SeekUnit<SeekStyle::DownFromHere>(meta, offset);
+				if (result)
+					return result;
+			}
+		}
+
+		return nullptr;
 	}
 
 	/// Find a unit by type and index from the hierarchy								
@@ -54,28 +141,45 @@ namespace Langulus::Entity
 	///	@param unit - the type of the unit to seek for								
 	///	@param offset - the index of the unit to return								
 	///	@return the unit if found, or nullptr otherwise								
-	inline const Unit* Entity::SeekUnit(SeekStyle seek, DMeta unit, const Index& offset) const {
-		return const_cast<Entity*>(this)->SeekUnit(seek, unit, offset);
+	template<SeekStyle SEEK>
+	const Unit* Entity::SeekUnit(DMeta unit, const Index& offset) const {
+		return const_cast<Entity*>(this)->SeekUnit<SEEK>(unit, offset);
 	}
 
 	/// Find a unit by index and static type from the hierarchy (const)			
 	///	@param seek - where to seek for the unit										
 	///	@param offset - the index of the unit to return								
 	///	@return the unit if found, or nullptr otherwise								
-	template<CT::Unit T>
-	const Decay<T>* Entity::SeekUnit(SeekStyle seek, const Index& offset) const {
+	template<CT::Unit T, SeekStyle SEEK>
+	const Decay<T>* Entity::SeekUnit(const Index& offset) const {
 		return static_cast<const Decay<T>*>(
-			SeekUnit(seek, MetaData::Of<Decay<T>>(), offset));
+			SeekUnit<SEEK>(MetaData::Of<Decay<T>>(), offset));
 	}
 
 	/// Find a unit by index and static type from the hierarchy						
 	///	@param seek - where to seek for the unit										
 	///	@param offset - the index of the unit to return								
 	///	@return the unit if found, or nullptr otherwise								
-	template<CT::Unit T>
-	Decay<T>* Entity::SeekUnit(SeekStyle seek, const Index& offset) {
+	template<CT::Unit T, SeekStyle SEEK>
+	Decay<T>* Entity::SeekUnit(const Index& offset) {
 		return static_cast<Decay<T>*>(
-			SeekUnit(seek, MetaData::Of<Decay<T>>(), offset));
+			SeekUnit<SEEK>(MetaData::Of<Decay<T>>(), offset));
+	}
+
+	/// Create a unit by static type and arguments, relying on producers			
+	/// in the hierarchy																			
+	///	@return the newly created unit if able to create it						
+	template<CT::Unit T, class... A>
+	Decay<T>* Entity::CreateUnit(A&&...arguments) {
+		TAny<Unit*> produced;
+		auto request = Construct::From<Decay<T>>();
+		if constexpr (sizeof...(arguments) > 0)
+			(request << ... << Forward<A>(arguments));
+
+		CreateUnitInner(request, produced);
+		SAFETY(if (produced.IsEmpty())
+			Throw<Except::Construct>("Bad unit creation in Entity::CreateUnit"));
+		return produced.As<Decay<T>*>();
 	}
 
 	inline const Unit* Entity::GetUnit(DMeta type, const Index& offset) const {
@@ -112,21 +216,21 @@ namespace Langulus::Entity
 		return const_cast<Entity*>(this)->GetTrait(trait, output, offset);
 	}
 
-	template<CT::Data T>
-	bool Entity::SeekValue(SeekStyle seek, TMeta trait, T& value) const {
+	template<SeekStyle SEEK, CT::Data T>
+	bool Entity::SeekValue(TMeta trait, T& value) const {
 		Trait found;
-		if (!SeekTrait(seek, trait, found) || found.IsEmpty())
+		if (!SeekTrait<SEEK>(trait, found) || found.IsEmpty())
 			return false;
 
 		value = found.AsCast<T>();
 		return true;
 	}
 
-	template<CT::Trait T, CT::Data D>
-	bool Entity::SeekValue(SeekStyle seek, D& value) const {
+	template<SeekStyle SEEK, CT::Trait T, CT::Data D>
+	bool Entity::SeekValue(D& value) const {
 		static const auto tmeta = MetaTrait::Of<T>();
 		Trait found;
-		if (!SeekTrait(seek, tmeta, found) || found.IsEmpty())
+		if (!SeekTrait<SEEK>(tmeta, found) || found.IsEmpty())
 			return false;
 
 		value = found.AsCast<D>();
@@ -170,44 +274,51 @@ namespace Langulus::Entity
 		return const_cast<Entity*>(this)->GetChild(name, offset);
 	}
 
-	/// Get a trait by scanning owners and other units									
-	///	@return the trait																		
-	template<CT::Trait T>
-	Trait Unit::SeekTrait() const {
-		bool satisfied {};
-		Trait output;
-		static const auto data = MetaTrait::Of<T>();
-		for (auto context : mOwners) {
-			bool found = context->SeekTrait(SeekStyle::UpToHere, data, output);
-			if (found && satisfied) {
-				Logger::Warning() << "Multiple " << data << " traits found in hierarchy";
-				Logger::Warning() << "Each sequential trait will overwrite the result";
-			}
-
-			satisfied |= found;
+	/// Find a trait, searching into the hierarchy (const)							
+	///	@param seek - direction to search at											
+	///	@param var - the trait to search for											
+	///	@param output - found traits go there											
+	///	@param offset - the offset to apply												
+	///	@return true if anything matching was found									
+	template<SeekStyle SEEK>
+	bool Entity::SeekTrait(TMeta var, Trait& output, const Index& offset) const {
+		// Seek here if requested														
+		if constexpr (SEEK & SeekStyle::Here) {
+			if (GetTrait(var, output))
+				return true;
 		}
 
-		return output;
+		// Seek in parents up to root, if requested								
+		if constexpr (SEEK & SeekStyle::Above) {
+			if (mOwner && mOwner->SeekTrait<SeekStyle::UpToHere>(var, output, offset))
+				return true;
+		}
+
+		// Seek children, if requested												
+		if constexpr (SEEK & SeekStyle::Below) {
+			for (const auto& child : mChildren) {
+				if (child.SeekTrait<SeekStyle::DownFromHere>(var, output, offset))
+					return true;
+			}
+		}
+
+		return false;
 	}
 
-	/// Get a value from inside a trait by scanning owners and other units		
-	///	@param trait - the trait to seek for											
-	///	@param value - [out] value to set if trait was found						
-	///	@return true if anything was written to value								
-	template<CT::Data D>
-	bool Unit::SeekValue(TMeta trait, D& value) const {
-		bool satisfied {};
-		for (auto context : mOwners) {
-			bool found = context->SeekValue(SeekStyle::UpToHere, trait, value);
-			if (found && satisfied) {
-				Logger::Warning() << "Multiple " << trait << " traits found in hierarchy";
-				Logger::Warning() << "Each sequential trait will overwrite the result";
-			}
-
-			satisfied |= found;
-		}
-
-		return satisfied;
+	/// Find a trait, searching into the hierarchy										
+	///	@param seek - direction to search at											
+	///	@param var - the trait to search for											
+	///	@param output - found traits go there											
+	///	@param offset - the offset to apply												
+	///	@return true if anything matching was found									
+	template<SeekStyle SEEK>
+	bool Entity::SeekTrait(TMeta var, Trait& output, const Index& offset) {
+		return const_cast<const Entity*>(this)->SeekTrait<SEEK>(var, output, offset);
 	}
 
 } // namespace Langulus::Entity
+
+#undef ENTITY_VERBOSE_SELF
+#undef ENTITY_VERBOSE
+#undef ENTITY_CREATION_VERBOSE_SELF
+#undef ENTITY_SELECTION_VERBOSE_SELF

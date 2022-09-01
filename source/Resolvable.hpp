@@ -10,6 +10,7 @@ namespace Langulus::Entity
 	/// Holds a reflected class type and context state									
 	///																								
 	struct Resolvable {
+		LANGULUS(ABSTRACT) true;
 	protected:
 		DMeta mClassType;
 		Offset mClassOffset;
@@ -34,6 +35,13 @@ namespace Langulus::Entity
 		NOD() Token GetToken() const noexcept;
 		NOD() constexpr DMeta GetType() const noexcept;
 		NOD() Block GetBlock() const noexcept;
+		template<bool DISPATCH = true, bool DEFAULT = true, CT::Verb V>
+		NOD() bool Run(V& verb);
+
+		template<CT::Index INDEX>
+		NOD() Block GetMember(TMeta, const INDEX&) noexcept;
+		template<CT::Index INDEX>
+		NOD() Block GetMember(TMeta, const INDEX&) const noexcept;
 
 		NOD() explicit operator Debug() const;
 	};

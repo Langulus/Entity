@@ -14,4 +14,7 @@ namespace Langulus::Entity
 	using TimePoint = ::std::chrono::steady_clock::time_point;
 	using Time = ::std::chrono::steady_clock::duration;
 
+	constexpr TimePoint InvalidTimePoint {TimePoint::min()};
+	constexpr Time InvalidTime {Time::min()};
+
 } //namespace Langulus::Entity
