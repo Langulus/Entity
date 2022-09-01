@@ -1,8 +1,111 @@
-#define VERBOSE_MISSING_POINT(a) pcLogVerbose << a
-#define VERBOSE_MISSING_POINT_TAB(a) ScopedTab tab; pcLogVerbose << a << tab
+#pragma once
+#include "MissingFlow.hpp"
 
-namespace PCFW
+#define VERBOSE_MISSING_POINT(a) Logger::Verbose() << a
+#define VERBOSE_MISSING_POINT_TAB(a) const auto tabs = Logger::Verbose() << a << Logger::Tabs{}
+
+namespace Langulus::Entity
 {
+
+	/// Number of digits in a value															
+	/// Credit goes to http://stackoverflow.com/questions/1489830					
+	constexpr NOD() LANGULUS(ALWAYSINLINE) Count CountDigits(uint8_t x) noexcept {
+		return (x < 10u ? 1 : (x < 100u ? 2 : 3));
+	}
+
+	constexpr NOD() LANGULUS(ALWAYSINLINE) Count CountDigits(int8_t x) noexcept {
+		return CountDigits(static_cast<uint8_t>(::std::abs(x)));
+	}
+
+	constexpr NOD() LANGULUS(ALWAYSINLINE) Count CountDigits(uint16_t x) noexcept {
+		return (x < 10u ? 1 : (x < 100u ? 2 : (x < 1000u ? 3 : (x < 10000u ? 4 : 5))));
+	}
+
+	constexpr NOD() LANGULUS(ALWAYSINLINE) Count CountDigits(int16_t x) noexcept {
+		return CountDigits(static_cast<uint16_t>(::std::abs(x)));
+	}
+
+	constexpr NOD() LANGULUS(ALWAYSINLINE) Count CountDigits(uint32_t x) noexcept {
+		return
+			(x < 10u ? 1 :
+			(x < 100u ? 2 :
+			(x < 1000u ? 3 :
+			(x < 10000u ? 4 :
+			(x < 100000u ? 5 :
+			(x < 1000000u ? 6 :
+			(x < 10000000u ? 7 :
+			(x < 100000000u ? 8 :
+			(x < 1000000000u ? 9 : 10)))))))));
+	}
+
+	constexpr NOD() LANGULUS(ALWAYSINLINE) Count pcNumDigits(int32_t x) noexcept {
+		return CountDigits(static_cast<uint32_t>(::std::abs(x)));
+	}
+
+	constexpr NOD() LANGULUS(ALWAYSINLINE) Count CountDigits(uint64_t x) noexcept {
+		return
+			(x < 10ull ? 1 :
+			(x < 100ull ? 2 :
+			(x < 1000ull ? 3 :
+			(x < 10000ull ? 4 :
+			(x < 100000ull ? 5 :
+			(x < 1000000ull ? 6 :
+			(x < 10000000ull ? 7 :
+			(x < 100000000ull ? 8 :
+			(x < 1000000000ull ? 9 :
+			(x < 10000000000ull ? 10 :
+			(x < 100000000000ull ? 11 :
+			(x < 1000000000000ull ? 12 :
+			(x < 10000000000000ull ? 13 :
+			(x < 100000000000000ull ? 14 :
+			(x < 1000000000000000ull ? 15 :
+			(x < 10000000000000000ull ? 16 :
+			(x < 100000000000000000ull ? 17 :
+			(x < 1000000000000000000ull ? 18 :
+			(x < 10000000000000000000ull ? 19 : 20
+		)))))))))))))))))));
+	}
+
+	constexpr NOD() LANGULUS(ALWAYSINLINE) Count CountDigits(int64_t x) noexcept {
+		// http://graphics.stanford.edu/~seander/bithacks.html#IntegerAbs	
+		int const mask = x >> (sizeof(int64_t) * 8 - 1);
+		return CountDigits(static_cast<uint64_t>((x + mask) ^ mask));
+	}
+
+	/// Count digits in real numbers															
+	/// The dot in the real number is considered a digit, too						
+	///	@param x - real number to cound digits of										
+	template<CT::Real T>
+	constexpr NOD() LANGULUS(ALWAYSINLINE) Count CountDigits(T x) noexcept {
+		T floored;
+		T fraction {::std::abs(::std::modf(x, &floored))};
+		if (fraction == 0)
+			return CountDigits(uint64_t {floored});
+
+		floored = ::std::abs(floored);
+		T limit {1};
+		Count fract_numbers {};
+		while (fraction < limit && limit < T {1000}) {
+			fraction *= T {10};
+			limit *= T {10};
+			++fract_numbers;
+		}
+
+		return CountDigits(uint64_t {floored}) + fract_numbers + Count {1};
+	}
+
+	/// Concatenate two numbers																
+	///	@param lhs - left number															
+	///	@param rhs - right number															
+	///	@return the concatenation of the two numbers									
+	template<CT::Number T>
+	NOD() LANGULUS(ALWAYSINLINE) T ConcatenateNumbers(const T& lhs, const T& rhs) {
+		T result {lhs};
+		result *= ::std::pow(T {10}, T {CountDigits(rhs)});
+		result += rhs;
+		return result;
+	}
+
    
 	/// Filter and push content to this point												
 	///	@param content - the content to filter and insert							
@@ -12,10 +115,10 @@ namespace PCFW
 		if (content.IsDeep()) {
 			// Don't allow deep content to be reset at once!					
 			// Nest to prevent this														
-			SuccessTrap atLeastOneSuccess;
+			bool atLeastOneSuccess {};
 			if (content.IsOr()) {
 				content.ForEach([&](Any& subcontent) {
-					atLeastOneSuccess = FilterAndInsert<ATTEMPT, true>(subcontent, FindPastPoints);
+					atLeastOneSuccess |= FilterAndInsert<ATTEMPT, true>(subcontent, FindPastPoints);
 				});
 
 				if constexpr (!ATTEMPT)
@@ -23,7 +126,7 @@ namespace PCFW
 			}
 			else {
 				content.ForEach([&](Any& subcontent) {
-					atLeastOneSuccess = FilterAndInsert<ATTEMPT, CLONE>(subcontent, FindPastPoints);
+					atLeastOneSuccess |= FilterAndInsert<ATTEMPT, CLONE>(subcontent, FindPastPoints);
 					if constexpr (!ATTEMPT && !CLONE) {
 						if (subcontent.IsEmpty())
 							content.Remove(&subcontent);
@@ -38,23 +141,22 @@ namespace PCFW
 			if constexpr (!ATTEMPT) {
 				// Special case when integrating implicit charges				
 				// Always succeeds, because it is not mandatory					
-				real mass = mChanges ? mChargeFor->mCharge.mMass : 0;
-				auto interpreter =
-					Verb::From<Verbs::Interpret>({}, DataID::Of<real>).ShortCircuit(false);
+				Real mass = mChanges ? mChargeFor->mMass : 0;
+				auto interpreter = Verbs::Interpret(MetaData::Of<Real>()).ShortCircuit(false);
 				if (Verb::DispatchDeep(content, interpreter)) {
 					interpreter.GetOutput().ForEachDeep(
-						[&mass](const real& n) noexcept {
-							mass = pcConcat(mass, n);
+						[&mass](const Real& n) noexcept {
+							mass = ConcatenateNumbers(mass, n);
 						}
 					);
 
-					VERBOSE_MISSING_POINT(ccPurple 
+					VERBOSE_MISSING_POINT(Logger::Purple 
 						<< "Charge changed (via " << content << "): ");
-					VERBOSE_MISSING_POINT(ccPurple 
+					VERBOSE_MISSING_POINT(Logger::Purple
 						<< " - was " << *mChargeFor);
-					mChargeFor->mCharge.mMass = mass;
+					mChargeFor->mMass = mass;
 					++mChanges;
-					VERBOSE_MISSING_POINT(ccPurple 
+					VERBOSE_MISSING_POINT(Logger::Purple
 						<< " - now " << *mChargeFor);
 					content.Reset();
 				}
@@ -69,9 +171,8 @@ namespace PCFW
 			if (!content.Is<Verb>()) {
 				// Try interpreting scope as verbs and try pushing them		
 				// If that fails just push the scope itself						
-				auto interpreter =
-					Verb::From<Verbs::Interpret>({}, DataID::Of<Verb>).ShortCircuit(false);
-				if (Verb::DispatchDeep(content, interpreter)) {
+				auto interpreter = Verbs::Interpret(MetaData::Of<Verb>()).ShortCircuit(false);
+				if (Flow::DispatchDeep(content, interpreter)) {
 					Any inserted;
 					if (Insert<ATTEMPT, CLONE>(*this, interpreter.GetOutput(), inserted, FindPastPoints)) {
 						if constexpr (!ATTEMPT) {
@@ -102,10 +203,10 @@ namespace PCFW
 		VERBOSE_MISSING_POINT_TAB("Satisfying filter " << filters 
 			<< " by interpreting " << content);
 
-		auto interpreter = Verb::From<Verbs::Interpret>({}, filters).ShortCircuit(false);
+		auto interpreter = Verbs::Interpret(filters).ShortCircuit(false);
 		if (Verb::DispatchDeep(content, interpreter)) {
 			// If results in verb skip insertion, delay for unfiltered		
-			bool skip = false;
+			bool skip {};
 			interpreter.GetOutput().ForEachDeep([&skip](const Verb&) {
 				skip = true;
 				return false;
@@ -140,9 +241,9 @@ namespace PCFW
 			if (!content.IsOr()) {
 				// Nest AND																	
 				// Subsequent insertions are allowed to consume contexts		
-				FailureTrap failure;
+				bool failure {};
 				content.ForEach([&](Any& b) {
-					failure = Insert<ATTEMPT, CLONE>(context, b, output, FindPastPoints);
+					failure |= !Insert<ATTEMPT, CLONE>(context, b, output, FindPastPoints);
 					return !failure;
 				});
 
@@ -153,10 +254,10 @@ namespace PCFW
 				// Subsequent insertions are NOT allowed to consume			
 				// contexts - the whole context is reset after all				
 				// branches have been processed										
-				SuccessTrap success;
+				bool success {};
 				auto localOutput = Any::FromStateOf(content);
 				content.ForEach([&](Any& b) {
-					success = Insert<ATTEMPT, true>(context, b, localOutput, FindPastPoints);
+					success |= Insert<ATTEMPT, true>(context, b, localOutput, FindPastPoints);
 				});
 
 				if constexpr (!ATTEMPT) {
@@ -165,7 +266,7 @@ namespace PCFW
 						if (localOutput.GetCount() == 1)
 							output.InsertBlock(localOutput);
 						else
-							output << pcMove(localOutput);
+							output << Move(localOutput);
 					}
 				}
 
@@ -180,7 +281,7 @@ namespace PCFW
 			if constexpr (CLONE)
 				localContent = content.Clone();
 			else
-				localContent = pcMove(content);
+				localContent = Move(content);
 		}
 		else localContent = content;
 
@@ -203,7 +304,7 @@ namespace PCFW
 					return true;
 
 				if constexpr (!ATTEMPT) {
-					VERBOSE_MISSING_POINT(ccRed
+					VERBOSE_MISSING_POINT(Logger::Red
 						<< "Can't past-integrate with empty past: " << localContent);
 				}
 
@@ -224,11 +325,11 @@ namespace PCFW
 
 			// This is optimization that minimizes branching a lot			
 			if constexpr (!ATTEMPT) {
-				VERBOSE_MISSING_POINT(ccRed
+				VERBOSE_MISSING_POINT(Logger::Red
 					<< "Can't past-integrate: " << localContent);
-				VERBOSE_MISSING_POINT(ccRed
+				VERBOSE_MISSING_POINT(Logger::Red
 					<< "With: " << pastContent);
-				VERBOSE_MISSING_POINT(ccRed
+				VERBOSE_MISSING_POINT(Logger::Red
 					<< "Requires: " << past->GetFilter());
 			}
 
@@ -236,11 +337,11 @@ namespace PCFW
 		}
 
 		if constexpr (!ATTEMPT)
-			output << pcMove(localContent);
+			output << Move(localContent);
 		return true;
 	}
 
-} // namespace PCFW
+} // namespace Langulus::Entity
 
 #undef VERBOSE_MISSING_POINT
 #undef VERBOSE_MISSING_POINT_TAB

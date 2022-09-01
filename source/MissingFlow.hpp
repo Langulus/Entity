@@ -39,7 +39,7 @@ namespace Langulus::Entity
 	public:
 		Real mPriority;
 		Ptr<Any> mPack;
-		Construct* mChargeFor {};
+		Charge* mChargeFor {};
 		Count mChanges = 0;
 	};
 

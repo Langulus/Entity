@@ -25,6 +25,8 @@ namespace Langulus::Entity
 	///																								
 	class Temporal final {
 	private:
+		Temporal* mParent;
+
 		// Increments on each call to Update()										
 		TimePoint mPreviousTime;
 		TimePoint mCurrentTime;

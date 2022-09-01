@@ -3,7 +3,7 @@
 #define VERBOSE_MISSING_POINT(a) //pcLogVerbose << a
 #define VERBOSE_MISSING_POINT_TAB(a) //ScopedTab tab; pcLogVerbose << a << tab
 
-namespace PCFW
+namespace Langulus::Entity
 {
    
 	/// Check if the future point branches out											
@@ -14,15 +14,17 @@ namespace PCFW
 
 	/// Get the filter part of the point													
 	///	@return a reference to the filter part											
-	const Filter& MissingPoint::GetFilter() const SAFE_NOEXCEPT() {
-		SAFETY(if(IsFork()) throw Except::BadFlow(
+	const Filter& MissingPoint::GetFilter() const SAFETY_NOEXCEPT() {
+		SAFETY(if(IsFork()) Throw<Except::Flow>(
 			"Point is a fork, and you must handle it explicitly"));
 
 		if (mPack->IsMissing()) {
 			const auto& filter = mPack->IsDeep() ? mPack->Get<Any>(0) : *mPack;
-			SAFETY(if(!filter.IsEmpty() && !filter.Is<DataID>()) 
-				throw Except::BadFlow(pcLogError << "Bad filter format"));
-			return pcReinterpret<Filter>(filter);
+			SAFETY(if (!filter.IsEmpty() && !filter.Is<DataID>()) {
+				Logger::Error() << "Bad filter format";
+				Throw<Except::Flow>("Bad filter format");
+			})
+			return ReinterpretCast<Filter>(filter);
 		}
 
 		static const Filter fallback{};
@@ -32,12 +34,12 @@ namespace PCFW
 	/// Get the filter part of the point													
 	///	@param content - the content to push											
 	///	@return a reference to the filter part											
-	NOD() inline bool MissingPoint::Accepts(const Block& content) const SAFE_NOEXCEPT() {
+	NOD() inline bool MissingPoint::Accepts(const Block& content) const SAFETY_NOEXCEPT() {
 		if (GetFilter().IsEmpty())
 			return true;
 
-		for (auto& type : GetFilter()) {
-			if (content.InterpretsAs(type.GetMeta()))
+		for (auto type : GetFilter()) {
+			if (content.CastsTo(type))
 				return true;
 		}
 
@@ -46,9 +48,11 @@ namespace PCFW
 
 	/// Get the content part of the point													
 	///	@return a reference to the filter part											
-	NOD() inline const Block& MissingPoint::GetContent() const SAFE_NOEXCEPT() {
-		SAFETY(if(IsFork()) throw Except::BadFlow(pcLogError <<
-			"Point is a fork, and you must handle it explicitly"));
+	NOD() inline const Block& MissingPoint::GetContent() const SAFETY_NOEXCEPT() {
+		SAFETY(if (IsFork()) {
+			Logger::Error() << "Point is a fork, and you must handle it explicitly";
+			Throw<Except::Flow>("Point is a fork, and you must handle it explicitly");
+		});
 
 		static const Block fallback{};
 		if (mPack->IsMissing())
@@ -58,7 +62,7 @@ namespace PCFW
 
 	/// Get the content part of the point													
 	///	@return a reference to the filter part											
-	NOD() inline bool MissingPoint::HasRelevantContent() const SAFE_NOEXCEPT() {
+	NOD() inline bool MissingPoint::HasRelevantContent() const SAFETY_NOEXCEPT() {
 		auto& content = GetContent();
 		if (content.IsEmpty() || GetFilter().IsEmpty())
 			return false;
@@ -76,52 +80,56 @@ namespace PCFW
 	/// Push content to the point - always clones										
 	///	@param content - the content to push											
 	void MissingPoint::AddContent(Any& content) {
-		SAFETY(if(IsFork()) throw Except::BadFlow(pcLogError <<
-			"Point is a fork, and you must handle it explicitly"));
+		SAFETY(if (IsFork()) {
+			Logger::Error() << "Point is a fork, and you must handle it explicitly";
+			Throw<Except::Flow>("Point is a fork, and you must handle it explicitly");
+		});
 
 		// This is reached only if !ATTEMPT											
-		if (mPriority == noPriority) {
-			VERBOSE_MISSING_POINT(ccPurple
+		if (mPriority == NoPriority) {
+			VERBOSE_MISSING_POINT(Logger::Purple
 				<< "Point changed (no priority):");
 		}
 		else {
-			VERBOSE_MISSING_POINT(ccPurple
+			VERBOSE_MISSING_POINT(Logger::Purple
 				<< "Point changed (priority " << mPriority << "):");
 		}
 
-		VERBOSE_MISSING_POINT(ccPurple << " - was " << mPack);
+		VERBOSE_MISSING_POINT(Logger::Purple << " - was " << mPack);
 
 		if (mPack->IsMissing()) {
 			// Deepen the point if not deep yet, so that we keep filter		
 			if (!mPack->IsDeep())
-				mPack->Deepen<Any>(false);
+				mPack->Deepen<Any, false>();
 
 			if (mPack->GetCount() == 1)
 				*mPack << Any{};
 
 			SAFETY(if (mPack->GetCount() != 2) TODO());
-			mPack->Get<Any>(1) << pcMove(content);
+			mPack->Get<Any>(1) << Move(content);
 		}
 		else {
 			// Doesn't have a filter, so just push									
-			*mPack << pcMove(content);
+			*mPack << Move(content);
 		}
 
-		VERBOSE_MISSING_POINT(ccPurple << " - now " << mPack);
+		VERBOSE_MISSING_POINT(Logger::Purple << " - now " << mPack);
 	}
 
 	/// Collapse the point, clearing contents, polarity, filters					
 	void MissingPoint::Collapse() {
-		SAFETY(if(IsFork()) throw Except::BadFlow(pcLogError <<
-			"Point is a fork, and you must handle it explicitly"));
+		SAFETY(if (IsFork()) {
+			Logger::Error() << "Point is a fork, and you must handle it explicitly";
+			Throw<Except::Flow>("Point is a fork, and you must handle it explicitly");
+		});
 
 		if (mPack->IsMissing()) {
-			if (mPack->IsRight()) {
+			if (mPack->IsFuture()) {
 				// Remove only content if dedicated future						
 				if (mPack->IsDeep() && mPack->GetCount() == 2)
 					mPack->RemoveIndex(1);
 			}
-			else if (mPack->IsLeft()) {
+			else if (mPack->IsPast()) {
 				// Remove everything if dedicated past								
 				mPack->Reset();
 			}
@@ -138,7 +146,7 @@ namespace PCFW
 	///	@return the new branch																
 	Futures& MissingPoint::AddBranch() {
 		{
-			VERBOSE_MISSING_POINT_TAB(ccYellow << "CREATING BRANCH IN: ");
+			VERBOSE_MISSING_POINT_TAB(Logger::Yellow << "CREATING BRANCH IN: ");
 			Dump();
 		}
 
@@ -146,11 +154,11 @@ namespace PCFW
 			// Turn a normal point to a fork											
 			Fork fork;
 			fork.mRoot = mPack;
-			fork.mIdentity = pcMove(*mPack);
+			fork.mIdentity = Move(*mPack);
 			fork.mDedicatedIdentity = true;
 			mPack->Reset();
 			mPack->MakeOr();
-			mPack = Ptr<Any>::New(pcMove(fork));
+			mPack = Ptr<Any>::New(Move(fork));
 		}
 
 		// At this point, this future point is a fork							
@@ -167,12 +175,12 @@ namespace PCFW
 
 		// Push the new branch, interfacing that cloned identity				
 		Futures branch;
-		auto newPoint = Ptr<MissingPoint>::New(mPriority, fork.mRoot->As<Any*>(uiLast));
+		auto newPoint = Ptr<MissingPoint>::New(mPriority, fork.mRoot->As<Any*>(IndexLast));
 		branch << newPoint.Get();
-		fork.mBranches << pcMove(branch);
+		fork.mBranches << Move(branch);
 
 		{
-			VERBOSE_MISSING_POINT_TAB(ccYellow << "RESULTING BRANCHES: ");
+			VERBOSE_MISSING_POINT_TAB(Logger::Yellow << "RESULTING BRANCHES: ");
 			Dump();
 		}
 
@@ -183,23 +191,23 @@ namespace PCFW
 	void MissingPoint::Dump() const {
 		if (IsFork()) {
 			for (auto& branch : mPack->Get<Fork>().mBranches) {
-				VERBOSE_MISSING_POINT_TAB(ccYellow << "BRANCH: ");
+				VERBOSE_MISSING_POINT_TAB(Logger::Yellow << "BRANCH: ");
 				for (auto p : branch)
 					p->Dump();
 			}
 		}
 		else {
-			if (mPriority == noPriority) {
-				VERBOSE_MISSING_POINT(ccPurple 
+			if (mPriority == NoPriority) {
+				VERBOSE_MISSING_POINT(Logger::Purple
 					<< "FUTURE (no priority): ");
 			}
 			else {
-				VERBOSE_MISSING_POINT(ccPurple 
+				VERBOSE_MISSING_POINT(Logger::Purple
 					<< "FUTURE (priority " << mPriority << "): ");
 			}
 
-			pcLog << *mPack;
+			Logger::Append() << *mPack;
 		}
 	}
 
-} // namespace PCFW
+} // namespace Langulus::Entity
