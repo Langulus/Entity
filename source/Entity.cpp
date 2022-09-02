@@ -549,7 +549,7 @@ namespace Langulus::Entity
 
 	/// Get the current runtime																
 	///	@return the pointer to the runtime 												
-	Runtime* Entity::GetRuntime() {
+	Runtime* Entity::GetRuntime() const noexcept {
 		return mRuntime.Get();
 	}
 
@@ -617,7 +617,7 @@ namespace Langulus::Entity
 						createdChildren << created;
 				}
 				else if (construct.CastsTo<Unit>())
-					CreateUnitInner(construct, createdUnits);
+					createdUnits += CreateDataInner(construct);
 				else if (construct.CastsTo<Module>()) {
 					auto created = GetRuntime()->InstantiateModule(construct);
 					if (created)
@@ -793,26 +793,6 @@ namespace Langulus::Entity
 		return &mChildren.Last();
 	}
 
-	/// Charged creation of children															
-	///	@param construct - the entity constructor										
-	///	@return created children															
-	TAny<Entity*> Entity::CreateChildren(const Construct& construct) {
-		// First make the entity														
-		auto newEntity = Ptr<Entity>::New(this);
-		mChildren << newEntity;
-
-		// Then 'create' inside it														
-		Any childBlock {newEntity->GetBlock()};
-		UNUSED() Any unusedSideproducts;
-		Verb::DefaultCreateInner(childBlock, construct.GetAll(), unusedSideproducts);
-		products << newEntity;
-
-		if (unusedSideproducts.IsEmpty())
-			ENTITY_VERBOSE_SELF(newEntity << " added");
-		else
-			ENTITY_VERBOSE_SELF(newEntity << " added, with sideproducts: " << unusedSideproducts);
-	}
-
 	/// Add a child																				
 	///	@param entity - entity instance to register as a child					
 	void Entity::AddChild(Entity* entity) {
@@ -828,42 +808,14 @@ namespace Langulus::Entity
 	///	@attention provided pointer is considered invalid after this call		
 	///	@param entity - entity instance to destroy									
 	void Entity::RemoveChild(Entity* entity) {
-		if (mChildren.RemoveAddress(entity))
+		if (mChildren.RemovePointer(entity))
 			mRefreshRequired = true;
 	}
 
-	/// Move an entity as a child to this one, remapping units and hierarchy	
-	/// @attention - 'other' is considered invalid after the move, overwrite	
-	/// with the returned value to avoid undefined behavior!							
-	///	@param other - the entity to move												
-	///	@return the moved entity - you should overwrite 'other' with it		
-	Entity* Entity::MoveAsChild(Entity* other) {
-		if (mChildren.Find(other))
-			return other;
-
-		ENTITY_VERBOSE_SELF(other << " moved in as a child");
-		auto newEntity = Ptr<Entity>::New(Move(*other));
-		mChildren << newEntity;
-		newEntity->mOwner->RemoveChild(other);
-		// Consider 'other' as an invalid pointer at this point				
-		newEntity->mOwner = this;
-		newEntity->mRefreshRequired = true;
-		return newEntity;
-	}
-
-	/// Produce a unit from the entity's hierarchy by the type token				
-	///	@param name - name of the unit to produce										
-	///	@return the unit instance, or nullptr if none created						
-	Unit* Entity::CreateUnitFromToken(const Token& name) {
-		TAny<Unit*> products;
-		CreateUnitInner(Construct(name), products);
-		return products[0];
-	}
-
 	/// Create all dependencies required for the production of 'type', if such	
-	/// don't yet exist the this entity's upwards hierarchy							
-	/// They will be added either next to their own producers/modules, or the	
-	/// CRuntime component as a fallback													
+	/// doesn't yet exist the this entity's upward hierarchy							
+	/// They will be added either immediately below to their own producers, or	
+	/// by the Runtime as a fallback															
 	///	@param type - the type to build dependencies for							
 	///	@return the resulting dependencies (top level)								
 	Any Entity::CreateDependencies(DMeta type) {
@@ -875,106 +827,58 @@ namespace Langulus::Entity
 			Throw<Except::Construct>("Can't create dependencies");
 		}
 
-		if (meta->IsChildOf<Unit>()) {
-			TAny<Unit*> producers;
+		if (meta->HasBase<Unit>()) {
+			// Unit dependencies, search for them in the hierarchy,			
+			// they might already exist												
+			auto producers = GatherUnits<SeekStyle::UpToHere>(meta);
 
-			// Producer is a unit, search for it in the hierarchy				
-			//TODO collect all capable producers in the hierarchy?			
-			auto producerFound = SeekUnit<SeekStyle::UpToHere>(meta);
-			if (producerFound)
-				producers << producerFound;
-			else {
-				// No producer available in the hierarchy, so nest to			
-				// produce producer														
+			if (producers.IsEmpty()) {
+				// No producer available in the hierarchy, so nest-create	
+				// producer's producers													
 				ENTITY_VERBOSE_SELF(Logger::DarkYellow
 					<< "Required producer " << meta << " for creating " << type
 					<< " not found in hierarchy - attempting to create it...");
-				auto nestedProducers = CreateDependencies(meta);
 
-				// The producer will be added either next							
-				// to its own producer, or the runtime 							
-				const Construct c {meta};
+				auto nestedProducers = CreateDependencies(meta);
 				nestedProducers.ForEach(
 					[&](Unit* unit) {
-						unit->GetOwners()[0]->CreateUnitInner(c, producers);
+						for (auto owner : unit->GetOwners()) {
+							producers += owner->CreateDataInner(meta);
+						}
 					},
 					[&](Module* module) {
-						module->GetRuntime()->GetOwners()[0]->CreateUnitInner(c, producers);
+						const auto owner = module->GetRuntime()->GetOwner();
+						producers += owner->CreateDataInner(meta);
 					}
 				);
 			}
 
 			return producers;
 		}
-		else if (meta->IsChildOf<Module>()) {
+		else if (meta->HasBase<Module>()) {
 			// Producer is a module. Let's seek the runtime component,		
 			// since it contains the instantiated modules						
 			auto runtime = GetRuntime();
-			if (!runtime) {
-				// No runtime available, so create one at the root entity	
-				auto root = this;
-				while (root->GetOwner())
-					root = root->GetOwner().Get();
-				runtime = root->CreateUnit<Runtime>();
-			}
-
-			// Runtime unit is available, poll it for the module				
-			TAny<Module*> producers;
-			runtime->InstantiateModule(meta, producers);
-			return producers;
+			if (!runtime)
+				Throw<Except::Construct>("No runtime available");
+			return runtime->InstantiateModule(meta);
 		}
 
 		Logger::Error()
 			<< "Couldn't produce " << type << " from " << meta
 			<< " - the producer wasn't found, and couldn't be produced";
-
 		Throw<Except::Construct>("Couldn't create dependencies");
 	}
 
 	/// Produce unit(s) from the entity's hierarchy										
 	///	@param construct - instructions for the creation of the unit(s)		
-	///	@param products - [out] the resulting units go here						
-	void Entity::CreateUnitInner(const Construct& construct, TAny<Unit*>& products) {
-		if (construct.Is<Runtime>()) {
-			// Produce a runtime component											
-			auto system = Ptr<CRuntime>::Create();
-			Any systemBlock { system->GetBlock() };
-			UNUSED() Any unusedSideproducts;
-			Verb::DefaultCreateInner(systemBlock, construct.GetAll(), unusedSideproducts);
-			AddUnit(system);
-			products << system;
-			return;
-		}
-
-		if (construct.Is<Temporal>()) {
-			// Produce a flow component												
-			auto flow = Ptr<CFlow>::Create();
-			Any flowBlock { flow->GetBlock() };
-			UNUSED() Any unusedSideproducts;
-			Verb::DefaultCreateInner(flowBlock, construct.GetAll(), unusedSideproducts);
-			AddUnit(flow);
-			products << flow;
-			return;
-		}
-
-		// Find the producer																
-		auto unit = construct.GetMeta();
-		auto creator = Verb::From<Verbs::Create>({}, &construct);
-		auto producers = CreateDependencies(unit);
-		Verb::ExecuteVerb(producers, creator);
-
-		// Call constructors for each locally produced unit					
-		creator.GetOutput().ForEachDeep([&](Block& group) {
-			group.ForEach([this, &products](AUnit* newUnit) {
-				AddUnit(newUnit);
-				products << newUnit;
-			});
-
-			// Delegation might produce more requests, so we nest those		
-			group.ForEach([this, &products](const Construct& nestedConstruct) {
-				CreateUnitInner(nestedConstruct, products);
-			});
-		});
+	///	@return all created units															
+	Any Entity::CreateDataInner(const Construct& construct) {
+		Verbs::Create creator {&construct};
+		auto producers = CreateDependencies(construct.GetType());
+		if (Scope::ExecuteVerb(producers, creator))
+			return Abandon(creator.GetOutput());
+		return {};
 	}
 	
 } // namespace Langulus::Entry

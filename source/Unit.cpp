@@ -36,7 +36,7 @@ namespace Langulus::Entity
 	///	@attention assumes units are correctly coupled and coupling to			
 	///				  different runtimes is never allowed by Entity					
 	///	@return a pointer to the runtime, if available								
-	Runtime* Unit::GetRuntime() noexcept {
+	Runtime* Unit::GetRuntime() const noexcept {
 		for (auto owner : mOwners)
 			return owner->GetRuntime();
 		return nullptr;

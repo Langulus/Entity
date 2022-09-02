@@ -4,6 +4,12 @@
 namespace Langulus::Entity
 {
 
+	/// Get the list of unit owners															
+	///	return the owners																		
+	inline const TAny<Entity*>& Unit::GetOwners() const noexcept {
+		return mOwners;
+	}
+
 	/// Execute verb in all owners															
 	///	@param verb - the verb to execute in all owners								
 	///	@param seek - where in the hierarchy to execute								

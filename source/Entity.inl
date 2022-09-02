@@ -73,8 +73,8 @@ namespace Langulus::Entity
 	///	@param meta - the units to seek for												
 	///	@return the gathered units that match the type								
 	template<SeekStyle SEEK>
-	Any Entity::GatherUnits(DMeta meta) const {
-		Any result;
+	TAny<const Unit*> Entity::GatherUnits(DMeta meta) const {
+		TAny<const Unit*> result;
 
 		// Seek here if requested														
 		if constexpr (SEEK & SeekStyle::Here) {

@@ -89,8 +89,8 @@ namespace Langulus::Entity
 		Entity(const Entity&) = delete;
 		Entity(Entity&&) noexcept;
 
-		NOD() Runtime* GetRuntime();
-		NOD() Temporal* GetFlow();
+		NOD() Runtime* GetRuntime() const noexcept;
+		NOD() Temporal* GetFlow() const noexcept;
 
 		void Do(Verb&);
 		void Select(Verb&);
@@ -122,12 +122,9 @@ namespace Langulus::Entity
 		///	HIERARCHY MANAGEMENT																
 		///																							
 		NOD() Entity* CreateChild(const Any&);
-		NOD() TAny<Entity*> CreateChildren(const Construct&);
 
 		void AddChild(Entity*);
 		void RemoveChild(Entity*);
-
-		NOD() Entity* MoveAsChild(Entity*);
 
 		NOD() Entity* GetChild(const Index&);
 		NOD() const Entity* GetChild(const Index&) const;
@@ -151,12 +148,11 @@ namespace Langulus::Entity
 		NOD() Count HasUnits(DMeta) const;
 
 		template<SeekStyle>
-		NOD() Any GatherUnits(DMeta) const;
+		NOD() TAny<const Unit*> GatherUnits(DMeta) const;
 		template<CT::Unit T, SeekStyle>
 		NOD() TAny<const Decay<T>*> GatherUnits() const;
 
-		void CreateUnitInner(const Construct&, TAny<Unit*>&);
-		Unit* CreateUnitFromToken(const Token&);
+		NOD() Any CreateDataInner(const Construct&);
 
 		template<CT::Unit T, class ... A>
 		Decay<T>* CreateUnit(A&&...);

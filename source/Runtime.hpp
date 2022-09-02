@@ -22,11 +22,14 @@ namespace Langulus::Entity
 	///																								
 	class Runtime final {
 	public:
-		Runtime();
+		Runtime() = delete;
+		Runtime(Entity* owner) noexcept;
 		Runtime(Runtime&&) noexcept = default;
 		~Runtime();
 
 	public:
+		NOD() Entity* GetOwner() const noexcept { return mOwner; }
+
 		SharedLibrary LoadSharedLibrary(const Path&);
 		void UnloadSharedLibrary(SharedLibrary);
 
@@ -43,7 +46,9 @@ namespace Langulus::Entity
 		NOD() AFile* GetFile(const Path&);
 		NOD() AFolder* GetFolder(const Path&);
 
-	private:
+	protected:
+		Entity* mOwner;
+
 		// Loaded shared libraries, indexed by filename							
 		// This is a static registry - all Runtimes use the same shared	
 		// library objects, but manage their own module instantiations		

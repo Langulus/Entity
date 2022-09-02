@@ -197,13 +197,15 @@ namespace Langulus::Entity
 		return handle;
 	}
 
-	/// Default runtime component construction											
-	Runtime::Runtime() {
+	/// Runtime construction																	
+	///	@param owner - the owner of the runtime										
+	Runtime::Runtime(Entity* owner) noexcept
+		: mOwner {owner} {
 		Logger::Verbose() << "Initializing...";
 		Logger::Verbose() << "Initialized";
 	}
 
-	/// Runtime component destruction														
+	/// Runtime destruction																		
 	Runtime::~Runtime() {
 		while (!mLibraries.IsEmpty())
 			UnloadSharedLibrary(mLibraries.GetValue(IndexFirst));

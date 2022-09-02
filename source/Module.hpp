@@ -46,6 +46,7 @@ namespace Langulus::Entity
 		using ExitPoint = void (*)();
 
 	public:
+		NOD() Runtime* GetRuntime() const noexcept { return mRuntime; }
 		virtual void Update(Time) = 0;
 
 	private:

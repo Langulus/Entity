@@ -317,9 +317,12 @@ namespace Langulus::Entity
 					//TODO this is a pretty radical heuristic - only constructs with missing arguments 
 					// search for implicit mass, but what if you want to make a number of constructs, that are explicitly defined in the ontology?
 					// works for now...
-					auto missingNumber = Ptr<Any>::New(ANumber::ID);
-					missingNumber->MakeMissing().MakeLeft();
-					auto newPoint = Ptr<MissingPoint>::New(Real {}, missingNumber, &construct);
+					auto missingNumber = Ptr<Any>::New(
+						MetaData::Of<A::Number>());
+					missingNumber->MakeMissing();
+					missingNumber->MakePast();
+					auto newPoint = Ptr<MissingPoint>::New(
+						Real {}, missingNumber, &construct);
 					result << newPoint.Get();
 				}
 			}
@@ -591,7 +594,7 @@ namespace Langulus::Entity
 		
 		// Scope is flat AND																
 		// It is safe to just push each verb individually						
-		for (pcptr i = 0; i < content.GetCount(); ++i) {
+		for (Offset i = 0; i < content.GetCount(); ++i) {
 			auto element = content.GetElementResolved(i);
 			for (auto future : futures) {
 				if (element.Is<Verb>()) {
