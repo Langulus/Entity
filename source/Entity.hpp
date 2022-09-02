@@ -69,9 +69,9 @@ namespace Langulus::Entity
 		//	Hierarchy																		
 		TAny<Entity> mChildren;
 		// Units																				
-		THashMap<DMeta, TAny<Unit*>> mUnits;
+		TUnorderedMap<DMeta, TAny<Unit*>> mUnits;
 		// Traits																			
-		THashMap<TMeta, TAny<Trait>> mTraits;
+		TUnorderedMap<TMeta, TAny<Trait>> mTraits;
 
 		// Runtime																			
 		Ptr<Runtime> mRuntime;
@@ -156,7 +156,7 @@ namespace Langulus::Entity
 		NOD() TAny<const Decay<T>*> GatherUnits() const;
 
 		void CreateUnitInner(const Construct&, TAny<Unit*>&);
-		Unit* CreateUnitFromToken(const Text&);
+		Unit* CreateUnitFromToken(const Token&);
 
 		template<CT::Unit T, class ... A>
 		Decay<T>* CreateUnit(A&&...);

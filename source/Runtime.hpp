@@ -47,16 +47,16 @@ namespace Langulus::Entity
 		// Loaded shared libraries, indexed by filename							
 		// This is a static registry - all Runtimes use the same shared	
 		// library objects, but manage their own module instantiations		
-		static THashMap<Path, SharedLibrary> mLibraries;
+		static TUnorderedMap<Path, SharedLibrary> mLibraries;
 
 		// Instantiated modules, sorted by priority								
 		TMap<Real, TAny<Module*>> mModules;
 		// Instantiated modules, indexed by library handles					
-		THashMap<SharedLibrary, TAny<Module*>> mInstantiations;
+		TUnorderedMap<SharedLibrary, TAny<Module*>> mInstantiations;
 		// Instantiated modules, indexed by concrete type						
-		THashMap<DMeta, TAny<Module*>> mConcreteModules;
+		TUnorderedMap<DMeta, TAny<Module*>> mConcreteModules;
 		// Instantiated modules, indexed by category								
-		THashMap<DMeta, TAny<Module*>> mCategories;
+		TUnorderedMap<DMeta, TAny<Module*>> mCategories;
 	};
 
 } // namespace Langulus::Entity

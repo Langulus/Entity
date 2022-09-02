@@ -611,8 +611,11 @@ namespace Langulus::Entity
 						<< "Charged creation - creating " << i + 1 << " of " << count);
 				}
 
-				if (construct.Is<Entity>())
-					CreateChild(construct, createdChildren);
+				if (construct.Is<Entity>()) {
+					auto created = CreateChild(construct);
+					if (created)
+						createdChildren << created;
+				}
 				else if (construct.CastsTo<Unit>())
 					CreateUnitInner(construct, createdUnits);
 				else if (construct.CastsTo<Module>()) {
@@ -784,32 +787,22 @@ namespace Langulus::Entity
 
 	/// Create a child entity via default-construction									
 	///	@return the instance of the child												
-	Entity* Entity::CreateChild() {
-		mChildren.Emplace(this);
+	Entity* Entity::CreateChild(const Any& descriptor) {
+		mChildren.Emplace(this, descriptor);
 		ENTITY_VERBOSE_SELF(mChildren.Last() << " added");
 		return &mChildren.Last();
 	}
 
-	/// Create a child entity via move-construction										
-	///	@param initializer - the entity to move										
-	///	@return the instance of the child												
-	Entity* Entity::CreateChild(Entity&& initializer) {
-		auto newEntity = Ptr<Entity>::New(Forward<Entity>(initializer));
-		mChildren << newEntity;
-		ENTITY_VERBOSE_SELF(newEntity << " added");
-		return newEntity;
-	}
-
-	/// Create a child entity via dynamic construction									
+	/// Charged creation of children															
 	///	@param construct - the entity constructor										
-	///	@param products - [out] created children go here							
-	void Entity::CreateChild(const Construct& construct, TAny<Entity*>& products) {
+	///	@return created children															
+	TAny<Entity*> Entity::CreateChildren(const Construct& construct) {
 		// First make the entity														
 		auto newEntity = Ptr<Entity>::New(this);
 		mChildren << newEntity;
 
 		// Then 'create' inside it														
-		Any childBlock { newEntity->GetBlock() };
+		Any childBlock {newEntity->GetBlock()};
 		UNUSED() Any unusedSideproducts;
 		Verb::DefaultCreateInner(childBlock, construct.GetAll(), unusedSideproducts);
 		products << newEntity;
@@ -823,7 +816,7 @@ namespace Langulus::Entity
 	/// Add a child																				
 	///	@param entity - entity instance to register as a child					
 	void Entity::AddChild(Entity* entity) {
-		if (mChildren.Find(entity) != uiNone)
+		if (mChildren.Find(entity))
 			return;
 
 		mChildren << entity;
@@ -835,17 +828,8 @@ namespace Langulus::Entity
 	///	@attention provided pointer is considered invalid after this call		
 	///	@param entity - entity instance to destroy									
 	void Entity::RemoveChild(Entity* entity) {
-		for (auto child : mChildren) {
-			if (child != entity)
-				continue;
-
-			ENTITY_VERBOSE_SELF(child << " removed");
-
-			SAFETY(bool trulyRemoved = )
-				mChildren.Remove(child);
-			SAFETY(if (!trulyRemoved) throw Except::BadDestruction());
-			return;
-		}
+		if (mChildren.RemoveAddress(entity))
+			mRefreshRequired = true;
 	}
 
 	/// Move an entity as a child to this one, remapping units and hierarchy	
@@ -854,13 +838,11 @@ namespace Langulus::Entity
 	///	@param other - the entity to move												
 	///	@return the moved entity - you should overwrite 'other' with it		
 	Entity* Entity::MoveAsChild(Entity* other) {
-		if (mChildren.Find(other) != uiNone) {
-			// 'other' is already a child - nothing moves						
+		if (mChildren.Find(other))
 			return other;
-		}
 
 		ENTITY_VERBOSE_SELF(other << " moved in as a child");
-		auto newEntity = Ptr<Entity>::New(pcMove(*other));
+		auto newEntity = Ptr<Entity>::New(Move(*other));
 		mChildren << newEntity;
 		newEntity->mOwner->RemoveChild(other);
 		// Consider 'other' as an invalid pointer at this point				
@@ -872,8 +854,8 @@ namespace Langulus::Entity
 	/// Produce a unit from the entity's hierarchy by the type token				
 	///	@param name - name of the unit to produce										
 	///	@return the unit instance, or nullptr if none created						
-	AUnit* Entity::CreateUnitFromToken(const Text& name) {
-		TAny<AUnit*> products;
+	Unit* Entity::CreateUnitFromToken(const Token& name) {
+		TAny<Unit*> products;
 		CreateUnitInner(Construct(name), products);
 		return products[0];
 	}
@@ -885,45 +867,46 @@ namespace Langulus::Entity
 	///	@param type - the type to build dependencies for							
 	///	@return the resulting dependencies (top level)								
 	Any Entity::CreateDependencies(DMeta type) {
-		auto meta = type->GetProducerMeta();
+		auto meta = type->mProducer;
 		if (!meta) {
-			throw Except::BadConstruction(pcLogSelfError 
+			Logger::Error()
 				<< "Can't create " << type
-				<< " - type has no defined producer unit/module");
+				<< " - type has no defined producer unit/module";
+			Throw<Except::Construct>("Can't create dependencies");
 		}
 
-		if (meta->IsChildOf<AUnit>()) {
-			TAny<AUnit*> producers;
+		if (meta->IsChildOf<Unit>()) {
+			TAny<Unit*> producers;
 
 			// Producer is a unit, search for it in the hierarchy				
 			//TODO collect all capable producers in the hierarchy?			
-			auto producerFound = SeekUnit(SeekStyle::UpToHere, meta);
+			auto producerFound = SeekUnit<SeekStyle::UpToHere>(meta);
 			if (producerFound)
 				producers << producerFound;
 			else {
 				// No producer available in the hierarchy, so nest to			
 				// produce producer														
-				ENTITY_VERBOSE_SELF(ccDarkYellow
+				ENTITY_VERBOSE_SELF(Logger::DarkYellow
 					<< "Required producer " << meta << " for creating " << type
 					<< " not found in hierarchy - attempting to create it...");
 				auto nestedProducers = CreateDependencies(meta);
 
 				// The producer will be added either next							
-				// to its own producer, or the CRuntime component				
+				// to its own producer, or the runtime 							
 				const Construct c {meta};
-				EitherDoThis
-					nestedProducers.ForEach([&](AUnit* unit) {
+				nestedProducers.ForEach(
+					[&](Unit* unit) {
 						unit->GetOwners()[0]->CreateUnitInner(c, producers);
-					})
-				OrThis
-					nestedProducers.ForEach([&](AModule* module) {
+					},
+					[&](Module* module) {
 						module->GetRuntime()->GetOwners()[0]->CreateUnitInner(c, producers);
-					});
+					}
+				);
 			}
 
-			return producers.Decay();
+			return producers;
 		}
-		else if (meta->IsChildOf<AModule>()) {
+		else if (meta->IsChildOf<Module>()) {
 			// Producer is a module. Let's seek the runtime component,		
 			// since it contains the instantiated modules						
 			auto runtime = GetRuntime();
@@ -932,25 +915,27 @@ namespace Langulus::Entity
 				auto root = this;
 				while (root->GetOwner())
 					root = root->GetOwner().Get();
-				runtime = root->CreateUnit<CRuntime>();
+				runtime = root->CreateUnit<Runtime>();
 			}
 
 			// Runtime unit is available, poll it for the module				
-			TAny<AModule*> producers;
+			TAny<Module*> producers;
 			runtime->InstantiateModule(meta, producers);
-			return producers.Decay();
+			return producers;
 		}
 
-		throw Except::BadConstruction(pcLogSelfError
+		Logger::Error()
 			<< "Couldn't produce " << type << " from " << meta
-			<< " - the producer wasn't found, and couldn't be produced");
+			<< " - the producer wasn't found, and couldn't be produced";
+
+		Throw<Except::Construct>("Couldn't create dependencies");
 	}
 
 	/// Produce unit(s) from the entity's hierarchy										
 	///	@param construct - instructions for the creation of the unit(s)		
 	///	@param products - [out] the resulting units go here						
-	void Entity::CreateUnitInner(const Construct& construct, TAny<AUnit*>& products) {
-		if (construct.Is<CRuntime>()) {
+	void Entity::CreateUnitInner(const Construct& construct, TAny<Unit*>& products) {
+		if (construct.Is<Runtime>()) {
 			// Produce a runtime component											
 			auto system = Ptr<CRuntime>::Create();
 			Any systemBlock { system->GetBlock() };
@@ -961,7 +946,7 @@ namespace Langulus::Entity
 			return;
 		}
 
-		if (construct.Is<CFlow>()) {
+		if (construct.Is<Temporal>()) {
 			// Produce a flow component												
 			auto flow = Ptr<CFlow>::Create();
 			Any flowBlock { flow->GetBlock() };
@@ -992,4 +977,4 @@ namespace Langulus::Entity
 		});
 	}
 	
-} // namespace PCFW
+} // namespace Langulus::Entry

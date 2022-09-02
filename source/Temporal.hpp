@@ -44,7 +44,7 @@ namespace Langulus::Entity
 		TMap<TimePoint, Temporal> mTimeStack;
 
 		// Verb frequency stack - flows that trigger periodically			
-		THashMap<Time, Temporal> mFrequencyStack;
+		TUnorderedMap<Time, Temporal> mFrequencyStack;
 
 	public:
 		Temporal(const Temporal&) = delete;

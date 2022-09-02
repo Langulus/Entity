@@ -221,22 +221,33 @@ namespace Langulus::Entity
 
 	/// Execute the whole flow in a specific context									
 	///	@param context - context to execute in											
-	///	@param timeOffset - time offset to set before execution					
-	///	@param timePeriod - the period to execute										
-	void Temporal::Execute(Block& context, const TimePoint timeOffset, const Time timePeriod) {
-		mCurrentTime = mPreviousTime = timeOffset;
-		Update(context, timePeriod);
+	///	@param offset - time offset to set before execution						
+	///	@param period - the period to execute											
+	void Temporal::Execute(Block& context, const TimePoint offset, const Time period) {
+		mCurrentTime = mPreviousTime = offset;
+		Update(context, period);
 	}
 
 	/// Merge a flow																				
 	///	@param other - the flow to merge with this one								
 	void Temporal::Merge(const Temporal& other) {
+		// Concatenate priority stacks												
 		mPriorityStack += other.mPriorityStack;
+
+		// Merge time stacks																
 		for (auto pair : other.mTimeStack) {
-			const auto found = mTimeStack.FindKey(pair.mKey);
+			const auto found = mTimeStack.FindKeyIndex(pair.mKey);
 			if (!found)
 				mTimeStack.Insert(pair.mKey, Temporal {this});
 			mTimeStack[pair.mKey].Merge(pair.mValue);
+		};
+
+		// Merge periodic stacks														
+		for (auto pair : other.mFrequencyStack) {
+			const auto found = mFrequencyStack.FindKeyIndex(pair.mKey);
+			if (!found)
+				mFrequencyStack.Insert(pair.mKey, Temporal {this});
+			mFrequencyStack[pair.mKey].Merge(pair.mValue);
 		};
 	}
 
