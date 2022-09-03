@@ -7,6 +7,7 @@ namespace Langulus::Entity
 
 	class AFile;
 	class AFolder;
+	using ModuleList = TAny<Module*>;
 
 
 	///																								
@@ -21,32 +22,26 @@ namespace Langulus::Entity
 	/// children, modules, units, etc.														
 	///																								
 	class Runtime final {
-	public:
-		Runtime() = delete;
-		Runtime(Entity* owner) noexcept;
-		Runtime(Runtime&&) noexcept = default;
-		~Runtime();
-
-	public:
-		NOD() Entity* GetOwner() const noexcept { return mOwner; }
-
-		SharedLibrary LoadSharedLibrary(const Path&);
-		void UnloadSharedLibrary(SharedLibrary);
-
-		Module* InstantiateModule(const Construct&);
-
-		NOD() Module* GetModule(DMeta);
-		NOD() const Module* GetModule(DMeta) const;
-		NOD() Module* GetModule(const Token&);
-		NOD() const Module* GetModule(const Token&) const;
-
-		void Update(Time);
-
-		NOD() Count GetNumberOfActiveWindows() const;
-		NOD() AFile* GetFile(const Path&);
-		NOD() AFolder* GetFolder(const Path&);
-
 	protected:
+		/// Library handle																		
+		struct SharedLibrary {
+			uintptr_t mHandle {};
+			Module::EntryPoint mEntry;
+			Module::CreatePoint mCreator;
+			Module::InfoPoint mInfo;
+			Module::ExitPoint mExit;
+
+			/// Compare shared libraries by handle only									
+			bool operator == (const SharedLibrary& rhs) const noexcept {
+				return mHandle == rhs.mHandle;
+			}
+
+			/// Hashing for to being able to contain it in a map						
+			Hash GetHash() const noexcept {
+				return {mHandle};
+			}
+		};
+
 		Entity* mOwner;
 
 		// Loaded shared libraries, indexed by filename							
@@ -54,14 +49,36 @@ namespace Langulus::Entity
 		// library objects, but manage their own module instantiations		
 		static TUnorderedMap<Path, SharedLibrary> mLibraries;
 
+		// Shared library dependencies for all externally registered types
+		static TUnorderedMap<DMeta, SharedLibrary> mDependencies;
+
 		// Instantiated modules, sorted by priority								
-		TMap<Real, TAny<Module*>> mModules;
+		TMap<Real, ModuleList> mModules;
+
 		// Instantiated modules, indexed by library handles					
-		TUnorderedMap<SharedLibrary, TAny<Module*>> mInstantiations;
-		// Instantiated modules, indexed by concrete type						
-		TUnorderedMap<DMeta, TAny<Module*>> mConcreteModules;
-		// Instantiated modules, indexed by category								
-		TUnorderedMap<DMeta, TAny<Module*>> mCategories;
+		TUnorderedMap<SharedLibrary, ModuleList> mInstantiations;
+
+		// Instantiated modules, indexed by type									
+		TUnorderedMap<DMeta, ModuleList> mModulesByType;
+
+		NOD() SharedLibrary LoadSharedLibrary(const Path&);
+		void UnloadSharedLibrary(const SharedLibrary&);
+
+	public:
+		Runtime() = delete;
+		Runtime(Entity*) noexcept;
+		Runtime(Runtime&&) noexcept = default;
+		~Runtime();
+
+		NOD() Entity* GetOwner() const noexcept { return mOwner; }
+
+	public:
+		NOD() Module* InstantiateModule(const Construct&);
+
+		NOD() const ModuleList& GetModules(DMeta) const noexcept;
+		NOD() const ModuleList& GetModules(const Token&) const noexcept;
+
+		void Update(Time);
 	};
 
 } // namespace Langulus::Entity

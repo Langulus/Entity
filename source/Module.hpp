@@ -1,6 +1,30 @@
 #pragma once
 #include "Resolvable.hpp"
 
+namespace Langulus
+{
+
+	using MetaList = Anyness::TAny<RTTI::DMeta>;
+
+	/// Helper function, that reflects and registers a type list					
+	///	@return a container with list of all the registered types				
+	template<class... T>
+	MetaList RegisterTypeList() {
+		return MetaList::Wrap(
+			RTTI::MetaData::Of<T>()...);
+	}
+
+	/// Helper function, that unregisters a type list									
+	///	@return a container with list of all the unregistered types				
+	template<class... T>
+	MetaList UnregisterTypeList() {
+		return MetaList::Wrap(
+			RTTI::Database.Unregister(RTTI::MetaData::Of<T>())...);
+	}
+
+} // namespace Langulus
+
+
 namespace Langulus::Entity
 {
 
@@ -14,6 +38,8 @@ namespace Langulus::Entity
 	///	External module interface															
 	///																								
 	class Module : public Resolvable {
+		LANGULUS(ABSTRACT) true;
+		LANGULUS(PRODUCER) Runtime;
 	public:
 		Module(DMeta classid, Runtime* runtime) noexcept
 			: Resolvable {classid}
@@ -27,7 +53,7 @@ namespace Langulus::Entity
 		Module& operator = (const Module&) noexcept = default;
 		Module& operator = (Module&&) noexcept = default;
 
-		struct ModuleInfo {
+		struct Info {
 			// Define the order in which module updates, relative to others
 			Real mPriority = 0;
 			// Name of the module														
@@ -40,10 +66,10 @@ namespace Langulus::Entity
 			DMeta mCategory {};
 		};
 
-		using EntryPoint = void (*)();
-		using CreatePoint = Module* (*)(Runtime*, const Any&);
-		using InfoPoint = const ModuleInfo& (*)();
-		using ExitPoint = void (*)();
+		using EntryPoint = MetaList(*)();
+		using CreatePoint = Module*(*)(Runtime*, const Any&);
+		using InfoPoint = const Info&(*)();
+		using ExitPoint = MetaList(*)();
 
 	public:
 		NOD() Runtime* GetRuntime() const noexcept { return mRuntime; }
@@ -54,39 +80,61 @@ namespace Langulus::Entity
 		Runtime* mRuntime;
 	};
 
-	/// Library handle																			
-	struct SharedLibrary {
-		intptr_t mHandle {};
-		Module::EntryPoint mEntry;
-		Module::CreatePoint mCreator;
-		Module::InfoPoint mInfo;
-		Module::ExitPoint mExit;
-	};
-
-
-	/// Convenience macro for implementing module entry and exit points			
-	#define LANGULUS_DEFINE_MODULE(module) \
-		AModule* LANGULUS_MODULE_CREATOR (CRuntime* system, PCFW::SharedLibrary handle) {\
-			static_assert(!pcIsAbstract<module>, "Langulus module " #module " is abstract, have you forgotten to define its interface?"); \
-			return new module(system, handle);\
-		}\
-		const PCFW::ModuleInfo& LANGULUS_MODULE_INFO () {\
-			return gsModuleInfo;\
-		}
-
-	/// Define module entry and exit points, as well as module info				
-	///	@param prio - priority of the module											
-	///	@param name - name of the module													
-	///	@param info - verbose info about the module's purpose						
-	///	@param depo - default resource import/export directory					
-	///	@param abst - abstract module type												
-	#define LANGULUS_DECLARE_MODULE(prio, name, info, depo, abst) \
-		const PCFW::ModuleInfo gsModuleInfo = {prio, name, info, depo, DataID::Of<abst>};\
-		extern "C" {\
-			LANGULUS_EXPORT() void LANGULUS_MODULE_LINKER ();\
-			LANGULUS_EXPORT() AModule* LANGULUS_MODULE_CREATOR (CRuntime*, PCFW::SharedLibrary);\
-			LANGULUS_EXPORT() const PCFW::ModuleInfo& LANGULUS_MODULE_INFO ();\
-			LANGULUS_EXPORT() void LANGULUS_MODULE_DESTROYER ();\
-		}
-
 } // namespace Langulus::Entity
+
+
+
+/// Utility macro, that turns its argument to a string literal (inner)			
+#define LANGULUS_STRINGIFY_INNER(x)		#x
+/// Utility macro, that turns its argument to a string literal						
+#define LANGULUS_STRINGIFY(x)					LANGULUS_STRINGIFY_INNER(x)
+
+/// Name of module entry function															
+#define LANGULUS_MODULE_ENTRY()				LangulusModuleEntryPoint
+#define LANGULUS_MODULE_ENTRY_TOKEN()		LANGULUS_STRINGIFY(LANGULUS_MODULE_ENTRY())
+/// Name of module exit function																
+#define LANGULUS_MODULE_EXIT()				LangulusModuleExitPoint
+#define LANGULUS_MODULE_EXIT_TOKEN()		LANGULUS_STRINGIFY(LANGULUS_MODULE_EXIT())
+/// Name of module instantiation function													
+#define LANGULUS_MODULE_CREATE()				LangulusModuleCreatePoint
+#define LANGULUS_MODULE_CREATE_TOKEN()		LANGULUS_STRINGIFY(LANGULUS_MODULE_CREATE())
+/// Name of module information function													
+#define LANGULUS_MODULE_INFO()				LangulusModuleInfoPoint
+#define LANGULUS_MODULE_INFO_TOKEN()		LANGULUS_STRINGIFY(LANGULUS_MODULE_INFO())
+
+
+/// Convenience macro for implementing module entry and exit points				
+///	@param m - the type of the module interface, must inherit Module			
+///	@param prio - the priority of the module											
+///	@param name - the module identifier token											
+///	@param info - information string literal about the module					
+///	@param depo - relative path for the module, under Data/Modules/			
+///	@param ... - a type list to reflect upon module load							
+#define LANGULUS_DEFINE_MODULE(m, prio, name, info, depo, cat, ...) \
+	extern "C" { \
+		LANGULUS_EXPORT() ::Langulus::MetaList LANGULUS_MODULE_ENTRY() () { \
+			return ::Langulus::RegisterTypeList<__VA_ARGS__>();\
+		} \
+		\
+		LANGULUS_EXPORT() ::Langulus::MetaList LANGULUS_MODULE_EXIT() () { \
+			return ::Langulus::UnregisterTypeList<__VA_ARGS__>();\
+		} \
+		\
+		LANGULUS_EXPORT() ::Langulus::Entity::Module* LANGULUS_MODULE_CREATE() ( \
+			::Langulus::Entity::Runtime* rt, const ::Langulus::Anyness::Any& desc) { \
+			static_assert(::Langulus::CT::DerivedFrom<m, ::Langulus::Entity::Module>, \
+				"Langulus module class interface " \
+				#m " doesn't inherit ::Langulus::Entity::Module"); \
+			static_assert(!::Langulus::CT::Abstract<m>, \
+				"Langulus module class interface " \
+				#m " is abstract, have you forgotten to define its interface?"); \
+			return new m {rt, desc}; \
+		} \
+		\
+		LANGULUS_EXPORT() const ::Langulus::Entity::Module::Info& LANGULUS_MODULE_INFO() () { \
+			static const ::Langulus::Entity::Module::Info i { \
+				prio, name, info, depo, cat \
+			}; \
+			return i; \
+		} \
+	}

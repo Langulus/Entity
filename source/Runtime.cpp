@@ -57,145 +57,7 @@ namespace Langulus::Entity
 	#else
 		#error Unsupported OS
 	#endif
-	
-	/// Load a shared library module															
-	///	@param filename - the shared library to load									
-	///	@return the shared library handle												
-	SharedLibrary LoadSharedLibrary(const Path& filename) {
-		SharedLibrary handle;
-		Path file;
 
-		// File prefix																		
-		#if LANGULUS_OS(LINUX)
-			file = "./lib";
-		#endif
-
-		file += "M";
-		file += filename;
-
-		#if LANGULUS(DEBUG)
-			file += "d";
-		#endif
-
-		// File postfix																	
-		#if LANGULUS_OS(WINDOWS)
-			file += ".dll";
-		#elif LANGULUS_OS(LINUX)
-			file += ".so";
-		#else
-			#error Unsupported OS
-		#endif
-
-		// Make sure string ends with terminator									
-		file = file.Terminate();
-
-		// Load the library																
-		#if LANGULUS_OS(WINDOWS)
-			auto dll = LoadLibraryA(file.GetRaw());
-		#elif LANGULUS_OS(LINUX)
-			auto dll = dlopen(file.GetRaw(), RTLD_NOW);
-		#else 
-			#error Unsupported OS
-		#endif
-
-		if (!dll) {
-			Logger::Error() << "Failed to load module " << file << " - file is missing or corrupted";
-			#if LANGULUS_OS(WINDOWS)
-				OSGetLastError("IModule::LOAD");
-			#endif
-			return {};
-		}
-
-		// Great success!																	
-		Logger::Info() << "Module " << file << " loaded";
-
-		// Get entry point from the dll												
-		// Entry point is used to produce modules									
-		#if LANGULUS_OS(WINDOWS)
-			handle.mEntry = reinterpret_cast<Module::EntryPoint>(
-				GetProcAddress(dll, LANGULUS_TOSTRING(LANGULUS_MODULE_LINKER)));
-		#elif LANGULUS_OS(LINUX)
-			handle.mEntry = reinterpret_cast<ModuleEntryPointPtr>(
-				dlsym(dll, LANGULUS_TOSTRING(LANGULUS_MODULE_LINKER)));
-		#else 
-			#error Unsupported OS
-		#endif	
-
-		if (!handle.mEntry) {
-			#if LANGULUS_OS(WINDOWS)
-				OSGetLastError("GetProcAddress(" LANGULUS_TOSTRING(LANGULUS_MODULE_LINKER) ")");
-			#endif
-			Logger::Error() << "Module " << file << " has no valid linking point - unloading...";
-			UnloadSharedLibrary(dll);
-			return {};
-		}
-
-		// Get creator point from the dll											
-		// Creator point is used to produce modules								
-		#if LANGULUS_OS(WINDOWS)
-			handle.mCreator = reinterpret_cast<Module::CreatePoint>(
-				GetProcAddress(dll, LANGULUS_TOSTRING(LANGULUS_MODULE_CREATOR)));
-		#elif LANGULUS_OS(LINUX)
-			handle.mCreator = reinterpret_cast<ModuleCreatePointPtr>(
-				dlsym(dll, LANGULUS_TOSTRING(LANGULUS_MODULE_CREATOR)));
-		#else 
-			#error Unsupported OS
-		#endif
-
-		if (!handle.mCreator) {
-			#if LANGULUS_OS(WINDOWS)
-				OSGetLastError("GetProcAddress(" LANGULUS_TOSTRING(LANGULUS_MODULE_CREATOR) ")");
-			#endif
-			Logger::Error() << "Module " << file << " has no valid creator point - unloading...";
-			UnloadSharedLibrary(dll);
-			return {};
-		}
-
-		// Get info point from the dll												
-		// Info point contains various information about module				
-		// For example: module executional priority								
-		#if LANGULUS_OS(WINDOWS)
-			handle.mInfo = reinterpret_cast<Module::InfoPoint>(
-				GetProcAddress(dll, LANGULUS_TOSTRING(LANGULUS_MODULE_INFO)));
-		#elif LANGULUS_OS(LINUX)
-			handle.mInfo = reinterpret_cast<ModuleInfoPointPtr>(
-				dlsym(dll, LANGULUS_TOSTRING(LANGULUS_MODULE_INFO)));
-		#else 
-			#error Unsupported OS
-		#endif
-
-		if (!handle.mInfo) {
-			#if LANGULUS_OS(WINDOWS)
-				OSGetLastError("GetProcAddress(" LANGULUS_TOSTRING(LANGULUS_MODULE_INFO) ")");
-			#endif
-			Logger::Error() << "Module " << file << " has no valid info point - unloading...";
-			UnloadSharedLibrary(dll);
-			return {};
-		}
-
-		// Get exit point from the dll												
-		// Exit point unlinks and removed meta data								
-		#if LANGULUS_OS(WINDOWS)
-			handle.mExit = reinterpret_cast<Module::ExitPoint>(
-				GetProcAddress(dll, LANGULUS_TOSTRING(LANGULUS_MODULE_DESTROYER)));
-		#elif LANGULUS_OS(LINUX)
-			handle.mExit = reinterpret_cast<ModuleExitPointPtr>(
-				dlsym(dll, LANGULUS_TOSTRING(LANGULUS_MODULE_DESTROYER)));
-		#else 
-			#error Unsupported OS
-		#endif
-
-		if (!handle.mExit) {
-			#if LANGULUS_OS(WINDOWS)
-				OSGetLastError("GetProcAddress(" LANGULUS_TOSTRING(LANGULUS_MODULE_DESTROYER) ")");
-			#endif
-			Logger::Error() << "Module " << file << " has no valid exit point - unloading...";
-			UnloadSharedLibrary(dll);
-			return {};
-		}
-
-		return handle;
-	}
 
 	/// Runtime construction																	
 	///	@param owner - the owner of the runtime										
@@ -216,38 +78,78 @@ namespace Langulus::Entity
 	///	@return the new module instance													
 	Module* Runtime::InstantiateModule(const Construct& construct) {
 		const auto type = construct.GetType();
-		auto module = GetModule(type);
-		if (!module) {
-			// A module instance doesn't exist yet, so instantiate			
-			Logger::Warning()
-				<< "Required module " << type
-				<< " is not instanced - attempting to create module...";
-
-			// Delegate any configuration to the module instance via the	
-			// construct (the descriptor)												
-			module = Module::CREATE(this, construct);
-			mModules.Merge(info.mPriority, module.Get());
-			mModules.Sort(IndexSmallest);
-			Logger::Verbose()
-				<< "Module " << info.mName
-				<< " registered with priority " << info.mPriority;
-			return module;
-
-			if (!module) {
-				Logger::Error()
-					<< "Can't instantiate module " << type
-					<< " - most likely due to bad initialization, or a missing DLL/SO file")
-				Throw<Except::Construct>("Can't instantiate module ");
-			}
+		if (!type->mProducer->Is<Runtime>()) {
+			Logger::Error()
+				<< "Runtime can't instantiate " << type << " - it's not a module";
+			return nullptr;
 		}
 
+		// Check if module is already instantiated								
+		auto& foundModules = GetModules(type);
+		if (!foundModules.IsEmpty())
+			return foundModules[0];
+
+		// What library produces the module/data?									
+		auto dependency = mDependencies.FindKeyIndex(type);
+		if (!dependency) {
+			Logger::Error()
+				<< "Module " << type << "'s dependency is not known";
+			return nullptr;
+		}
+
+		// A module instance doesn't exist yet, so instantiate it			
+		Logger::Verbose()
+			<< "Module " << type << " is not instantiated yet"
+			<< " - attempting to create it...";
+		auto& library = mDependencies.GetValue(dependency);
+
+		// Use the creation point of the library to instantiate module		
+		const auto& info = library.mInfo();
+		auto module = library.mCreator(this, construct);
+		if (!module) {
+			Logger::Error()
+				<< "Module " << type << "'s creator didn't provide a module";
+			return nullptr;
+		}
+
+		// Register the module in the various maps, for fast access			
+		try {
+			mModules[info.mPriority] << module;
+			mInstantiations[library] << module;
+			mModulesByType[module->GetType()] << module;
+		}
+		catch (...) {
+			Logger::Error()
+				<< "Registering module " << type << " failed";
+
+			// Make sure we end up in an invariant state							
+			mModules[info.mPriority].RemoveValue(module);
+			if (mModules[info.mPriority].IsEmpty())
+				mModules.RemoveKey(info.mPriority);
+
+			mInstantiations[library].RemoveValue(module);
+			if (mInstantiations[library].IsEmpty())
+				mInstantiations.RemoveKey(library);
+
+			mModulesByType[module->GetType()].RemoveValue(module);
+			if (mModulesByType[module->GetType()].IsEmpty())
+				mModulesByType.RemoveKey(module->GetType());
+
+			delete module;
+			return nullptr;
+		}
+
+		// Done, if reached																
+		Logger::Verbose()
+			<< "Module " << info.mName
+			<< " registered with priority " << info.mPriority;
 		return module;
 	}
 
 	/// Load a shared library for a module													
 	///	@param filename - the file for the dynamic library							
 	///	@return the module handle (OS dependent)										
-	SharedLibrary Runtime::LoadSharedLibrary(const Path& filename) {
+	typename Runtime::SharedLibrary Runtime::LoadSharedLibrary(const Path& filename) {
 		// Clone path into our memory, just in case								
 		auto path = filename.Clone();
 
@@ -258,150 +160,178 @@ namespace Langulus::Entity
 			return mLibraries.GetValue(preloaded);
 		}
 
-		// Load the library and retrieve entry, info, and exit points		
-		const auto library = ::Langulus::Entity::LoadSharedLibrary(path);
-		if (0 == library)
-			return 0;
+		// File prefix																		
+		#if LANGULUS_OS(LINUX)
+			file = "./lib";
+		#endif
 
+		path += "M";
+		path += filename;
+
+		#if LANGULUS(DEBUG)
+			path += "d";
+		#endif
+
+		// File postfix																	
+		#if LANGULUS_OS(WINDOWS)
+			path += ".dll";
+		#elif LANGULUS_OS(LINUX)
+			path += ".so";
+		#else
+			#error Unsupported OS
+		#endif
+
+		// Make sure string ends with terminator									
+		path = path.Terminate();
+
+		// Load the library																
+		#if LANGULUS_OS(WINDOWS)
+			const auto dll = LoadLibraryA(path.GetRaw());
+		#elif LANGULUS_OS(LINUX)
+			const auto dll = dlopen(path.GetRaw(), RTLD_NOW);
+		#else 
+			#error Unsupported OS
+		#endif
+
+		if (!dll) {
+			Logger::Error() << "Failed to load module `" << path << "` - file is missing or corrupted; Error code: ";
+			#if LANGULUS_OS(WINDOWS)
+				Logger::Append() << ::GetLastError();
+			#endif
+			return {};
+		}
+
+		// Great success!																	
+		Logger::Info() << "Module " << path << " loaded";
+		SharedLibrary library;
+		static_assert(sizeof(library.mHandle) == sizeof(dll), "Size mismatch");
+		library.mHandle = reinterpret_cast<decltype(library.mHandle)>(dll);
+
+		// Get entry, creator, info and exit points from the library		
+		#if LANGULUS_OS(WINDOWS)
+			library.mEntry = reinterpret_cast<Module::EntryPoint>(
+				GetProcAddress(dll, LANGULUS_MODULE_ENTRY_TOKEN()));
+			library.mCreator = reinterpret_cast<Module::CreatePoint>(
+				GetProcAddress(dll, LANGULUS_MODULE_CREATE_TOKEN()));
+			library.mInfo = reinterpret_cast<Module::InfoPoint>(
+				GetProcAddress(dll, LANGULUS_MODULE_INFO_TOKEN()));
+			library.mExit = reinterpret_cast<Module::ExitPoint>(
+				GetProcAddress(dll, LANGULUS_MODULE_EXIT_TOKEN()));
+		#elif LANGULUS_OS(LINUX)
+			library.mEntry = reinterpret_cast<Module::EntryPoint>(
+				dlsym(dll, LANGULUS_MODULE_ENTRY_TOKEN()));
+			library.mCreator = reinterpret_cast<Module::CreatePoint>(
+				dlsym(dll, LANGULUS_MODULE_CREATE_TOKEN()));
+			library.mInfo = reinterpret_cast<Module::InfoPoint>(
+				dlsym(dll, LANGULUS_MODULE_INFO_TOKEN()));
+			library.mExit = reinterpret_cast<Module::ExitPoint>(
+				dlsym(dll, LANGULUS_MODULE_EXIT_TOKEN()));
+		#else 
+			#error Unsupported OS
+		#endif	
+
+		if (!library.mEntry) {
+			Logger::Error()
+				<< "Module `" << path << "` has no valid entry point - "
+				<< "the function " LANGULUS_MODULE_ENTRY_TOKEN() " is missing";
+			UnloadSharedLibrary(library);
+			return {};
+		}
+
+		if (!library.mCreator) {
+			Logger::Error()
+				<< "Module `" << path << "` has no valid instantiation point - "
+				<< "the function " LANGULUS_MODULE_CREATE_TOKEN() " is missing";
+			UnloadSharedLibrary(library);
+			return {};
+		}
+
+		if (!library.mInfo) {
+			Logger::Error()
+				<< "Module `" << path << "` has no valid information point - "
+				<< "the function " LANGULUS_MODULE_INFO_TOKEN() " is missing";
+			UnloadSharedLibrary(library);
+			return {};
+		}
+
+		if (!library.mExit) {
+			Logger::Error()
+				<< "Module `" << path << "` has no valid exit point - "
+				<< "the function " LANGULUS_MODULE_EXIT_TOKEN() " is missing";
+			UnloadSharedLibrary(library);
+			return {};
+		}
+
+		// Link the module - this shall merge RTTI definitions				
+		// It might throw if out of memory or on meta collision, while		
+		// registering new types on the other side								
+		MetaList registeredTypes;
 		try {
-			// Link the module - this shall merge RTTI definitions			
-			// It might throw if out of memory or on meta collision, while	
-			// registering new types on the other side							
-			linker();
+			registeredTypes = library.mEntry();
+
+			mLibraries.Insert(path, library);
+			for (auto externalType : registeredTypes)
+				mDependencies.Insert(externalType, library);
 		}
-		catch (const Exception& exception) {
-			// Probably meta data conflict											
-			Logger::Error() << "Could not load: " << filename;
-			Logger::Error() << "Exception: " << exception;
-			exitp();
-			Module::UNLOAD(library);
-			throw;
+		catch (...) {
+			// Make sure we end up in an invariant state							
+			Logger::Error() << "Could not enter `" << path << "` due to an exception";
+			mLibraries.RemoveKey(path);
+			for (auto externalType : registeredTypes)
+				mDependencies.RemoveKey(externalType);
+			UnloadSharedLibrary(library);
+			return {};
 		}
 
-		// Get info and push to pending modules									
-		mLibraries.Insert(path, library);
 		return library;
 	}
 
 	/// Unload a DLL/SO extension module													
 	///	@param module - the module handle to unload									
-	void Runtime::UnloadSharedLibrary(SharedLibrary moduleHandle) {
-		// Remove every instantiation made from this library					
-		for (auto& group : mModules) {
-			for (auto& module : group) {
-				if (module->GetHandle() != moduleHandle)
-					continue;
-				group.Remove(module);
-				//TODO check if deleted!
-				break;
-			}
-		}
-
-		// Remove every module occuring in the module registry				
-		Module::UNLOAD(moduleHandle);
-		mLibraries.RemoveValue(moduleHandle);
-	}
-
-	/// Get a DLL/SO extension module by data type										
-	///	@param type - the module meta to get											
-	///	@return the module instance														
-	Module* Runtime::GetModule(DMeta type) {
-		for (auto& module_group : mModules) {
-			for (auto& mod : module_group) {
-				if (mod->CastsTo(type))
-					return mod;
-			}
-		}
-
-		return nullptr;
-	}
-
-	/// Get a DLL/SO extension module by data type (const)							
-	///	@param type - the module meta to get											
-	///	@return the module instance														
-	const Module* Runtime::GetModule(DMeta type) const {
-		return const_cast<Runtime*>(this)->GetModule(type);
-	}
-
-	/// Get a DLL/SO extension module by token name										
-	///	@param token - module name token													
-	///	@return the module instance, or nullptr if not found						
-	Module* Runtime::GetModule(const Token& token) {
-		for (auto& pair : mModules) {
-			for (auto& mod : pair) {
-				if (token == mod->ClassMeta()->GetToken())
-					return mod;
-			}
-		}
-
-		return nullptr;
-	}
-
-	/// Get a DLL/SO extension module by token name										
-	///	@param mname - module name token													
-	///	@return the module instance, or nullptr if not found						
-	const Module* Runtime::GetModule(const Text& token) const {
-		return const_cast<Runtime*>(this)->GetModule(token);
-	}
-
-	/// Get number of active windows															
-	///	@return the number of active windows											
-	Count Runtime::GetNumberOfActiveWindows() const {
-		const auto platform = GetModule(DataID::Reflect<AModulePlatform>());
-		if (platform && platform->IsClassValid())
-			return platform.As<AModulePlatform>()->GetNumberOfActiveWindows();
-		return 0;
-	}
-
-	/// Get a file interface (loads MVFS if not loaded yet)							
-	///	@param filename - the file to get												
-	///	@return the file interface															
-	AFile* Runtime::GetFile(const Path& filename) {
-		auto fs = GetModule(DataID::Reflect<AModuleVFS>());
-		if (!fs)
-			fs = CreateModule(DataID::Reflect<AModuleVFS>());
-		return fs.As<AModuleVFS>()->GetFile(filename);
-	}
-
-	/// Get a folder interface (loads MVFS if not loaded yet)						
-	///	@param dirname - the directory to get											
-	///	@return the folder interface														
-	AFolder* Runtime::GetFolder(const Path& dirname) {
-		auto fs = GetModule(DataID::Reflect<AModuleVFS>());
-		if (!fs)
-			fs = CreateModule(DataID::Reflect<AModuleVFS>());
-		return fs.As<AModuleVFS>()->GetFolder(dirname);
-	}
-
-	/// Update the runtime, by updating each active module							
-	///	@param dt - delta time between update calls									
-	void Runtime::Update(Time dt) {
-		// Update all modules															
-		for (auto& pair : mModules) {
-			for (auto& mod : pair) {
-				if (mod->IsClassValid())
-					mod->Update(dt);
-			}
-		}
-
-		// If you close all interactive windows, or none are available,	
-		// you're returned to console mode											
-		if (GetNumberOfActiveWindows())
+	void Runtime::UnloadSharedLibrary(const SharedLibrary& module) {
+		if (module.mHandle == 0)
 			return;
 
-		// No active windows at this point											
-		// We're in console mode, so collect commands forever, until		
-		// a shutdown command, or closing the console							
-		for (auto owner : GetOwners()) {
-			Logger::Prompt() << owner << ": Waiting for command:\n";
-			std::wstring line;
-			std::getline(std::wcin, line);
-			try {
-				owner->RunCode(line.c_str());
-			}
-			catch (...) {
+		const MetaList unregisteredTypes = module.mExit();
+		for (auto externalType : unregisteredTypes)
+			mDependencies.RemoveKey(externalType);
 
-			}
+		#if LANGULUS_OS(WINDOWS)
+			::Langulus::Entity::UnloadSharedLibrary(
+				reinterpret_cast<HMODULE>(module.mHandle));
+		#elif LANGULUS_OS(LINUX)
+			::Langulus::Entity::UnloadSharedLibrary(
+				reinterpret_cast<void*>(module.mHandle));
+		#else 
+			#error Unsupported OS
+		#endif
+	}
+
+	/// Get a module instance by type														
+	///	@param type - the type to search for											
+	///	@return the module instance														
+	const ModuleList& Runtime::GetModules(DMeta type) const noexcept {
+		auto found = mDependencies.FindKeyIndex(type);
+		if (found)
+			return mInstantiations[mDependencies.GetValue(found)];
+
+		static const ModuleList emptyFallback {};
+		return emptyFallback;
+	}
+
+	/// Get a module instance by type token												
+	///	@param token - type token															
+	///	@return the module instance, or nullptr if not found						
+	const ModuleList& Runtime::GetModules(const Token& token) const noexcept {
+		return GetModules(RTTI::Database.GetMetaData(token));
+	}
+
+	/// Update the runtime, by updating all module instantiations					
+	///	@param dt - delta time between update calls									
+	void Runtime::Update(Time dt) {
+		for (auto pair : mInstantiations) {
+			for (auto module : pair.mValue)
+				module->Update(dt);
 		}
 	}
 

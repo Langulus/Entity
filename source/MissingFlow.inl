@@ -80,7 +80,7 @@ namespace Langulus::Entity
 		T floored;
 		T fraction {::std::abs(::std::modf(x, &floored))};
 		if (fraction == 0)
-			return CountDigits(uint64_t {floored});
+			return CountDigits(static_cast<uint64_t>(floored));
 
 		floored = ::std::abs(floored);
 		T limit {1};
@@ -91,7 +91,7 @@ namespace Langulus::Entity
 			++fract_numbers;
 		}
 
-		return CountDigits(uint64_t {floored}) + fract_numbers + Count {1};
+		return CountDigits(static_cast<uint64_t>(floored)) + fract_numbers + Count {1};
 	}
 
 	/// Concatenate two numbers																
@@ -101,7 +101,7 @@ namespace Langulus::Entity
 	template<CT::Number T>
 	NOD() LANGULUS(ALWAYSINLINE) T ConcatenateNumbers(const T& lhs, const T& rhs) {
 		T result {lhs};
-		result *= ::std::pow(T {10}, T {CountDigits(rhs)});
+		result *= ::std::pow(T {10}, static_cast<T>(CountDigits(rhs)));
 		result += rhs;
 		return result;
 	}
@@ -142,8 +142,9 @@ namespace Langulus::Entity
 				// Special case when integrating implicit charges				
 				// Always succeeds, because it is not mandatory					
 				Real mass = mChanges ? mChargeFor->mMass : 0;
-				auto interpreter = Verbs::Interpret(MetaData::Of<Real>()).ShortCircuit(false);
-				if (Verb::DispatchDeep(content, interpreter)) {
+				auto interpreter = Verbs::Interpret {MetaData::Of<Real>()}
+					.ShortCircuit(false);
+				if (Flow::DispatchDeep(content, interpreter)) {
 					interpreter.GetOutput().ForEachDeep(
 						[&mass](const Real& n) noexcept {
 							mass = ConcatenateNumbers(mass, n);
@@ -171,7 +172,8 @@ namespace Langulus::Entity
 			if (!content.Is<Verb>()) {
 				// Try interpreting scope as verbs and try pushing them		
 				// If that fails just push the scope itself						
-				auto interpreter = Verbs::Interpret(MetaData::Of<Verb>()).ShortCircuit(false);
+				auto interpreter = Verbs::Interpret {MetaData::Of<Verb>()}
+					.ShortCircuit(false);
 				if (Flow::DispatchDeep(content, interpreter)) {
 					Any inserted;
 					if (Insert<ATTEMPT, CLONE>(*this, interpreter.GetOutput(), inserted, FindPastPoints)) {
@@ -203,8 +205,9 @@ namespace Langulus::Entity
 		VERBOSE_MISSING_POINT_TAB("Satisfying filter " << filters 
 			<< " by interpreting " << content);
 
-		auto interpreter = Verbs::Interpret(filters).ShortCircuit(false);
-		if (Verb::DispatchDeep(content, interpreter)) {
+		auto interpreter = Verbs::Interpret {filters}
+			.ShortCircuit(false);
+		if (Flow::DispatchDeep(content, interpreter)) {
 			// If results in verb skip insertion, delay for unfiltered		
 			bool skip {};
 			interpreter.GetOutput().ForEachDeep([&skip](const Verb&) {
@@ -255,7 +258,7 @@ namespace Langulus::Entity
 				// contexts - the whole context is reset after all				
 				// branches have been processed										
 				bool success {};
-				auto localOutput = Any::FromStateOf(content);
+				auto localOutput = Any::FromState(content);
 				content.ForEach([&](Any& b) {
 					success |= Insert<ATTEMPT, true>(context, b, localOutput, FindPastPoints);
 				});

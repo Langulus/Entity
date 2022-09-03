@@ -58,6 +58,7 @@ namespace Langulus::Entity
 	/// units, and other entities.															
 	///																								
 	class Entity final : public Resolvable {
+		LANGULUS(ABSTRACT) false;
 	protected:
 		void ResetRuntime(Runtime*);
 		void ResetFlow(Temporal*);
@@ -122,9 +123,7 @@ namespace Langulus::Entity
 		///	HIERARCHY MANAGEMENT																
 		///																							
 		NOD() Entity* CreateChild(const Any&);
-
-		void AddChild(Entity*);
-		void RemoveChild(Entity*);
+		Count DestroyChild(Entity*);
 
 		NOD() Entity* GetChild(const Index&);
 		NOD() const Entity* GetChild(const Index&) const;

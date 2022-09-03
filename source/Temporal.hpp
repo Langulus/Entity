@@ -1,5 +1,6 @@
 #pragma once
 #include "Resolvable.hpp"
+#include "Time.hpp"
 
 namespace Langulus::Entity
 {
@@ -31,11 +32,11 @@ namespace Langulus::Entity
 		Temporal* mParent {};
 
 		// Increments on each call to Update()										
-		TimePoint mPreviousTime = InvalidTimePoint;
-		TimePoint mCurrentTime = InvalidTimePoint;
+		TimePoint mPreviousTime;
+		TimePoint mCurrentTime;
 
 		// Accumulated flow duration													
-		Time mDuration = InvalidTime;
+		Time mDuration;
 
 		// Priority stack																	
 		Scope mPriorityStack;

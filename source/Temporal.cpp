@@ -135,7 +135,7 @@ namespace Langulus::Entity
 	///	@param context - the context to execute any verbs							
 	///	@param dt - delta time																
 	void Temporal::Update(Block& context, Time dt) {
-		if (mCurrentTime == InvalidTimePoint) {
+		if (!mCurrentTime) {
 			// If we're at the beginning of time - prepare for execution	
 			// This will omit any compilation-stage junk that remains in	
 			// the priority stack - we no longer need it							
@@ -183,7 +183,7 @@ namespace Langulus::Entity
 				<< "Flow after execution " << mPriorityStack);
 		}
 
-		if (dt == InvalidTime) {
+		if (!dt) {
 			// Avoid updating anything else, if no time had passed			
 			return;
 		}

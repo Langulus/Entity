@@ -786,30 +786,22 @@ namespace Langulus::Entity
 	}
 
 	/// Create a child entity via default-construction									
-	///	@return the instance of the child												
+	///	@param descriptor - instructions for the entity's creation				
+	///	@return the new child instance													
 	Entity* Entity::CreateChild(const Any& descriptor) {
 		mChildren.Emplace(this, descriptor);
 		ENTITY_VERBOSE_SELF(mChildren.Last() << " added");
 		return &mChildren.Last();
 	}
 
-	/// Add a child																				
-	///	@param entity - entity instance to register as a child					
-	void Entity::AddChild(Entity* entity) {
-		if (mChildren.Find(entity))
-			return;
-
-		mChildren << entity;
-		entity->mOwner = this;
-		entity->mRefreshRequired = true;
-	}
-
 	/// Destroy a child that matched pointer												
 	///	@attention provided pointer is considered invalid after this call		
 	///	@param entity - entity instance to destroy									
-	void Entity::RemoveChild(Entity* entity) {
-		if (mChildren.RemovePointer(entity))
-			mRefreshRequired = true;
+	///	@return the number of destroyed children										
+	Count Entity::DestroyChild(Entity* entity) {
+		const auto removed = mChildren.RemovePointer(entity);
+		mRefreshRequired = removed;
+		return removed;
 	}
 
 	/// Create all dependencies required for the production of 'type', if such	

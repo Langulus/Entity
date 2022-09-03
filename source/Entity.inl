@@ -78,16 +78,20 @@ namespace Langulus::Entity
 
 		// Seek here if requested														
 		if constexpr (SEEK & SeekStyle::Here) {
-			for (auto unit : mUnits) {
-				if (unit->CastsTo(meta))
-					result << unit;
+			for (auto unitList : mUnits) {
+				for (auto unit : unitList.mValue) {
+					if (unit->CastsTo(meta))
+						result << unit;
+				}
 			}
 		}
 
 		// Seek in parents up to root, if requested								
-		if constexpr (SEEK & SeekStyle::Above && mOwner) {
-			auto inParents = mOwner->GatherUnits<SeekStyle::UpToHere>(meta);
-			result.SmartPush(Abandon(inParents));
+		if constexpr (SEEK & SeekStyle::Above) {
+			if (mOwner) {
+				auto inParents = mOwner->GatherUnits<SeekStyle::UpToHere>(meta);
+				result.SmartPush(Abandon(inParents));
+			}
 		}
 
 		// Seek children, if requested												
@@ -118,10 +122,12 @@ namespace Langulus::Entity
 		}
 
 		// Seek in parents up to root, if requested								
-		if constexpr (SEEK & SeekStyle::Above && mOwner) {
-			result = mOwner->SeekUnit<SeekStyle::UpToHere>(meta, offset);
-			if (result)
-				return result;
+		if constexpr (SEEK & SeekStyle::Above) {
+			if (mOwner) {
+				result = mOwner->SeekUnit<SeekStyle::UpToHere>(meta, offset);
+				if (result)
+					return result;
+			}
 		}
 
 		// Seek children, if requested												
