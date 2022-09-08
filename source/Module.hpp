@@ -83,12 +83,6 @@ namespace Langulus::Entity
 } // namespace Langulus::Entity
 
 
-
-/// Utility macro, that turns its argument to a string literal (inner)			
-#define LANGULUS_STRINGIFY_INNER(x)		#x
-/// Utility macro, that turns its argument to a string literal						
-#define LANGULUS_STRINGIFY(x)					LANGULUS_STRINGIFY_INNER(x)
-
 /// Name of module entry function															
 #define LANGULUS_MODULE_ENTRY()				LangulusModuleEntryPoint
 #define LANGULUS_MODULE_ENTRY_TOKEN()		LANGULUS_STRINGIFY(LANGULUS_MODULE_ENTRY())
