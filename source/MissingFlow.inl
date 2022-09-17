@@ -1,3 +1,10 @@
+///																									
+/// Langulus::Entity																				
+/// Copyright(C) 2013 Dimo Markov <langulusteam@gmail.com>							
+///																									
+/// Distributed under GNU General Public License v3+									
+/// See LICENSE file, or https://www.gnu.org/licenses									
+///																									
 #pragma once
 #include "MissingFlow.hpp"
 
@@ -9,23 +16,23 @@ namespace Langulus::Entity
 
 	/// Number of digits in a value															
 	/// Credit goes to http://stackoverflow.com/questions/1489830					
-	constexpr NOD() LANGULUS(ALWAYSINLINE) Count CountDigits(uint8_t x) noexcept {
+	NOD() constexpr LANGULUS(ALWAYSINLINE) Count CountDigits(uint8_t x) noexcept {
 		return (x < 10u ? 1 : (x < 100u ? 2 : 3));
 	}
 
-	constexpr NOD() LANGULUS(ALWAYSINLINE) Count CountDigits(int8_t x) noexcept {
+	NOD() constexpr LANGULUS(ALWAYSINLINE) Count CountDigits(int8_t x) noexcept {
 		return CountDigits(static_cast<uint8_t>(::std::abs(x)));
 	}
 
-	constexpr NOD() LANGULUS(ALWAYSINLINE) Count CountDigits(uint16_t x) noexcept {
+	NOD() constexpr LANGULUS(ALWAYSINLINE) Count CountDigits(uint16_t x) noexcept {
 		return (x < 10u ? 1 : (x < 100u ? 2 : (x < 1000u ? 3 : (x < 10000u ? 4 : 5))));
 	}
 
-	constexpr NOD() LANGULUS(ALWAYSINLINE) Count CountDigits(int16_t x) noexcept {
+	NOD() constexpr LANGULUS(ALWAYSINLINE) Count CountDigits(int16_t x) noexcept {
 		return CountDigits(static_cast<uint16_t>(::std::abs(x)));
 	}
 
-	constexpr NOD() LANGULUS(ALWAYSINLINE) Count CountDigits(uint32_t x) noexcept {
+	NOD() constexpr LANGULUS(ALWAYSINLINE) Count CountDigits(uint32_t x) noexcept {
 		return
 			(x < 10u ? 1 :
 			(x < 100u ? 2 :
@@ -38,11 +45,11 @@ namespace Langulus::Entity
 			(x < 1000000000u ? 9 : 10)))))))));
 	}
 
-	constexpr NOD() LANGULUS(ALWAYSINLINE) Count pcNumDigits(int32_t x) noexcept {
+	NOD() constexpr LANGULUS(ALWAYSINLINE) Count pcNumDigits(int32_t x) noexcept {
 		return CountDigits(static_cast<uint32_t>(::std::abs(x)));
 	}
 
-	constexpr NOD() LANGULUS(ALWAYSINLINE) Count CountDigits(uint64_t x) noexcept {
+	NOD() constexpr LANGULUS(ALWAYSINLINE) Count CountDigits(uint64_t x) noexcept {
 		return
 			(x < 10ull ? 1 :
 			(x < 100ull ? 2 :
@@ -66,7 +73,7 @@ namespace Langulus::Entity
 		)))))))))))))))))));
 	}
 
-	constexpr NOD() LANGULUS(ALWAYSINLINE) Count CountDigits(int64_t x) noexcept {
+	NOD() constexpr LANGULUS(ALWAYSINLINE) Count CountDigits(int64_t x) noexcept {
 		// http://graphics.stanford.edu/~seander/bithacks.html#IntegerAbs	
 		int const mask = x >> (sizeof(int64_t) * 8 - 1);
 		return CountDigits(static_cast<uint64_t>((x + mask) ^ mask));
@@ -76,7 +83,7 @@ namespace Langulus::Entity
 	/// The dot in the real number is considered a digit, too						
 	///	@param x - real number to cound digits of										
 	template<CT::Real T>
-	constexpr NOD() LANGULUS(ALWAYSINLINE) Count CountDigits(T x) noexcept {
+	NOD() constexpr LANGULUS(ALWAYSINLINE) Count CountDigits(T x) noexcept {
 		T floored;
 		T fraction {::std::abs(::std::modf(x, &floored))};
 		if (fraction == 0)
@@ -129,7 +136,7 @@ namespace Langulus::Entity
 					atLeastOneSuccess |= FilterAndInsert<ATTEMPT, CLONE>(subcontent, FindPastPoints);
 					if constexpr (!ATTEMPT && !CLONE) {
 						if (subcontent.IsEmpty())
-							content.Remove(&subcontent);
+							content.RemoveValue(&subcontent);
 					}
 				});
 			}

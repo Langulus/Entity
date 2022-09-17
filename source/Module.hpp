@@ -1,3 +1,10 @@
+///																									
+/// Langulus::Entity																				
+/// Copyright(C) 2013 Dimo Markov <langulusteam@gmail.com>							
+///																									
+/// Distributed under GNU General Public License v3+									
+/// See LICENSE file, or https://www.gnu.org/licenses									
+///																									
 #pragma once
 #include "Resolvable.hpp"
 
@@ -49,6 +56,7 @@ namespace Langulus::Entity
 		Module() = delete;
 		Module(const Module&) = delete;
 		Module(Module&&) = delete;
+		virtual ~Module() {}
 		
 		Module& operator = (const Module&) noexcept = default;
 		Module& operator = (Module&&) noexcept = default;

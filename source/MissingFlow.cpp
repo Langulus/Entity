@@ -1,7 +1,14 @@
+///																									
+/// Langulus::Entity																				
+/// Copyright(C) 2013 Dimo Markov <langulusteam@gmail.com>							
+///																									
+/// Distributed under GNU General Public License v3+									
+/// See LICENSE file, or https://www.gnu.org/licenses									
+///																									
 #include "MissingFlow.hpp"
 
-#define VERBOSE_MISSING_POINT(a) //pcLogVerbose << a
-#define VERBOSE_MISSING_POINT_TAB(a) //ScopedTab tab; pcLogVerbose << a << tab
+#define VERBOSE_MISSING_POINT(a)			//Logger::Verbose() <<
+#define VERBOSE_MISSING_POINT_TAB(a)	//auto tab = Logger::Verbose() << a << Logger::Tabs{}
 
 namespace Langulus::Entity
 {
@@ -15,15 +22,13 @@ namespace Langulus::Entity
 	/// Get the filter part of the point													
 	///	@return a reference to the filter part											
 	const Filter& MissingPoint::GetFilter() const SAFETY_NOEXCEPT() {
-		SAFETY(if(IsFork()) Throw<Except::Flow>(
-			"Point is a fork, and you must handle it explicitly"));
+		LANGULUS_ASSUME(DevAssumes, !IsFork(),
+			"Point is a fork, and must be handled explicitly");
 
 		if (mPack->IsMissing()) {
 			const auto& filter = mPack->IsDeep() ? mPack->Get<Any>(0) : *mPack;
-			SAFETY(if (!filter.IsEmpty() && !filter.Is<DataID>()) {
-				Logger::Error() << "Bad filter format";
-				Throw<Except::Flow>("Bad filter format");
-			})
+			LANGULUS_ASSUME(DevAssumes, filter.IsEmpty() || filter.Is<DMeta>(),
+				"Bad filter format");
 			return ReinterpretCast<Filter>(filter);
 		}
 
@@ -49,10 +54,8 @@ namespace Langulus::Entity
 	/// Get the content part of the point													
 	///	@return a reference to the filter part											
 	NOD() inline const Block& MissingPoint::GetContent() const SAFETY_NOEXCEPT() {
-		SAFETY(if (IsFork()) {
-			Logger::Error() << "Point is a fork, and you must handle it explicitly";
-			Throw<Except::Flow>("Point is a fork, and you must handle it explicitly");
-		});
+		LANGULUS_ASSUME(DevAssumes, !IsFork(),
+			"Point is a fork, and must be handled explicitly");
 
 		static const Block fallback{};
 		if (mPack->IsMissing())
@@ -80,10 +83,8 @@ namespace Langulus::Entity
 	/// Push content to the point - always clones										
 	///	@param content - the content to push											
 	void MissingPoint::AddContent(Any& content) {
-		SAFETY(if (IsFork()) {
-			Logger::Error() << "Point is a fork, and you must handle it explicitly";
-			Throw<Except::Flow>("Point is a fork, and you must handle it explicitly");
-		});
+		LANGULUS_ASSUME(DevAssumes, !IsFork(),
+			"Point is a fork, and must be handled explicitly");
 
 		// This is reached only if !ATTEMPT											
 		if (mPriority == NoPriority) {
@@ -105,7 +106,6 @@ namespace Langulus::Entity
 			if (mPack->GetCount() == 1)
 				*mPack << Any{};
 
-			SAFETY(if (mPack->GetCount() != 2) TODO());
 			mPack->Get<Any>(1) << Move(content);
 		}
 		else {
@@ -118,10 +118,8 @@ namespace Langulus::Entity
 
 	/// Collapse the point, clearing contents, polarity, filters					
 	void MissingPoint::Collapse() {
-		SAFETY(if (IsFork()) {
-			Logger::Error() << "Point is a fork, and you must handle it explicitly";
-			Throw<Except::Flow>("Point is a fork, and you must handle it explicitly");
-		});
+		LANGULUS_ASSUME(DevAssumes, !IsFork(),
+			"Point is a fork, and must be handled explicitly");
 
 		if (mPack->IsMissing()) {
 			if (mPack->IsFuture()) {

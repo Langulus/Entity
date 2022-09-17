@@ -1,3 +1,10 @@
+///																									
+/// Langulus::Entity																				
+/// Copyright(C) 2013 Dimo Markov <langulusteam@gmail.com>							
+///																									
+/// Distributed under GNU General Public License v3+									
+/// See LICENSE file, or https://www.gnu.org/licenses									
+///																									
 #include "Entity.hpp"
 #include "Runtime.hpp"
 
@@ -94,11 +101,9 @@ namespace Langulus::Entity
 		// Execute code																	
 		auto parsed = code.Parse();
 		Any context {GetBlock()};
-
 		Any output;
 		if (!parsed.Execute(context, output)) {
-			Logger::Error()
-				<< "RunCode failed to execute: [" << parsed << ']';
+			Logger::Error() << "RunCode failed to execute: [" << parsed << ']';
 			return {};
 		}
 
@@ -416,9 +421,8 @@ namespace Langulus::Entity
 		// We must guarantee, that no unit is coupled to entities with		
 		// different runtimes!															
 		for (auto owners : unit->mOwners) {
-			if (owners->GetRuntime() != GetRuntime())
-				Throw<Except::Access>(
-					"Coupling a unit to multiple runtimes is not allowed");
+			LANGULUS_ASSERT(owners->GetRuntime() == GetRuntime(), Except::Access,
+				"Coupling a unit to multiple runtimes is not allowed");
 		}
 
 		// Log self before unit being added, it might change name			
@@ -439,7 +443,7 @@ namespace Langulus::Entity
 			const auto removed = mUnits.GetValue(foundType).RemoveValue(unit);
 			if (removed) {
 				// Decouple before unit is destroyed								
-				unit->mOwners.Remove(this);
+				unit->mOwners.RemoveValue<false, true>(this);
 
 				// Notify all other units about the environment change		
 				mRefreshRequired = true;
@@ -465,7 +469,7 @@ namespace Langulus::Entity
 			return;
 
 		list[foundUnit] = withThis;
-		replaceThis->mOwners.Remove(this);
+		replaceThis->mOwners.RemoveValue(this);
 		withThis->mOwners << this;
 		mRefreshRequired = true;
 		ENTITY_VERBOSE_SELF(replaceThis << " replaced with " << withThis);
@@ -607,8 +611,8 @@ namespace Langulus::Entity
 			const auto count = static_cast<Count>(construct.GetCharge().mMass);
 			for (Offset i = 0; i < count; ++i) {
 				if (count != 1) {
-					ENTITY_CREATION_VERBOSE_SELF(Logger::Yellow 
-						<< "Charged creation - creating " << i + 1 << " of " << count);
+					ENTITY_CREATION_VERBOSE_SELF(Logger::Yellow <<
+						"Charged creation - creating " << i + 1 << " of " << count);
 				}
 
 				if (construct.Is<Entity>()) {
@@ -799,7 +803,7 @@ namespace Langulus::Entity
 	///	@param entity - entity instance to destroy									
 	///	@return the number of destroyed children										
 	Count Entity::DestroyChild(Entity* entity) {
-		const auto removed = mChildren.RemovePointer(entity);
+		const auto removed = mChildren.RemoveValue(entity);
 		mRefreshRequired = removed;
 		return removed;
 	}

@@ -1,3 +1,10 @@
+///																									
+/// Langulus::Entity																				
+/// Copyright(C) 2013 Dimo Markov <langulusteam@gmail.com>							
+///																									
+/// Distributed under GNU General Public License v3+									
+/// See LICENSE file, or https://www.gnu.org/licenses									
+///																									
 #pragma once
 #include "Common.hpp"
 #include <chrono>
@@ -26,7 +33,7 @@ namespace Langulus::Entity
 			return *this != min();
 		}
 
-		NOD() constexpr Hash GetHash() const noexcept {
+		NOD() Hash GetHash() const noexcept {
 			using Representation = typename Base::rep;
 			static_assert(sizeof(Representation) == sizeof(TimePoint),
 				"Size mismatch");
@@ -50,7 +57,7 @@ namespace Langulus::Entity
 			return *this != zero();
 		}
 
-		NOD() constexpr Hash GetHash() const noexcept {
+		NOD() Hash GetHash() const noexcept {
 			using Representation = typename Base::rep;
 			static_assert(sizeof(Representation) == sizeof(Time),
 				"Size mismatch");

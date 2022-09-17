@@ -1,3 +1,10 @@
+///																									
+/// Langulus::Entity																				
+/// Copyright(C) 2013 Dimo Markov <langulusteam@gmail.com>							
+///																									
+/// Distributed under GNU General Public License v3+									
+/// See LICENSE file, or https://www.gnu.org/licenses									
+///																									
 #pragma once
 #include "Resolvable.hpp"
 
@@ -67,10 +74,10 @@ namespace Langulus::Entity
 		result += Flow::Code::OpenScope;
 		#if !LANGULUS(PARANOID) && LANGULUS(DEBUG)
 			// We're not paranoid, so directly dump the memory address		
-			result += fmt::format("{:X}", reinterpret_cast<intptr_t>(this));
+			result += Text {fmt::format("{:X}", reinterpret_cast<intptr_t>(this))};
 		#else
 			// Obfuscate the pointer, by hashing it								
-			result += fmt::format("{:X}", HashNumber(reinterpret_cast<intptr_t>(this)));
+			result += Text {fmt::format("{:X}", HashNumber(reinterpret_cast<intptr_t>(this)))};
 		#endif
 		result += Flow::Code::CloseScope;
 		return result;
@@ -80,7 +87,7 @@ namespace Langulus::Entity
 	/// The availability of this function is reflected via CT::Resolvable		
 	/// You can invoke this function via Block::GetElementResolved()				
 	///	@return the static memory block representing this instance				
-	Block Resolvable::GetBlock() const noexcept {
+	inline Block Resolvable::GetBlock() const noexcept {
 		// 'this' pointer points to Resolvable object, so we need to		
 		// compensate this, by offsetting 'this' by the relative class		
 		// type offset. I like to live dangerously <3							
