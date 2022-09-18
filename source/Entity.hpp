@@ -75,7 +75,7 @@ namespace Langulus::Entity
 		// The entity's parent															
 		Ptr<Entity> mOwner;
 		//	Hierarchy																		
-		TAny<Entity> mChildren;
+		TAny<Entity*> mChildren;
 		// Units																				
 		TUnorderedMap<DMeta, TAny<Unit*>> mUnits;
 		// Traits																			

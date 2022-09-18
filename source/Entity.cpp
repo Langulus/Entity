@@ -34,13 +34,14 @@ namespace Langulus::Entity
 		, mTraits {Move(other.mTraits)}
 		, mRuntime {Move(other.mRuntime)} {
 		// Remap children																	
-		for (auto& child : mChildren)
-			child.mOwner = this;
+		for (auto child : mChildren)
+			child->mOwner = this;
 
 		// Remap components																
-		mUnits.ForEachValue([&](Unit* unit) {
-			unit->ReplaceOwner(&other, this);
-		});
+		for (auto unitpair : mUnits) {
+			for (auto unit : unitpair.mValue)
+				unit->ReplaceOwner(&other, this);
+		}
 	}
 
 	/// Compare two entities																	
@@ -72,22 +73,24 @@ namespace Langulus::Entity
 
 		if (!mTraits.IsEmpty()) {
 			Logger::Verbose() << ".. contains " << mTraits.GetCount() << " traits";
-			mTraits.ForEachValue([](const Trait& trait) {
-				Logger::Verbose() << ". " << trait;
-			});
+			for (auto traitpair : mTraits) {
+				for (auto trait : traitpair.mValue)
+					Logger::Verbose() << ". " << trait;
+			}
 		}
 
 		if (!mUnits.IsEmpty()) {
 			Logger::Verbose() << "++ contains " << mUnits.GetCount() << " units";
-			mUnits.ForEachValue([](const Unit* unit) {
-				Logger::Verbose() << "+ " << *unit;
-			});
+			for (auto unitpair : mUnits) {
+				for (auto unit : unitpair.mValue)
+					Logger::Verbose() << "+ " << *unit;
+			}
 		}
 
 		if (!mChildren.IsEmpty()) {
 			Logger::Verbose() << "** contains " << mChildren.GetCount() << " child entities";
-			for (auto& child : mChildren)
-				child.DumpHierarchy();
+			for (auto child : mChildren)
+				child->DumpHierarchy();
 		}
 	}
 
@@ -363,7 +366,7 @@ namespace Langulus::Entity
 	///	@param id - the index to pick														
 	///	@return the child entity, or nullptr of none was found					
 	Entity* Entity::GetChild(const Index& id) {
-		return &mChildren[id];
+		return mChildren[id];
 	}
 
 	/// Get child by name and offset (searches for Traits::Name in children)	
@@ -372,10 +375,10 @@ namespace Langulus::Entity
 	///	@return the child entity, or nullptr of none was found					
 	Entity* Entity::GetChild(const Token& name, const Index& offset) {
 		Index matches = 0;
-		for (auto& child : mChildren) {
-			if (child.GetName() == name) {
+		for (auto child : mChildren) {
+			if (child->GetName() == name) {
 				if (matches == offset)
-					return &child;
+					return child;
 				++matches;
 			}
 		}
@@ -391,8 +394,8 @@ namespace Langulus::Entity
 			return;
 
 		mRuntime = newrt;
-		for (auto& child : mChildren)
-			child.ResetRuntime(newrt);
+		for (auto child : mChildren)
+			child->ResetRuntime(newrt);
 	}
 
 	/// Do a cascading temporal flow reset - all children that do not have own	
@@ -403,8 +406,8 @@ namespace Langulus::Entity
 			return;
 
 		mFlow = newflow;
-		for (auto& child : mChildren)
-			child.ResetFlow(newflow);
+		for (auto child : mChildren)
+			child->ResetFlow(newflow);
 	}
 
 	/// Add a new unit to the entity 														
@@ -795,7 +798,7 @@ namespace Langulus::Entity
 	Entity* Entity::CreateChild(const Any& descriptor) {
 		mChildren.Emplace(this, descriptor);
 		ENTITY_VERBOSE_SELF(mChildren.Last() << " added");
-		return &mChildren.Last();
+		return mChildren.Last();
 	}
 
 	/// Destroy a child that matched pointer												

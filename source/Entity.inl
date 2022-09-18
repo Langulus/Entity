@@ -103,8 +103,8 @@ namespace Langulus::Entity
 
 		// Seek children, if requested												
 		if constexpr (SEEK & SeekStyle::Below) {
-			for (const auto& child : mChildren) {
-				auto inChildren = child.GatherUnits<SeekStyle::DownFromHere>(meta);
+			for (auto child : mChildren) {
+				auto inChildren = child->GatherUnits<SeekStyle::DownFromHere>(meta);
 				result.SmartPush(Abandon(inChildren));
 			}
 		}
@@ -309,8 +309,8 @@ namespace Langulus::Entity
 
 		// Seek children, if requested												
 		if constexpr (SEEK & SeekStyle::Below) {
-			for (const auto& child : mChildren) {
-				if (child.SeekTrait<SeekStyle::DownFromHere>(var, output, offset))
+			for (auto child : mChildren) {
+				if (child->SeekTrait<SeekStyle::DownFromHere>(var, output, offset))
 					return true;
 			}
 		}
