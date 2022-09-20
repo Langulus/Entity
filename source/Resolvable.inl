@@ -77,7 +77,7 @@ namespace Langulus::Entity
 			result += Text {fmt::format("{:X}", reinterpret_cast<intptr_t>(this))};
 		#else
 			// Obfuscate the pointer, by hashing it								
-			result += Text {fmt::format("{:X}", HashNumber(reinterpret_cast<intptr_t>(this)))};
+			result += Text {fmt::format("{:X}", HashNumber(reinterpret_cast<intptr_t>(this)).mHash)};
 		#endif
 		result += Flow::Code::CloseScope;
 		return result;
