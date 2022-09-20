@@ -37,8 +37,8 @@ namespace Langulus::Entity
 
 		// Execute in children, if requested										
 		if constexpr (SEEK & SeekStyle::Below) {
-			for (auto& child : mChildren) {
-				if (child.DoInHierarchy<SeekStyle::DownFromHere>(verb))
+			for (auto child : mChildren) {
+				if (child->DoInHierarchy<SeekStyle::DownFromHere>(verb))
 					return true;
 			}
 		}
@@ -139,8 +139,8 @@ namespace Langulus::Entity
 
 		// Seek children, if requested												
 		if constexpr (SEEK & SeekStyle::Below) {
-			for (auto& child : mChildren) {
-				result = child.SeekUnit<SeekStyle::DownFromHere>(meta, offset);
+			for (auto child : mChildren) {
+				result = child->SeekUnit<SeekStyle::DownFromHere>(meta, offset);
 				if (result)
 					return result;
 			}
