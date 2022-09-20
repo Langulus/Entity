@@ -7,7 +7,6 @@
 ///																									
 #pragma once
 #include "Module.hpp"
-#include "Unit.hpp"
 
 namespace Langulus::Entity
 {

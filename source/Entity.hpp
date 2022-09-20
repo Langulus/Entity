@@ -8,6 +8,7 @@
 #pragma once
 #include "Unit.hpp"
 #include "Temporal.hpp"
+#include "Runtime.hpp"
 
 namespace Langulus::Traits
 {

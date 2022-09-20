@@ -18,6 +18,7 @@
 #endif
 
 #if defined(__linux__)
+	#include <dlfcn.h>
 	#define LANGULUS_OS_LINUX() 1
 #else 
 	#define LANGULUS_OS_LINUX() 0
@@ -157,19 +158,17 @@ namespace Langulus::Entity
 	///	@param filename - the file for the dynamic library							
 	///	@return the module handle (OS dependent)										
 	typename Runtime::SharedLibrary Runtime::LoadSharedLibrary(const Path& filename) {
-		// Clone path into our memory, just in case								
-		auto path = filename.Clone();
-
 		// Check if this library is already loaded								
-		const auto preloaded = mLibraries.FindKeyIndex(path);
+		const auto preloaded = mLibraries.FindKeyIndex(filename);
 		if (preloaded) {
 			// Never even attempt to load libraries more than once			
 			return mLibraries.GetValue(preloaded);
 		}
 
 		// File prefix																		
+		Path path;
 		#if LANGULUS_OS(LINUX)
-			file = "./lib";
+			path += "./lib";
 		#endif
 
 		path += "M";
