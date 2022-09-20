@@ -16,5 +16,9 @@ namespace Langulus::Entity
 	using ::Langulus::Flow::Construct;
 	using ::Langulus::Flow::Charge;
 	using ::Langulus::Flow::SeekStyle;
+	using ::Langulus::Flow::Resolvable;
+	using ::Langulus::Flow::Temporal;
+	using ::Langulus::Flow::Time;
+	using ::Langulus::Flow::Scope;
 
 } // namespace Langulus::Entity
