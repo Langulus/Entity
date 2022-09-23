@@ -1,5 +1,5 @@
 #pragma once
-#include <Langulus.Entity.hpp>
+#include <LangulusEntity.hpp>
 using namespace Langulus;
 using namespace Langulus::Entity;
 

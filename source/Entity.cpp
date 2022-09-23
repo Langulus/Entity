@@ -131,7 +131,7 @@ namespace Langulus::Entity
 		// Create message objects from the hierarchy, and try					
 		// interpreting them to executable scopes									
 		auto messages = CreateData<Lingua>();
-		auto interpreter = Verbs::InterpretTo<Flow::Scope>();
+		Verbs::InterpretTo<Flow::Scope> interpreter;
 		if (!Flow::DispatchFlat(messages, interpreter)) {
 			Logger::Error()
 				<< "Messages failed to interpret: " << messages;
@@ -542,15 +542,16 @@ namespace Langulus::Entity
 	///	@param id - trait to check															
 	///	@return the number of matching traits											
 	Count Entity::HasTraits(const Trait& prototype) const {
-		Count counter {};
 		const auto found = mTraits.FindKeyIndex(prototype.GetTrait());
-		if (found) {
-			const auto& list = mTraits.GetValue(found);
-			for (auto& trait : list)
-				if (trait == prototype)
-					++counter;
-		}
+		if (!found)
+			return 0;
 
+		Count counter {};
+		const auto& list = mTraits.GetValue(found);
+		for (auto& trait : list) {
+			if (trait == prototype)
+				++counter;
+		}
 		return counter;
 	}
 
@@ -702,7 +703,7 @@ namespace Langulus::Entity
 			if (construct.Is<Entity>()) {
 				// Find an entity containing construct arguments				
 				// Start with this one													
-				auto selector = Verbs::Select {construct.GetArgument()};
+				Verbs::Select selector {construct.GetArgument()};
 				Select(selector);
 				if (!selector.GetOutput().IsEmpty()) {
 					selectedEntities << this;
@@ -723,7 +724,7 @@ namespace Langulus::Entity
 					construct.ForEachDeep([&](const Block& part) {
 						for (Offset i = 0; i < part.GetCount(); ++i) {
 							auto element = part.GetElementResolved(i);
-							auto selector = Verbs::Select {element};
+							Verbs::Select selector {element};
 							if (!Flow::DispatchFlat(unitBlock, selector)) {
 								// Abort on first failure								
 								localMismatch = true;
@@ -819,38 +820,32 @@ namespace Langulus::Entity
 	///	@return the resulting dependencies (top level)								
 	Any Entity::CreateDependencies(DMeta type) {
 		auto meta = type->mProducer;
-		if (!meta) {
-			Logger::Error()
-				<< "Can't create " << type
-				<< " - type has no defined producer unit/module";
-			Throw<Except::Construct>("Can't create dependencies");
-		}
+		LANGULUS_ASSERT(meta, Except::Construct, "Missing producer");
 
 		if (meta->HasBase<Unit>()) {
 			// Unit dependencies, search for them in the hierarchy,			
 			// they might already exist												
 			auto producers = GatherUnits<SeekStyle::UpToHere>(meta);
+			if (!producers.IsEmpty())
+				return producers;
 
-			if (producers.IsEmpty()) {
-				// No producer available in the hierarchy, so nest-create	
-				// producer's producers													
-				ENTITY_VERBOSE_SELF(Logger::DarkYellow
-					<< "Required producer " << meta << " for creating " << type
-					<< " not found in hierarchy - attempting to create it...");
+			// No producer available in the hierarchy, so nest-create		
+			// producer's producers														
+			ENTITY_VERBOSE_SELF(Logger::DarkYellow
+				<< "Required producer " << meta << " for creating " << type
+				<< " not found in hierarchy - attempting to create it...");
 
-				auto nestedProducers = CreateDependencies(meta);
-				nestedProducers.ForEach(
-					[&](Unit* unit) {
-						for (auto owner : unit->GetOwners()) {
-							producers += owner->CreateDataInner(meta);
-						}
-					},
-					[&](Module* module) {
-						const auto owner = module->GetRuntime()->GetOwner();
+			auto nestedProducers = CreateDependencies(meta);
+			nestedProducers.ForEach(
+				[&](Unit* unit) {
+					for (auto owner : unit->GetOwners())
 						producers += owner->CreateDataInner(meta);
-					}
-				);
-			}
+				},
+				[&](Module* module) {
+					const auto owner = module->GetRuntime()->GetOwner();
+					producers += owner->CreateDataInner(meta);
+				}
+			);
 
 			return producers;
 		}
@@ -858,8 +853,7 @@ namespace Langulus::Entity
 			// Producer is a module. Let's seek the runtime component,		
 			// since it contains the instantiated modules						
 			auto runtime = GetRuntime();
-			if (!runtime)
-				Throw<Except::Construct>("No runtime available");
+			LANGULUS_ASSERT(runtime, Except::Construct, "Missing runtime");
 			return runtime->InstantiateModule(meta);
 		}
 
