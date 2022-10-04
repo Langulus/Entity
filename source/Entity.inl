@@ -190,8 +190,6 @@ namespace Langulus::Entity
 			(request << ... << Forward<A>(arguments));
 
 		CreateUnitInner(request, produced);
-		SAFETY(if (produced.IsEmpty())
-			Throw<Except::Construct>("Bad unit creation in Entity::CreateUnit"));
 		return produced.As<Decay<T>*>();
 	}
 

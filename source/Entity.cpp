@@ -860,7 +860,7 @@ namespace Langulus::Entity
 		Logger::Error()
 			<< "Couldn't produce " << type << " from " << meta
 			<< " - the producer wasn't found, and couldn't be produced";
-		Throw<Except::Construct>("Couldn't create dependencies");
+		LANGULUS_THROW(Construct, "Couldn't create dependencies");
 	}
 
 	/// Produce unit(s) from the entity's hierarchy										
