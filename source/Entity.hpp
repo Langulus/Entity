@@ -9,41 +9,11 @@
 #include "Unit.hpp"
 #include "Runtime.hpp"
 
-namespace Langulus::Traits
-{
-
-	/// Trait trait, used to access traits in aggregate types, like Entity		
-	struct Trait : public StaticTrait<Trait> {
-		using StaticTrait::StaticTrait;
-		using StaticTrait::operator =;
-	};
-
-	/// Runtime trait, used to access runtime interface in hierarchy				
-	struct Runtime : public StaticTrait<Runtime> {
-		using StaticTrait::StaticTrait;
-		using StaticTrait::operator =;
-	};
-
-	/// Unit trait, used to access units in aggregate types, like Entity			
-	struct Unit : public StaticTrait<Unit> {
-		using StaticTrait::StaticTrait;
-		using StaticTrait::operator =;
-	};
-
-	/// Child trait, used to access children in hierarchies							
-	struct Child : public StaticTrait<Child> {
-		using StaticTrait::StaticTrait;
-		using StaticTrait::operator =;
-	};
-
-	/// Parent trait, used to access parents in hierarchies							
-	struct Parent : public StaticTrait<Parent> {
-		using StaticTrait::StaticTrait;
-		using StaticTrait::operator =;
-	};
-
-} // namespace Langulus::Traits
-
+LANGULUS_DEFINE_TRAIT(Trait, "Accesses traits, dynamic or static");
+LANGULUS_DEFINE_TRAIT(Runtime, "Accesses Runtime component inside a hierarchy of Entities");
+LANGULUS_DEFINE_TRAIT(Unit, "Accesses components, dynamic or static");
+LANGULUS_DEFINE_TRAIT(Child, "Accesses children in hierarchies");
+LANGULUS_DEFINE_TRAIT(Parent, "Accesses parents in hierarchies");
 
 namespace Langulus::Entity
 {
