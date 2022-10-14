@@ -148,11 +148,13 @@ namespace Langulus::Entity
 		NOD() Decay<T>* GetUnit(const Index& = IndexFirst);
 		template<CT::Unit T>
 		NOD() const Decay<T>* GetUnit(const Index& = IndexFirst) const;
-		NOD() const Unit* GetUnit(const Token&, const Index& = IndexFirst) const;
-		NOD() Unit* GetUnit(const Token&, const Index& = IndexFirst);
 
-		template<CT::Unit T>
-		NOD() Decay<T>* GetUnitAs(const Token&, const Index& = IndexFirst);
+		#if LANGULUS_FEATURE(MANAGED_REFLECTION)
+			NOD() const Unit* GetUnit(const Token&, const Index& = IndexFirst) const;
+			NOD() Unit* GetUnit(const Token&, const Index& = IndexFirst);
+			template<CT::Unit T>
+			NOD() Decay<T>* GetUnitAs(const Token&, const Index& = IndexFirst);
+		#endif
 
 		///																							
 		///	TRAIT MANAGEMENT																	

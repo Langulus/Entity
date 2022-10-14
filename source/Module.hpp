@@ -17,16 +17,23 @@ namespace Langulus
 	///	@return a container with list of all the registered types				
 	template<class... T>
 	MetaList RegisterTypeList() {
-		return MetaList::Wrap(
-			RTTI::MetaData::Of<T>()...);
+		static const MetaList types {
+			MetaList::Wrap(RTTI::MetaData::Of<T>()...)
+		};
+		return types;
 	}
 
 	/// Helper function, that unregisters a type list									
 	///	@return a container with list of all the unregistered types				
 	template<class... T>
 	MetaList UnregisterTypeList() {
-		return MetaList::Wrap(
-			RTTI::Database.Unregister(RTTI::MetaData::Of<T>())...);
+		#if LANGULUS_FEATURE(MANAGED_REFLECTION)
+			return MetaList::Wrap(
+				RTTI::Database.Unregister(RTTI::MetaData::Of<T>())...);
+		#else
+			// No reference counting, just return the same list				
+			return RegisterTypeList<T...>();
+		#endif
 	}
 
 } // namespace Langulus

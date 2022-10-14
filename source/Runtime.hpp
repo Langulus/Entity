@@ -82,7 +82,10 @@ namespace Langulus::Entity
 		NOD() Module* InstantiateModule(const Construct&);
 
 		NOD() const ModuleList& GetModules(DMeta) const noexcept;
-		NOD() const ModuleList& GetModules(const Token&) const noexcept;
+
+		#if LANGULUS_FEATURE(MANAGED_REFLECTION)
+			NOD() const ModuleList& GetModules(const Token&) const noexcept;
+		#endif
 
 		void Update(Time);
 	};

@@ -354,6 +354,7 @@ namespace Langulus::Entity
 		return found;
 	}
 
+#if LANGULUS_FEATURE(MANAGED_REFLECTION)
 	/// Get a unit by token and offset														
 	///	@param token - the type name of the unit										
 	///	@param offset - the unit index													
@@ -361,6 +362,7 @@ namespace Langulus::Entity
 	Unit* Entity::GetUnit(const Token& token, const Index& offset) {
 		return GetUnit(RTTI::Database.GetMetaData(token), offset);
 	}
+#endif
 
 	/// Get a child by index																	
 	///	@param id - the index to pick														

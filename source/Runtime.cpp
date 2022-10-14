@@ -325,12 +325,14 @@ namespace Langulus::Entity
 		return emptyFallback;
 	}
 
+#if LANGULUS_FEATURE(MANAGED_REFLECTION)
 	/// Get a module instance by type token												
 	///	@param token - type token															
 	///	@return the module instance, or nullptr if not found						
 	const ModuleList& Runtime::GetModules(const Token& token) const noexcept {
 		return GetModules(RTTI::Database.GetMetaData(token));
 	}
+#endif
 
 	/// Update the runtime, by updating all module instantiations					
 	///	@param dt - delta time between update calls									

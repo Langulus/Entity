@@ -209,14 +209,16 @@ namespace Langulus::Entity
 			GetUnit(MetaData::Of<Decay<T>>(), offset));
 	}
 
-	inline const Unit* Entity::GetUnit(const Token& token, const Index& offset) const {
-		return const_cast<Entity*>(this)->GetUnit(token, offset);
-	}
+	#if LANGULUS_FEATURE(MANAGED_REFLECTION)
+		inline const Unit* Entity::GetUnit(const Token& token, const Index& offset) const {
+			return const_cast<Entity*>(this)->GetUnit(token, offset);
+		}
 
-	template<CT::Unit T>
-	Decay<T>* Entity::GetUnitAs(const Token& token, const Index& offset) {
-		return static_cast<Decay<T>*>(GetUnit(token, offset));
-	}
+		template<CT::Unit T>
+		Decay<T>* Entity::GetUnitAs(const Token& token, const Index& offset) {
+			return static_cast<Decay<T>*>(GetUnit(token, offset));
+		}
+	#endif
 
 	template<CT::Trait T, CT::Data D>
 	Trait* Entity::AddTrait(const D& data) {
