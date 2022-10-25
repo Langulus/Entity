@@ -41,7 +41,7 @@ namespace Langulus::Entity
       Unit(DMeta) noexcept;
       Unit(Unit&&) noexcept;
       Unit& operator = (Unit&&) noexcept;
-      ~Unit();
+      virtual ~Unit();
       
       void Select(Verb&);
 

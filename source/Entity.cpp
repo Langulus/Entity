@@ -146,7 +146,7 @@ namespace Langulus::Entity
    /// This is used for the purpose of a main loop, but also supports sub     
    /// systems and multiple runtimes with different environments              
    ///   @param dt - delta time that has passed between updates               
-   void Entity::Update(Time dt) {
+   void Entity::Update(Time) {
       // Keep a flow inside the runtime?
       /*
       auto thisBlock = GetBlock();
