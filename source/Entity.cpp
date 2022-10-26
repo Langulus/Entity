@@ -17,12 +17,28 @@
 namespace Langulus::Entity
 {
 
+   /// Construct as a root                                                    
+   ///   @param descriptor - instructions for creating the entity             
+   Entity::Entity(const Any& descriptor)
+      : Resolvable {MetaOf<Entity>()} {
+      if (!descriptor.IsEmpty()) {
+         Verbs::Create creator {descriptor};
+         Create(creator);
+      }
+   }
+   
    /// Construct as a child                                                   
    ///   @param parent - the owner of the entity                              
-   Entity::Entity(Entity* parent) noexcept
-      : Resolvable {MetaData::Of<Entity>()}
+   ///   @param descriptor - instructions for creating the entity             
+   Entity::Entity(Entity* parent, const Any& descriptor)
+      : Resolvable {MetaOf<Entity>()}
       , mOwner {parent}
-      , mRuntime {parent ? parent->GetRuntime() : nullptr} {}
+      , mRuntime {parent ? parent->GetRuntime() : nullptr} {
+      if (!descriptor.IsEmpty()) {
+         Verbs::Create creator {descriptor};
+         Create(creator);
+      }
+   }
 
    /// Move constructor                                                       
    ///   @param other - move that entity                                      
@@ -94,52 +110,57 @@ namespace Langulus::Entity
       }
    }
 
-   /// Execute a piece of langulus Code in the closest possible temporal flow 
-   ///   @param code - the code to execute                                    
-   ///   @return the results of the code                                      
+   /// Execute a piece of langulus code in the closest possible temporal flow 
+   ///   @param code - the code to parse and execute                          
+   ///   @return the results of the execution                                 
    Any Entity::Run(const Code& code) {
       if (code.IsEmpty())
          return {};
-
-      // Execute code                                                   
-      auto parsed = code.Parse();
-      Any context {GetBlock()};
-      Any output;
-      if (!parsed.Execute(context, output)) {
-         Logger::Error() << "RunCode failed to execute: [" << parsed << ']';
-         return {};
-      }
-
-      return output;
+      return Run(code.Parse());
    }
 
    /// Find an AIAD component that can process speech and interpret using it  
    /// This function completely relies on external modules                    
    ///   @param text - text to execute                                        
-   ///   @return true if the text was successfully executed                   
+   ///   @return the results of the execution                                 
    Any Entity::Run(const Lingua& text) {
       if (text.IsEmpty())
          return {};
 
-      if (!GetFlow()) {
-         Logger::Error()
-            << "Message not interpreted due to lack of temporal flow: ["
-            << text << ']';
-         return {};
-      }
-
-      // Create message objects from the hierarchy, and try             
-      // interpreting them to executable scopes                         
-      auto messages = CreateData<Lingua>();
+      // Message is still contextless, we don't know here exactly to    
+      // interpret it, so create message objects from the hierarchy,    
+      // and try interpreting those to executable scopes                
+      // Each trained AI in the hierarchy will produce its own          
+      // interpretation                                                 
+      auto messages = CreateData<Lingua>(text);
       Verbs::InterpretTo<Flow::Scope> interpreter;
-      if (!Flow::DispatchFlat(messages, interpreter)) {
+      if (!Flow::DispatchFlat(messages, interpreter)) {  
          Logger::Error()
-            << "Messages failed to interpret: " << messages;
+            << "Messages failed to interpret to scope: " << messages;
          return {};
       }
 
-      // Execute the flow                                               
-      return Run(interpreter.GetOutput());
+      // Execute the resulting scopes                                   
+      Any results;
+      interpreter.GetOutput().ForEach([&](const Flow::Scope& scope) {
+         results << Run(scope);
+      });
+
+      return Abandon(results);
+   }
+
+   /// Execute a scope in the entity's context                                
+   ///   @param scope - the scope to execute                                  
+   ///   @return the results of the execution                                 
+   Any Entity::Run(const Scope& scope) {
+      Any context {GetBlock()};
+      Any output;
+      if (!scope.Execute(context, output)) {
+         Logger::Error() << "Can't execute scope: " << scope;
+         return {};
+      }
+
+      return output;
    }
 
    /// Update all children's Runtime(s) and Temporal(s)                       
@@ -563,6 +584,12 @@ namespace Langulus::Entity
       return mRuntime.Get();
    }
 
+   /// Get the current temporal flow                                          
+   ///   @return the pointer to the flow                                      
+   Temporal* Entity::GetFlow() const noexcept {
+      return mFlow.Get();
+   }
+
    /// Add/overwrite entity's name trait                                      
    ///   @param name - the name to set                                        
    void Entity::SetName(const Text& name) {
@@ -795,7 +822,7 @@ namespace Langulus::Entity
          mOwner->Select(verb);
    }
 
-   /// Create a child entity via default-construction                         
+   /// Create a child entity                                                  
    ///   @param descriptor - instructions for the entity's creation           
    ///   @return the new child instance                                       
    Entity* Entity::CreateChild(const Any& descriptor) {

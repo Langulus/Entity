@@ -44,9 +44,9 @@ namespace Langulus::Entity
    ///              different runtimes is never allowed by Entity             
    ///   @return a pointer to the runtime, if available                       
    Runtime* Unit::GetRuntime() const noexcept {
-      for (auto owner : mOwners)
-         return owner->GetRuntime();
-      return nullptr;
+      if (mOwners.IsEmpty())
+         return nullptr;
+      return mOwners[0]->GetRuntime();
    }
 
    /// Move operator                                                          

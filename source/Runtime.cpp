@@ -52,6 +52,9 @@
 namespace Langulus::Entity
 {
 
+   TUnorderedMap<Path, Runtime::SharedLibrary> Runtime::mLibraries;
+   TUnorderedMap<DMeta, Runtime::SharedLibrary> Runtime::mDependencies;
+
    /// Close a shared library handle, unloading it                            
    ///   @param library - the library handle                                  
    #if LANGULUS_OS(WINDOWS)

@@ -97,6 +97,15 @@ namespace Langulus::Entity
 
 } // namespace Langulus::Entity
 
+namespace Langulus::CT
+{
+
+   /// Any type that inherits Module is considered a module                   
+   template<class T>
+   concept Module = DerivedFrom<T, ::Langulus::Entity::Module>;
+
+} // namespace Langulus::CT
+
 
 /// Name of module entry function                                             
 #define LANGULUS_MODULE_ENTRY()            LangulusModuleEntryPoint

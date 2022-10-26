@@ -76,7 +76,7 @@ namespace Langulus::Entity
       Runtime(Runtime&&) noexcept = default;
       ~Runtime();
 
-      NOD() Entity* GetOwner() const noexcept { return mOwner; }
+      NOD() auto GetOwner() const noexcept { return mOwner; }
 
    public:
       NOD() Module* InstantiateModule(const Construct&);

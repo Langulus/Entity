@@ -21,7 +21,7 @@ namespace Langulus::Entity
    using Flow::Code;
 
    /// A text specialization, dedicated for natural language text             
-   /// It is reflected as abstract, so production happens in external modules 
+   /// It is a placeholder type, that can be extended by external modules     
    class Lingua : public Text {
       LANGULUS(ABSTRACT) true;
    };
@@ -36,6 +36,9 @@ namespace Langulus::Entity
    ///                                                                        
    class Entity final : public Resolvable {
       LANGULUS(ABSTRACT) false;
+      LANGULUS(PRODUCER) Entity;
+      LANGULUS(UNINSERTABLE) false;
+
    protected:
       void ResetRuntime(Runtime*);
       void ResetFlow(Temporal*);
@@ -63,9 +66,13 @@ namespace Langulus::Entity
       bool mRefreshRequired {};
 
    public:
-      Entity(Entity* = nullptr) noexcept;
-      Entity(const Entity&) = delete;
+      Entity(const Any& = {});
+      Entity(Entity*, const Any& = {});
       Entity(Entity&&) noexcept;
+
+      // Shallow copy is disabled, you should be able only to clone,    
+      // move, or abandon                                               
+      Entity(const Entity&) = delete;
 
       NOD() Runtime* GetRuntime() const noexcept;
       NOD() Temporal* GetFlow() const noexcept;
@@ -76,8 +83,10 @@ namespace Langulus::Entity
 
       template<CT::Data, SeekStyle = SeekStyle::UpToHere>
       Any CreateData(const Any& = {});
-      template<SeekStyle = SeekStyle::UpToHere>
-      Any CreateData(const Token&, const Any& = {});
+      #if LANGULUS_FEATURE(MANAGED_REFLECTION)
+         template<SeekStyle = SeekStyle::UpToHere>
+         Any CreateData(const Token&, const Any& = {});
+      #endif
       template<SeekStyle = SeekStyle::UpToHere>
       Any CreateData(DMeta, const Any& = {});
 
@@ -86,7 +95,7 @@ namespace Langulus::Entity
 
       Any Run(const Lingua&);
       Any Run(const Code&);
-      Any Run(const Any&);
+      Any Run(const Scope&);
 
       void Update(Time);
       void Reset();
@@ -125,7 +134,7 @@ namespace Langulus::Entity
 
       template<SeekStyle>
       NOD() TAny<const Unit*> GatherUnits(DMeta) const;
-      template<CT::Unit T, SeekStyle>
+      template<SeekStyle, CT::Unit T = Unit>
       NOD() TAny<const Decay<T>*> GatherUnits() const;
 
       NOD() Any CreateDataInner(const Construct&);

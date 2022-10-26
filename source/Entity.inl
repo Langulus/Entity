@@ -70,7 +70,7 @@ namespace Langulus::Entity
 
    /// Gather all units of a specific static type                             
    ///   @return a container filled with the matches                          
-   template<CT::Unit T, SeekStyle SEEK>
+   template<SeekStyle SEEK, CT::Unit T>
    TAny<const Decay<T>*> Entity::GatherUnits() const {
       return GatherUnits<SEEK>(MetaData::Of<Decay<T>>());
    }
@@ -319,15 +319,86 @@ namespace Langulus::Entity
    }
 
    /// Find a trait, searching into the hierarchy                             
-   ///   @param seek - direction to search at                                 
-   ///   @param var - the trait to search for                                 
-   ///   @param output - found traits go there                                
-   ///   @param offset - the offset to apply                                  
+   ///   @tparam SEEK - direction to search at                                
+   ///   @param var - the trait type to search for                            
+   ///   @param output - [out] found traits go there                          
+   ///   @param offset - the number of the matching trait to use              
    ///   @return true if anything matching was found                          
    template<SeekStyle SEEK>
    bool Entity::SeekTrait(TMeta var, Trait& output, const Index& offset) {
       return const_cast<const Entity*>(this)->SeekTrait<SEEK>(var, output, offset);
    }
+
+   /// Attempt creating data from the hierarchy, invoking creation verbs with 
+   /// the provided arguments in each unit/module, in the specified way       
+   ///   @tparam T - the type of data we're producing                         
+   ///   @tparam SEEK - in what part of the hierarchy are we producing        
+   ///   @param arguments - arguments that get sent to T's constructors       
+   ///   @return the produced data, if any                                    
+   template<CT::Data T, SeekStyle SEEK>
+   Any Entity::CreateData(const Any& arguments) {
+      if constexpr (CT::Producible<T>) {
+         // Data has a specific producer, we can narrow the required    
+         // contexts for creation a lot                                 
+         using Producer = CT::ProducerOf<T>;
+
+         if constexpr (CT::Unit<Producer>) {
+            // Producible inside a unit                                 
+            auto producers = GatherUnits<SEEK, Producer>();
+            if (!producers.IsEmpty()) {
+               auto creator = Verbs::Create {
+                  Construct::From<T>(arguments)
+               };
+
+               if (Flow::DispatchFlat(producers, creator))
+                  return Abandon(creator.GetOutput());
+            }
+         }
+         else if constexpr (CT::Module<Producer>) {
+            TODO();
+         }
+         else if constexpr (CT::Same<Entity, T>) {
+            TODO();
+         }
+      }
+      else if constexpr (CT::Abstract<T> && !CT::Concretizable<T>) {
+         // Data doesn't have a specific producer, but it is abstract   
+         // so we know that only a module/unit can concretize it        
+         auto producers = GatherUnits<SEEK>();
+         if (!producers.IsEmpty()) {
+            auto creator = Verbs::Create {
+               Construct::From<T>(arguments)
+            };
+
+            if (Flow::DispatchFlat(producers, creator))
+               return Abandon(creator.GetOutput());
+         }
+
+         //TODO try modules too?
+      }
+      else {
+         // Data is not abstract, and doesn't have a producer, so just  
+         // make it statically right here                               
+         return T {arguments};
+      }
+
+      return {};
+   }
+
+#if LANGULUS_FEATURE(MANAGED_REFLECTION)
+   template<SeekStyle>
+   Any Entity::CreateData(const Token&, const Any&) {
+      TODO();
+   }
+#endif
+
+   template<SeekStyle>
+   Any Entity::CreateData(DMeta, const Any&) {
+      TODO();
+   }
+
+
+
 
    
    /// Execute verb in all owners                                             
