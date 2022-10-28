@@ -8,6 +8,12 @@
 #pragma once
 #include <LangulusFlow.hpp>
 
+#if defined(LANGULUS_EXPORT_ALL) || defined(LANGULUS_EXPORT_ENTITY)
+   #define LANGULUS_API_ENTITY() LANGULUS_EXPORT()
+#else
+   #define LANGULUS_API_ENTITY() LANGULUS_IMPORT()
+#endif
+
 namespace Langulus::Entity
 {
 

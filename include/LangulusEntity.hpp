@@ -10,3 +10,5 @@
 #include "../source/Entity.hpp"
 #include "../source/Runtime.hpp"
 #include "../source/Temporal.hpp"
+
+#define LANGULUS_LIBRARY_ENTITY() 1
