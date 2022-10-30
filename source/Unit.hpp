@@ -12,7 +12,7 @@ namespace Langulus::Entity
 {
    /// Some predeclarations                                                   
 
-   class Entity;
+   class Thing;
    class Runtime;
 
 
@@ -26,10 +26,10 @@ namespace Langulus::Entity
    ///                                                                        
    class Unit : public Resolvable {
    protected:
-      friend class Entity;
+      friend class Thing;
 
-      // Entities that are coupled with this unit                       
-      TAny<Entity*> mOwners;
+      // Things that are coupled with this unit                         
+      TAny<Thing*> mOwners;
 
    public:
       /// A unit can not be default-created, nor be shallowly copied          
@@ -49,7 +49,7 @@ namespace Langulus::Entity
       virtual void Refresh() {}
 
       NOD() Runtime* GetRuntime() const noexcept;
-      NOD() const TAny<Entity*>& GetOwners() const noexcept;
+      NOD() const TAny<Thing*>& GetOwners() const noexcept;
 
       template<CT::Trait T, SeekStyle = SeekStyle::UpToHere>
       Trait SeekTrait() const;
@@ -63,9 +63,9 @@ namespace Langulus::Entity
       bool DoInHierarchy(Verb&);
 
    protected:
-      void Couple(Entity*);
-      void Decouple(Entity*);
-      void ReplaceOwner(Entity*, Entity*);
+      void Couple(Thing*);
+      void Decouple(Thing*);
+      void ReplaceOwner(Thing*, Thing*);
    };
 
 } // namespace Langulus::Entity

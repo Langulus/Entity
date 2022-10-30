@@ -13,7 +13,7 @@ namespace Langulus::Entity
 
    /// Get the list of unit owners                                            
    ///   return the owners                                                    
-   inline const TAny<Entity*>& Unit::GetOwners() const noexcept {
+   inline const TAny<Thing*>& Unit::GetOwners() const noexcept {
       return mOwners;
    }
 

@@ -6,7 +6,7 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include "Entity.hpp"
+#include "Thing.hpp"
 
 #define ENTITY_VERBOSE_SELF(a)            //Logger::Verbose() << this << ": "<< a
 #define ENTITY_VERBOSE(a)                 //Logger::Append() << a
@@ -21,7 +21,7 @@ namespace Langulus::Entity
    ///   @param verb - the verb to execute                                    
    ///   @return true if succesfully executed                                 
    template<SeekStyle SEEK>
-   bool Entity::DoInHierarchy(Verb& verb) {
+   bool Thing::DoInHierarchy(Verb& verb) {
       // Execute in owners directly                                     
       if constexpr (SEEK & SeekStyle::Here) {
          Do(verb);
@@ -50,7 +50,7 @@ namespace Langulus::Entity
    ///   @tparam T - the type of units to remove                              
    ///   @return the number of removed units                                  
    template<CT::Unit T>
-   Count Entity::RemoveUnits() {
+   Count Thing::RemoveUnits() {
       const auto found = mUnits.FindKeyIndex(MetaData::Of<T>());
       if (found) {
          auto& list = mUnits.GetValue(found);
@@ -69,9 +69,10 @@ namespace Langulus::Entity
    }
 
    /// Gather all units of a specific static type                             
+   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @return a container filled with the matches                          
    template<SeekStyle SEEK, CT::Unit T>
-   TAny<const Decay<T>*> Entity::GatherUnits() const {
+   TAny<const Decay<T>*> Thing::GatherUnits() const {
       return GatherUnits<SEEK>(MetaData::Of<Decay<T>>());
    }
    
@@ -80,11 +81,10 @@ namespace Langulus::Entity
    ///   @param meta - the units to seek for                                  
    ///   @return the gathered units that match the type                       
    template<SeekStyle SEEK>
-   TAny<const Unit*> Entity::GatherUnits(DMeta meta) const {
+   TAny<const Unit*> Thing::GatherUnits(DMeta meta) const {
       TAny<const Unit*> result;
-
-      // Seek here if requested                                         
       if constexpr (SEEK & SeekStyle::Here) {
+         // Seek here if requested                                      
          for (auto unitList : mUnits) {
             for (auto unit : unitList.mValue) {
                if (unit->CastsTo(meta))
@@ -93,16 +93,16 @@ namespace Langulus::Entity
          }
       }
 
-      // Seek in parents up to root, if requested                       
       if constexpr (SEEK & SeekStyle::Above) {
+         // Seek in parents up to root, if requested                    
          if (mOwner) {
             auto inParents = mOwner->GatherUnits<SeekStyle::UpToHere>(meta);
             result.SmartPush(Abandon(inParents));
          }
       }
 
-      // Seek children, if requested                                    
       if constexpr (SEEK & SeekStyle::Below) {
+         // Seek children, if requested                                 
          for (auto child : mChildren) {
             auto inChildren = child->GatherUnits<SeekStyle::DownFromHere>(meta);
             result.SmartPush(Abandon(inChildren));
@@ -118,18 +118,17 @@ namespace Langulus::Entity
    ///   @param offset - which of the matches to return                       
    ///   @return the found unit, or nullptr if no such unit was found         
    template<SeekStyle SEEK>
-   Unit* Entity::SeekUnit(DMeta meta, const Index& offset) {
+   Unit* Thing::SeekUnit(DMeta meta, const Index& offset) {
       Unit* result = nullptr;
-
-      // Seek here if requested                                         
       if constexpr (SEEK & SeekStyle::Here) {
+         // Seek here if requested                                      
          result = GetUnit(meta, offset);
          if (result)
             return result;
       }
 
-      // Seek in parents up to root, if requested                       
       if constexpr (SEEK & SeekStyle::Above) {
+         // Seek in parents up to root, if requested                    
          if (mOwner) {
             result = mOwner->SeekUnit<SeekStyle::UpToHere>(meta, offset);
             if (result)
@@ -137,8 +136,8 @@ namespace Langulus::Entity
          }
       }
 
-      // Seek children, if requested                                    
       if constexpr (SEEK & SeekStyle::Below) {
+         // Seek children, if requested                                 
          for (auto child : mChildren) {
             result = child->SeekUnit<SeekStyle::DownFromHere>(meta, offset);
             if (result)
@@ -150,31 +149,31 @@ namespace Langulus::Entity
    }
 
    /// Find a unit by type and index from the hierarchy                       
-   ///   @param seek - where to seek for the unit                             
+   ///   @tparam SEEK - where to seek for the unit                            
    ///   @param unit - the type of the unit to seek for                       
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
    template<SeekStyle SEEK>
-   const Unit* Entity::SeekUnit(DMeta unit, const Index& offset) const {
-      return const_cast<Entity*>(this)->SeekUnit<SEEK>(unit, offset);
+   const Unit* Thing::SeekUnit(DMeta unit, const Index& offset) const {
+      return const_cast<Thing*>(this)->SeekUnit<SEEK>(unit, offset);
    }
 
    /// Find a unit by index and static type from the hierarchy (const)        
-   ///   @param seek - where to seek for the unit                             
+   ///   @tparam SEEK - where to seek for the unit                            
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
    template<CT::Unit T, SeekStyle SEEK>
-   const Decay<T>* Entity::SeekUnit(const Index& offset) const {
+   const Decay<T>* Thing::SeekUnit(const Index& offset) const {
       return static_cast<const Decay<T>*>(
          SeekUnit<SEEK>(MetaData::Of<Decay<T>>(), offset));
    }
 
    /// Find a unit by index and static type from the hierarchy                
-   ///   @param seek - where to seek for the unit                             
+   ///   @tparam SEEK - where to seek for the unit                            
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
    template<CT::Unit T, SeekStyle SEEK>
-   Decay<T>* Entity::SeekUnit(const Index& offset) {
+   Decay<T>* Thing::SeekUnit(const Index& offset) {
       return static_cast<Decay<T>*>(
          SeekUnit<SEEK>(MetaData::Of<Decay<T>>(), offset));
    }
@@ -183,7 +182,7 @@ namespace Langulus::Entity
    /// in the hierarchy                                                       
    ///   @return the newly created unit if able to create it                  
    template<CT::Unit T, class... A>
-   Decay<T>* Entity::CreateUnit(A&&...arguments) {
+   Decay<T>* Thing::CreateUnit(A&&...arguments) {
       TAny<Unit*> produced;
       auto request = Construct::From<Decay<T>>();
       if constexpr (sizeof...(arguments) > 0)
@@ -193,44 +192,39 @@ namespace Langulus::Entity
       return produced.As<Decay<T>*>();
    }
 
-   inline const Unit* Entity::GetUnit(DMeta type, const Index& offset) const {
-      return const_cast<Entity*>(this)->GetUnit(type, offset);
+   inline const Unit* Thing::GetUnit(DMeta type, const Index& offset) const {
+      return const_cast<Thing*>(this)->GetUnit(type, offset);
    }
 
    template<CT::Unit T>
-   Decay<T>* Entity::GetUnit(const Index& offset) {
+   Decay<T>* Thing::GetUnit(const Index& offset) {
       return static_cast<Decay<T>*>(
          GetUnit(MetaData::Of<Decay<T>>(), offset));
    }
 
    template<CT::Unit T>
-   const Decay<T>* Entity::GetUnit(const Index& offset) const {
+   const Decay<T>* Thing::GetUnit(const Index& offset) const {
       return static_cast<const Decay<T>*>(
          GetUnit(MetaData::Of<Decay<T>>(), offset));
    }
 
    #if LANGULUS_FEATURE(MANAGED_REFLECTION)
-      inline const Unit* Entity::GetUnit(const Token& token, const Index& offset) const {
-         return const_cast<Entity*>(this)->GetUnit(token, offset);
+      inline const Unit* Thing::GetUnit(const Token& token, const Index& offset) const {
+         return const_cast<Thing*>(this)->GetUnit(token, offset);
       }
 
       template<CT::Unit T>
-      Decay<T>* Entity::GetUnitAs(const Token& token, const Index& offset) {
+      Decay<T>* Thing::GetUnitAs(const Token& token, const Index& offset) {
          return static_cast<Decay<T>*>(GetUnit(token, offset));
       }
    #endif
 
-   template<CT::Trait T, CT::Data D>
-   Trait* Entity::AddTrait(const D& data) {
-      return AddTrait(Trait::From<T, D>(data));
-   }
-
-   inline bool Entity::GetTrait(TMeta trait, Trait& output, const Index& offset) const {
-      return const_cast<Entity*>(this)->GetTrait(trait, output, offset);
+   inline bool Thing::GetTrait(TMeta trait, Trait& output, const Index& offset) const {
+      return const_cast<Thing*>(this)->GetTrait(trait, output, offset);
    }
 
    template<SeekStyle SEEK, CT::Data T>
-   bool Entity::SeekValue(TMeta trait, T& value) const {
+   bool Thing::SeekValue(TMeta trait, T& value) const {
       Trait found;
       if (!SeekTrait<SEEK>(trait, found) || found.IsEmpty())
          return false;
@@ -240,7 +234,7 @@ namespace Langulus::Entity
    }
 
    template<SeekStyle SEEK, CT::Trait T, CT::Data D>
-   bool Entity::SeekValue(D& value) const {
+   bool Thing::SeekValue(D& value) const {
       static const auto tmeta = MetaTrait::Of<T>();
       Trait found;
       if (!SeekTrait<SEEK>(tmeta, found) || found.IsEmpty())
@@ -250,8 +244,8 @@ namespace Langulus::Entity
       return true;
    }
 
-   inline bool Entity::GetTrait(const Trait& trait, Trait& output, const Index& offset) const {
-      return const_cast<Entity*>(this)->GetTrait(trait, output, offset);
+   inline bool Thing::GetTrait(const Trait& trait, Trait& output, const Index& offset) const {
+      return const_cast<Thing*>(this)->GetTrait(trait, output, offset);
    }
 
    /// Get local trait by static type and offset                              
@@ -259,7 +253,7 @@ namespace Langulus::Entity
    ///   @param offset - the offset of the trait to return                    
    ///   @return the trait or nullptr if none found                           
    template<CT::Trait T>
-   Trait* Entity::GetLocalTrait(const Index& offset) {
+   Trait* Thing::GetLocalTrait(const Index& offset) {
       return GetLocalTrait(MetaTrait::Of<T>(), offset);
    }
 
@@ -268,23 +262,23 @@ namespace Langulus::Entity
    ///   @param offset - the offset of the trait to return                    
    ///   @return the trait or nullptr if none found                           
    template<CT::Trait T>
-   const Trait* Entity::GetLocalTrait(const Index& offset) const {
-      return const_cast<Entity&>(*this).GetLocalTrait<T>(offset);
+   const Trait* Thing::GetLocalTrait(const Index& offset) const {
+      return const_cast<Thing&>(*this).GetLocalTrait<T>(offset);
    }
 
    /// Get child entity by offset                                             
    ///   @param offset - the offset of the entity to return                   
    ///   @return the child or nullptr if none found                           
-   inline const Entity* Entity::GetChild(const Index& offset) const {
-      return const_cast<Entity*>(this)->GetChild(offset);
+   inline const Thing* Thing::GetChild(const Index& offset) const {
+      return const_cast<Thing*>(this)->GetChild(offset);
    }
 
    /// Get child entity by name and offset                                    
    ///   @param name - the name trait to search for                           
    ///   @param offset - the offset of the matching entity to return          
    ///   @return the child or nullptr if none found                           
-   inline const Entity* Entity::GetChild(const Token& name, const Index& offset) const {
-      return const_cast<Entity*>(this)->GetChild(name, offset);
+   inline const Thing* Thing::GetChild(const Token& name, const Index& offset) const {
+      return const_cast<Thing*>(this)->GetChild(name, offset);
    }
 
    /// Find a trait, searching into the hierarchy (const)                     
@@ -294,7 +288,7 @@ namespace Langulus::Entity
    ///   @param offset - the offset to apply                                  
    ///   @return true if anything matching was found                          
    template<SeekStyle SEEK>
-   bool Entity::SeekTrait(TMeta var, Trait& output, const Index& offset) const {
+   bool Thing::SeekTrait(TMeta var, Trait& output, const Index& offset) const {
       // Seek here if requested                                         
       if constexpr (SEEK & SeekStyle::Here) {
          if (GetTrait(var, output))
@@ -325,8 +319,8 @@ namespace Langulus::Entity
    ///   @param offset - the number of the matching trait to use              
    ///   @return true if anything matching was found                          
    template<SeekStyle SEEK>
-   bool Entity::SeekTrait(TMeta var, Trait& output, const Index& offset) {
-      return const_cast<const Entity*>(this)->SeekTrait<SEEK>(var, output, offset);
+   bool Thing::SeekTrait(TMeta var, Trait& output, const Index& offset) {
+      return const_cast<const Thing*>(this)->SeekTrait<SEEK>(var, output, offset);
    }
 
    /// Attempt creating data from the hierarchy, invoking creation verbs with 
@@ -336,7 +330,7 @@ namespace Langulus::Entity
    ///   @param arguments - arguments that get sent to T's constructors       
    ///   @return the produced data, if any                                    
    template<CT::Data T, SeekStyle SEEK>
-   Any Entity::CreateData(const Any& arguments) {
+   Any Thing::CreateData(const Any& arguments) {
       if constexpr (CT::Producible<T>) {
          // Data has a specific producer, we can narrow the required    
          // contexts for creation a lot                                 
@@ -357,7 +351,7 @@ namespace Langulus::Entity
          else if constexpr (CT::Module<Producer>) {
             TODO();
          }
-         else if constexpr (CT::Same<Entity, T>) {
+         else if constexpr (CT::Same<Thing, T>) {
             TODO();
          }
       }
@@ -387,13 +381,13 @@ namespace Langulus::Entity
 
 #if LANGULUS_FEATURE(MANAGED_REFLECTION)
    template<SeekStyle>
-   Any Entity::CreateData(const Token&, const Any&) {
+   Any Thing::CreateData(const Token&, const Any&) {
       TODO();
    }
 #endif
 
    template<SeekStyle>
-   Any Entity::CreateData(DMeta, const Any&) {
+   Any Thing::CreateData(DMeta, const Any&) {
       TODO();
    }
 

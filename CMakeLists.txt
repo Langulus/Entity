@@ -6,6 +6,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Check if this project is built as standalone, or a part of something else
 if (PROJECT_IS_TOP_LEVEL)
+    if(LANGULUS_BUILD_SHARED_LIBRARIES)
+        set(LANGULUS_LIBRARY_TYPE SHARED)
+    else()
+        set(LANGULUS_LIBRARY_TYPE STATIC)
+    endif()
+
     find_package(Git REQUIRED)
     execute_process(
         COMMAND ${GIT_EXECUTABLE} submodule update --init -- cmake 
@@ -27,15 +33,17 @@ if (PROJECT_IS_TOP_LEVEL)
     add_compile_definitions(LANGULUS_ENABLE_TESTING)
     enable_testing()
 	add_subdirectory(test)
+else()
+    set(LANGULUS_LIBRARY_TYPE OBJECT)
 endif()
 
 # Build and install Entity library
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/source SOURCE_FILES)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/source/modules SOURCE_FILES)
-add_library(Langulus.Entity ${SOURCE_FILES})
+add_library(Langulus.Entity ${LANGULUS_LIBRARY_TYPE} ${SOURCE_FILES})
 
 if (MSVC)
-    target_compile_options(Langulus.Entity PRIVATE /utf-8 /bigobj)
+    target_compile_options(Langulus.Entity PRIVATE /bigobj)
 endif()
 
 target_include_directories(Langulus.Entity PUBLIC include)

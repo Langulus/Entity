@@ -5,8 +5,7 @@
 /// Distributed under GNU General Public License v3+                          
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
-#include "Unit.hpp"
-#include "Entity.hpp"
+#include "Thing.hpp"
 
 namespace Langulus::Entity
 {
@@ -64,7 +63,7 @@ namespace Langulus::Entity
    /// Couple the component with an entity                                    
    /// This will call refresh to all units in that entity on next frame       
    ///   @param entity - the entity to couple with                            
-   void Unit::Couple(Entity* entity) {
+   void Unit::Couple(Thing* entity) {
       if (!entity)
          return;
       entity->AddUnit(this);
@@ -73,7 +72,7 @@ namespace Langulus::Entity
    /// Decouple the component from an entity                                  
    /// This will call refresh to all units in that entity on next frame       
    ///   @param entity - the entity to decouple with                          
-   void Unit::Decouple(Entity* entity) {
+   void Unit::Decouple(Thing* entity) {
       if (!entity)
          return;
       entity->RemoveUnit(this);
@@ -84,7 +83,7 @@ namespace Langulus::Entity
    ///   @attention - internal function, should be called from Entity         
    ///   @param replaceThis - owner to replace                                
    ///   @param withThis - entity to replace it with                          
-   void Unit::ReplaceOwner(Entity* replaceThis, Entity* withThis) {
+   void Unit::ReplaceOwner(Thing* replaceThis, Thing* withThis) {
       const auto found = mOwners.Find(replaceThis);
       if (found)
          mOwners[found] = withThis;

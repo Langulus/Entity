@@ -28,15 +28,15 @@ namespace Langulus::Entity
 
 
    ///                                                                        
-   ///   Entity                                                               
+   ///   Thing                                                                
    ///                                                                        
-   ///   The primary composed type. Its functionality comes from its units    
-   /// and children/owner's units. An entity is an aggregate of traits,       
-   /// units, and other entities.                                             
+   /// The primary composed type. Its functionality comes from its units and  
+   /// children/owner's units. A thing is an aggregate of traits, units, and  
+   /// other things.                                                          
    ///                                                                        
-   class Entity final : public Resolvable {
+   class Thing final : public Resolvable {
       LANGULUS(ABSTRACT) false;
-      LANGULUS(PRODUCER) Entity;
+      LANGULUS(PRODUCER) Thing;
       LANGULUS(UNINSERTABLE) false;
 
    protected:
@@ -46,9 +46,9 @@ namespace Langulus::Entity
       Any CreateDependencies(DMeta);
 
       // The entity's parent                                            
-      Ptr<Entity> mOwner;
-      //   Hierarchy                                                    
-      TAny<Entity*> mChildren;
+      Ptr<Thing> mOwner;
+      // Hierarchy                                                      
+      TAny<Thing*> mChildren;
       // Units                                                          
       TUnorderedMap<DMeta, TAny<Unit*>> mUnits;
       // Traits                                                         
@@ -66,13 +66,13 @@ namespace Langulus::Entity
       bool mRefreshRequired {};
 
    public:
-      Entity(const Any& = {});
-      Entity(Entity*, const Any& = {});
-      Entity(Entity&&) noexcept;
+      Thing(const Any& = {});
+      Thing(Thing*, const Any& = {});
+      Thing(Thing&&) noexcept;
 
       // Shallow copy is disabled, you should be able only to clone,    
       // move, or abandon                                               
-      Entity(const Entity&) = delete;
+      Thing(const Thing&) = delete;
 
       NOD() Runtime* GetRuntime() const noexcept;
       NOD() Temporal* GetFlow() const noexcept;
@@ -83,10 +83,12 @@ namespace Langulus::Entity
 
       template<CT::Data, SeekStyle = SeekStyle::UpToHere>
       Any CreateData(const Any& = {});
+
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
          template<SeekStyle = SeekStyle::UpToHere>
          Any CreateData(const Token&, const Any& = {});
       #endif
+
       template<SeekStyle = SeekStyle::UpToHere>
       Any CreateData(DMeta, const Any& = {});
 
@@ -100,28 +102,31 @@ namespace Langulus::Entity
       void Update(Time);
       void Reset();
 
-      NOD() bool operator == (const Entity&) const;
+      NOD() bool operator == (const Thing&) const;
 
       NOD() explicit operator Debug() const;
 
    public:
       ///                                                                     
-      ///   HIERARCHY MANAGEMENT                                              
+      ///   Hierarchy management                                              
       ///                                                                     
-      NOD() Entity* CreateChild(const Any&);
-      Count DestroyChild(Entity*);
+      Runtime* CreateRuntime();
+      Temporal* CreateFlow();
+      Thing* CreateChild(const Any&);
+      Count DestroyChild(Thing*);
+      Module* LoadMod(const Token&, const Any& = {});
 
-      NOD() Entity* GetChild(const Index&);
-      NOD() const Entity* GetChild(const Index&) const;
-      NOD() Entity* GetChild(const Token&, const Index&);
-      NOD() const Entity* GetChild(const Token&, const Index&) const;
+      NOD() Thing* GetChild(const Index&);
+      NOD() const Thing* GetChild(const Index&) const;
+      NOD() Thing* GetChild(const Token&, const Index&);
+      NOD() const Thing* GetChild(const Token&, const Index&) const;
 
-      NOD() bool IsFamilyOf(const Entity&) const;
+      NOD() bool IsFamilyOf(const Thing&) const;
 
       void DumpHierarchy() const;
 
       ///                                                                     
-      ///   UNIT MANAGEMENT                                                   
+      ///   Unit management                                                   
       ///                                                                     
       Count AddUnit(Unit*);
       Count RemoveUnit(Unit*);
@@ -166,11 +171,9 @@ namespace Langulus::Entity
       #endif
 
       ///                                                                     
-      ///   TRAIT MANAGEMENT                                                  
+      ///   Trait management                                                  
       ///                                                                     
       Trait* AddTrait(const Trait&);
-      template<CT::Trait, CT::Data D>
-      Trait* AddTrait(const D&);
 
       Count RemoveTrait(TMeta);
       Count RemoveTrait(const Trait&);
@@ -207,4 +210,4 @@ namespace Langulus::Entity
 
 } // namespace Langulus::Entity
 
-#include "Entity.inl"
+#include "Thing.inl"

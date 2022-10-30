@@ -11,6 +11,7 @@
 namespace Langulus::Entity
 {
 
+   class Thing;
    class AFile;
    class AFolder;
    using ModuleList = TAny<Module*>;
@@ -23,37 +24,45 @@ namespace Langulus::Entity
    /// modules, handles overall system state and console input. Overall, it   
    /// takes care of the minimally required OS aspect of running a program.   
    ///   You can view a Runtime as a single process inside Langulus. You can  
-   /// create infinite nested subprocesses in any Entity. Each new runtime    
-   /// will act as the environment for that Entity, as well as all of its     
+   /// create infinite nested subprocesses in any Thing. Each new runtime     
+   /// will act as the environment for that Thing, as well as all of its      
    /// children, modules, units, etc.                                         
    ///                                                                        
    class Runtime final {
    protected:
       /// Library handle                                                      
-      struct SharedLibrary {
+      class SharedLibrary {
+      friend class Runtime;
+      protected:
          uintptr_t mHandle {};
          Module::EntryPoint mEntry;
          Module::CreatePoint mCreator;
          Module::InfoPoint mInfo;
          Module::ExitPoint mExit;
 
+      public:
+         /// Check if the shared library handle is valid                      
+         NOD() constexpr bool IsValid() const noexcept {
+            return mHandle != 0;
+         }
+
          /// Compare shared libraries by handle only                          
-         bool operator == (const SharedLibrary& rhs) const noexcept {
+         NOD() constexpr bool operator == (const SharedLibrary& rhs) const noexcept {
             return mHandle == rhs.mHandle;
          }
 
          /// Hashing for to being able to contain it in a map                 
-         Hash GetHash() const noexcept {
-            return {mHandle};
+         NOD() constexpr Hash GetHash() const noexcept {
+            return HashNumber(mHandle);
          }
       };
 
-      Entity* mOwner;
+      Thing* mOwner;
 
       // Loaded shared libraries, indexed by filename                   
       // This is a static registry - all Runtimes use the same shared   
       // library objects, but manage their own module instantiations    
-      static TUnorderedMap<Path, SharedLibrary> mLibraries;
+      static TUnorderedMap<Token, SharedLibrary> mLibraries;
 
       // Shared library dependencies for all externally registered types
       static TUnorderedMap<DMeta, SharedLibrary> mDependencies;
@@ -67,23 +76,25 @@ namespace Langulus::Entity
       // Instantiated modules, indexed by type                          
       TUnorderedMap<DMeta, ModuleList> mModulesByType;
 
-      NOD() SharedLibrary LoadSharedLibrary(const Path&);
       void UnloadSharedLibrary(const SharedLibrary&);
 
    public:
       Runtime() = delete;
-      Runtime(Entity*) noexcept;
+      Runtime(Thing*) noexcept;
       Runtime(Runtime&&) noexcept = default;
       ~Runtime();
 
       NOD() auto GetOwner() const noexcept { return mOwner; }
 
-   public:
-      NOD() Module* InstantiateModule(const Construct&);
+      NOD() SharedLibrary LoadSharedLibrary(const Token&);
+      NOD() Module* InstantiateModule(const Token&, const Any& = {});
+      NOD() Module* InstantiateModule(const SharedLibrary&, const Any& = {});
 
+      NOD() SharedLibrary GetDependency(DMeta) const noexcept;
       NOD() const ModuleList& GetModules(DMeta) const noexcept;
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
+         NOD() SharedLibrary GetDependency(const Token&) const noexcept;
          NOD() const ModuleList& GetModules(const Token&) const noexcept;
       #endif
 

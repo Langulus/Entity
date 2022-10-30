@@ -5,54 +5,38 @@
 /// Distributed under GNU General Public License v3+                          
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
-#include "Entity.hpp"
+#include "Thing.hpp"
 #include "Runtime.hpp"
 
-#define LANGULUS_OS(a) LANGULUS_OS_##a()
-
-#if defined(_WIN32) || defined(__CYGWIN__)
+#if LANGULUS_OS(WINDOWS)
    #include <Windows.h>
-   #define LANGULUS_OS_WINDOWS() 1
-#else 
-   #define LANGULUS_OS_WINDOWS() 0
 #endif
 
-#if defined(__linux__)
+#if LANGULUS_OS(LINUX)
    #include <dlfcn.h>
-   #define LANGULUS_OS_LINUX() 1
-#else 
-   #define LANGULUS_OS_LINUX() 0
 #endif
 
-#if defined(__ANDROID__)
-   #define LANGULUS_OS_ANDROID() 1
-#else 
-   #define LANGULUS_OS_ANDROID() 0
+#if LANGULUS_OS(ANDROID)
+   //TODO
 #endif
 
-#if defined(__APPLE__)
-   #define LANGULUS_OS_MACOS() 1
-#else 
-   #define LANGULUS_OS_MACOS() 0
+#if LANGULUS_OS(MACOS)
+   //TODO
 #endif
 
-#if defined(__unix__)
-   #define LANGULUS_OS_UNIX() 1
-#else 
-   #define LANGULUS_OS_UNIX() 0
+#if LANGULUS_OS(UNIX)
+   //TODO
 #endif
 
-#if defined(__FreeBSD__)
-   #define LANGULUS_OS_FREEBSD() 1
-#else 
-   #define LANGULUS_OS_FREEBSD() 0
+#if LANGULUS_OS(FREEBSD)
+   //TODO
 #endif
 
 
 namespace Langulus::Entity
 {
 
-   TUnorderedMap<Path, Runtime::SharedLibrary> Runtime::mLibraries;
+   TUnorderedMap<Token, Runtime::SharedLibrary> Runtime::mLibraries;
    TUnorderedMap<DMeta, Runtime::SharedLibrary> Runtime::mDependencies;
 
    /// Close a shared library handle, unloading it                            
@@ -72,7 +56,7 @@ namespace Langulus::Entity
 
    /// Runtime construction                                                   
    ///   @param owner - the owner of the runtime                              
-   Runtime::Runtime(Entity* owner) noexcept
+   Runtime::Runtime(Thing* owner) noexcept
       : mOwner {owner} {
       Logger::Verbose() << "Initializing...";
       Logger::Verbose() << "Initialized";
@@ -85,41 +69,35 @@ namespace Langulus::Entity
    }
 
    /// Create a module instance or return an already instantiated one         
-   ///   @param construct - module initialization construct                   
+   ///   @param name - module name                                            
+   ///   @param descriptor - module initialization descriptor                 
    ///   @return the new module instance                                      
-   Module* Runtime::InstantiateModule(const Construct& construct) {
-      const auto type = construct.GetType();
-      if (!type->mProducer->Is<Runtime>()) {
-         Logger::Error()
-            << "Runtime can't instantiate " << type << " - it's not a module";
-         return nullptr;
-      }
-
+   Module* Runtime::InstantiateModule(const Token& name, const Any& descriptor) {
       // Check if module is already instantiated                        
-      auto& foundModules = GetModules(type);
+      auto& foundModules = GetModules(name);
       if (!foundModules.IsEmpty())
          return foundModules[0];
 
-      // What library produces the module/data?                         
-      auto dependency = mDependencies.FindKeyIndex(type);
-      if (!dependency) {
-         Logger::Error()
-            << "Module " << type << "'s dependency is not known";
-         return nullptr;
-      }
-
       // A module instance doesn't exist yet, so instantiate it         
       Logger::Verbose()
-         << "Module " << type << " is not instantiated yet"
-         << " - attempting to create it...";
-      auto& library = mDependencies.GetValue(dependency);
+         << "Module `" << name << "` is not instantiated yet"
+         << ", so attempting to create it...";
 
+      auto& library = mLibraries[name];
+      return InstantiateModule(library, descriptor);
+   }
+   
+   /// Create a module instance or return an already instantiated one         
+   ///   @param library - the library handle                                  
+   ///   @param descriptor - module initialization descriptor                 
+   ///   @return the new module instance                                      
+   Module* Runtime::InstantiateModule(const SharedLibrary& library, const Any& descriptor) {
       // Use the creation point of the library to instantiate module    
       const auto& info = library.mInfo();
-      auto module = library.mCreator(this, construct);
+      auto module = library.mCreator(this, descriptor);
       if (!module) {
          Logger::Error()
-            << "Module " << type << "'s creator didn't provide a module";
+            << "Module `" << info.mName << "` creator didn't provide a module";
          return nullptr;
       }
 
@@ -131,7 +109,7 @@ namespace Langulus::Entity
       }
       catch (...) {
          Logger::Error()
-            << "Registering module " << type << " failed";
+            << "Registering module `" << info.mName << "` failed";
 
          // Make sure we end up in an invariant state                   
          mModules[info.mPriority].RemoveValue(module);
@@ -152,17 +130,19 @@ namespace Langulus::Entity
 
       // Done, if reached                                               
       Logger::Verbose()
-         << "Module " << info.mName
-         << " registered with priority " << info.mPriority;
+         << "Module `" << info.mName
+         << "` registered with priority " << info.mPriority;
       return module;
    }
 
    /// Load a shared library for a module                                     
-   ///   @param filename - the file for the dynamic library                   
+   ///   @param name - the name for the dynamic library                       
+   ///                 the filename will be derived from it, by prefixing     
+   ///                 with `Mod.`, and suffixing with `.so` or `.dll`        
    ///   @return the module handle (OS dependent)                             
-   typename Runtime::SharedLibrary Runtime::LoadSharedLibrary(const Path& filename) {
+   Runtime::SharedLibrary Runtime::LoadSharedLibrary(const Token& name) {
       // Check if this library is already loaded                        
-      const auto preloaded = mLibraries.FindKeyIndex(filename);
+      const auto preloaded = mLibraries.FindKeyIndex(name);
       if (preloaded) {
          // Never even attempt to load libraries more than once         
          return mLibraries.GetValue(preloaded);
@@ -170,12 +150,13 @@ namespace Langulus::Entity
 
       // File prefix                                                    
       Path path;
+
       #if LANGULUS_OS(LINUX)
          path += "./lib";
       #endif
 
-      path += "M";
-      path += filename;
+      path += "Mod.";
+      path += name;
 
       #if LANGULUS(DEBUG)
          path += "d";
@@ -211,7 +192,8 @@ namespace Langulus::Entity
       }
 
       // Great success!                                                 
-      Logger::Info() << "Module " << path << " loaded";
+      Logger::Info() << "Module `" << path << "` loaded";
+
       SharedLibrary library;
       static_assert(sizeof(library.mHandle) == sizeof(dll), "Size mismatch");
       library.mHandle = reinterpret_cast<decltype(library.mHandle)>(dll);
@@ -316,6 +298,16 @@ namespace Langulus::Entity
       #endif
    }
 
+   /// Get the dependency module of a given type                              
+   ///   @param type - the type to search for                                 
+   ///   @return the shared library handle, you should check if it's valid    
+   Runtime::SharedLibrary Runtime::GetDependency(DMeta type) const noexcept {
+      auto found = mDependencies.FindKeyIndex(type);
+      if (found)
+         return mDependencies.GetValue(found);
+      return {};
+   }
+
    /// Get a module instance by type                                          
    ///   @param type - the type to search for                                 
    ///   @return the module instance                                          
@@ -329,6 +321,13 @@ namespace Langulus::Entity
    }
 
 #if LANGULUS_FEATURE(MANAGED_REFLECTION)
+   /// Get the dependency module of a given type by token                     
+   ///   @param token - type token                                            
+   ///   @return the shared library handle, you should check if it's valid    
+   Runtime::SharedLibrary Runtime::GetDependency(const Token& token) const noexcept {
+      return GetDependency(RTTI::Database.GetMetaData(token));
+   }
+
    /// Get a module instance by type token                                    
    ///   @param token - type token                                            
    ///   @return the module instance, or nullptr if not found                 
