@@ -46,4 +46,11 @@ if (MSVC)
 endif()
 
 target_include_directories(Langulus.Entity PUBLIC include)
-target_link_libraries(Langulus.Entity PUBLIC Langulus.Flow)
+
+target_link_libraries(Langulus.Entity
+    PUBLIC      Langulus.Core
+                Langulus.Logger
+                Langulus.RTTI
+                Langulus.Anyness
+                Langulus.Flow
+)
