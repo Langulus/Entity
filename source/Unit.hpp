@@ -25,6 +25,9 @@ namespace Langulus::Entity
    /// graphics, input, AI, content, and whatever extensions you make.        
    ///                                                                        
    class Unit : public Resolvable {
+      LANGULUS(UNINSERTABLE) false;
+      LANGULUS_BASES(Resolvable);
+
    protected:
       friend class Thing;
 

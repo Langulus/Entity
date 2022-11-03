@@ -37,7 +37,7 @@ namespace Langulus::Entity
 {
 
    TUnorderedMap<Token, Runtime::SharedLibrary> Runtime::mLibraries;
-   TUnorderedMap<DMeta, Runtime::SharedLibrary> Runtime::mDependencies;
+   TUnorderedMap<const RTTI::Meta*, Runtime::SharedLibrary> Runtime::mDependencies;
 
    /// Close a shared library handle, unloading it                            
    ///   @param library - the library handle                                  
@@ -161,10 +161,6 @@ namespace Langulus::Entity
       path += "Mod.";
       path += name;
 
-      /*#if LANGULUS(DEBUG)
-         path += "d";
-      #endif*/
-
       // File postfix                                                   
       #if LANGULUS_OS(WINDOWS)
          path += ".dll";
@@ -209,8 +205,8 @@ namespace Langulus::Entity
             GetProcAddress(dll, LANGULUS_MODULE_CREATE_TOKEN()));
          library.mInfo = reinterpret_cast<Module::InfoPoint>(
             GetProcAddress(dll, LANGULUS_MODULE_INFO_TOKEN()));
-         library.mExit = reinterpret_cast<Module::ExitPoint>(
-            GetProcAddress(dll, LANGULUS_MODULE_EXIT_TOKEN()));
+         //library.mExit = reinterpret_cast<Module::ExitPoint>(
+         //   GetProcAddress(dll, LANGULUS_MODULE_EXIT_TOKEN()));
       #elif LANGULUS_OS(LINUX)
          library.mEntry = reinterpret_cast<Module::EntryPoint>(
             dlsym(dll, LANGULUS_MODULE_ENTRY_TOKEN()));
@@ -218,8 +214,8 @@ namespace Langulus::Entity
             dlsym(dll, LANGULUS_MODULE_CREATE_TOKEN()));
          library.mInfo = reinterpret_cast<Module::InfoPoint>(
             dlsym(dll, LANGULUS_MODULE_INFO_TOKEN()));
-         library.mExit = reinterpret_cast<Module::ExitPoint>(
-            dlsym(dll, LANGULUS_MODULE_EXIT_TOKEN()));
+         //library.mExit = reinterpret_cast<Module::ExitPoint>(
+         //   dlsym(dll, LANGULUS_MODULE_EXIT_TOKEN()));
       #else 
          #error Unsupported OS
       #endif   
@@ -248,30 +244,29 @@ namespace Langulus::Entity
          return {};
       }
 
-      if (!library.mExit) {
+      /*if (!library.mExit) {
          Logger::Error()
             << "Module `" << path << "` has no valid exit point - "
             << "the function " LANGULUS_MODULE_EXIT_TOKEN() " is missing";
          UnloadSharedLibrary(library);
          return {};
-      }
+      }*/
 
       // Link the module - this shall merge RTTI definitions            
       // It might throw if out of memory or on meta collision, while    
       // registering new types on the other side                        
-      MetaList registeredTypes;
       try {
-         registeredTypes = library.mEntry();
+         library.mTypes = library.mEntry();
 
          mLibraries.Insert(path, library);
-         for (auto externalType : registeredTypes)
+         for (auto externalType : library.mTypes)
             mDependencies.Insert(externalType, library);
       }
       catch (...) {
          // Make sure we end up in an invariant state                   
          Logger::Error() << "Could not enter `" << path << "` due to an exception";
          mLibraries.RemoveKey(path);
-         for (auto externalType : registeredTypes)
+         for (auto externalType : library.mTypes)
             mDependencies.RemoveKey(externalType);
          UnloadSharedLibrary(library);
          return {};
@@ -286,11 +281,13 @@ namespace Langulus::Entity
       if (module.mHandle == 0)
          return;
 
-      if (module.mExit) {
-         const MetaList unregisteredTypes = module.mExit();
-         for (auto externalType : unregisteredTypes)
-            mDependencies.RemoveKey(externalType);
+      for (auto externalType : module.mTypes) {
+         mDependencies.RemoveKey(externalType);
+         RTTI::Database.Unregister(externalType);
       }
+
+      //if (module.mExit)
+      //   module.mExit();
 
       #if LANGULUS_OS(WINDOWS)
          ::Langulus::Entity::UnloadSharedLibrary(

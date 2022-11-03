@@ -12,31 +12,37 @@ LANGULUS_EXCEPTION(Module);
 
 namespace Langulus
 {
+   /*namespace Inner
+   {
+      template<class T>
+      bool UnregisterType() {
+         #if LANGULUS_FEATURE(MANAGED_REFLECTION)
+            RTTI::Database.Unregister(MetaOf<T>());
+         #endif
+         return true;
+      }
+   }*/
 
-   using MetaList = Anyness::TAny<RTTI::DMeta>;
+   using MetaList = Anyness::TAny<const RTTI::Meta*>;
 
    /// Helper function, that reflects and registers a type list               
    ///   @return a container with list of all the registered types            
    template<class... T>
    MetaList RegisterTypeList() {
       static const MetaList types {
-         MetaList::Wrap(RTTI::MetaData::Of<T>()...)
+         MetaList::Wrap(MetaOf<T>()...)
       };
       return types;
    }
 
    /// Helper function, that unregisters a type list                          
    ///   @return a container with list of all the unregistered types          
-   template<class... T>
-   MetaList UnregisterTypeList() {
+   /*template<class... T>
+   void UnregisterTypeList() {
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
-         return MetaList::Wrap(
-            RTTI::Database.Unregister(RTTI::MetaData::Of<T>())...);
-      #else
-         // No reference counting, just return the same list            
-         return RegisterTypeList<T...>();
+         (Inner::UnregisterType<T>() && ...);
       #endif
-   }
+   }*/
 
 } // namespace Langulus
 
@@ -54,10 +60,16 @@ namespace Langulus::Entity
    ///   External module interface                                            
    ///                                                                        
    class Module : public Resolvable {
-      LANGULUS(ABSTRACT) true;
       LANGULUS(PRODUCER) Runtime;
+      LANGULUS(UNINSERTABLE) false;
+      LANGULUS_BASES(Resolvable);
+
+   private:
+      // Runtime that owns the module instance                          
+      Runtime* mRuntime;
+
    public:
-      Module(DMeta classid, Runtime* runtime) noexcept
+      Module(DMeta classid, Runtime* runtime) SAFETY_NOEXCEPT()
          : Resolvable {classid}
          , mRuntime {runtime} {}
 
@@ -86,15 +98,12 @@ namespace Langulus::Entity
       using EntryPoint = MetaList(*)();
       using CreatePoint = Module*(*)(Runtime*, const Any&);
       using InfoPoint = const Info&(*)();
-      using ExitPoint = MetaList(*)();
+      //using ExitPoint = void(*)();
+
+      NOD() Runtime* GetRuntime() const noexcept { return mRuntime; }
 
    public:
-      NOD() Runtime* GetRuntime() const noexcept { return mRuntime; }
       virtual void Update(Time) = 0;
-
-   private:
-      // Runtime that owns the module instance                          
-      Runtime* mRuntime;
    };
 
 } // namespace Langulus::Entity
@@ -110,14 +119,14 @@ namespace Langulus::CT
 
 
 /// Name of module entry function                                             
-#define LANGULUS_MODULE_ENTRY()            LangulusModuleEntryPoint
-#define LANGULUS_MODULE_ENTRY_TOKEN()      LANGULUS_STRINGIFY(LANGULUS_MODULE_ENTRY())
+#define LANGULUS_MODULE_ENTRY()           LangulusModuleEntryPoint
+#define LANGULUS_MODULE_ENTRY_TOKEN()     LANGULUS_STRINGIFY(LANGULUS_MODULE_ENTRY())
 /// Name of module exit function                                              
-#define LANGULUS_MODULE_EXIT()            LangulusModuleExitPoint
-#define LANGULUS_MODULE_EXIT_TOKEN()      LANGULUS_STRINGIFY(LANGULUS_MODULE_EXIT())
+//#define LANGULUS_MODULE_EXIT()            LangulusModuleExitPoint
+//#define LANGULUS_MODULE_EXIT_TOKEN()      LANGULUS_STRINGIFY(LANGULUS_MODULE_EXIT())
 /// Name of module instantiation function                                     
-#define LANGULUS_MODULE_CREATE()            LangulusModuleCreatePoint
-#define LANGULUS_MODULE_CREATE_TOKEN()      LANGULUS_STRINGIFY(LANGULUS_MODULE_CREATE())
+#define LANGULUS_MODULE_CREATE()          LangulusModuleCreatePoint
+#define LANGULUS_MODULE_CREATE_TOKEN()    LANGULUS_STRINGIFY(LANGULUS_MODULE_CREATE())
 /// Name of module information function                                       
 #define LANGULUS_MODULE_INFO()            LangulusModuleInfoPoint
 #define LANGULUS_MODULE_INFO_TOKEN()      LANGULUS_STRINGIFY(LANGULUS_MODULE_INFO())
@@ -129,15 +138,12 @@ namespace Langulus::CT
 ///   @param name - the module identifier token                               
 ///   @param info - information string literal about the module               
 ///   @param depo - relative path for the module, under Data/Modules/         
+///   @param cat - module category, i.e. some abstract type                   
 ///   @param ... - a type list to reflect upon module load                    
 #define LANGULUS_DEFINE_MODULE(m, prio, name, info, depo, cat, ...) \
    extern "C" { \
       LANGULUS_EXPORT() ::Langulus::MetaList LANGULUS_MODULE_ENTRY() () { \
-         return ::Langulus::RegisterTypeList<__VA_ARGS__>();\
-      } \
-      \
-      LANGULUS_EXPORT() ::Langulus::MetaList LANGULUS_MODULE_EXIT() () { \
-         return ::Langulus::UnregisterTypeList<__VA_ARGS__>();\
+         return ::Langulus::RegisterTypeList<m, __VA_ARGS__>();\
       } \
       \
       LANGULUS_EXPORT() ::Langulus::Entity::Module* LANGULUS_MODULE_CREATE() ( \
@@ -158,3 +164,9 @@ namespace Langulus::CT
          return i; \
       } \
    }
+
+/*      \
+      LANGULUS_EXPORT() void LANGULUS_MODULE_EXIT() () { \
+         ::Langulus::UnregisterTypeList<m, __VA_ARGS__>();\
+      } \
+*/

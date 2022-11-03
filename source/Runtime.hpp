@@ -38,7 +38,8 @@ namespace Langulus::Entity
          Module::EntryPoint mEntry;
          Module::CreatePoint mCreator;
          Module::InfoPoint mInfo;
-         Module::ExitPoint mExit;
+         //Module::ExitPoint mExit;
+         MetaList mTypes;
 
       public:
          /// Check if the shared library handle is valid                      
@@ -65,7 +66,7 @@ namespace Langulus::Entity
       static TUnorderedMap<Token, SharedLibrary> mLibraries;
 
       // Shared library dependencies for all externally registered types
-      static TUnorderedMap<DMeta, SharedLibrary> mDependencies;
+      static TUnorderedMap<const RTTI::Meta*, SharedLibrary> mDependencies;
 
       // Instantiated modules, sorted by priority                       
       TMap<Real, ModuleList> mModules;
