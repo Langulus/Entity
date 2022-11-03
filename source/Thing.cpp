@@ -399,10 +399,12 @@ namespace Langulus::Entity
    ///   @param descriptor - instructions for module setup                    
    ///   @return the instantiated module interface                            
    Module* Thing::LoadMod(const Token& module, const Any& descriptor) {
-      auto runtime = GetRuntime();
+      const auto runtime = GetRuntime();
       LANGULUS_ASSUME(UserAssumes, runtime != nullptr,
          "No runtime available for loading a module");
-      return runtime->InstantiateModule(module, descriptor);
+      const auto instance = runtime->InstantiateModule(module, descriptor);
+      LANGULUS_ASSERT(instance, Except::Module, "Missing module");
+      return instance;
    }
 
    /// Create all dependencies required for the production of 'type', if such 

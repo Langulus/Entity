@@ -8,6 +8,8 @@
 #pragma once
 #include "Common.hpp"
 
+LANGULUS_EXCEPTION(Module);
+
 namespace Langulus
 {
 

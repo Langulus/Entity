@@ -83,7 +83,7 @@ namespace Langulus::Entity
          << "Module `" << name << "` is not instantiated yet"
          << ", so attempting to create it...";
 
-      auto& library = mLibraries[name];
+      auto library = LoadSharedLibrary(name);
       return InstantiateModule(library, descriptor);
    }
    
@@ -92,6 +92,9 @@ namespace Langulus::Entity
    ///   @param descriptor - module initialization descriptor                 
    ///   @return the new module instance                                      
    Module* Runtime::InstantiateModule(const SharedLibrary& library, const Any& descriptor) {
+      if (!library.IsValid())
+         return nullptr;
+
       // Use the creation point of the library to instantiate module    
       const auto& info = library.mInfo();
       auto module = library.mCreator(this, descriptor);
@@ -158,9 +161,9 @@ namespace Langulus::Entity
       path += "Mod.";
       path += name;
 
-      #if LANGULUS(DEBUG)
+      /*#if LANGULUS(DEBUG)
          path += "d";
-      #endif
+      #endif*/
 
       // File postfix                                                   
       #if LANGULUS_OS(WINDOWS)
@@ -283,9 +286,11 @@ namespace Langulus::Entity
       if (module.mHandle == 0)
          return;
 
-      const MetaList unregisteredTypes = module.mExit();
-      for (auto externalType : unregisteredTypes)
-         mDependencies.RemoveKey(externalType);
+      if (module.mExit) {
+         const MetaList unregisteredTypes = module.mExit();
+         for (auto externalType : unregisteredTypes)
+            mDependencies.RemoveKey(externalType);
+      }
 
       #if LANGULUS_OS(WINDOWS)
          ::Langulus::Entity::UnloadSharedLibrary(
