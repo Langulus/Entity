@@ -28,6 +28,7 @@ if (PROJECT_IS_TOP_LEVEL)
 	fetch_langulus_module(Core)
 	fetch_langulus_module(Logger)
 	fetch_langulus_module(RTTI)
+	fetch_langulus_module(SIMD)
 	fetch_langulus_module(Anyness)
 	fetch_langulus_module(Flow)
 
@@ -51,6 +52,7 @@ target_link_libraries(Langulus.Entity
     PUBLIC      Langulus.Core
                 Langulus.Logger
                 Langulus.RTTI
+                Langulus.SIMD
                 Langulus.Anyness
                 Langulus.Flow
 )
