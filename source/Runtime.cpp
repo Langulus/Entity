@@ -248,7 +248,7 @@ namespace Langulus::Entity
       // It might throw if out of memory or on meta collision, while    
       // registering new types on the other side                        
       try {
-         library.mTypes = library.mEntry();
+         library.mEntry(library.mTypes);
 
          mLibraries.Insert(path, library);
          for (auto externalType : library.mTypes)

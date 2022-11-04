@@ -16,17 +16,14 @@ namespace Langulus
    using MetaList = Anyness::TAny<const RTTI::Meta*>;
 
    /// Helper function, that reflects and registers a type list               
-   ///   @return a container with list of all the registered types            
+   ///   @param list - a container with list of all the registered types      
    template<class... T>
-   MetaList RegisterTypeList() {
-      static const MetaList types {
-         MetaList::Wrap(MetaOf<T>()...)
-      };
-      return types;
+   void RegisterTypeList(MetaList& list) {
+      const RTTI::Meta* const metas[] { MetaOf<T>()... };
+      list.Insert(metas, metas + sizeof(metas) / sizeof(RTTI::DMeta));
    }
 
 } // namespace Langulus
-
 
 namespace Langulus::Entity
 {
@@ -76,7 +73,7 @@ namespace Langulus::Entity
          DMeta mCategory {};
       };
 
-      using EntryFunction = MetaList(*)();
+      using EntryFunction = void(*)(MetaList&);
       using CreateFunction = Module*(*)(Runtime*, const Any&);
       using InfoFunction = const Info&(*)();
 
@@ -119,8 +116,8 @@ namespace Langulus::CT
 ///   @param ... - a type list to reflect upon module load                    
 #define LANGULUS_DEFINE_MODULE(m, prio, name, info, depo, cat, ...) \
    extern "C" { \
-      LANGULUS_EXPORT() ::Langulus::MetaList LANGULUS_MODULE_ENTRY() () { \
-         return ::Langulus::RegisterTypeList<m, __VA_ARGS__>();\
+      LANGULUS_EXPORT() void LANGULUS_MODULE_ENTRY() (::Langulus::MetaList& list) { \
+         ::Langulus::RegisterTypeList<m, cat, __VA_ARGS__>(list);\
       } \
       \
       LANGULUS_EXPORT() ::Langulus::Entity::Module* LANGULUS_MODULE_CREATE() ( \
@@ -136,7 +133,7 @@ namespace Langulus::CT
       \
       LANGULUS_EXPORT() const ::Langulus::Entity::Module::Info& LANGULUS_MODULE_INFO() () { \
          static const ::Langulus::Entity::Module::Info i { \
-            prio, name, info, depo, cat \
+            prio, name, info, depo, ::Langulus::MetaOf<cat>() \
          }; \
          return i; \
       } \
