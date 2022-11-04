@@ -34,11 +34,18 @@ namespace Langulus::Entity
       class SharedLibrary {
       friend class Runtime;
       protected:
+         // Library handle, returned by dlopen or LoadLibrary           
          uintptr_t mHandle {};
-         Module::EntryPoint mEntry;
-         Module::CreatePoint mCreator;
-         Module::InfoPoint mInfo;
+         // Exported entry function, that registers library types       
+         Module::EntryFunction mEntry {};
+         // Exported module instantiation function, produces modules    
+         Module::CreateFunction mCreator {};
+         // Information function, returning module description          
+         Module::InfoFunction mInfo {};
+         // List of types, that were registered upon entry              
          MetaList mTypes;
+         // Number of references for the library                        
+         Count mReferences {1};
 
       public:
          /// Check if the shared library handle is valid                      
@@ -57,7 +64,7 @@ namespace Langulus::Entity
          }
       };
 
-      Thing* mOwner;
+      Thing* mOwner {};
 
       // Loaded shared libraries, indexed by filename                   
       // This is a static registry - all Runtimes use the same shared   

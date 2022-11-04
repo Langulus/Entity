@@ -76,9 +76,9 @@ namespace Langulus::Entity
          DMeta mCategory {};
       };
 
-      using EntryPoint = MetaList(*)();
-      using CreatePoint = Module*(*)(Runtime*, const Any&);
-      using InfoPoint = const Info&(*)();
+      using EntryFunction = MetaList(*)();
+      using CreateFunction = Module*(*)(Runtime*, const Any&);
+      using InfoFunction = const Info&(*)();
 
       NOD() Runtime* GetRuntime() const noexcept { return mRuntime; }
 

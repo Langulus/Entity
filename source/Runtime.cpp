@@ -64,8 +64,12 @@ namespace Langulus::Entity
 
    /// Runtime destruction                                                    
    Runtime::~Runtime() {
-      while (!mLibraries.IsEmpty())
-         UnloadSharedLibrary(mLibraries.GetValue(IndexFirst));
+      for (auto library = mLibraries.begin(); library != mLibraries.end(); ++library) {
+         if (0 == --library->mValue.mReferences) {
+            UnloadSharedLibrary(library->mValue);
+            library = mLibraries.RemoveIndex(library);
+         }
+      }
    }
 
    /// Create a module instance or return an already instantiated one         
@@ -199,18 +203,18 @@ namespace Langulus::Entity
 
       // Get entry, creator, info and exit points from the library      
       #if LANGULUS_OS(WINDOWS)
-         library.mEntry = reinterpret_cast<Module::EntryPoint>(
+         library.mEntry = reinterpret_cast<Module::EntryFunction>(
             GetProcAddress(dll, LANGULUS_MODULE_ENTRY_TOKEN()));
-         library.mCreator = reinterpret_cast<Module::CreatePoint>(
+         library.mCreator = reinterpret_cast<Module::CreateFunction>(
             GetProcAddress(dll, LANGULUS_MODULE_CREATE_TOKEN()));
-         library.mInfo = reinterpret_cast<Module::InfoPoint>(
+         library.mInfo = reinterpret_cast<Module::InfoFunction>(
             GetProcAddress(dll, LANGULUS_MODULE_INFO_TOKEN()));
       #elif LANGULUS_OS(LINUX)
          library.mEntry = reinterpret_cast<Module::EntryPoint>(
             dlsym(dll, LANGULUS_MODULE_ENTRY_TOKEN()));
-         library.mCreator = reinterpret_cast<Module::CreatePoint>(
+         library.mCreator = reinterpret_cast<Module::CreateFunction>(
             dlsym(dll, LANGULUS_MODULE_CREATE_TOKEN()));
-         library.mInfo = reinterpret_cast<Module::InfoPoint>(
+         library.mInfo = reinterpret_cast<Module::InfoFunction>(
             dlsym(dll, LANGULUS_MODULE_INFO_TOKEN()));
       #else 
          #error Unsupported OS
