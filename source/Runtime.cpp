@@ -205,8 +205,6 @@ namespace Langulus::Entity
             GetProcAddress(dll, LANGULUS_MODULE_CREATE_TOKEN()));
          library.mInfo = reinterpret_cast<Module::InfoPoint>(
             GetProcAddress(dll, LANGULUS_MODULE_INFO_TOKEN()));
-         //library.mExit = reinterpret_cast<Module::ExitPoint>(
-         //   GetProcAddress(dll, LANGULUS_MODULE_EXIT_TOKEN()));
       #elif LANGULUS_OS(LINUX)
          library.mEntry = reinterpret_cast<Module::EntryPoint>(
             dlsym(dll, LANGULUS_MODULE_ENTRY_TOKEN()));
@@ -214,8 +212,6 @@ namespace Langulus::Entity
             dlsym(dll, LANGULUS_MODULE_CREATE_TOKEN()));
          library.mInfo = reinterpret_cast<Module::InfoPoint>(
             dlsym(dll, LANGULUS_MODULE_INFO_TOKEN()));
-         //library.mExit = reinterpret_cast<Module::ExitPoint>(
-         //   dlsym(dll, LANGULUS_MODULE_EXIT_TOKEN()));
       #else 
          #error Unsupported OS
       #endif   
@@ -243,14 +239,6 @@ namespace Langulus::Entity
          UnloadSharedLibrary(library);
          return {};
       }
-
-      /*if (!library.mExit) {
-         Logger::Error()
-            << "Module `" << path << "` has no valid exit point - "
-            << "the function " LANGULUS_MODULE_EXIT_TOKEN() " is missing";
-         UnloadSharedLibrary(library);
-         return {};
-      }*/
 
       // Link the module - this shall merge RTTI definitions            
       // It might throw if out of memory or on meta collision, while    
@@ -285,9 +273,6 @@ namespace Langulus::Entity
          mDependencies.RemoveKey(externalType);
          RTTI::Database.Unregister(externalType);
       }
-
-      //if (module.mExit)
-      //   module.mExit();
 
       #if LANGULUS_OS(WINDOWS)
          ::Langulus::Entity::UnloadSharedLibrary(

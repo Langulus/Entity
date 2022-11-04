@@ -38,7 +38,6 @@ namespace Langulus::Entity
          Module::EntryPoint mEntry;
          Module::CreatePoint mCreator;
          Module::InfoPoint mInfo;
-         //Module::ExitPoint mExit;
          MetaList mTypes;
 
       public:

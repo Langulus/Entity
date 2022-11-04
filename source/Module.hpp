@@ -12,16 +12,6 @@ LANGULUS_EXCEPTION(Module);
 
 namespace Langulus
 {
-   /*namespace Inner
-   {
-      template<class T>
-      bool UnregisterType() {
-         #if LANGULUS_FEATURE(MANAGED_REFLECTION)
-            RTTI::Database.Unregister(MetaOf<T>());
-         #endif
-         return true;
-      }
-   }*/
 
    using MetaList = Anyness::TAny<const RTTI::Meta*>;
 
@@ -34,15 +24,6 @@ namespace Langulus
       };
       return types;
    }
-
-   /// Helper function, that unregisters a type list                          
-   ///   @return a container with list of all the unregistered types          
-   /*template<class... T>
-   void UnregisterTypeList() {
-      #if LANGULUS_FEATURE(MANAGED_REFLECTION)
-         (Inner::UnregisterType<T>() && ...);
-      #endif
-   }*/
 
 } // namespace Langulus
 
@@ -98,7 +79,6 @@ namespace Langulus::Entity
       using EntryPoint = MetaList(*)();
       using CreatePoint = Module*(*)(Runtime*, const Any&);
       using InfoPoint = const Info&(*)();
-      //using ExitPoint = void(*)();
 
       NOD() Runtime* GetRuntime() const noexcept { return mRuntime; }
 
@@ -121,9 +101,6 @@ namespace Langulus::CT
 /// Name of module entry function                                             
 #define LANGULUS_MODULE_ENTRY()           LangulusModuleEntryPoint
 #define LANGULUS_MODULE_ENTRY_TOKEN()     LANGULUS_STRINGIFY(LANGULUS_MODULE_ENTRY())
-/// Name of module exit function                                              
-//#define LANGULUS_MODULE_EXIT()            LangulusModuleExitPoint
-//#define LANGULUS_MODULE_EXIT_TOKEN()      LANGULUS_STRINGIFY(LANGULUS_MODULE_EXIT())
 /// Name of module instantiation function                                     
 #define LANGULUS_MODULE_CREATE()          LangulusModuleCreatePoint
 #define LANGULUS_MODULE_CREATE_TOKEN()    LANGULUS_STRINGIFY(LANGULUS_MODULE_CREATE())
@@ -164,9 +141,3 @@ namespace Langulus::CT
          return i; \
       } \
    }
-
-/*      \
-      LANGULUS_EXPORT() void LANGULUS_MODULE_EXIT() () { \
-         ::Langulus::UnregisterTypeList<m, __VA_ARGS__>();\
-      } \
-*/
