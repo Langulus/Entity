@@ -210,7 +210,7 @@ namespace Langulus::Entity
          library.mInfo = reinterpret_cast<Module::InfoFunction>(
             GetProcAddress(dll, LANGULUS_MODULE_INFO_TOKEN()));
       #elif LANGULUS_OS(LINUX)
-         library.mEntry = reinterpret_cast<Module::EntryPoint>(
+         library.mEntry = reinterpret_cast<Module::EntryFunction>(
             dlsym(dll, LANGULUS_MODULE_ENTRY_TOKEN()));
          library.mCreator = reinterpret_cast<Module::CreateFunction>(
             dlsym(dll, LANGULUS_MODULE_CREATE_TOKEN()));
