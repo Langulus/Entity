@@ -9,11 +9,10 @@
 #include "Unit.hpp"
 #include "Runtime.hpp"
 
-LANGULUS_DEFINE_TRAIT(Trait, "Accesses traits, dynamic or static");
-LANGULUS_DEFINE_TRAIT(Runtime, "Accesses Runtime component inside a hierarchy of Entities");
-LANGULUS_DEFINE_TRAIT(Unit, "Accesses components, dynamic or static");
-LANGULUS_DEFINE_TRAIT(Child, "Accesses children in hierarchies");
-LANGULUS_DEFINE_TRAIT(Parent, "Accesses parents in hierarchies");
+LANGULUS_DEFINE_TRAIT(Runtime, "Accesses the runtime of a hierarchy of Things");
+LANGULUS_DEFINE_TRAIT(Unit, "Accesses units (components) of Things");
+LANGULUS_DEFINE_TRAIT(Child, "Accesses children in any kind of hierarchies");
+LANGULUS_DEFINE_TRAIT(Parent, "Accesses parents in any kind of hierarchies");
 
 namespace Langulus::Entity
 {
@@ -30,9 +29,9 @@ namespace Langulus::Entity
    ///                                                                        
    ///   Thing                                                                
    ///                                                                        
-   /// The primary composed type. Its functionality comes from its units and  
-   /// children/owner's units. A thing is an aggregate of traits, units, and  
-   /// other things.                                                          
+   /// The primary composable type. Its functionality comes from its units    
+   /// and children/owner's units. The Thing is an aggregate of traits,       
+   /// units, and subthings.                                                  
    ///                                                                        
    class Thing final : public Resolvable {
       LANGULUS(ABSTRACT) false;
@@ -49,7 +48,7 @@ namespace Langulus::Entity
       // The entity's parent                                            
       Ptr<Thing> mOwner;
       // Hierarchy                                                      
-      TAny<Thing*> mChildren;
+      Hierarchy mChildren;
       // Units                                                          
       TUnorderedMap<DMeta, TAny<Unit*>> mUnits;
       // Traits                                                         
@@ -129,10 +128,12 @@ namespace Langulus::Entity
       ///                                                                     
       ///   Unit management                                                   
       ///                                                                     
+      template<bool TWOSIDED = true>
       Count AddUnit(Unit*);
+      template<bool TWOSIDED = true>
       Count RemoveUnit(Unit*);
 
-      template<CT::Unit T>
+      template<CT::Unit T, bool TWOSIDED = true>
       Count RemoveUnits();
 
       void ReplaceUnit(Unit*, Unit*);

@@ -10,5 +10,6 @@
 #include "../source/Thing.hpp"
 #include "../source/Runtime.hpp"
 #include "../source/Temporal.hpp"
+#include "../source/Hierarchy.inl"
 
 #define LANGULUS_LIBRARY_ENTITY() 1

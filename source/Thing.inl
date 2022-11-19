@@ -45,18 +45,84 @@ namespace Langulus::Entity
 
       return false;
    }
+   
+   /// Add a new unit to the entity                                           
+   /// Adding units coupled with different runtimes is not allowed            
+   /// You can only duplicate units, if they're unique instances memorywise   
+   ///   @tparam TWOSIDED - if true, will both add unit to thing, and add     
+   ///                      the thing as an owner for the unit;               
+   ///                      used mainly internally to avoid endless loops     
+   ///   @param unit - the unit to add                                        
+   ///   @return 1 if unit has been added                                     
+   template<bool TWOSIDED>
+   Count Thing::AddUnit(Unit* unit) {
+      // Check if the unit instance is already registered here          
+      const auto foundType = mUnits.FindKeyIndex(unit->GetType());
+      if (foundType && mUnits.GetValue(foundType).Find(unit))
+         return 0;
+
+      // We must guarantee, that no unit is coupled to entities with    
+      // different runtimes!                                            
+      for (auto owners : unit->mOwners) {
+         LANGULUS_ASSERT(owners->GetRuntime() == GetRuntime(), Except::Access,
+            "Coupling a unit to multiple runtimes is not allowed");
+      }
+
+      // Log self before unit being added, it might change name         
+      ENTITY_VERBOSE_SELF("");
+
+      if constexpr (TWOSIDED) {
+         #if LANGULUS(SAFE)
+            unit->mOwners <<= this;
+         #else
+            unit->mOwners << this;
+         #endif
+      }
+
+      mUnits[unit->GetType()] << unit;
+      mRefreshRequired = true;
+      ENTITY_VERBOSE(unit << " added");
+      return 1;
+   }
+
+   /// Remove an unit instance from the thing                                 
+   ///   @tparam TWOSIDED - if true, will both remove unit from thing, and    
+   ///                      then remove the thing from unit's owners;         
+   ///                      used mainly internally to avoid endless loops     
+   ///   @param unit - unit to remove from the entity                         
+   ///   @return 1 if unit has been removed                                   
+   template<bool TWOSIDED>
+   Count Thing::RemoveUnit(Unit* unit) {
+      const auto foundType = mUnits.FindKeyIndex(unit->GetType());
+      if (foundType) {
+         const auto removed = mUnits.GetValue(foundType).RemoveValue(unit);
+         if (removed) {
+            // Decouple before unit is destroyed                        
+            if constexpr (TWOSIDED)
+               unit->mOwners.RemoveValue<false, true>(this);
+
+            // Notify all other units about the environment change      
+            mRefreshRequired = true;
+            ENTITY_VERBOSE_SELF(unit << " removed");
+            return 1;
+         }
+      }
+
+      return 0;
+   }
 
    /// Remove all units that are derived from the provided type               
    ///   @tparam T - the type of units to remove                              
    ///   @return the number of removed units                                  
-   template<CT::Unit T>
+   template<CT::Unit T, bool TWOSIDED>
    Count Thing::RemoveUnits() {
       const auto found = mUnits.FindKeyIndex(MetaData::Of<T>());
       if (found) {
          auto& list = mUnits.GetValue(found);
          for (auto unit : list) {
             ENTITY_VERBOSE_SELF(unit << " removed");
-            unit->mOwners.Remove(this);
+            if constexpr (TWOSIDED)
+               unit->mOwners.Remove(this);
          }
 
          const auto removed = list.GetCount();

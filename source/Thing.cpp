@@ -267,53 +267,6 @@ namespace Langulus::Entity
          child->ResetFlow(newflow);
    }
 
-   /// Add a new unit to the entity                                           
-   /// Adding units, coupled with different runtimes is not allowed           
-   /// You can not duplicate unit pointers                                    
-   ///   @param unit - the unit to add                                        
-   ///   @return 1 if unit has been added                                     
-   Count Thing::AddUnit(Unit* unit) {
-      // Check if pointer is already registered                         
-      const auto foundType = mUnits.FindKeyIndex(unit->GetType());
-      if (foundType && mUnits.GetValue(foundType).Find(unit))
-         return 0;
-
-      // We must guarantee, that no unit is coupled to entities with    
-      // different runtimes!                                            
-      for (auto owners : unit->mOwners) {
-         LANGULUS_ASSERT(owners->GetRuntime() == GetRuntime(), Except::Access,
-            "Coupling a unit to multiple runtimes is not allowed");
-      }
-
-      // Log self before unit being added, it might change name         
-      ENTITY_VERBOSE_SELF("");
-      unit->mOwners << this;
-      mUnits[unit->GetType()] << unit;
-      mRefreshRequired = true;
-      ENTITY_VERBOSE(unit << " added");
-      return 1;
-   }
-
-   /// Remove an exact unit from the entity                                   
-   ///   @param unit - unit to remove from the entity                         
-   ///   @return 1 if unit has been removed                                   
-   Count Thing::RemoveUnit(Unit* unit) {
-      const auto foundType = mUnits.FindKeyIndex(unit->GetType());
-      if (foundType) {
-         const auto removed = mUnits.GetValue(foundType).RemoveValue(unit);
-         if (removed) {
-            // Decouple before unit is destroyed                        
-            unit->mOwners.RemoveValue<false, true>(this);
-
-            // Notify all other units about the environment change      
-            mRefreshRequired = true;
-            ENTITY_VERBOSE_SELF(unit << " removed");
-         }
-      }
-
-      return 0;
-   }
-
    /// Replace one unit instance with another - used when moving units        
    ///   @attention assumes both units are different and not nullptr          
    ///   @param replaceThis - the unit to replace                             

@@ -6,21 +6,16 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include "Common.hpp"
+#include "Hierarchy.hpp"
 
 namespace Langulus::Entity
 {
-   /// Some predeclarations                                                   
-
-   class Thing;
-   class Runtime;
-
 
    ///                                                                        
    ///   An abstract unit                                                     
    ///                                                                        
    ///   Unit is a shorter name for a component, or extension. It's used for  
-   /// composing Entity behavior. Units are usually produced from factories   
+   /// composing Things' behavior. Units are usually produced from factories  
    /// inside external, dynamically loaded modules. There are units for       
    /// graphics, input, AI, content, and whatever extensions you make.        
    ///                                                                        
@@ -32,7 +27,9 @@ namespace Langulus::Entity
       friend class Thing;
 
       // Things that are coupled with this unit                         
-      TAny<Thing*> mOwners;
+      // Owners act as an environment for the unit's context, providing 
+      // additional traits and other units for interoperability         
+      Hierarchy mOwners;
 
    public:
       /// A unit can not be default-created, nor be shallowly copied          
@@ -40,12 +37,13 @@ namespace Langulus::Entity
       Unit(const Unit&) = delete;
       Unit& operator = (const Unit&) = delete;
 
-      /// A unit can only be moved or created with a resolvable type          
-      Unit(DMeta) noexcept;
+      /// A unit can only be moved or created with type and owner             
+      Unit(DMeta, const Any&) noexcept;
       Unit(Unit&&) noexcept;
-      Unit& operator = (Unit&&) noexcept;
       virtual ~Unit();
-      
+
+      Unit& operator = (Unit&&) noexcept;
+
       void Select(Verb&);
 
    public:
@@ -66,9 +64,9 @@ namespace Langulus::Entity
       bool DoInHierarchy(Verb&);
 
    protected:
-      void Couple(Thing*);
-      void Decouple(Thing*);
-      void ReplaceOwner(Thing*, Thing*);
+      void Couple(const Thing*);
+      void Decouple(const Thing*);
+      void ReplaceOwner(const Thing*, const Thing*);
    };
 
 } // namespace Langulus::Entity
@@ -77,7 +75,7 @@ namespace Langulus::Entity
 namespace Langulus::CT
 {
 
-   /// Any type that inherits A::Unit is considered a unit                    
+   /// Any type that inherits Unit is considered a unit                       
    template<class T>
    concept Unit = DerivedFrom<T, ::Langulus::Entity::Unit>;
 
