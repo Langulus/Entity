@@ -166,13 +166,13 @@ namespace Langulus::Entity
       bool mismatch = false;
 
       const auto selectTrait = [&](const MetaTrait* trait) {
-         Trait found;
-         if (!GetTrait(trait, found)) {
+         auto found = GetTrait(trait);
+         if (found.IsEmpty()) {
             mismatch = true;
             return false;
          }
 
-         selectedTraits << found;
+         selectedTraits << Abandon(found);
          return true;
       };
 

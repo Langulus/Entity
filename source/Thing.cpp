@@ -209,6 +209,16 @@ namespace Langulus::Entity
       return found;
    }
 
+   /// Get a unit by type and offset (const)                                  
+   /// If type is nullptr searches only by offset                             
+   /// If type is not nullptr, gets the Nth matching unit, if any             
+   ///   @param type - the type of the unit                                   
+   ///   @param offset - the unit index to seek                               
+   ///   @return the unit if found, or nullptr if not                         
+   const Unit* Thing::GetUnit(DMeta type, const Index& offset) const {
+      return const_cast<Thing*>(this)->GetUnit(type, offset);
+   }
+
 #if LANGULUS_FEATURE(MANAGED_REFLECTION)
    /// Get a unit by token and offset                                         
    ///   @param token - the type name of the unit                             
@@ -226,11 +236,26 @@ namespace Langulus::Entity
       return mChildren[id];
    }
 
+   /// Get child entity by offset                                             
+   ///   @param offset - the offset of the entity to return                   
+   ///   @return the child or nullptr if none found                           
+   const Thing* Thing::GetChild(const Index& offset) const {
+      return const_cast<Thing*>(this)->GetChild(offset);
+   }
+
+   /// Get child entity by name and offset                                    
+   ///   @param name - the name trait to search for                           
+   ///   @param offset - the offset of the matching entity to return          
+   ///   @return the child or nullptr if none found                           
+   const Thing* Thing::GetNamedChild(const Token& name, const Index& offset) const {
+      return const_cast<Thing*>(this)->GetNamedChild(name, offset);
+   }
+
    /// Get child by name and offset (searches for Traits::Name in children)   
    ///   @param name - name to seek                                           
    ///   @param offset - offset to seek                                       
    ///   @return the child entity, or nullptr of none was found               
-   Thing* Thing::GetChild(const Token& name, const Index& offset) {
+   Thing* Thing::GetNamedChild(const Token& name, const Index& offset) {
       Index matches = 0;
       for (auto child : mChildren) {
          if (child->GetName() == name) {

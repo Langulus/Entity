@@ -24,6 +24,7 @@ namespace Langulus::Entity
       LANGULUS_BASES(Resolvable);
 
    protected:
+   TESTING(public:)
       friend class Thing;
 
       // Things that are coupled with this unit                         

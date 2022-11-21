@@ -40,6 +40,7 @@ namespace Langulus::Entity
       LANGULUS_BASES(Resolvable);
 
    protected:
+   TESTING(public:)
       void ResetRuntime(Runtime*);
       void ResetFlow(Temporal*);
 
@@ -110,16 +111,16 @@ namespace Langulus::Entity
       ///                                                                     
       ///   Hierarchy management                                              
       ///                                                                     
-      Runtime* CreateRuntime();
-      Temporal* CreateFlow();
-      Thing* CreateChild(const Any&);
-      Count DestroyChild(Thing*);
-      Module* LoadMod(const Token&, const Any& = {});
+      Runtime*    CreateRuntime();
+      Temporal*   CreateFlow();
+      Thing*      CreateChild(const Any& = {});
+      Count       DestroyChild(Thing*);
+      Module*     LoadMod(const Token&, const Any& = {});
 
-      NOD() Thing* GetChild(const Index&);
-      NOD() const Thing* GetChild(const Index&) const;
-      NOD() Thing* GetChild(const Token&, const Index&);
-      NOD() const Thing* GetChild(const Token&, const Index&) const;
+      NOD()       Thing* GetChild(const Index& = IndexFirst);
+      NOD() const Thing* GetChild(const Index& = IndexFirst) const;
+      NOD()       Thing* GetNamedChild(const Token&, const Index& = IndexFirst);
+      NOD() const Thing* GetNamedChild(const Token&, const Index& = IndexFirst) const;
 
       NOD() bool IsFamilyOf(const Thing&) const;
 
@@ -138,24 +139,26 @@ namespace Langulus::Entity
 
       void ReplaceUnit(Unit*, Unit*);
       NOD() Count HasUnits(DMeta) const;
+      template<CT::Unit T>
+      NOD() Count HasUnits() const;
 
-      template<SeekStyle>
+      template<SeekStyle = SeekStyle::UpToHere>
       NOD() TAny<const Unit*> GatherUnits(DMeta) const;
-      template<SeekStyle, CT::Unit T = Unit>
+      template<CT::Unit T = Unit, SeekStyle = SeekStyle::UpToHere>
       NOD() TAny<const Decay<T>*> GatherUnits() const;
 
       NOD() Any CreateDataInner(const Construct&);
 
       template<CT::Unit T, class ... A>
-      Decay<T>* CreateUnit(A&&...);
+      Any CreateUnit(A&&...);
 
-      template<SeekStyle>
+      template<SeekStyle = SeekStyle::UpToHere>
       NOD() Unit* SeekUnit(DMeta, const Index& = IndexFirst);
-      template<SeekStyle>
+      template<SeekStyle = SeekStyle::UpToHere>
       NOD() const Unit* SeekUnit(DMeta, const Index& = IndexFirst) const;
-      template<CT::Unit T, SeekStyle>
+      template<CT::Unit T, SeekStyle = SeekStyle::UpToHere>
       NOD() const Decay<T>* SeekUnit(const Index& = IndexFirst) const;
-      template<CT::Unit T, SeekStyle>
+      template<CT::Unit T, SeekStyle = SeekStyle::UpToHere>
       NOD() Decay<T>* SeekUnit(const Index& = IndexFirst);
 
       NOD() const Unit* GetUnit(DMeta, const Index& = IndexFirst) const;
@@ -183,27 +186,34 @@ namespace Langulus::Entity
       NOD() Count HasTraits(TMeta) const;
       NOD() Count HasTraits(const Trait&) const;
 
-      template<SeekStyle>
-      bool SeekTrait(TMeta, Trait&, const Index& = IndexFirst) const;
-      template<SeekStyle>
-      bool SeekTrait(TMeta, Trait&, const Index& = IndexFirst);
+      template<SeekStyle = SeekStyle::UpToHere>
+      Trait SeekTrait(TMeta, const Index& = IndexFirst) const;
+      template<SeekStyle = SeekStyle::UpToHere>
+      Trait SeekTrait(TMeta, const Index& = IndexFirst);
+      template<CT::Trait T = Trait, SeekStyle = SeekStyle::UpToHere>
+      Trait SeekTrait(const Index& = IndexFirst) const;
+      template<CT::Trait T = Trait, SeekStyle = SeekStyle::UpToHere>
+      Trait SeekTrait(const Index& = IndexFirst);
 
-      bool GetTrait(TMeta, Trait&, const Index& = IndexFirst) const;
-      bool GetTrait(TMeta, Trait&, const Index& = IndexFirst);
-      bool GetTrait(const Trait&, Trait&, const Index& = IndexFirst) const;
-      bool GetTrait(const Trait&, Trait&, const Index& = IndexFirst);
+      Trait GetTrait(TMeta, const Index& = IndexFirst) const;
+      Trait GetTrait(TMeta, const Index& = IndexFirst);
+      template<CT::Trait T = Trait>
+      Trait GetTrait(const Index& = IndexFirst);
 
-      Trait* GetLocalTrait(TMeta, const Index& = IndexFirst);
+      Trait GetTrait(const Trait&, const Index& = IndexFirst) const;
+      Trait GetTrait(const Trait&, const Index& = IndexFirst);
+
       const Trait* GetLocalTrait(TMeta, const Index& = IndexFirst) const;
+      Trait* GetLocalTrait(TMeta, const Index& = IndexFirst);
 
       template<CT::Trait>
       Trait* GetLocalTrait(const Index& = IndexFirst);
       template<CT::Trait>
       const Trait* GetLocalTrait(const Index& = IndexFirst) const;
 
-      template<SeekStyle, CT::Data T>
+      template<SeekStyle = SeekStyle::UpToHere, CT::Data T>
       bool SeekValue(TMeta, T&) const;
-      template<SeekStyle, CT::Trait, CT::Data D>
+      template<CT::Trait, SeekStyle = SeekStyle::UpToHere, CT::Data D>
       bool SeekValue(D&) const;
 
       void SetName(const Text&);

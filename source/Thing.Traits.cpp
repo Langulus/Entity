@@ -17,13 +17,20 @@
 namespace Langulus::Entity
 {
 
-   /// Get a trait by type                                                    
-   ///   @param id - trait id                                                 
-   ///   @param output - [out] result of the search                           
+   /// Get a trait by type (const)                                            
+   ///   @param trait - trait id                                              
    ///   @param offset - offset of result to use                              
-   ///   @return true if anything was found                                   
-   bool Thing::GetTrait(TMeta id, Trait& output, const Index& offset) {
-      return GetTrait(Trait::FromMeta(id, nullptr), output, offset);
+   ///   @return a filled trait if fount, empty if not                        
+   Trait Thing::GetTrait(TMeta trait, const Index& offset) const {
+      return GetTrait(Trait::FromMeta(trait, nullptr), offset);
+   }
+
+   /// Get a trait by type                                                    
+   ///   @param trait - trait id                                              
+   ///   @param offset - offset of result to use                              
+   ///   @return a filled trait if fount, empty if not                        
+   Trait Thing::GetTrait(TMeta trait, const Index& offset) {
+      return GetTrait(Trait::FromMeta(trait, nullptr), offset);
    }
 
    /// Get a trait from this entity's trait list                              
@@ -67,70 +74,71 @@ namespace Langulus::Entity
 
    /// Get a trait by type and contents                                       
    ///   @param id - trait to match                                           
-   ///   @param output - [out] result of the search                           
-   ///   @param offset - offset of result to use                              
-   ///   @return true if anything was found                                   
-   bool Thing::GetTrait(const Trait& id, Trait& output, const Index& index) {
+   ///   @param index - offset of result to use                               
+   ///   @return a non-empty trait, if found                                  
+   Trait Thing::GetTrait(const Trait& id, const Index& index) {
       if (id.GetTrait()) {
+         // Handle some predefined traits here                          
          if (id.TraitIs<Traits::Unit>()) {
             // Get a component                                          
             auto unit = GetUnit(nullptr, index);
-            if (unit) {
-               output = Traits::Unit {unit};
-               return true;
-            }
-
-            return false;
+            if (unit)
+               return Traits::Unit {unit};
+            return {};
          }
          else if (id.TraitIs<Traits::Child>()) {
             // Get a child entity                                       
             auto child = GetChild(index);
-            if (child) {
-               output = Traits::Child {child};
-               return true;
-            }
-
-            return false;
+            if (child)
+               return Traits::Child {child};
+            return {};
          }
          else if (id.TraitIs<Traits::Runtime>()) {
             // Get the nearest runtime                                  
-            output = Traits::Runtime {mRuntime};
-            return true;
+            return Traits::Runtime {mRuntime};
          }
          else if (id.TraitIs<Traits::Parent>()) {
             // Get the parent                                           
-            output = Traits::Parent {mOwner.Get()};
-            return true;
+            return Traits::Parent {mOwner.Get()};
          }
       }
 
       // Check dynamic traits in the entity                             
       auto found = GetLocalTrait(id.GetTrait(), index);
-      if (found) {
-         output = *found;
-         return true;
-      }
+      if (found)
+         return *found;
 
       // Then check each unit's static traits                           
+      Trait output;
       mUnits.ForEachValue([&](Unit* unit) {
          auto t = unit->GetMember(id.GetTrait(), index);
          if (!t.IsEmpty()) {
             output = Trait {id.GetTrait(), t};
-            return;
+            return false;
          }
+         return true;
       });
+      if (!output.IsEmpty())
+         return Abandon(output);
 
       // Finally, check this entity's static traits                     
       auto t = GetMember(id.GetTrait(), index);
-      if (!t.IsEmpty()) {
-         output = Trait {id.GetTrait(), t};
-         return true;
-      }
+      if (!t.IsEmpty())
+         return Trait {id.GetTrait(), t};
 
-      return false;
+      // Nothing was found                                              
+      return {};
    }
 
-   /// Add a new trait to the universal entity                                
+   /// Get a trait by type and contents (const)                               
+   ///   @param id - trait to match                                           
+   ///   @param index - offset of result to use                               
+   ///   @return a non-empty trait, if found                                  
+   Trait Thing::GetTrait(const Trait& id, const Index& index) const {
+      return const_cast<Thing*>(this)->GetTrait(id, index);
+   }
+
+   /// Add a new trait to the thing                                           
    ///   @param initializer - trait to shallow copy                           
    ///   @return the new trait instance                                       
    Trait* Thing::AddTrait(const Trait& initializer) {
@@ -143,6 +151,7 @@ namespace Langulus::Entity
 
    /// Remove a trait from the universal entity                               
    ///   @param id - type of trait to remove                                  
+   ///   @return the number of removed traits                                 
    Count Thing::RemoveTrait(TMeta id) {
       const auto found = mTraits.FindKeyIndex(id);
       if (found) {
@@ -158,6 +167,7 @@ namespace Langulus::Entity
 
    /// Remove an exact-matching trait from this entity                        
    ///   @param id - type and value to remove                                 
+   ///   @return the number of removed traits                                 
    Count Thing::RemoveTrait(const Trait& prototype) {
       const auto found = mTraits.FindKeyIndex(prototype.GetTrait());
       if (found) {
@@ -214,7 +224,7 @@ namespace Langulus::Entity
    ///   @return the name, or empty string if no such trait was found here    
    Text Thing::GetName() const {
       Text name;
-      if (!SeekValue<SeekStyle::Here, Traits::Name>(name))
+      if (!SeekValue<Traits::Name, SeekStyle::Here>(name))
          return {};
       return name;
    }
