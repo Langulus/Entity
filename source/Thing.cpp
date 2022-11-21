@@ -7,6 +7,7 @@
 ///                                                                           
 #include "Thing.hpp"
 #include "Runtime.hpp"
+#include "Hierarchy.inl"
 
 #define ENTITY_VERBOSE_SELF(a)            //Logger::Verbose() << this << ": "<< a
 #define ENTITY_VERBOSE(a)                 //Logger::Append() << a
@@ -27,28 +28,36 @@ namespace Langulus::Entity
       }
    }
    
-   /// Construct as a child                                                   
-   ///   @param parent - the owner of the entity                              
-   ///   @param descriptor - instructions for creating the entity             
+   /// Construct as a child of another thing                                  
+   ///   @param parent - the owner of the thing                               
+   ///   @param descriptor - instructions for creating the thing              
    Thing::Thing(Thing* parent, const Any& descriptor)
       : Resolvable {MetaOf<Thing>()}
-      , mOwner {parent}
-      , mRuntime {parent ? parent->GetRuntime() : nullptr} {
+      , mOwner {parent} {
+      if (parent) {
+         parent->AddChild<false>(this);
+         mRuntime = parent->GetRuntime();
+      }
+
       if (!descriptor.IsEmpty()) {
+         // Create any subthings/traits/unit in this thing              
          Verbs::Create creator {descriptor};
          Create(creator);
       }
    }
 
    /// Move constructor                                                       
+   ///   @attention owner is never moved, you're moving only the hierarchy    
+   ///              below the parent, however other's parent is notified of   
+   ///              the move, 'other' is removed from its children            
    ///   @param other - move that entity                                      
    Thing::Thing(Thing&& other) noexcept
       : Resolvable {Forward<Resolvable>(other)}
-      , mOwner {Move(other.mOwner)}
       , mChildren {Move(other.mChildren)}
       , mUnits {Move(other.mUnits)}
       , mTraits {Move(other.mTraits)}
-      , mRuntime {Move(other.mRuntime)} {
+      , mRuntime {Move(other.mRuntime)}
+      , mRefreshRequired {true} {
       // Remap children                                                 
       for (auto child : mChildren)
          child->mOwner = this;
@@ -58,6 +67,10 @@ namespace Langulus::Entity
          for (auto unit : unitpair.mValue)
             unit->ReplaceOwner(&other, this);
       }
+
+      // Make sure the losing parent is notified of the change          
+      if (other.mOwner)
+         other.mOwner->RemoveChild(&other);
    }
 
    /// Compare two entities                                                   
@@ -272,7 +285,7 @@ namespace Langulus::Entity
    /// runtime, will incorporate the provided one                             
    ///   @param newrt - the new runtime to set                                
    void Thing::ResetRuntime(Runtime* newrt) {
-      if (mOwnRuntime)
+      if (mRuntime.IsPinned())
          return;
 
       mRuntime = newrt;
@@ -284,7 +297,7 @@ namespace Langulus::Entity
    /// flow, will incorporate the provided one                                
    ///   @param newrt - the new flow to set                                   
    void Thing::ResetFlow(Temporal* newflow) {
-      if (mOwnFlow)
+      if (mFlow.IsPinned())
          return;
 
       mFlow = newflow;
@@ -336,18 +349,20 @@ namespace Langulus::Entity
    /// Create a local runtime for this thing                                  
    ///   @return the new runtime instance, or the old one if already created  
    Runtime* Thing::CreateRuntime() {
-      if (mOwnRuntime)
+      if (mRuntime.IsPinned())
          return mRuntime.Get();
       mRuntime.New(this);
+      mRuntime.Pin();
       return mRuntime.Get();
    }
 
    /// Create a local flow for this thing                                     
    ///   @return the new flow instance, or the old one, if already created    
    Temporal* Thing::CreateFlow() {
-      if (mOwnFlow)
+      if (mFlow.IsPinned())
          return mFlow.Get();
       mFlow.New(this);
+      mFlow.Pin();
       return mFlow.Get();
    }
 
@@ -358,16 +373,6 @@ namespace Langulus::Entity
       mChildren.Emplace(this, descriptor);
       ENTITY_VERBOSE_SELF(mChildren.Last() << " added");
       return mChildren.Last();
-   }
-
-   /// Destroy a child that matched pointer                                   
-   ///   @attention provided pointer is considered invalid after this call    
-   ///   @param entity - entity instance to destroy                           
-   ///   @return the number of destroyed children                             
-   Count Thing::DestroyChild(Thing* entity) {
-      const auto removed = mChildren.RemoveValue(entity);
-      mRefreshRequired = removed > 0;
-      return removed;
    }
 
    /// Uses the current runtime to load a shared library module, and          
@@ -391,7 +396,7 @@ namespace Langulus::Entity
    /// by the Runtime as a fallback                                           
    ///   @param type - the type to build dependencies for                     
    ///   @return the resulting dependencies (top level)                       
-   Any Thing::CreateDependencies(DMeta type) {
+   /*Any Thing::CreateDependencies(DMeta type) {
       auto meta = type->mProducer;
       LANGULUS_ASSERT(meta, Except::Construct, "Missing producer");
 
@@ -436,17 +441,6 @@ namespace Langulus::Entity
          << "Couldn't produce " << type << " from " << meta
          << " - the producer wasn't found, and couldn't be produced";
       LANGULUS_THROW(Construct, "Couldn't create dependencies");
-   }
-
-   /// Produce unit(s) from the entity's hierarchy                            
-   ///   @param construct - instructions for the creation of the unit(s)      
-   ///   @return all created units                                            
-   Any Thing::CreateDataInner(const Construct& construct) {
-      Verbs::Create creator {&construct};
-      auto producers = CreateDependencies(construct.GetType());
-      if (Scope::ExecuteVerb(producers, creator))
-         return Abandon(creator.GetOutput());
-      return {};
-   }
+   }*/
    
 } // namespace Langulus::Entry

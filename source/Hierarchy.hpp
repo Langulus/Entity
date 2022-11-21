@@ -54,6 +54,8 @@ namespace Langulus::Entity
 
       void Pin() noexcept;
       void Unpin() noexcept;
+
+      NOD() bool IsPinned() const noexcept;
    };
 
 

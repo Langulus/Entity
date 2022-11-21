@@ -34,12 +34,15 @@ namespace Langulus::Entity
       if (text.IsEmpty())
          return {};
 
-      // Message is still contextless, we don't know here exactly to    
+      // Message is still contextless, we don't know where exactly to   
       // interpret it, so create message objects from the hierarchy,    
       // and try interpreting those to executable scopes                
       // Each trained AI in the hierarchy will produce its own          
       // interpretation                                                 
-      auto messages = CreateData<Lingua>(text);
+      auto messages = CreateData(
+         Construct::From<Lingua>(static_cast<const Text&>(text))
+      );
+
       Verbs::InterpretTo<Flow::Scope> interpreter;
       if (!Flow::DispatchFlat(messages, interpreter)) {  
          Logger::Error()
@@ -92,13 +95,8 @@ namespace Langulus::Entity
    /// Create/Destroy stuff inside entity's context                           
    ///   @param verb - creation verb                                          
    void Thing::Create(Verb& verb) {
-      if (verb.GetArgument().IsEmpty())
+      if (verb.IsEmpty())
          return;
-
-      TAny<Trait*> createdTraits;
-      TAny<Unit*> createdUnits;
-      TAny<Module*> createdModules;
-      TAny<Thing*> createdChildren;
 
       const auto create = [&](const Construct& construct) {
          const auto count = static_cast<Count>(construct.GetCharge().mMass);
@@ -109,18 +107,18 @@ namespace Langulus::Entity
             }
 
             if (construct.Is<Thing>()) {
-               auto created = CreateChild(construct);
-               if (created)
-                  createdChildren << created;
+               // Instantiate a child Thing                             
+               verb << CreateChild(construct);
             }
-            else if (construct.CastsTo<Unit>())
-               createdUnits += CreateDataInner(construct);
             else if (construct.CastsTo<Module>()) {
+               // Instantiate a module from the runtime                 
                auto runtime = GetRuntime();
                auto dependency = runtime->GetDependency(construct.GetType());
-               auto created = runtime->InstantiateModule(dependency, construct);
-               if (created)
-                  createdModules << created;
+               verb << runtime->InstantiateModule(dependency, construct);
+            }
+            else {
+               // Instantiate anything else                             
+               verb << CreateData(construct);
             }
          }
       };
@@ -131,7 +129,7 @@ namespace Langulus::Entity
             [&](const Trait& trait) {
                ENTITY_CREATION_VERBOSE_SELF(
                   "Creating: " << Logger::Yellow << trait);
-               createdTraits << AddTrait(trait);
+               verb << AddTrait(trait);
             },
             [&](const Construct& construct) {
                if (construct.GetCharge().mMass > 0) {
@@ -147,11 +145,6 @@ namespace Langulus::Entity
             }
          );
       });
-
-      verb << createdTraits;
-      verb << createdUnits;
-      verb << createdModules;
-      verb << createdChildren;
    }
 
    /// Pick something from the entity - children, traits, units, modules      

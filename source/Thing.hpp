@@ -44,7 +44,7 @@ namespace Langulus::Entity
       void ResetRuntime(Runtime*);
       void ResetFlow(Temporal*);
 
-      Any CreateDependencies(DMeta);
+      //Any CreateDependencies(DMeta);
 
       // The entity's parent                                            
       Ptr<Thing> mOwner;
@@ -56,15 +56,16 @@ namespace Langulus::Entity
       TUnorderedMap<TMeta, TAny<Trait>> mTraits;
 
       // Runtime                                                        
-      Ptr<Runtime> mRuntime;
-      bool mOwnRuntime {};
+      Pinnable<Ptr<Runtime>> mRuntime;
 
       // Temporal flow                                                  
-      Ptr<Temporal> mFlow;
-      bool mOwnFlow {};
+      Pinnable<Ptr<Temporal>> mFlow;
 
       // Hierarchy requires an update                                   
       bool mRefreshRequired {};
+
+      template<SeekStyle = SeekStyle::UpToHere>
+      NOD() Any CreateData(const Construct&);
 
    public:
       Thing(const Any& = {});
@@ -81,17 +82,6 @@ namespace Langulus::Entity
       void Do(Verb&);
       void Select(Verb&);
       void Create(Verb&);
-
-      template<CT::Data, SeekStyle = SeekStyle::UpToHere>
-      Any CreateData(const Any& = {});
-
-      #if LANGULUS_FEATURE(MANAGED_REFLECTION)
-         template<SeekStyle = SeekStyle::UpToHere>
-         Any CreateData(const Token&, const Any& = {});
-      #endif
-
-      template<SeekStyle = SeekStyle::UpToHere>
-      Any CreateData(DMeta, const Any& = {});
 
       template<SeekStyle = SeekStyle::UpToHere>
       bool DoInHierarchy(Verb&);
@@ -114,7 +104,10 @@ namespace Langulus::Entity
       Runtime*    CreateRuntime();
       Temporal*   CreateFlow();
       Thing*      CreateChild(const Any& = {});
-      Count       DestroyChild(Thing*);
+      template<bool TWOSIDED = true>
+      Count       AddChild(Thing*);
+      template<bool TWOSIDED = true>
+      Count       RemoveChild(Thing*);
       Module*     LoadMod(const Token&, const Any& = {});
 
       NOD()       Thing* GetChild(const Index& = IndexFirst);
@@ -146,8 +139,6 @@ namespace Langulus::Entity
       NOD() TAny<const Unit*> GatherUnits(DMeta) const;
       template<CT::Unit T = Unit, SeekStyle = SeekStyle::UpToHere>
       NOD() TAny<const Decay<T>*> GatherUnits() const;
-
-      NOD() Any CreateDataInner(const Construct&);
 
       template<CT::Unit T, class ... A>
       Any CreateUnit(A&&...);

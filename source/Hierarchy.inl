@@ -35,6 +35,12 @@ namespace Langulus::Entity
       return *this;
    }
 
+   /// Check if the value is pinned                                           
+   template<class T>
+   bool Pinnable<T>::IsPinned() const noexcept {
+      return mLocked;
+   }
+
    /// Pin the value, it will no longer be overwritten by environment         
    template<class T>
    void Pinnable<T>::Pin() noexcept {

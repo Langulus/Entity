@@ -14,9 +14,9 @@ SCENARIO("Testing Thing", "[thing]") {
       THEN("Properties should match") {
          REQUIRE(root.mOwner == nullptr);
          REQUIRE(root.mRuntime == nullptr);
-         REQUIRE(root.mOwnRuntime == false);
+         REQUIRE(root.mRuntime.IsPinned() == false);
          REQUIRE(root.mFlow == nullptr);
-         REQUIRE(root.mOwnFlow == false);
+         REQUIRE(root.mFlow.IsPinned() == false);
          REQUIRE(root.mRefreshRequired == false);
          REQUIRE(root.mChildren.IsEmpty());
          REQUIRE(root.mUnits.IsEmpty());
@@ -31,9 +31,9 @@ SCENARIO("Testing Thing", "[thing]") {
       THEN("Properties should match") {
          REQUIRE(root.mOwner == nullptr);
          REQUIRE(root.mRuntime == nullptr);
-         REQUIRE(root.mOwnRuntime == false);
+         REQUIRE(root.mRuntime.IsPinned() == false);
          REQUIRE(root.mFlow == nullptr);
-         REQUIRE(root.mOwnFlow == false);
+         REQUIRE(root.mFlow.IsPinned() == false);
          REQUIRE(root.mRefreshRequired == false);
          REQUIRE(root.mChildren.GetCount() == 1);
          REQUIRE(root.mChildren[0] == &child);
@@ -42,9 +42,9 @@ SCENARIO("Testing Thing", "[thing]") {
 
          REQUIRE(child.mOwner == &root);
          REQUIRE(child.mRuntime == nullptr);
-         REQUIRE(child.mOwnRuntime == false);
+         REQUIRE(child.mRuntime.IsPinned() == false);
          REQUIRE(child.mFlow == nullptr);
-         REQUIRE(child.mOwnFlow == false);
+         REQUIRE(child.mFlow.IsPinned() == false);
          REQUIRE(child.mRefreshRequired == false);
          REQUIRE(child.mChildren.IsEmpty());
          REQUIRE(child.mUnits.IsEmpty());
@@ -80,9 +80,9 @@ SCENARIO("Testing Thing", "[thing]") {
       THEN("Properties should match") {
          REQUIRE(root.mOwner == nullptr);
          REQUIRE(root.mRuntime != nullptr);
-         REQUIRE(root.mOwnRuntime == true);
+         REQUIRE(root.mRuntime.IsPinned() == true);
          REQUIRE(root.mFlow != nullptr);
-         REQUIRE(root.mOwnFlow == true);
+         REQUIRE(root.mFlow.IsPinned() == true);
          REQUIRE(root.mRefreshRequired == false);
          REQUIRE(root.mChildren.GetCount() == 2);
          REQUIRE(root.mUnits.GetCount() == 2);
@@ -92,9 +92,9 @@ SCENARIO("Testing Thing", "[thing]") {
          auto child1 = root.mChildren[0];
          REQUIRE(child1->mOwner == &root);
          REQUIRE(child1->mRuntime == root.mRuntime);
-         REQUIRE(child1->mOwnRuntime == false);
+         REQUIRE(child1->mRuntime.IsPinned() == false);
          REQUIRE(child1->mFlow == root.mFlow);
-         REQUIRE(child1->mOwnFlow == false);
+         REQUIRE(child1->mFlow.IsPinned() == false);
          REQUIRE(child1->mRefreshRequired == false);
          REQUIRE(child1->mChildren.GetCount() == 2);
          REQUIRE(child1->mUnits.GetCount() == 2);
@@ -104,9 +104,9 @@ SCENARIO("Testing Thing", "[thing]") {
          auto child2 = root.mChildren[1];
          REQUIRE(child2->mOwner == &root);
          REQUIRE(child2->mRuntime == root.mRuntime);
-         REQUIRE(child2->mOwnRuntime == false);
+         REQUIRE(child2->mRuntime.IsPinned() == false);
          REQUIRE(child2->mFlow == root.mFlow);
-         REQUIRE(child2->mOwnFlow == false);
+         REQUIRE(child2->mFlow.IsPinned() == false);
          REQUIRE(child2->mRefreshRequired == false);
          REQUIRE(child2->mChildren.IsEmpty());
          REQUIRE(child2->mUnits.IsEmpty());
@@ -116,9 +116,9 @@ SCENARIO("Testing Thing", "[thing]") {
          auto grandchild1 = child1->mChildren[0];
          REQUIRE(grandchild1->mOwner == child1);
          REQUIRE(grandchild1->mRuntime == root.mRuntime);
-         REQUIRE(grandchild1->mOwnRuntime == false);
+         REQUIRE(grandchild1->mRuntime.IsPinned() == false);
          REQUIRE(grandchild1->mFlow == root.mFlow);
-         REQUIRE(grandchild1->mOwnFlow == false);
+         REQUIRE(grandchild1->mFlow.IsPinned() == false);
          REQUIRE(grandchild1->mRefreshRequired == false);
          REQUIRE(grandchild1->mChildren.IsEmpty());
          REQUIRE(grandchild1->mUnits.IsEmpty());
@@ -128,9 +128,9 @@ SCENARIO("Testing Thing", "[thing]") {
          auto grandchild2 = child1->mChildren[1];
          REQUIRE(grandchild2->mOwner == child1);
          REQUIRE(grandchild2->mRuntime == root.mRuntime);
-         REQUIRE(grandchild2->mOwnRuntime == false);
+         REQUIRE(grandchild2->mRuntime.IsPinned() == false);
          REQUIRE(grandchild2->mFlow == root.mFlow);
-         REQUIRE(grandchild2->mOwnFlow == false);
+         REQUIRE(grandchild2->mFlow.IsPinned() == false);
          REQUIRE(grandchild2->mRefreshRequired == false);
          REQUIRE(grandchild2->mChildren.IsEmpty());
          REQUIRE(grandchild2->mUnits.IsEmpty());
@@ -147,7 +147,7 @@ SCENARIO("Testing Thing", "[thing]") {
 
          THEN("Properties should match") {
             REQUIRE(root.mRuntime == runtime);
-            REQUIRE(root.mOwnRuntime == true);
+            REQUIRE(root.mRuntime.IsPinned() == true);
          }
       }
 
@@ -156,7 +156,7 @@ SCENARIO("Testing Thing", "[thing]") {
 
          THEN("Properties should match") {
             REQUIRE(root.mFlow == flow);
-            REQUIRE(root.mOwnFlow == true);
+            REQUIRE(root.mFlow.IsPinned() == true);
          }
       }
 
@@ -166,9 +166,9 @@ SCENARIO("Testing Thing", "[thing]") {
          THEN("Properties should match") {
             REQUIRE(root.mOwner == nullptr);
             REQUIRE(root.mRuntime == nullptr);
-            REQUIRE(root.mOwnRuntime == false);
+            REQUIRE(root.mRuntime.IsPinned() == false);
             REQUIRE(root.mFlow == nullptr);
-            REQUIRE(root.mOwnFlow == false);
+            REQUIRE(root.mFlow.IsPinned() == false);
             REQUIRE(root.mRefreshRequired == false);
             REQUIRE(root.mChildren.GetCount() == 1);
             REQUIRE(root.mUnits.IsEmpty());
@@ -178,9 +178,9 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(child1 == child);
             REQUIRE(child1->mOwner == &root);
             REQUIRE(child1->mRuntime == root.mRuntime);
-            REQUIRE(child1->mOwnRuntime == false);
+            REQUIRE(child1->mRuntime.IsPinned() == false);
             REQUIRE(child1->mFlow == root.mFlow);
-            REQUIRE(child1->mOwnFlow == false);
+            REQUIRE(child1->mFlow.IsPinned() == false);
             REQUIRE(child1->mRefreshRequired == false);
             REQUIRE(child1->mChildren.IsEmpty());
             REQUIRE(child1->mUnits.IsEmpty());
@@ -196,9 +196,9 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(added == 1);
             REQUIRE(root.mOwner == nullptr);
             REQUIRE(root.mRuntime == nullptr);
-            REQUIRE(root.mOwnRuntime == false);
+            REQUIRE(root.mRuntime.IsPinned() == false);
             REQUIRE(root.mFlow == nullptr);
-            REQUIRE(root.mOwnFlow == false);
+            REQUIRE(root.mFlow.IsPinned() == false);
             REQUIRE(root.mRefreshRequired == false);
             REQUIRE(root.mChildren.IsEmpty());
             REQUIRE(root.mUnits.GetCount() == 1);
@@ -218,9 +218,9 @@ SCENARIO("Testing Thing", "[thing]") {
          THEN("Properties should match") {
             REQUIRE(root.mOwner == nullptr);
             REQUIRE(root.mRuntime == nullptr);
-            REQUIRE(root.mOwnRuntime == false);
+            REQUIRE(root.mRuntime.IsPinned() == false);
             REQUIRE(root.mFlow == nullptr);
-            REQUIRE(root.mOwnFlow == false);
+            REQUIRE(root.mFlow.IsPinned() == false);
             REQUIRE(root.mRefreshRequired == false);
             REQUIRE(root.mChildren.IsEmpty());
             REQUIRE(root.mUnits.GetCount() == 1);
@@ -243,9 +243,9 @@ SCENARIO("Testing Thing", "[thing]") {
 
             REQUIRE(root.mOwner == nullptr);
             REQUIRE(root.mRuntime == nullptr);
-            REQUIRE(root.mOwnRuntime == false);
+            REQUIRE(root.mRuntime.IsPinned() == false);
             REQUIRE(root.mFlow == nullptr);
-            REQUIRE(root.mOwnFlow == false);
+            REQUIRE(root.mFlow.IsPinned() == false);
             REQUIRE(root.mRefreshRequired == false);
             REQUIRE(root.mChildren.IsEmpty());
             REQUIRE(root.mUnits.IsEmpty());
@@ -267,9 +267,9 @@ SCENARIO("Testing Thing", "[thing]") {
 
             REQUIRE(root.mOwner == nullptr);
             REQUIRE(root.mRuntime == nullptr);
-            REQUIRE(root.mOwnRuntime == false);
+            REQUIRE(root.mRuntime.IsPinned() == false);
             REQUIRE(root.mFlow == nullptr);
-            REQUIRE(root.mOwnFlow == false);
+            REQUIRE(root.mFlow.IsPinned() == false);
             REQUIRE(root.mRefreshRequired == false);
             REQUIRE(root.mChildren.IsEmpty());
             REQUIRE(root.mUnits.IsEmpty());

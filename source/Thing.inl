@@ -16,6 +16,48 @@
 namespace Langulus::Entity
 {
    
+   /// Remove a child                                                         
+   ///   @attention assumes entity is a valid pointer                         
+   ///   @tparam TWOSIDED - true to also set the entity's owner               
+   ///   @param entity - entity instance to add as child                      
+   ///   @return the number of added children                                 
+   template<bool TWOSIDED>
+   Count Thing::AddChild(Thing* entity) {
+      LANGULUS_ASSUME(DevAssumes, nullptr != entity, "Bad entity pointer");
+      const auto added = mChildren.Merge(entity);
+      if constexpr (TWOSIDED) {
+         if (added && entity->mOwner != this) {
+            if (entity->mOwner)
+               entity->mOwner->RemoveChild<false>(entity);
+            entity->mOwner == this;
+            entity->mRefreshRequired = true;
+         }
+      }
+
+      return added;
+   }
+      
+   /// Destroy a child that matched pointer                                   
+   ///   @attention assumes entity is a valid pointer                         
+   ///   @attention provided pointer may be invalid after this call           
+   ///   @tparam TWOSIDED - true to also remove entity's owner                
+   ///   @param entity - entity instance to remove from children              
+   ///   @return the number of removed children                               
+   template<bool TWOSIDED>
+   Count Thing::RemoveChild(Thing* entity) {
+      LANGULUS_ASSUME(DevAssumes, nullptr != entity, "Bad entity pointer");
+      const auto removed = mChildren.RemoveValue<false, true>(entity);
+      if constexpr (TWOSIDED) {
+         //TODO check if entity is valid at this point?
+         if (removed && entity->mOwner == this) {
+            entity->mOwner = nullptr;
+            entity->mRefreshRequired = true;
+         }
+      }
+
+      return removed;
+   }
+
    /// Execute verb in the hierarchy                                          
    ///   @tparam SEEK - where in the hierarchy to execute                     
    ///   @param verb - the verb to execute                                    
@@ -264,11 +306,9 @@ namespace Langulus::Entity
    ///   @return the created unit(s)                                          
    template<CT::Unit T, class... A>
    Any Thing::CreateUnit(A&&...arguments) {
-      auto request = Construct::From<Decay<T>>();
-      if constexpr (sizeof...(arguments) > 0)
-         (request << ... << Forward<A>(arguments));
-
-      return CreateDataInner(request);
+      return CreateData(
+         Construct::From<Decay<T>>(Forward<A>(arguments)...)
+      );
    }
 
    /// Get a unit by a static type and an optional offset                     
@@ -325,7 +365,7 @@ namespace Langulus::Entity
       if (found.IsEmpty())
          return false;
 
-      value = found.AsCast<T>();
+      value = found.template AsCast<T>();
       return true;
    }
 
@@ -434,47 +474,46 @@ namespace Langulus::Entity
          ->template SeekTrait<SEEK>(var, offset);
    }
 
-   /// Attempt creating data from the hierarchy, invoking creation verbs with 
-   /// the provided arguments in each unit/module, in the specified way       
-   ///   @tparam T - the type of data we're producing                         
-   ///   @tparam SEEK - in what part of the hierarchy are we producing        
-   ///   @param arguments - arguments that get sent to T's constructors       
-   ///   @return the produced data, if any                                    
-   template<CT::Data T, SeekStyle SEEK>
-   Any Thing::CreateData(const Any& arguments) {
-      if constexpr (CT::Producible<T>) {
+   /// Produce any data (including units) from the hierarchy                  
+   ///   @tparam SEEK - what part of the hierarchy to use for the creation    
+   ///   @param construct - instructions for the creation of the data         
+   ///   @return created data                                                 
+   template<SeekStyle SEEK>
+   Any Thing::CreateData(const Construct& construct) {
+      const auto type = construct.GetType();
+      const auto producer = type->mProducer;
+
+      if (producer) {
          // Data has a specific producer, we can narrow the required    
          // contexts for creation a lot                                 
-         using Producer = CT::ProducerOf<T>;
-
-         if constexpr (CT::Unit<Producer>) {
-            // Producible inside a unit                                 
-            auto producers = GatherUnits<Producer, SEEK>();
+         if (producer->template CastsTo<Unit>()) {
+            // Data is producible from a unit                           
+            auto producers = GatherUnits<SEEK>(producer);
             if (!producers.IsEmpty()) {
-               auto creator = Verbs::Create {
-                  Construct::From<T>(arguments)
-               };
-
+               // Potential unit producers found, attempt creation there
+               auto creator = Verbs::Create {&construct};
                if (Flow::DispatchFlat(producers, creator))
+                  // Great success                                      
                   return Abandon(creator.GetOutput());
             }
          }
-         else if constexpr (CT::Module<Producer>) {
+         else if (producer->template CastsTo<Module>()) {
+            // Data is producible from a module                         
             TODO();
          }
-         else if constexpr (CT::Same<Thing, T>) {
+         else if (producer->template CastsTo<Thing>()) {
+            // Data is producible from a thing                          
             TODO();
          }
       }
-      else if constexpr (CT::Abstract<T> && !CT::Concretizable<T>) {
+      else if (type->mIsAbstract && !type->mConcrete) {
          // Data doesn't have a specific producer, but it is abstract   
          // so we know that only a module/unit can concretize it        
+         // Gather all units in the desired part of the hierarchy       
          auto producers = GatherUnits<Unit, SEEK>();
          if (!producers.IsEmpty()) {
-            auto creator = Verbs::Create {
-               Construct::From<T>(arguments)
-            };
-
+            // Potential unit producers found, attempt creation there   
+            auto creator = Verbs::Create {&construct};
             if (Flow::DispatchFlat(producers, creator))
                return Abandon(creator.GetOutput());
          }
@@ -482,30 +521,27 @@ namespace Langulus::Entity
          //TODO try modules too?
       }
       else {
-         // Data is not abstract, and doesn't have a producer, so just  
-         // make it statically right here                               
-         return T {arguments};
+         // Data is not abstract, nor has a producer, so just make it   
+         // right here if possible, passing the descriptor over         
+         TODO();
       }
 
       return {};
-   }
 
-#if LANGULUS_FEATURE(MANAGED_REFLECTION)
-   template<SeekStyle>
-   Any Thing::CreateData(const Token&, const Any&) {
-      TODO();
-   }
-#endif
 
-   template<SeekStyle>
-   Any Thing::CreateData(DMeta, const Any&) {
-      TODO();
+      /*Verbs::Create creator {&construct};
+      auto producers = CreateDependencies(construct.GetType());
+      if (Scope::ExecuteVerb(producers, creator))
+         return Abandon(creator.GetOutput());
+      return {};*/
    }
 
 
 
 
-   
+
+
+
    /// Execute verb in all owners                                             
    ///   @param verb - the verb to execute in all owners                      
    ///   @param seek - where in the hierarchy to execute                      
