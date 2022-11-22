@@ -39,7 +39,7 @@ namespace Langulus::Entity
       
    /// Destroy a child that matched pointer                                   
    ///   @attention assumes entity is a valid pointer                         
-   ///   @attention provided pointer may be invalid after this call           
+   ///   @attention provided pointer is considered invalid after this call    
    ///   @tparam TWOSIDED - true to also remove entity's owner                
    ///   @param entity - entity instance to remove from children              
    ///   @return the number of removed children                               
@@ -155,7 +155,7 @@ namespace Langulus::Entity
    }
 
    /// Remove all units that are derived from the provided type               
-   ///   @tparam T - the type of units to remove                              
+   ///   @tparam T - the type of units to remove, use Unit for all            
    ///   @tparam TWOSIDED - if true, will both remove unit from thing, and    
    ///                      then remove the thing from unit's owners;         
    ///                      used mainly internally to avoid endless loops     
@@ -180,7 +180,7 @@ namespace Langulus::Entity
    }
 
    /// Count the number of matching units in this entity                      
-   ///   @tparam T - the type of units to seach for                           
+   ///   @tparam T - the type of units to seach for, use Unit for all         
    ///   @return the number of matching units                                 
    template<CT::Unit T>
    Count Thing::HasUnits() const {
@@ -189,7 +189,7 @@ namespace Langulus::Entity
 
    /// Gather all units of a specific static type                             
    /// Use an abstract type to gather a broader range of units                
-   ///   @tparam T - the type of unit we're searchin for                      
+   ///   @tparam T - the type of unit we're searching for, use Unit for all   
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @return a container filled with the matches                          
    template<CT::Unit T, SeekStyle SEEK>
@@ -483,6 +483,10 @@ namespace Langulus::Entity
       const auto type = construct.GetType();
       const auto producer = type->mProducer;
 
+      // Always implicitly attach a parent trait to descriptor          
+      Any descriptor = construct.GetArgument();
+      descriptor << Traits::Parent {this};
+
       if (producer) {
          // Data has a specific producer, we can narrow the required    
          // contexts for creation a lot                                 
@@ -491,10 +495,11 @@ namespace Langulus::Entity
             auto producers = GatherUnits<SEEK>(producer);
             if (!producers.IsEmpty()) {
                // Potential unit producers found, attempt creation there
-               auto creator = Verbs::Create {&construct};
-               if (Flow::DispatchFlat(producers, creator))
+               auto creator = Verbs::Create {&descriptor};
+               if (Flow::DispatchFlat(producers, creator)) {
                   // Great success                                      
                   return Abandon(creator.GetOutput());
+               }
             }
          }
          else if (producer->template CastsTo<Module>()) {
@@ -513,17 +518,31 @@ namespace Langulus::Entity
          auto producers = GatherUnits<Unit, SEEK>();
          if (!producers.IsEmpty()) {
             // Potential unit producers found, attempt creation there   
-            auto creator = Verbs::Create {&construct};
+            auto creator = Verbs::Create {&descriptor};
             if (Flow::DispatchFlat(producers, creator))
                return Abandon(creator.GetOutput());
          }
 
          //TODO try modules too?
+         TODO();
       }
       else {
          // Data is not abstract, nor has a producer, so just make it   
-         // right here if possible, passing the descriptor over         
-         TODO();
+         // right here if possible, passing the descriptor over, if     
+         // such constructor is reflected                               
+         // If it's a unit, its descriptor is resposible for            
+         // registering it with the parent                              
+         if (type->mDescriptorConstructor) {
+            auto result = Any::FromMeta(type);
+            result.Emplace(descriptor);
+            return Abandon(result);
+         }
+         else if (type->mDefaultConstructor) {
+            auto result = Any::FromMeta(type);
+            result.Emplace();
+            return Abandon(result);
+         }
+         else LANGULUS_THROW(Construct, "Requested data is not default- nor descriptor-constructible");
       }
 
       return {};
