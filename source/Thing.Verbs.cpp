@@ -110,6 +110,14 @@ namespace Langulus::Entity
                // Instantiate a child Thing                             
                verb << CreateChild(construct);
             }
+            else if (construct.Is<Runtime>()) {
+               // Instantiate a runtime                                 
+               verb << CreateRuntime();
+            }
+            else if (construct.Is<Temporal>()) {
+               // Instantiate a temporal flow                           
+               verb << CreateFlow();
+            }
             else if (construct.CastsTo<Module>()) {
                // Instantiate a module from the runtime                 
                auto runtime = GetRuntime();
