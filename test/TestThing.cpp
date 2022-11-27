@@ -51,94 +51,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(child.mTraits.IsEmpty());
       }
    }
-
-   WHEN("Creating a Thing by descriptor") {
-      auto descriptor = Any::Wrap(
-         Traits::Name {"Root"_text},
-         Construct::From<Runtime>(),
-         Construct::From<Temporal>(),
-         Construct::From<TestUnit1>(),
-         Construct::From<TestUnit2>(),
-         Construct::From<Thing>(
-            Traits::Name {"Child1"_text},
-            Construct::From<TestUnit1>(),
-            Construct::From<TestUnit2>(),
-            Construct::From<Thing>(
-               Traits::Name {"GrandChild1"_text}
-            ),
-            Construct::From<Thing>(
-               Traits::Name {"GrandChild2"_text}
-            )
-         ),
-         Construct::From<Thing>(
-            Traits::Name {"Child2"_text}
-         )
-      );
-
-      Thing root {descriptor};
-
-      THEN("Properties should match") {
-         REQUIRE(root.mOwner == nullptr);
-         REQUIRE(root.mRuntime != nullptr);
-         REQUIRE(root.mRuntime.IsPinned() == true);
-         REQUIRE(root.mFlow != nullptr);
-         REQUIRE(root.mFlow.IsPinned() == true);
-         REQUIRE(root.mRefreshRequired == false);
-         REQUIRE(root.mChildren.GetCount() == 2);
-         REQUIRE(root.mUnits.GetCount() == 2);
-         REQUIRE(root.mTraits.GetCount() == 1);
-         REQUIRE(root.GetName() == "Root");
-
-         auto child1 = root.mChildren[0];
-         REQUIRE(child1->mOwner == &root);
-         REQUIRE(child1->mRuntime == root.mRuntime);
-         REQUIRE(child1->mRuntime.IsPinned() == false);
-         REQUIRE(child1->mFlow == root.mFlow);
-         REQUIRE(child1->mFlow.IsPinned() == false);
-         REQUIRE(child1->mRefreshRequired == false);
-         REQUIRE(child1->mChildren.GetCount() == 2);
-         REQUIRE(child1->mUnits.GetCount() == 2);
-         REQUIRE(child1->mTraits.GetCount() == 1);
-         REQUIRE(child1->GetName() == "Child1");
-
-         auto child2 = root.mChildren[1];
-         REQUIRE(child2->mOwner == &root);
-         REQUIRE(child2->mRuntime == root.mRuntime);
-         REQUIRE(child2->mRuntime.IsPinned() == false);
-         REQUIRE(child2->mFlow == root.mFlow);
-         REQUIRE(child2->mFlow.IsPinned() == false);
-         REQUIRE(child2->mRefreshRequired == false);
-         REQUIRE(child2->mChildren.IsEmpty());
-         REQUIRE(child2->mUnits.IsEmpty());
-         REQUIRE(child2->mTraits.GetCount() == 1);
-         REQUIRE(child2->GetName() == "Child2");
-
-         auto grandchild1 = child1->mChildren[0];
-         REQUIRE(grandchild1->mOwner == child1);
-         REQUIRE(grandchild1->mRuntime == root.mRuntime);
-         REQUIRE(grandchild1->mRuntime.IsPinned() == false);
-         REQUIRE(grandchild1->mFlow == root.mFlow);
-         REQUIRE(grandchild1->mFlow.IsPinned() == false);
-         REQUIRE(grandchild1->mRefreshRequired == false);
-         REQUIRE(grandchild1->mChildren.IsEmpty());
-         REQUIRE(grandchild1->mUnits.IsEmpty());
-         REQUIRE(grandchild1->mTraits.GetCount() == 1);
-         REQUIRE(grandchild1->GetName() == "GrandChild1");
-
-         auto grandchild2 = child1->mChildren[1];
-         REQUIRE(grandchild2->mOwner == child1);
-         REQUIRE(grandchild2->mRuntime == root.mRuntime);
-         REQUIRE(grandchild2->mRuntime.IsPinned() == false);
-         REQUIRE(grandchild2->mFlow == root.mFlow);
-         REQUIRE(grandchild2->mFlow.IsPinned() == false);
-         REQUIRE(grandchild2->mRefreshRequired == false);
-         REQUIRE(grandchild2->mChildren.IsEmpty());
-         REQUIRE(grandchild2->mUnits.IsEmpty());
-         REQUIRE(grandchild2->mTraits.GetCount() == 1);
-         REQUIRE(grandchild2->GetName() == "GrandChild2");
-      }
-   }
-
+   
    GIVEN("A root Thing") {
       Thing root;
 
@@ -199,7 +112,7 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.mRuntime.IsPinned() == false);
             REQUIRE(root.mFlow == nullptr);
             REQUIRE(root.mFlow.IsPinned() == false);
-            REQUIRE(root.mRefreshRequired == false);
+            REQUIRE(root.mRefreshRequired == true);
             REQUIRE(root.mChildren.IsEmpty());
             REQUIRE(root.mUnits.GetCount() == 1);
             REQUIRE(root.mTraits.IsEmpty());
@@ -221,7 +134,7 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.mRuntime.IsPinned() == false);
             REQUIRE(root.mFlow == nullptr);
             REQUIRE(root.mFlow.IsPinned() == false);
-            REQUIRE(root.mRefreshRequired == false);
+            REQUIRE(root.mRefreshRequired == true);
             REQUIRE(root.mChildren.IsEmpty());
             REQUIRE(root.mUnits.GetCount() == 1);
             REQUIRE(root.mTraits.IsEmpty());
@@ -229,7 +142,7 @@ SCENARIO("Testing Thing", "[thing]") {
             auto it = root.mUnits.begin();
             REQUIRE(it->mKey == MetaOf<TestUnit1>());
             REQUIRE(it->mValue.GetCount() == 1);
-            REQUIRE(it->mValue[0] == unit);
+            REQUIRE(it->mValue[0] == unit.As<TestUnit1*>());
             REQUIRE(it->mValue[0]->mOwners.GetCount() == 1);
             REQUIRE(it->mValue[0]->mOwners[0] == &root);
          }
@@ -246,7 +159,7 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.mRuntime.IsPinned() == false);
             REQUIRE(root.mFlow == nullptr);
             REQUIRE(root.mFlow.IsPinned() == false);
-            REQUIRE(root.mRefreshRequired == false);
+            REQUIRE(root.mRefreshRequired == true);
             REQUIRE(root.mChildren.IsEmpty());
             REQUIRE(root.mUnits.IsEmpty());
             REQUIRE(root.mTraits.GetCount() == 1);
@@ -270,18 +183,105 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.mRuntime.IsPinned() == false);
             REQUIRE(root.mFlow == nullptr);
             REQUIRE(root.mFlow.IsPinned() == false);
-            REQUIRE(root.mRefreshRequired == false);
+            REQUIRE(root.mRefreshRequired == true);
             REQUIRE(root.mChildren.IsEmpty());
             REQUIRE(root.mUnits.IsEmpty());
             REQUIRE(root.mTraits.GetCount() == 1);
             REQUIRE(root.GetName() == "Dimo");
 
             auto it = root.mTraits.begin();
-            REQUIRE(it->mKey == MetaOf<Traits::Count>());
+            REQUIRE(it->mKey == MetaOf<Traits::Name>());
             REQUIRE(it->mValue.GetCount() == 1);
             REQUIRE(it->mValue[0] == Traits::Name {"Dimo"_text});
             REQUIRE(&it->mValue[0] == trait);
          }
+      }
+   }
+
+   WHEN("Creating a Thing by descriptor") {
+      auto descriptor = Any::Wrap(
+         Traits::Name {"Root"_text},
+         Construct::From<Runtime>(),
+         Construct::From<Temporal>(),
+         Construct::From<TestUnit1>(),
+         Construct::From<TestUnit2>(),
+         Construct::From<Thing>(
+            Traits::Name {"Child1"_text},
+            Construct::From<TestUnit1>(),
+            Construct::From<TestUnit2>(),
+            Construct::From<Thing>(
+               Traits::Name {"GrandChild1"_text}
+            ),
+            Construct::From<Thing>(
+               Traits::Name {"GrandChild2"_text}
+            )
+         ),
+         Construct::From<Thing>(
+            Traits::Name {"Child2"_text}
+         )
+      );
+
+      Thing root {descriptor};
+
+      THEN("Properties should match") {
+         REQUIRE(root.mOwner == nullptr);
+         REQUIRE(root.mRuntime != nullptr);
+         REQUIRE(root.mRuntime.IsPinned() == true);
+         REQUIRE(root.mFlow != nullptr);
+         REQUIRE(root.mFlow.IsPinned() == true);
+         REQUIRE(root.mRefreshRequired == true);
+         REQUIRE(root.mChildren.GetCount() == 2);
+         REQUIRE(root.mUnits.GetCount() == 2);
+         REQUIRE(root.mTraits.GetCount() == 1);
+         REQUIRE(root.GetName() == "Root");
+
+         auto child1 = root.mChildren[0];
+         REQUIRE(child1->mOwner == &root);
+         REQUIRE(child1->mRuntime == root.mRuntime);
+         REQUIRE(child1->mRuntime.IsPinned() == false);
+         REQUIRE(child1->mFlow == root.mFlow);
+         REQUIRE(child1->mFlow.IsPinned() == false);
+         REQUIRE(child1->mRefreshRequired == true);
+         REQUIRE(child1->mChildren.GetCount() == 2);
+         REQUIRE(child1->mUnits.GetCount() == 2);
+         REQUIRE(child1->mTraits.GetCount() == 1);
+         REQUIRE(child1->GetName() == "Child1");
+
+         auto child2 = root.mChildren[1];
+         REQUIRE(child2->mOwner == &root);
+         REQUIRE(child2->mRuntime == root.mRuntime);
+         REQUIRE(child2->mRuntime.IsPinned() == false);
+         REQUIRE(child2->mFlow == root.mFlow);
+         REQUIRE(child2->mFlow.IsPinned() == false);
+         REQUIRE(child2->mRefreshRequired == true);
+         REQUIRE(child2->mChildren.IsEmpty());
+         REQUIRE(child2->mUnits.IsEmpty());
+         REQUIRE(child2->mTraits.GetCount() == 1);
+         REQUIRE(child2->GetName() == "Child2");
+
+         auto grandchild1 = child1->mChildren[0];
+         REQUIRE(grandchild1->mOwner == child1);
+         REQUIRE(grandchild1->mRuntime == root.mRuntime);
+         REQUIRE(grandchild1->mRuntime.IsPinned() == false);
+         REQUIRE(grandchild1->mFlow == root.mFlow);
+         REQUIRE(grandchild1->mFlow.IsPinned() == false);
+         REQUIRE(grandchild1->mRefreshRequired == true);
+         REQUIRE(grandchild1->mChildren.IsEmpty());
+         REQUIRE(grandchild1->mUnits.IsEmpty());
+         REQUIRE(grandchild1->mTraits.GetCount() == 1);
+         REQUIRE(grandchild1->GetName() == "GrandChild1");
+
+         auto grandchild2 = child1->mChildren[1];
+         REQUIRE(grandchild2->mOwner == child1);
+         REQUIRE(grandchild2->mRuntime == root.mRuntime);
+         REQUIRE(grandchild2->mRuntime.IsPinned() == false);
+         REQUIRE(grandchild2->mFlow == root.mFlow);
+         REQUIRE(grandchild2->mFlow.IsPinned() == false);
+         REQUIRE(grandchild2->mRefreshRequired == true);
+         REQUIRE(grandchild2->mChildren.IsEmpty());
+         REQUIRE(grandchild2->mUnits.IsEmpty());
+         REQUIRE(grandchild2->mTraits.GetCount() == 1);
+         REQUIRE(grandchild2->GetName() == "GrandChild2");
       }
    }
 
@@ -340,7 +340,7 @@ SCENARIO("Testing Thing", "[thing]") {
          }
       }
 
-      WHEN("IsFamilyOf is invoked") {
+      /*WHEN("IsFamilyOf is invoked") {
          Thing separateRoot;
          auto child1 = root.GetChild(0);
          auto child2 = child1->GetChild(0);
@@ -352,7 +352,7 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(child1->IsFamilyOf(root));
             REQUIRE(child2->IsFamilyOf(root));
          }
-      }
+      }*/
 
       WHEN("Get a local unit by index") {
          auto unit = root.GetUnit(0);

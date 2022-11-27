@@ -8,10 +8,19 @@
 #pragma once
 #include "Thing.hpp"
 
-#define ENTITY_VERBOSE_SELF(a)            //Logger::Verbose() << this << ": "<< a
-#define ENTITY_VERBOSE(a)                 //Logger::Append() << a
-#define ENTITY_CREATION_VERBOSE_SELF(a)   //Logger::Verbose() << this << ": " <<a
-#define ENTITY_SELECTION_VERBOSE_SELF(a)  //Logger::Verbose() << this << ": " <<a
+#if 0
+   #define ENTITY_VERBOSE_ENABLED() 1
+   #define ENTITY_VERBOSE_SELF(a)            Logger::Verbose() << Self() << a
+   #define ENTITY_VERBOSE(a)                 Logger::Append() << a
+   #define ENTITY_CREATION_VERBOSE_SELF(a)   Logger::Verbose() << Self() << a
+   #define ENTITY_SELECTION_VERBOSE_SELF(a)  Logger::Verbose() << Self() << a
+#else
+   #define ENTITY_VERBOSE_ENABLED() 0
+   #define ENTITY_VERBOSE_SELF(a)
+   #define ENTITY_VERBOSE(a)
+   #define ENTITY_CREATION_VERBOSE_SELF(a)
+   #define ENTITY_SELECTION_VERBOSE_SELF(a)
+#endif
 
 namespace Langulus::Entity
 {
@@ -25,6 +34,7 @@ namespace Langulus::Entity
    Count Thing::AddChild(Thing* entity) {
       LANGULUS_ASSUME(DevAssumes, nullptr != entity, "Bad entity pointer");
       const auto added = mChildren.Merge(entity);
+
       if constexpr (TWOSIDED) {
          if (added && entity->mOwner != this) {
             if (entity->mOwner)
@@ -34,26 +44,46 @@ namespace Langulus::Entity
          }
       }
 
+      #if ENTITY_VERBOSE_ENABLED()
+         if (added)
+            ENTITY_VERBOSE_SELF(entity << " added");
+      #endif
+
       return added;
    }
       
    /// Destroy a child that matched pointer                                   
    ///   @attention assumes entity is a valid pointer                         
-   ///   @attention provided pointer is considered invalid after this call    
+   ///   @attention assumes you have ownership of that entity outside call    
+   ///              otherwise you risk deallocation of the memory behind it,  
+   ///              if managed memory is enabled, and we have jurisdiction    
    ///   @tparam TWOSIDED - true to also remove entity's owner                
    ///   @param entity - entity instance to remove from children              
    ///   @return the number of removed children                               
    template<bool TWOSIDED>
    Count Thing::RemoveChild(Thing* entity) {
       LANGULUS_ASSUME(DevAssumes, nullptr != entity, "Bad entity pointer");
+      #if LANGULUS_FEATURE(MANAGED_MEMORY)
+         LANGULUS_ASSUME(DevAssumes, 
+            !Anyness::Inner::Allocator::CheckAuthority(MetaOf<Thing>(), entity) ||
+             Anyness::Inner::Allocator::Find(MetaOf<Thing>(), entity)->GetUses() > 1,
+            "Managed entity pointer has no ownership outside this function, "
+            "and will result in a bad pointer after removed from children"
+         );
+      #endif
+      
       const auto removed = mChildren.RemoveValue<false, true>(entity);
       if constexpr (TWOSIDED) {
-         //TODO check if entity is valid at this point?
          if (removed && entity->mOwner == this) {
             entity->mOwner = nullptr;
             entity->mRefreshRequired = true;
          }
       }
+
+      #if ENTITY_VERBOSE_ENABLED()
+         if (removed)
+            ENTITY_VERBOSE_SELF(entity << " removed");
+      #endif
 
       return removed;
    }

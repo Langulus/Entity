@@ -115,7 +115,7 @@ namespace Langulus::Entity
       NOD()       Thing* GetNamedChild(const Token&, const Index& = IndexFirst);
       NOD() const Thing* GetNamedChild(const Token&, const Index& = IndexFirst) const;
 
-      NOD() bool IsFamilyOf(const Thing&) const;
+      //NOD() bool IsFamilyOf(const Thing&) const;
 
       void DumpHierarchy() const;
 

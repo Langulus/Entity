@@ -58,8 +58,8 @@ namespace Langulus::Entity
    ///   @param owner - the owner of the runtime                              
    Runtime::Runtime(Thing* owner) noexcept
       : mOwner {owner} {
-      Logger::Verbose() << "Initializing...";
-      Logger::Verbose() << "Initialized";
+      Logger::Verbose() << IdentityOf(this) << ": Initializing...";
+      Logger::Verbose() << IdentityOf(this) << ": Initialized";
    }
 
    /// Runtime destruction                                                    

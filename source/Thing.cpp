@@ -37,6 +37,7 @@ namespace Langulus::Entity
       if (parent) {
          parent->AddChild<false>(this);
          mRuntime = parent->GetRuntime();
+         mFlow = parent->GetFlow();
       }
 
       if (!descriptor.IsEmpty()) {
@@ -174,7 +175,7 @@ namespace Langulus::Entity
    /// Check if this entity is other, or some kind of parent of it            
    ///   @param other - the entity instance to test                           
    ///   @return true if this entity is either the other, or related upwards  
-   bool Thing::IsFamilyOf(const Thing& other) const {
+   /*bool Thing::IsFamilyOf(const Thing& other) const {
       if (this == &other)
          return true;
 
@@ -187,7 +188,7 @@ namespace Langulus::Entity
       }
 
       return false;
-   }
+   }*/
 
    /// Get a unit by type and offset                                          
    /// If type is nullptr searches only by offset                             
@@ -370,9 +371,9 @@ namespace Langulus::Entity
    ///   @param descriptor - instructions for the entity's creation           
    ///   @return the new child instance                                       
    Thing* Thing::CreateChild(const Any& descriptor) {
-      mChildren.Emplace(this, descriptor);
-      ENTITY_VERBOSE_SELF(mChildren.Last() << " added");
-      return mChildren.Last();
+      Ptr<Thing> newThing;
+      newThing.New(this, descriptor);
+      return newThing.Get();
    }
 
    /// Uses the current runtime to load a shared library module, and          
