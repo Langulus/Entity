@@ -74,10 +74,10 @@ namespace Langulus::Entity
       // Scan descriptor                                                
       bool done = false;
       descriptor.ForEachDeep([&done,&value](const Trait& trait) {
-         if (trait.TraitIs<T>()) {
+         if (trait.template TraitIs<T>()) {
             // Found match                                              
             try {
-               value = trait.AsCast<D>();
+               value = trait.template AsCast<D>();
                done = true;
                return false;
             }
@@ -103,7 +103,7 @@ namespace Langulus::Entity
       // If reached, then no trait was found in the descriptor          
       // Let's delve into the hierarchy                                 
       for (auto owner : *this) {
-         if (owner->SeekValue<SEEK, T>(value)) {
+         if (owner->template SeekValue<T, SEEK>(value)) {
             // Value was found                                          
             return true;
          }
@@ -134,7 +134,7 @@ namespace Langulus::Entity
       descriptor.ForEachDeep([&done,&value](const Block& group) {
          // Found match                                                 
          try {
-            value = group.AsCast<D>();
+            value = group.template AsCast<D>();
             done = true;
             return false;
          }
@@ -159,7 +159,7 @@ namespace Langulus::Entity
       // If reached, then no data was found in the descriptor           
       // Let's delve into the hierarchy                                 
       for (auto owner : *this) {
-         if (owner->SeekValue<SEEK>(value)) {
+         if (owner->template SeekValue<SEEK>(value)) {
             // Value was found                                          
             return true;
          }
@@ -186,7 +186,7 @@ namespace Langulus::Entity
 
       // Let's delve into the hierarchy                                 
       for (auto owner : *this) {
-         if (owner->SeekValue<SEEK, T>(value)) {
+         if (owner->template SeekValue<T, SEEK>(value)) {
             // Value was found                                          
             return true;
          }
@@ -212,7 +212,7 @@ namespace Langulus::Entity
 
       // Let's delve into the hierarchy                                 
       for (auto owner : *this) {
-         if (owner->SeekValue<SEEK>(value)) {
+         if (owner->template SeekValue<SEEK>(value)) {
             // Value was found                                          
             return true;
          }

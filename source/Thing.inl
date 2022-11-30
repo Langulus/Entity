@@ -389,13 +389,13 @@ namespace Langulus::Entity
    ///   @param trait - the type of trait we're searching for                 
    ///   @param value - [out] the found values will be written here           
    ///   @return true if value has been found and rewritten                   
-   template<SeekStyle SEEK, CT::Data T>
-   bool Thing::SeekValue(TMeta trait, T& value) const {
+   template<SeekStyle SEEK, CT::Data D>
+   bool Thing::SeekValue(TMeta trait, D& value) const {
       const auto found = SeekTrait<SEEK>(trait);
       if (found.IsEmpty())
          return false;
 
-      value = found.template AsCast<T>();
+      value = found.template AsCast<D>();
       return true;
    }
 
