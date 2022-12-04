@@ -16,11 +16,20 @@ namespace Langulus
    using MetaList = Anyness::TAny<const RTTI::Meta*>;
 
    /// Helper function, that reflects and registers a type list               
+   /// All types in the list, as well as their member and base types, will    
+   /// be associated with the module library. When library unloads, all       
+   /// these definitions will be removed, because otherwise they might        
+   /// contain lambdas, that no longer will exist after shared object unload. 
+   /// This is possible only when managed reflection feature is enabled.      
+   /// If it is not, it is your resposibility to manage these dependencies.   
    ///   @param list - a container with list of all the registered types      
+   ///                 be aware, these does not include bases and members     
+   ///                 but only intentionally exposed types                   
    template<class... T>
    void RegisterTypeList(MetaList& list) {
-      const RTTI::Meta* const metas[] { MetaOf<T>()... };
-      list.Insert(metas, metas + sizeof(metas) / sizeof(RTTI::DMeta));
+      // Merge to avoid duplications                                    
+      //TODO use set instead
+      (list <<= ... <<= MetaOf<T>());
    }
 
 } // namespace Langulus
@@ -115,12 +124,13 @@ namespace Langulus::CT
 ///   @param cat - module category, i.e. some abstract type                   
 ///   @param ... - a type list to reflect upon module load                    
 #define LANGULUS_DEFINE_MODULE(m, prio, name, info, depo, cat, ...) \
+   LANGULUS_RTTI_BOUNDARY(name) \
    extern "C" { \
-      LANGULUS_EXPORT() inline void LANGULUS_MODULE_ENTRY() (::Langulus::MetaList& list) { \
+      LANGULUS_EXPORT() void LANGULUS_MODULE_ENTRY() (::Langulus::MetaList& list) { \
          ::Langulus::RegisterTypeList<m, cat, __VA_ARGS__>(list);\
       } \
       \
-      LANGULUS_EXPORT() inline ::Langulus::Entity::Module* LANGULUS_MODULE_CREATE() ( \
+      LANGULUS_EXPORT() ::Langulus::Entity::Module* LANGULUS_MODULE_CREATE() ( \
          ::Langulus::Entity::Runtime* rt, const ::Langulus::Anyness::Any& desc) { \
          static_assert(::Langulus::CT::DerivedFrom<m, ::Langulus::Entity::Module>, \
             "Langulus module class interface " \
@@ -131,7 +141,7 @@ namespace Langulus::CT
          return new m {rt, desc}; \
       } \
       \
-      LANGULUS_EXPORT() inline const ::Langulus::Entity::Module::Info& LANGULUS_MODULE_INFO() () { \
+      LANGULUS_EXPORT() const ::Langulus::Entity::Module::Info& LANGULUS_MODULE_INFO() () { \
          static const ::Langulus::Entity::Module::Info i { \
             prio, name, info, depo, ::Langulus::MetaOf<cat>() \
          }; \

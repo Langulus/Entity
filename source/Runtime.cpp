@@ -32,6 +32,7 @@
    //TODO
 #endif
 
+LANGULUS_RTTI_BOUNDARY("Langulus")
 
 namespace Langulus::Entity
 {
@@ -253,6 +254,10 @@ namespace Langulus::Entity
          mLibraries.Insert(path, library);
          for (auto externalType : library.mTypes)
             mDependencies.Insert(externalType, library);
+
+         Logger::Info()
+            << "Module `" << library.mInfo().mName 
+            << "` exposed the following types: " << library.mTypes;
       }
       catch (...) {
          // Make sure we end up in an invariant state                   
@@ -268,22 +273,22 @@ namespace Langulus::Entity
    }
 
    /// Unload a DLL/SO extension module                                       
-   ///   @param module - the module handle to unload                          
-   void Runtime::UnloadSharedLibrary(const SharedLibrary& module) {
-      if (module.mHandle == 0)
+   ///   @param library - the library handle to unload                        
+   void Runtime::UnloadSharedLibrary(const SharedLibrary& library) {
+      if (library.mHandle == 0)
          return;
 
-      for (auto externalType : module.mTypes) {
+      for (auto externalType : library.mTypes)
          mDependencies.RemoveKey(externalType);
-         RTTI::Database.Unregister(externalType);
-      }
+
+      RTTI::Database.UnloadLibrary(library.mInfo().mName);
 
       #if LANGULUS_OS(WINDOWS)
          ::Langulus::Entity::UnloadSharedLibrary(
-            reinterpret_cast<HMODULE>(module.mHandle));
+            reinterpret_cast<HMODULE>(library.mHandle));
       #elif LANGULUS_OS(LINUX)
          ::Langulus::Entity::UnloadSharedLibrary(
-            reinterpret_cast<void*>(module.mHandle));
+            reinterpret_cast<void*>(library.mHandle));
       #else 
          #error Unsupported OS
       #endif
