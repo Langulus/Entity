@@ -172,24 +172,6 @@ namespace Langulus::Entity
       mTraits.Clear();
    }
 
-   /// Check if this entity is other, or some kind of parent of it            
-   ///   @param other - the entity instance to test                           
-   ///   @return true if this entity is either the other, or related upwards  
-   /*bool Thing::IsFamilyOf(const Thing& other) const {
-      if (this == &other)
-         return true;
-
-      auto parent = other.mOwner.Get();
-      while (parent) {
-         if (parent == this)
-            return true;
-
-         parent = parent->mOwner.Get();
-      }
-
-      return false;
-   }*/
-
    /// Get a unit by type and offset                                          
    /// If type is nullptr searches only by offset                             
    /// If type is not nullptr, gets the Nth matching unit, if any             
@@ -391,57 +373,4 @@ namespace Langulus::Entity
       return instance;
    }
 
-   /// Create all dependencies required for the production of 'type', if such 
-   /// doesn't yet exist the this entity's upward hierarchy                   
-   /// They will be added either immediately below to their own producers, or 
-   /// by the Runtime as a fallback                                           
-   ///   @param type - the type to build dependencies for                     
-   ///   @return the resulting dependencies (top level)                       
-   /*Any Thing::CreateDependencies(DMeta type) {
-      auto meta = type->mProducer;
-      LANGULUS_ASSERT(meta, Except::Construct, "Missing producer");
-
-      if (meta->HasBase<Unit>()) {
-         // Unit dependencies, search for them in the hierarchy,        
-         // they might already exist                                    
-         auto producers = GatherUnits<SeekStyle::UpToHere>(meta);
-         if (!producers.IsEmpty())
-            return producers;
-
-         // No producer available in the hierarchy, so nest-create      
-         // producer's producers                                        
-         ENTITY_VERBOSE_SELF(Logger::DarkYellow
-            << "Required producer " << meta << " for creating " << type
-            << " not found in hierarchy - attempting to create it...");
-
-         auto nestedProducers = CreateDependencies(meta);
-         nestedProducers.ForEach(
-            [&](Unit* unit) {
-               for (auto owner : unit->GetOwners())
-                  producers += owner->CreateDataInner(meta);
-            },
-            [&](Module* module) {
-               const auto owner = module->GetRuntime()->GetOwner();
-               producers += owner->CreateDataInner(meta);
-            }
-         );
-
-         return producers;
-      }
-      else if (meta->HasBase<Module>()) {
-         // Producer is a module. Let's seek the runtime component,     
-         // since it contains the instantiated modules                  
-         auto runtime = GetRuntime();
-         LANGULUS_ASSERT(runtime, Except::Construct, "Missing runtime");
-
-         auto dependency = runtime->GetDependency(meta);
-         return runtime->InstantiateModule(dependency);
-      }
-
-      Logger::Error()
-         << "Couldn't produce " << type << " from " << meta
-         << " - the producer wasn't found, and couldn't be produced";
-      LANGULUS_THROW(Construct, "Couldn't create dependencies");
-   }*/
-   
 } // namespace Langulus::Entry

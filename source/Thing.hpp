@@ -11,8 +11,6 @@
 
 LANGULUS_DEFINE_TRAIT(Runtime, "Accesses the runtime of a hierarchy of Things");
 LANGULUS_DEFINE_TRAIT(Unit, "Accesses units (components) of Things");
-LANGULUS_DEFINE_TRAIT(Child, "Accesses children in any kind of hierarchies");
-LANGULUS_DEFINE_TRAIT(Parent, "Accesses parents in any kind of hierarchies");
 
 namespace Langulus::Entity
 {
@@ -43,8 +41,6 @@ namespace Langulus::Entity
    TESTING(public:)
       void ResetRuntime(Runtime*);
       void ResetFlow(Temporal*);
-
-      //Any CreateDependencies(DMeta);
 
       // The entity's parent                                            
       Ptr<Thing> mOwner;
@@ -115,8 +111,6 @@ namespace Langulus::Entity
       NOD()       Thing* GetNamedChild(const Token&, const Index& = IndexFirst);
       NOD() const Thing* GetNamedChild(const Token&, const Index& = IndexFirst) const;
 
-      //NOD() bool IsFamilyOf(const Thing&) const;
-
       void DumpHierarchy() const;
 
       ///                                                                     
@@ -126,6 +120,13 @@ namespace Langulus::Entity
       Count AddUnit(Unit*);
       template<bool TWOSIDED = true>
       Count RemoveUnit(Unit*);
+
+      template<CT::Unit T, class... A>
+      Any CreateUnit(A&&...);
+      #if LANGULUS_FEATURE(MANAGED_REFLECTION)
+         template<class... A>
+         Any CreateUnitToken(const Token&, A&&...);
+      #endif
 
       template<CT::Unit T, bool TWOSIDED = true>
       Count RemoveUnits();
@@ -139,9 +140,6 @@ namespace Langulus::Entity
       NOD() TAny<const Unit*> GatherUnits(DMeta) const;
       template<CT::Unit T = Unit, SeekStyle = SeekStyle::UpToHere>
       NOD() TAny<const Decay<T>*> GatherUnits() const;
-
-      template<CT::Unit T, class ... A>
-      Any CreateUnit(A&&...);
 
       template<SeekStyle = SeekStyle::UpToHere>
       NOD() Unit* SeekUnit(DMeta, const Index& = IndexFirst);

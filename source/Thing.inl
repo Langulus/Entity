@@ -310,6 +310,7 @@ namespace Langulus::Entity
    }
 
    /// Find a unit by index and static type from the hierarchy (const)        
+   ///   @tparam T - static unit type to search for                           
    ///   @tparam SEEK - where to seek for the unit                            
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
@@ -320,6 +321,7 @@ namespace Langulus::Entity
    }
 
    /// Find a unit by index and static type from the hierarchy                
+   ///   @tparam T - static unit type to search for                           
    ///   @tparam SEEK - where to seek for the unit                            
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
@@ -333,6 +335,7 @@ namespace Langulus::Entity
    /// in the hierarchy                                                       
    ///   @tparam T - the unit to create                                       
    ///   @tparam A... - arguments for the unit's creation                     
+   ///   @param arguments... - the arguments to provide for construct         
    ///   @return the created unit(s)                                          
    template<CT::Unit T, class... A>
    Any Thing::CreateUnit(A&&...arguments) {
@@ -340,6 +343,21 @@ namespace Langulus::Entity
          Construct::From<Decay<T>>(Forward<A>(arguments)...)
       );
    }
+
+#if LANGULUS_FEATURE(MANAGED_REFLECTION)
+   /// Create a unit by type token and arguments, relying on producers        
+   /// in the hierarchy                                                       
+   ///   @tparam A... - arguments for the unit's creation                     
+   ///   @param token - the unit type token                                   
+   ///   @param arguments... - the arguments to provide for construct         
+   ///   @return the created unit(s)                                          
+   template<class... A>
+   Any Thing::CreateUnitToken(const Token& token, A&&...arguments) {
+      return CreateData(
+         Construct::FromToken(token, Forward<A>(arguments)...)
+      );
+   }
+#endif
 
    /// Get a unit by a static type and an optional offset                     
    ///   @tparam T - the type of unit we're searching for                     
@@ -514,7 +532,7 @@ namespace Langulus::Entity
       const auto producer = type->mProducer;
 
       // Always implicitly attach a parent trait to descriptor          
-      Any descriptor = construct.GetArgument();
+      Construct descriptor {construct};
       descriptor << Traits::Parent {this};
 
       if (producer) {
@@ -524,7 +542,7 @@ namespace Langulus::Entity
             // Data is producible from a unit                           
             auto producers = GatherUnits<SEEK>(producer);
             if (!producers.IsEmpty()) {
-               // Potential unit producers found, attempt creation there
+               // Potential unit producers found, attempt creation      
                auto creator = Verbs::Create {&descriptor};
                if (Flow::DispatchFlat(producers, creator)) {
                   // Great success                                      
@@ -534,7 +552,15 @@ namespace Langulus::Entity
          }
          else if (producer->template CastsTo<Module>()) {
             // Data is producible from a module                         
-            TODO();
+            auto producers = GetRuntime()->GetModules(producer);
+            if (!producers.IsEmpty()) {
+               // Potential module producers found, attempt creation    
+               auto creator = Verbs::Create {&descriptor};
+               if (Flow::DispatchFlat(producers, creator)) {
+                  // Great success                                      
+                  return Abandon(creator.GetOutput());
+               }
+            }
          }
          else if (producer->template CastsTo<Thing>()) {
             // Data is producible from a thing                          
@@ -576,13 +602,6 @@ namespace Langulus::Entity
       }
 
       return {};
-
-
-      /*Verbs::Create creator {&construct};
-      auto producers = CreateDependencies(construct.GetType());
-      if (Scope::ExecuteVerb(producers, creator))
-         return Abandon(creator.GetOutput());
-      return {};*/
    }
 
 
