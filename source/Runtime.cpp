@@ -101,28 +101,28 @@ namespace Langulus::Entity
          return nullptr;
 
       // Use the creation point of the library to instantiate module    
-      const auto& info = library.mInfo();
+      const auto info = library.mInfo();
       auto module = library.mCreator(this, descriptor);
       if (!module) {
          Logger::Error()
-            << "Module `" << info.mName << "` creator didn't provide a module";
+            << "Module `" << info->mName << "` creator didn't provide a module";
          return nullptr;
       }
 
       // Register the module in the various maps, for fast access       
       try {
-         mModules[info.mPriority] << module;
+         mModules[info->mPriority] << module;
          mInstantiations[library] << module;
          mModulesByType[module->GetType()] << module;
       }
       catch (...) {
          Logger::Error()
-            << "Registering module `" << info.mName << "` failed";
+            << "Registering module `" << info->mName << "` failed";
 
          // Make sure we end up in an invariant state                   
-         mModules[info.mPriority].RemoveValue(module);
-         if (mModules[info.mPriority].IsEmpty())
-            mModules.RemoveKey(info.mPriority);
+         mModules[info->mPriority].RemoveValue(module);
+         if (mModules[info->mPriority].IsEmpty())
+            mModules.RemoveKey(info->mPriority);
 
          mInstantiations[library].RemoveValue(module);
          if (mInstantiations[library].IsEmpty())
@@ -138,8 +138,8 @@ namespace Langulus::Entity
 
       // Done, if reached                                               
       Logger::Verbose()
-         << "Module `" << info.mName
-         << "` registered with priority " << info.mPriority;
+         << "Module `" << info->mName
+         << "` registered with priority " << info->mPriority;
       return module;
    }
 
@@ -256,7 +256,7 @@ namespace Langulus::Entity
             mDependencies.Insert(externalType, library);
 
          Logger::Info()
-            << "Module `" << library.mInfo().mName 
+            << "Module `" << library.mInfo()->mName 
             << "` exposed the following types: " << library.mTypes;
       }
       catch (...) {
@@ -281,7 +281,7 @@ namespace Langulus::Entity
       for (auto externalType : library.mTypes)
          mDependencies.RemoveKey(externalType);
 
-      RTTI::Database.UnloadLibrary(library.mInfo().mName);
+      RTTI::Database.UnloadLibrary(library.mInfo()->mName);
 
       #if LANGULUS_OS(WINDOWS)
          ::Langulus::Entity::UnloadSharedLibrary(

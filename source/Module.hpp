@@ -71,20 +71,20 @@ namespace Langulus::Entity
 
       struct Info {
          // Define the order in which module updates, relative to others
-         Real mPriority = 0;
+         Real mPriority;
          // Name of the module                                          
-         Token mName;
+         const char* mName;
          // Information about the module                                
-         Token mInfo;
+         const char* mInfo;
          // Relative module dedicated file folder, under Data/Modules/  
-         Token mDepository;
+         const char* mDepository;
          // Module abstract type                                        
-         DMeta mCategory {};
+         DMeta mCategory;
       };
 
       using EntryFunction = void(*)(MetaList&);
       using CreateFunction = Module*(*)(Runtime*, const Any&);
-      using InfoFunction = const Info&(*)();
+      using InfoFunction = const Info*(*)();
 
       NOD() Runtime* GetRuntime() const noexcept { return mRuntime; }
 
@@ -141,10 +141,10 @@ namespace Langulus::CT
          return new m {rt, desc}; \
       } \
       \
-      LANGULUS_EXPORT() const ::Langulus::Entity::Module::Info& LANGULUS_MODULE_INFO() () { \
+      LANGULUS_EXPORT() const ::Langulus::Entity::Module::Info* LANGULUS_MODULE_INFO() () { \
          static const ::Langulus::Entity::Module::Info i { \
             prio, name, info, depo, ::Langulus::MetaOf<cat>() \
          }; \
-         return i; \
+         return &i; \
       } \
    }

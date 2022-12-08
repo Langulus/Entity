@@ -39,7 +39,7 @@ namespace Langulus::Entity
          if (added && entity->mOwner != this) {
             if (entity->mOwner)
                entity->mOwner->RemoveChild<false>(entity);
-            entity->mOwner == this;
+            entity->mOwner = this;
             entity->mRefreshRequired = true;
          }
       }
