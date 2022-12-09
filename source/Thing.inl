@@ -590,7 +590,7 @@ namespace Langulus::Entity
          // registering it with the parent                              
          if (type->mDescriptorConstructor) {
             auto result = Any::FromMeta(type);
-            result.Emplace(descriptor);
+            result.Emplace(descriptor.GetArgument());
             return Abandon(result);
          }
          else if (type->mDefaultConstructor) {
