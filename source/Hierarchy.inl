@@ -77,7 +77,10 @@ namespace Langulus::Entity
          if (trait.template TraitIs<T>()) {
             // Found match                                              
             try {
-               value = trait.template AsCast<D>();
+               if constexpr (CT::Pinnable<D>)
+                  value = trait.template AsCast<TypeOf<D>>();
+               else
+                  value = trait.template AsCast<D>();
                done = true;
                return false;
             }
@@ -103,9 +106,13 @@ namespace Langulus::Entity
       // If reached, then no trait was found in the descriptor          
       // Let's delve into the hierarchy                                 
       for (auto owner : *this) {
-         if (owner->template SeekValue<T, SEEK>(value)) {
-            // Value was found                                          
-            return true;
+         if constexpr (CT::Pinnable<D>) {
+            if (owner->template SeekValue<T, SEEK, TypeOf<D>>(value))
+               return true;
+         }
+         else {
+            if (owner->template SeekValue<T, SEEK, D>(value))
+               return true;
          }
       }
 
