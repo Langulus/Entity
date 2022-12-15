@@ -113,7 +113,7 @@ namespace Langulus::Entity
       mUnits.ForEachValue([&](Unit* unit) {
          auto t = unit->GetMember(id.GetTrait(), index);
          if (!t.IsEmpty()) {
-            output = Trait {id.GetTrait(), t};
+            output = Trait::From(id.GetTrait(), t);
             return false;
          }
          return true;
@@ -124,7 +124,7 @@ namespace Langulus::Entity
       // Finally, check this entity's static traits                     
       auto t = GetMember(id.GetTrait(), index);
       if (!t.IsEmpty())
-         return Trait {id.GetTrait(), t};
+         return Trait::From(id.GetTrait(), t);
 
       // Nothing was found                                              
       return {};
