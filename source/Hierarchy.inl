@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include "Hierarchy.hpp"
+#include "Unit.hpp"
 
 namespace Langulus::Entity
 {
@@ -227,6 +228,136 @@ namespace Langulus::Entity
 
       // If reached, nothing was found                                  
       return false;
+   }
+
+   /// Seek a unit inside descriptor first, and then the hierarchy            
+   ///   @tparam T - the type of unit to search for                           
+   ///   @tparam SEEK - the direction we're seeking in the hierarchy          
+   ///   @param descriptor - descriptor to search through                     
+   ///   @return a valid unit pointer, if unit was found                      
+   template<CT::Data T, SeekStyle SEEK>
+   Unit* Hierarchy::SeekUnit(const Any& descriptor) const {
+      static_assert(CT::Unit<T>, "T must be a unit");
+
+      // Scan descriptor                                                
+      Unit* result {};
+      descriptor.ForEachDeep([&result](const Unit* unit) {
+         if (unit->template Is<T>()) {
+            // Found match                                              
+            result = unit;
+            return false;
+         }
+
+         // Just keep searching...                                      
+         return true;
+      });
+
+      if (result)
+         return result;
+
+      // If reached, then no unit was found in the descriptor           
+      // Let's delve into the hierarchy                                 
+      for (auto owner : *this) {
+         result = owner->template SeekUnit<T, SEEK>();
+         if (result)
+            return result;
+      }
+
+      // If reached, nothing was found                                  
+      return nullptr;
+   }
+
+   /// Seek a unit by token inside descriptor first, and then the hierarchy   
+   ///   @tparam SEEK - the direction we're seeking in the hierarchy          
+   ///   @param token - name of the unit to search for                        
+   ///   @param descriptor - descriptor to search through                     
+   ///   @return a valid unit pointer, if unit was found                      
+   template<SeekStyle SEEK>
+   Unit* Hierarchy::SeekUnit(const Token& token, const Any& descriptor) const {
+      return SeekUnit<SEEK>(Construct::FromToken(token), descriptor);
+   }
+
+   /// Seek a unit by construct inside descriptor first, then the hierarchy   
+   ///   @tparam SEEK - the direction we're seeking in the hierarchy          
+   ///   @param what - the unit descriptor to match                           
+   ///   @param descriptor - descriptor to search through                     
+   ///   @return a valid unit pointer, if unit was found                      
+   template<SeekStyle SEEK>
+   Unit* Hierarchy::SeekUnit(const Construct& what, const Any& descriptor) const {
+      // Scan descriptor                                                
+      Unit* result {};
+      descriptor.ForEachDeep([&](const Unit* unit) {
+         if (unit->Is(what.GetType())) {
+            // Found match                                              
+            //TODO check construct descriptor
+            result = const_cast<Unit*>(unit);
+            return false;
+         }
+
+         // Just keep searching...                                      
+         return true;
+      });
+
+      if (result)
+         return result;
+
+      // If reached, then no unit was found in the descriptor           
+      // Let's delve into the hierarchy                                 
+      for (auto owner : *this) {
+         result = owner->template SeekUnit<SEEK>(what.GetType());
+         //TODO implement Thing::SeekUnit by descriptor
+         if (result)
+            return result;
+      }
+
+      // If reached, nothing was found                                  
+      return nullptr;
+   }
+
+   /// Seek a unit inside the hierarchy                                       
+   ///   @tparam T - the type of unit to search for                           
+   ///   @tparam SEEK - the direction we're seeking in the hierarchy          
+   ///   @return a valid unit pointer, if unit was found                      
+   template<CT::Data T, SeekStyle SEEK>
+   Unit* Hierarchy::SeekUnit() const {
+      static_assert(CT::Unit<T>, "T must be a unit");
+
+      Unit* result {};
+      for (auto owner : *this) {
+         result = owner->template SeekUnit<T, SEEK>();
+         if (result)
+            return result;
+      }
+
+      // If reached, nothing was found                                  
+      return nullptr;
+   }
+
+   /// Seek a unit by token inside the hierarchy                              
+   ///   @tparam SEEK - the direction we're seeking in the hierarchy          
+   ///   @param token - name of the unit to search for                        
+   ///   @return a valid unit pointer, if unit was found                      
+   template<SeekStyle SEEK>
+   Unit* Hierarchy::SeekUnit(const Token& token) const {
+      return SeekUnit<SEEK>(Construct::FromToken(token));
+   }
+
+   /// Seek a unit by construct inside the hierarchy                          
+   ///   @tparam SEEK - the direction we're seeking in the hierarchy          
+   ///   @param what - the unit descriptor to match                           
+   ///   @return a valid unit pointer, if unit was found                      
+   template<SeekStyle SEEK>
+   Unit* Hierarchy::SeekUnit(const Construct& what) const {
+      Unit* result {};
+      for (auto owner : *this) {
+         result = owner->template SeekUnit<SEEK>(what.GetType());
+         //TODO implement Thing::SeekUnit by descriptor
+         if (result)
+            return result;
+      }
+
+      // If reached, nothing was found                                  
+      return nullptr;
    }
 
 } // namespace namespace Langulus::Entity

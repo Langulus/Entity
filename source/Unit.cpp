@@ -47,9 +47,9 @@ namespace Langulus::Entity
          owner->RemoveUnit<false>(this);
 
       // Then, the unit should have exactly one reference left          
-      LANGULUS_ASSERT(GetReferences() < 2, Except::Destruct,
+      LANGULUS_ASSERT(GetReferences() < 2, Destruct,
          "Unit destroyed while still in use");
-      LANGULUS_ASSERT(GetReferences() > 0, Except::Destruct,
+      LANGULUS_ASSERT(GetReferences() > 0, Destruct,
          "Unit destroyed at zero reference hints at potential undefined behavior");
    }
 

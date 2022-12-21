@@ -11,8 +11,7 @@
 namespace Langulus::Entity
 {
 
-   /// Some predeclarations                                                   
-
+   class Unit;
    class Thing;
    class Runtime;
    class Hierarchy;
@@ -67,15 +66,30 @@ namespace Langulus::Entity
    ///                                                                        
    class Hierarchy : public TAny<Thing*> {
    public:
+      using TAny::TAny;
+      using TAny::operator =;
+
       template<CT::Trait, SeekStyle = SeekStyle::UpToHere, CT::Data D>
       bool SeekTrait(const Any&, D&) const;
       template<SeekStyle = SeekStyle::UpToHere, CT::Data D>
       bool SeekValue(const Any&, D&) const;
+      template<CT::Data T, SeekStyle = SeekStyle::UpToHere>
+      Unit* SeekUnit(const Any&) const;
+      template<SeekStyle = SeekStyle::UpToHere>
+      Unit* SeekUnit(const Token&, const Any&) const;
+      template<SeekStyle = SeekStyle::UpToHere>
+      Unit* SeekUnit(const Construct&, const Any&) const;
 
       template<CT::Trait, SeekStyle = SeekStyle::UpToHere, CT::Data D>
       bool SeekTrait(D&) const;
       template<SeekStyle = SeekStyle::UpToHere, CT::Data D>
       bool SeekValue(D&) const;
+      template<CT::Data, SeekStyle = SeekStyle::UpToHere>
+      Unit* SeekUnit() const;
+      template<SeekStyle = SeekStyle::UpToHere>
+      Unit* SeekUnit(const Token&) const;
+      template<SeekStyle = SeekStyle::UpToHere>
+      Unit* SeekUnit(const Construct&) const;
    };
 
 } // namespace Langulus::Entity

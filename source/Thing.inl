@@ -136,7 +136,7 @@ namespace Langulus::Entity
       // We must guarantee, that no unit is coupled to entities with    
       // different runtimes!                                            
       for (auto owners : unit->mOwners) {
-         LANGULUS_ASSERT(owners->GetRuntime() == GetRuntime(), Except::Access,
+         LANGULUS_ASSERT(owners->GetRuntime() == GetRuntime(), Access,
             "Coupling a unit to multiple runtimes is not allowed");
       }
 

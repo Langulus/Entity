@@ -54,10 +54,10 @@ namespace Langulus::Entity
    ///   @param other - move that entity                                      
    Thing::Thing(Thing&& other) noexcept
       : Resolvable {Forward<Resolvable>(other)}
-      , mChildren {Move(other.mChildren)}
-      , mUnits {Move(other.mUnits)}
-      , mTraits {Move(other.mTraits)}
-      , mRuntime {Move(other.mRuntime)}
+      , mChildren {::std::move(other.mChildren)}
+      , mUnits {::std::move(other.mUnits)}
+      , mTraits {::std::move(other.mTraits)}
+      , mRuntime {::std::move(other.mRuntime)}
       , mRefreshRequired {true} {
       // Remap children                                                 
       for (auto child : mChildren)
@@ -369,7 +369,7 @@ namespace Langulus::Entity
       LANGULUS_ASSUME(UserAssumes, runtime != nullptr,
          "No runtime available for loading a module");
       const auto instance = runtime->InstantiateModule(module, descriptor);
-      LANGULUS_ASSERT(instance, Except::Module, "Missing module");
+      LANGULUS_ASSERT(instance, Module, "Missing module");
       return instance;
    }
 
