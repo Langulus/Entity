@@ -244,7 +244,7 @@ namespace Langulus::Entity
       descriptor.ForEachDeep([&result](const Unit* unit) {
          if (unit->template Is<T>()) {
             // Found match                                              
-            result = unit;
+            result = const_cast<Unit*>(unit);
             return false;
          }
 
