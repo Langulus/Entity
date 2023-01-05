@@ -316,8 +316,11 @@ namespace Langulus::Entity
    ///   @return the unit if found, or nullptr otherwise                      
    template<CT::Unit T, SeekStyle SEEK>
    const Decay<T>* Thing::SeekUnit(const Index& offset) const {
-      return static_cast<const Decay<T>*>(
-         SeekUnit<SEEK>(MetaData::Of<Decay<T>>(), offset));
+      using DT = Decay<T>;
+      const auto meta = MetaData::Of<DT>();
+      if (!meta)
+         return nullptr;
+      return static_cast<const DT*>(SeekUnit<SEEK>(meta, offset));
    }
 
    /// Find a unit by index and static type from the hierarchy                
@@ -327,8 +330,11 @@ namespace Langulus::Entity
    ///   @return the unit if found, or nullptr otherwise                      
    template<CT::Unit T, SeekStyle SEEK>
    Decay<T>* Thing::SeekUnit(const Index& offset) {
-      return static_cast<Decay<T>*>(
-         SeekUnit<SEEK>(MetaData::Of<Decay<T>>(), offset));
+      using DT = Decay<T>;
+      const auto meta = MetaData::Of<DT>();
+      if (!meta)
+         return nullptr;
+      return static_cast<DT*>(SeekUnit<SEEK>(meta, offset));
    }
 
    /// Create a unit by static type and arguments, relying on producers       

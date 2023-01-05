@@ -284,6 +284,9 @@ namespace Langulus::Entity
    ///   @return a valid unit pointer, if unit was found                      
    template<SeekStyle SEEK>
    Unit* Hierarchy::SeekUnit(const Construct& what, const Any& descriptor) const {
+      if (!what.GetType())
+         return nullptr;
+
       // Scan descriptor                                                
       Unit* result {};
       descriptor.ForEachDeep([&](const Unit* unit) {
