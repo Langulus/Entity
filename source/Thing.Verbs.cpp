@@ -8,10 +8,10 @@
 #include "Thing.hpp"
 #include "Runtime.hpp"
 
-#define ENTITY_VERBOSE_SELF(a)            //Logger::Verbose() << this << ": "<< a
-#define ENTITY_VERBOSE(a)                 //Logger::Append() << a
-#define ENTITY_CREATION_VERBOSE_SELF(a)   //Logger::Verbose() << this << ": " <<a
-#define ENTITY_SELECTION_VERBOSE_SELF(a)  //Logger::Verbose() << this << ": " <<a
+#define ENTITY_VERBOSE_SELF(...)            //Logger::Verbose(this, ": ", __VA_ARGS__)
+#define ENTITY_VERBOSE(...)                 //Logger::Append(__VA_ARGS__)
+#define ENTITY_CREATION_VERBOSE_SELF(...)   //Logger::Verbose(this, ": ", __VA_ARGS__)
+#define ENTITY_SELECTION_VERBOSE_SELF(...)  //Logger::Verbose(this, ": ", __VA_ARGS__)
 
 
 namespace Langulus::Entity
@@ -45,8 +45,7 @@ namespace Langulus::Entity
 
       Verbs::InterpretTo<Flow::Scope> interpreter;
       if (!Flow::DispatchFlat(messages, interpreter)) {  
-         Logger::Error()
-            << "Messages failed to interpret to scope: " << messages;
+         Logger::Error("Messages failed to interpret to scope: ", messages);
          return {};
       }
 
@@ -66,7 +65,7 @@ namespace Langulus::Entity
       Any context {GetBlock()};
       Any output;
       if (!scope.Execute(context, output)) {
-         Logger::Error() << "Can't execute scope: " << scope;
+         Logger::Error("Can't execute scope: ", scope);
          return {};
       }
 
@@ -103,8 +102,8 @@ namespace Langulus::Entity
          const auto count = static_cast<Count>(construct.GetCharge().mMass);
          for (Offset i = 0; i < count; ++i) {
             if (count != 1) {
-               ENTITY_CREATION_VERBOSE_SELF(Logger::Yellow <<
-                  "Charged creation - creating " << i + 1 << " of " << count);
+               ENTITY_CREATION_VERBOSE_SELF(Logger::Yellow,
+                  "Charged creation - creating ", i + 1, " of ", count);
             }
 
             if (construct.Is<Thing>()) {
@@ -137,19 +136,19 @@ namespace Langulus::Entity
          group.ForEach(
             [&](const Trait& trait) {
                ENTITY_CREATION_VERBOSE_SELF(
-                  "Creating: " << Logger::Yellow << trait);
+                  "Creating: ", Logger::Yellow, trait);
                verb << AddTrait(trait);
             },
             [&](const Construct& construct) {
                if (construct.GetCharge().mMass > 0) {
                   ENTITY_CREATION_VERBOSE_SELF(
-                     "Creating: " << Logger::Yellow << construct);
+                     "Creating: ", Logger::Yellow, construct);
                   create(construct);
                }
             },
             [&](const MetaData* type) {
                ENTITY_CREATION_VERBOSE_SELF(
-                  "Creating: " << Logger::Yellow << type->mToken);
+                  "Creating: ", Logger::Yellow, type->mToken);
                create(Construct(type));
             }
          );
@@ -263,20 +262,20 @@ namespace Langulus::Entity
       if (!mismatch) {
          // We're not seeking an entity, but components/traits          
          if (!selectedTraits.IsEmpty()) {
-            ENTITY_SELECTION_VERBOSE_SELF(Logger::Green 
-               << "Trait(s) selected: " << selectedTraits);
+            ENTITY_SELECTION_VERBOSE_SELF(Logger::Green,
+               "Trait(s) selected: ", selectedTraits);
             verb << selectedTraits;
          }
 
          if (!selectedUnits.IsEmpty()) {
-            ENTITY_SELECTION_VERBOSE_SELF(Logger::Green
-               << "Unit(s) selected: " << selectedUnits);
+            ENTITY_SELECTION_VERBOSE_SELF(Logger::Green,
+               "Unit(s) selected: ", selectedUnits);
             verb << selectedUnits;
          }
 
          if (!selectedEntities.IsEmpty()) {
-            ENTITY_SELECTION_VERBOSE_SELF(Logger::Green
-               << "Entity(s) selected: " << selectedEntities);
+            ENTITY_SELECTION_VERBOSE_SELF(Logger::Green,
+               "Entity(s) selected: ", selectedEntities);
             verb << selectedEntities;
          }
       }

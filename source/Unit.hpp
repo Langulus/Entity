@@ -51,7 +51,7 @@ namespace Langulus::Entity
       virtual void Refresh() {}
 
       NOD() Runtime* GetRuntime() const noexcept;
-      NOD() const TAny<Thing*>& GetOwners() const noexcept;
+      NOD() const Hierarchy& GetOwners() const noexcept;
 
       template<CT::Trait T, SeekStyle = SeekStyle::UpToHere>
       Trait SeekTrait() const;

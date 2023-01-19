@@ -89,7 +89,7 @@ namespace Langulus::Entity
       const auto name = GetName();
       if (!name.IsEmpty()) {
          Debug result;
-         result += "#";
+         result += '#';
          result += name;
          return result;
       }
@@ -99,26 +99,26 @@ namespace Langulus::Entity
 
    /// Dump the entity's hierarchy in log                                     
    void Thing::DumpHierarchy() const {
-      const auto tab = Logger::Verbose() << "** " << *this << Logger::Tabs {};
+      const auto tab = Logger::Verbose("** ", *this, Logger::Tabs {});
 
       if (!mTraits.IsEmpty()) {
-         Logger::Verbose() << ".. contains " << mTraits.GetCount() << " traits";
+         Logger::Verbose(".. contains ", mTraits.GetCount(), " traits");
          for (auto traitpair : mTraits) {
             for (auto trait : traitpair.mValue)
-               Logger::Verbose() << ". " << trait;
+               Logger::Verbose(". ", trait);
          }
       }
 
       if (!mUnits.IsEmpty()) {
-         Logger::Verbose() << "++ contains " << mUnits.GetCount() << " units";
+         Logger::Verbose("++ contains ", mUnits.GetCount(), " units");
          for (auto unitpair : mUnits) {
             for (auto unit : unitpair.mValue)
-               Logger::Verbose() << "+ " << *unit;
+               Logger::Verbose("+ ", *unit);
          }
       }
 
       if (!mChildren.IsEmpty()) {
-         Logger::Verbose() << "** contains " << mChildren.GetCount() << " child entities";
+         Logger::Verbose("** contains ", mChildren.GetCount(), " child entities");
          for (auto child : mChildren)
             child->DumpHierarchy();
       }

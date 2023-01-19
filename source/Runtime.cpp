@@ -59,8 +59,8 @@ namespace Langulus::Entity
    ///   @param owner - the owner of the runtime                              
    Runtime::Runtime(Thing* owner) noexcept
       : mOwner {owner} {
-      Logger::Verbose() << IdentityOf(this) << ": Initializing...";
-      Logger::Verbose() << IdentityOf(this) << ": Initialized";
+      Logger::Verbose(IdentityOf(this), ": Initializing...");
+      Logger::Verbose(IdentityOf(this), ": Initialized");
    }
 
    /// Runtime destruction                                                    
@@ -84,9 +84,8 @@ namespace Langulus::Entity
          return foundModules[0];
 
       // A module instance doesn't exist yet, so instantiate it         
-      Logger::Verbose()
-         << "Module `" << name << "` is not instantiated yet"
-         << ", so attempting to create it...";
+      Logger::Verbose("Module `", name, "` is not instantiated yet"
+         ", so attempting to create it...");
 
       auto library = LoadSharedLibrary(name);
       return InstantiateModule(library, descriptor);
@@ -104,8 +103,7 @@ namespace Langulus::Entity
       const auto info = library.mInfo();
       auto module = library.mCreator(this, descriptor);
       if (!module) {
-         Logger::Error()
-            << "Module `" << info->mName << "` creator didn't provide a module";
+         Logger::Error("Module `", info->mName, "` creator didn't provide a module");
          return nullptr;
       }
 
@@ -116,8 +114,7 @@ namespace Langulus::Entity
          mModulesByType[module->GetType()] << module;
       }
       catch (...) {
-         Logger::Error()
-            << "Registering module `" << info->mName << "` failed";
+         Logger::Error("Registering module `", info->mName, "` failed");
 
          // Make sure we end up in an invariant state                   
          mModules[info->mPriority].RemoveValue(module);
@@ -137,9 +134,8 @@ namespace Langulus::Entity
       }
 
       // Done, if reached                                               
-      Logger::Verbose()
-         << "Module `" << info->mName
-         << "` registered with priority " << info->mPriority;
+      Logger::Verbose("Module `", info->mName,
+         "` registered with priority ", info->mPriority);
       return module;
    }
 
@@ -188,15 +184,15 @@ namespace Langulus::Entity
       #endif
 
       if (!dll) {
-         Logger::Error() << "Failed to load module `" << path << "` - file is missing or corrupted; Error code: ";
+         Logger::Error("Failed to load module `", path, "` - file is missing or corrupted; Error code: ");
          #if LANGULUS_OS(WINDOWS)
-            Logger::Append() << ::GetLastError();
+            Logger::Append(::GetLastError());
          #endif
          return {};
       }
 
       // Great success!                                                 
-      Logger::Info() << "Module `" << path << "` loaded";
+      Logger::Info("Module `", path, "` loaded");
 
       SharedLibrary library;
       static_assert(sizeof(library.mHandle) == sizeof(dll), "Size mismatch");
@@ -222,25 +218,22 @@ namespace Langulus::Entity
       #endif   
 
       if (!library.mEntry) {
-         Logger::Error()
-            << "Module `" << path << "` has no valid entry point - "
-            << "the function " LANGULUS_MODULE_ENTRY_TOKEN() " is missing";
+         Logger::Error("Module `", path, "` has no valid entry point - ",
+            "the function " LANGULUS_MODULE_ENTRY_TOKEN() " is missing");
          UnloadSharedLibrary(library);
          return {};
       }
 
       if (!library.mCreator) {
-         Logger::Error()
-            << "Module `" << path << "` has no valid instantiation point - "
-            << "the function " LANGULUS_MODULE_CREATE_TOKEN() " is missing";
+         Logger::Error("Module `", path, "` has no valid instantiation point - ",
+            "the function " LANGULUS_MODULE_CREATE_TOKEN() " is missing");
          UnloadSharedLibrary(library);
          return {};
       }
 
       if (!library.mInfo) {
-         Logger::Error()
-            << "Module `" << path << "` has no valid information point - "
-            << "the function " LANGULUS_MODULE_INFO_TOKEN() " is missing";
+         Logger::Error("Module `", path, "` has no valid information point - ",
+            "the function " LANGULUS_MODULE_INFO_TOKEN() " is missing");
          UnloadSharedLibrary(library);
          return {};
       }
@@ -255,13 +248,12 @@ namespace Langulus::Entity
          for (auto externalType : library.mTypes)
             mDependencies.Insert(externalType, library);
 
-         Logger::Info()
-            << "Module `" << library.mInfo()->mName 
-            << "` exposed the following types: " << library.mTypes;
+         Logger::Info("Module `", library.mInfo()->mName, 
+            "` exposed the following types: ", library.mTypes);
       }
       catch (...) {
          // Make sure we end up in an invariant state                   
-         Logger::Error() << "Could not enter `" << path << "` due to an exception";
+         Logger::Error("Could not enter `", path, "` due to an exception");
          mLibraries.RemoveKey(path);
          for (auto externalType : library.mTypes)
             mDependencies.RemoveKey(externalType);

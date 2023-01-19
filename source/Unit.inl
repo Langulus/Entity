@@ -13,7 +13,8 @@ namespace Langulus::Entity
 
    /// Get the list of unit owners                                            
    ///   return the owners                                                    
-   inline const TAny<Thing*>& Unit::GetOwners() const noexcept {
+   LANGULUS(ALWAYSINLINE)
+   const Hierarchy& Unit::GetOwners() const noexcept {
       return mOwners;
    }
 
@@ -21,6 +22,7 @@ namespace Langulus::Entity
    ///   @param value - [out] value to set if trait was found                 
    ///   @return true if anything was written to value                        
    template<SeekStyle SEEK, CT::Trait T, CT::Data D>
+   LANGULUS(ALWAYSINLINE)
    bool Unit::SeekValue(D& value) const {
       return SeekValue<SEEK, D>(MetaTrait::Of<T>(), value);
    }

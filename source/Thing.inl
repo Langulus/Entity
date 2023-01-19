@@ -604,7 +604,8 @@ namespace Langulus::Entity
             result.Emplace();
             return Abandon(result);
          }
-         else LANGULUS_THROW(Construct, "Requested data is not default- nor descriptor-constructible");
+         else LANGULUS_THROW(Construct, 
+            "Requested data is not default- nor descriptor-constructible");
       }
 
       return {};
@@ -623,7 +624,7 @@ namespace Langulus::Entity
    template<SeekStyle SEEK>
    bool Unit::DoInHierarchy(Verb& verb) {
       if (mOwners.IsEmpty()) {
-         Logger::Warning() << "No owners available for executing " << verb;
+         Logger::Warning("No owners available for executing ", verb);
          return false;
       }
 
@@ -644,8 +645,8 @@ namespace Langulus::Entity
       for (auto context : mOwners) {
          const bool found = context->SeekTrait<SEEK>(data, output);
          if (found && satisfied) {
-            Logger::Warning() << "Multiple " << data << " traits found in hierarchy";
-            Logger::Warning() << "Each sequential trait will overwrite the result";
+            Logger::Warning("Multiple ", data, " traits found in hierarchy");
+            Logger::Warning("Each sequential trait will overwrite the result");
          }
 
          satisfied |= found;
@@ -664,8 +665,8 @@ namespace Langulus::Entity
       for (auto context : mOwners) {
          bool found = context->SeekValue<SEEK>(trait, value);
          if (found && satisfied) {
-            Logger::Warning() << "Multiple " << trait << " traits found in hierarchy";
-            Logger::Warning() << "Each sequential trait will overwrite the result";
+            Logger::Warning("Multiple ", trait, " traits found in hierarchy");
+            Logger::Warning("Each sequential trait will overwrite the result");
          }
 
          satisfied |= found;
