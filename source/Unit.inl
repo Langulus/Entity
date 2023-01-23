@@ -23,8 +23,8 @@ namespace Langulus::Entity
    ///   @return true if anything was written to value                        
    template<SeekStyle SEEK, CT::Trait T, CT::Data D>
    LANGULUS(ALWAYSINLINE)
-   bool Unit::SeekValue(D& value) const {
-      return SeekValue<SEEK, D>(MetaTrait::Of<T>(), value);
+   bool Unit::SeekValue(D& value, Offset offset) const {
+      return SeekValue<SEEK, D>(MetaTrait::Of<T>(), value, offset);
    }
 
 } // namespace Langulus::Entity

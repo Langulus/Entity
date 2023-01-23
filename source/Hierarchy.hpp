@@ -11,10 +11,10 @@
 namespace Langulus::Entity
 {
 
-   class Unit;
+   struct Unit;
    class Thing;
    class Runtime;
-   class Hierarchy;
+   struct Hierarchy;
 
 
    ///                                                                        
@@ -24,11 +24,12 @@ namespace Langulus::Entity
    /// Usually, unpinned values may change on Unit::Refresh()                 
    ///                                                                        
    template<class T>
-   class Pinnable : public T {
-      friend class Hierarchy;
+   struct Pinnable : T {
+      friend struct Hierarchy;
+
+      // Is the pinnable value pinned?                                  
       bool mLocked = false;
 
-   public:
       LANGULUS(POD) CT::POD<T>;
       LANGULUS(NULLIFIABLE) CT::Nullifiable<T>;
       LANGULUS_BASES(T);
@@ -36,6 +37,7 @@ namespace Langulus::Entity
          LANGULUS_PROPERTY_TRAIT(mLocked, State),
       LANGULUS_PROPERTIES_END();
 
+   public:
       static constexpr bool CTTI_Pinnable = true;
 
       using MemberType = T;
@@ -64,8 +66,7 @@ namespace Langulus::Entity
    /// Simply a sparse container of Things, with various quality-of-life      
    /// functions related to hierarchical retrieval of objects, traits, etc.   
    ///                                                                        
-   class Hierarchy : public TAny<Thing*> {
-   public:
+   struct Hierarchy : TAny<Thing*> {
       using TAny::TAny;
       using TAny::operator =;
 

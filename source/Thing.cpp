@@ -320,33 +320,33 @@ namespace Langulus::Entity
    /// Get the current runtime                                                
    ///   @return the pointer to the runtime                                   
    Runtime* Thing::GetRuntime() const noexcept {
-      return mRuntime.Get();
+      return mRuntime;
    }
 
    /// Get the current temporal flow                                          
    ///   @return the pointer to the flow                                      
    Temporal* Thing::GetFlow() const noexcept {
-      return mFlow.Get();
+      return mFlow;
    }
 
    /// Create a local runtime for this thing                                  
    ///   @return the new runtime instance, or the old one if already created  
    Runtime* Thing::CreateRuntime() {
       if (mRuntime.IsPinned())
-         return mRuntime.Get();
+         return mRuntime;
       mRuntime.New(this);
       mRuntime.Pin();
-      return mRuntime.Get();
+      return mRuntime;
    }
 
    /// Create a local flow for this thing                                     
    ///   @return the new flow instance, or the old one, if already created    
    Temporal* Thing::CreateFlow() {
       if (mFlow.IsPinned())
-         return mFlow.Get();
+         return mFlow;
       mFlow.New(this);
       mFlow.Pin();
-      return mFlow.Get();
+      return mFlow;
    }
 
    /// Create a child thing                                                   
@@ -355,7 +355,7 @@ namespace Langulus::Entity
    Thing* Thing::CreateChild(const Any& descriptor) {
       Ptr<Thing> newThing;
       newThing.New(this, descriptor);
-      return newThing.Get();
+      return newThing;
    }
 
    /// Uses the current runtime to load a shared library module, and          

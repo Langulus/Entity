@@ -16,6 +16,8 @@ namespace Langulus::Entity
 {
 
    using Flow::Code;
+   using UnitMap = TUnorderedMap<DMeta, TAny<Unit*>>;
+   using TraitMap = TUnorderedMap<TMeta, TAny<Trait>>;
 
    /// A text specialization, dedicated for natural language text             
    /// It is a placeholder type, that can be extended by external modules     
@@ -47,16 +49,13 @@ namespace Langulus::Entity
       // Hierarchy                                                      
       Hierarchy mChildren;
       // Units                                                          
-      TUnorderedMap<DMeta, TAny<Unit*>> mUnits;
+      UnitMap mUnits;
       // Traits                                                         
-      TUnorderedMap<TMeta, TAny<Trait>> mTraits;
-
+      TraitMap mTraits;
       // Runtime                                                        
       Pinnable<Ptr<Runtime>> mRuntime;
-
       // Temporal flow                                                  
       Pinnable<Ptr<Temporal>> mFlow;
-
       // Hierarchy requires an update                                   
       bool mRefreshRequired {};
 
@@ -106,6 +105,7 @@ namespace Langulus::Entity
       Count       RemoveChild(Thing*);
       Module*     LoadMod(const Token&, const Any& = {});
 
+      NOD() const Hierarchy& GetChildren() const noexcept;
       NOD()       Thing* GetChild(const Index& = IndexFirst);
       NOD() const Thing* GetChild(const Index& = IndexFirst) const;
       NOD()       Thing* GetNamedChild(const Token&, const Index& = IndexFirst);
@@ -150,6 +150,7 @@ namespace Langulus::Entity
       template<CT::Unit T, SeekStyle = SeekStyle::UpToHere>
       NOD() Decay<T>* SeekUnit(const Index& = IndexFirst);
 
+      NOD() const UnitMap& GetUnits() const noexcept;
       NOD() const Unit* GetUnit(DMeta, const Index& = IndexFirst) const;
       NOD() Unit* GetUnit(DMeta, const Index& = IndexFirst);
       template<CT::Unit T>
@@ -176,29 +177,30 @@ namespace Langulus::Entity
       NOD() Count HasTraits(const Trait&) const;
 
       template<SeekStyle = SeekStyle::UpToHere>
-      Trait SeekTrait(TMeta, const Index& = IndexFirst) const;
+      NOD() Trait SeekTrait(TMeta, const Index& = IndexFirst) const;
       template<SeekStyle = SeekStyle::UpToHere>
-      Trait SeekTrait(TMeta, const Index& = IndexFirst);
+      NOD() Trait SeekTrait(TMeta, const Index& = IndexFirst);
       template<CT::Trait T = Trait, SeekStyle = SeekStyle::UpToHere>
-      Trait SeekTrait(const Index& = IndexFirst) const;
+      NOD() Trait SeekTrait(const Index& = IndexFirst) const;
       template<CT::Trait T = Trait, SeekStyle = SeekStyle::UpToHere>
-      Trait SeekTrait(const Index& = IndexFirst);
+      NOD() Trait SeekTrait(const Index& = IndexFirst);
 
-      Trait GetTrait(TMeta, const Index& = IndexFirst) const;
-      Trait GetTrait(TMeta, const Index& = IndexFirst);
+      NOD() const TraitMap& GetTraits() const noexcept;
+      NOD() Trait GetTrait(TMeta, const Index& = IndexFirst) const;
+      NOD() Trait GetTrait(TMeta, const Index& = IndexFirst);
       template<CT::Trait T = Trait>
-      Trait GetTrait(const Index& = IndexFirst);
+      NOD() Trait GetTrait(const Index& = IndexFirst);
 
-      Trait GetTrait(const Trait&, const Index& = IndexFirst) const;
-      Trait GetTrait(const Trait&, const Index& = IndexFirst);
+      NOD() Trait GetTrait(const Trait&, const Index& = IndexFirst) const;
+      NOD() Trait GetTrait(const Trait&, const Index& = IndexFirst);
 
-      const Trait* GetLocalTrait(TMeta, const Index& = IndexFirst) const;
-      Trait* GetLocalTrait(TMeta, const Index& = IndexFirst);
+      NOD() const Trait* GetLocalTrait(TMeta, const Index& = IndexFirst) const;
+      NOD() Trait* GetLocalTrait(TMeta, const Index& = IndexFirst);
 
       template<CT::Trait>
-      Trait* GetLocalTrait(const Index& = IndexFirst);
+      NOD() Trait* GetLocalTrait(const Index& = IndexFirst);
       template<CT::Trait>
-      const Trait* GetLocalTrait(const Index& = IndexFirst) const;
+      NOD() const Trait* GetLocalTrait(const Index& = IndexFirst) const;
 
       template<SeekStyle = SeekStyle::UpToHere, CT::Data T>
       bool SeekValue(TMeta, T&) const;

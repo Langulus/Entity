@@ -19,12 +19,11 @@ namespace Langulus::Entity
    /// inside external, dynamically loaded modules. There are units for       
    /// graphics, input, AI, content, and whatever extensions you make.        
    ///                                                                        
-   class Unit : public Resolvable {
+   struct Unit : Resolvable {
       LANGULUS(UNINSERTABLE) false;
       LANGULUS_BASES(Resolvable);
 
-   protected:
-   TESTING(public:)
+   protected: TESTING(public:)
       friend class Thing;
 
       // Things that are coupled with this unit                         
@@ -54,12 +53,12 @@ namespace Langulus::Entity
       NOD() const Hierarchy& GetOwners() const noexcept;
 
       template<CT::Trait T, SeekStyle = SeekStyle::UpToHere>
-      Trait SeekTrait() const;
+      Trait SeekTrait(Offset = 0) const;
 
       template<SeekStyle = SeekStyle::UpToHere, CT::Data T>
-      bool SeekValue(TMeta, T&) const;
+      bool SeekValue(TMeta, T&, Offset = 0) const;
       template<SeekStyle = SeekStyle::UpToHere, CT::Trait T, CT::Data D>
-      bool SeekValue(D&) const;
+      bool SeekValue(D&, Offset = 0) const;
 
       template<SeekStyle SEEK = SeekStyle::UpToHere>
       bool DoInHierarchy(Verb&);
