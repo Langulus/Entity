@@ -7,13 +7,12 @@
 ///                                                                           
 #pragma once
 #include "Module.hpp"
+#include "External.hpp"
 
 namespace Langulus::Entity
 {
 
    class Thing;
-   class AFile;
-   class AFolder;
    using ModuleList = TAny<Module*>;
 
 
@@ -104,6 +103,8 @@ namespace Langulus::Entity
          NOD() SharedLibrary GetDependency(const Token&) const noexcept;
          NOD() const ModuleList& GetModules(const Token&) const noexcept;
       #endif
+
+      NOD() A::File* GetFile(const Path&);
 
       void Update(Time);
    };
