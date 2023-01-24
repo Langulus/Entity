@@ -52,15 +52,15 @@ namespace Langulus::Entity
       NOD() Runtime* GetRuntime() const noexcept;
       NOD() const Hierarchy& GetOwners() const noexcept;
 
-      template<CT::Trait T, SeekStyle = SeekStyle::UpToHere>
+      template<CT::Trait T, SeekStyle = SeekStyle::HereAndAbove>
       Trait SeekTrait(Offset = 0) const;
 
-      template<SeekStyle = SeekStyle::UpToHere, CT::Data T>
+      template<SeekStyle = SeekStyle::HereAndAbove, CT::Data T>
       bool SeekValue(TMeta, T&, Offset = 0) const;
-      template<SeekStyle = SeekStyle::UpToHere, CT::Trait T, CT::Data D>
+      template<SeekStyle = SeekStyle::HereAndAbove, CT::Trait T, CT::Data D>
       bool SeekValue(D&, Offset = 0) const;
 
-      template<SeekStyle SEEK = SeekStyle::UpToHere>
+      template<SeekStyle SEEK = SeekStyle::HereAndAbove>
       bool DoInHierarchy(Verb&);
 
    protected:

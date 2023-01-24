@@ -70,30 +70,30 @@ namespace Langulus::Entity
       using TAny::TAny;
       using TAny::operator =;
 
-      template<CT::Trait, SeekStyle = SeekStyle::UpToHere, CT::Data D>
+      template<CT::Trait, SeekStyle = SeekStyle::HereAndAbove, CT::Data D>
       bool SeekTrait(const Any&, D&) const;
-      template<CT::Trait, SeekStyle = SeekStyle::UpToHere, CT::Data D>
+      template<CT::Trait, SeekStyle = SeekStyle::HereAndAbove, CT::Data D>
       bool SeekTrait(D&) const;
 
-      template<SeekStyle = SeekStyle::UpToHere, CT::Data D>
+      template<SeekStyle = SeekStyle::HereAndAbove, CT::Data D>
       bool SeekValue(const Any&, D&) const;
-      template<SeekStyle = SeekStyle::UpToHere, CT::Data D>
+      template<SeekStyle = SeekStyle::HereAndAbove, CT::Data D>
       bool SeekValue(D&) const;
 
-      template<CT::Data T, SeekStyle = SeekStyle::UpToHere>
+      template<CT::Data T, SeekStyle = SeekStyle::HereAndAbove>
       Unit* SeekUnit(const Any&) const;
-      template<CT::Data, SeekStyle = SeekStyle::UpToHere>
+      template<CT::Data, SeekStyle = SeekStyle::HereAndAbove>
       Unit* SeekUnit() const;
 
-      template<SeekStyle = SeekStyle::UpToHere>
+      template<SeekStyle = SeekStyle::HereAndAbove>
       Unit* SeekUnit(const Construct&, const Any&) const;
-      template<SeekStyle = SeekStyle::UpToHere>
+      template<SeekStyle = SeekStyle::HereAndAbove>
       Unit* SeekUnit(const Construct&) const;
 
       #if LANGULUS_FEATURE(MANAGED_MEMORY)
-         template<SeekStyle = SeekStyle::UpToHere>
+         template<SeekStyle = SeekStyle::HereAndAbove>
          Unit* SeekUnit(const Token&, const Any&) const;
-         template<SeekStyle = SeekStyle::UpToHere>
+         template<SeekStyle = SeekStyle::HereAndAbove>
          Unit* SeekUnit(const Token&) const;
       #endif
    };
