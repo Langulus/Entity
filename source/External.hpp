@@ -12,6 +12,65 @@ namespace Langulus::A
 {
 
    ///                                                                        
+   ///   Abstract platform module                                             
+   ///                                                                        
+   struct PlatformModule : Entity::Module {
+      LANGULUS_BASES(Entity::Module);
+      using Entity::Module::Module;
+   };
+
+   ///                                                                        
+   ///   Abstract platform unit                                               
+   ///                                                                        
+   struct Platform : Entity::Unit {
+      LANGULUS_BASES(Entity::Unit);
+      using Entity::Unit::Unit;
+   };
+   
+   ///                                                                        
+   ///   Abstract platform window unit                                        
+   ///                                                                        
+   struct Window : Platform {
+      LANGULUS(PRODUCER) PlatformModule;
+      LANGULUS_BASES(Platform);
+      using Platform::Platform;
+   };
+
+   ///                                                                        
+   ///   Abstract physical module                                             
+   ///                                                                        
+   struct PhysicalModule : Entity::Module {
+      LANGULUS_BASES(Entity::Module);
+      using Entity::Module::Module;
+   };
+
+   ///                                                                        
+   ///   Abstract physical unit                                               
+   ///                                                                        
+   struct Physical : Entity::Unit {
+      LANGULUS_BASES(Entity::Unit);
+      using Entity::Unit::Unit;
+   };
+
+   ///                                                                        
+   ///   Abstract physical world unit                                         
+   ///                                                                        
+   struct World : Physical {
+      LANGULUS(PRODUCER) PhysicalModule;
+      LANGULUS_BASES(Physical);
+      using Physical::Physical;
+   };
+   
+   ///                                                                        
+   ///   Abstract physical instance unit                                      
+   ///                                                                        
+   struct Instance : Physical {
+      LANGULUS(PRODUCER) World;
+      LANGULUS_BASES(Physical);
+      using Physical::Physical;
+   };
+   
+   ///                                                                        
    ///   Abstract file system module                                          
    ///                                                                        
    struct FileSystem : Entity::Module {
@@ -177,6 +236,10 @@ namespace Langulus::CT
    /// A concept for any kind of a graphics unit                              
    template<class T>
    concept Graphics = DerivedFrom<T, A::Graphics>;
+
+   /// A concept for any kind of a physical unit                              
+   template<class T>
+   concept Physical = DerivedFrom<T, A::Physical>;
 
    /// A concept for any kind of content unit                                 
    template<class T>

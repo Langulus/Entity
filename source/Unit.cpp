@@ -60,16 +60,6 @@ namespace Langulus::Entity
          owner->Select(verb);
    }
 
-   /// Get the runtime                                                        
-   ///   @attention assumes units are correctly coupled and coupling to       
-   ///              different runtimes is never allowed                       
-   ///   @return a pointer to the runtime, if available                       
-   Runtime* Unit::GetRuntime() const noexcept {
-      if (mOwners.IsEmpty())
-         return nullptr;
-      return mOwners[0]->GetRuntime();
-   }
-
    /// Move operator                                                          
    ///   @param other - unit to move                                          
    Unit& Unit::operator = (Unit&& other) noexcept {
@@ -82,37 +72,4 @@ namespace Langulus::Entity
       return *this;
    }
    
-   /// Couple the component with an entity (always two-sided)                 
-   /// This will call refresh to all units in that entity on next tick        
-   ///   @param entity - the entity to couple with                            
-   void Unit::Couple(const Thing* entity) {
-      if (!entity)
-         return;
-      mOwners <<= const_cast<Thing*>(entity);
-      const_cast<Thing*>(entity)->AddUnit<false>(this);
-   }
-
-   /// Decouple the component from an entity (always two-sided)               
-   /// This will call refresh to all units in that entity on next frame       
-   ///   @param entity - the entity to decouple with                          
-   void Unit::Decouple(const Thing* entity) {
-      if (!entity)
-         return;
-      mOwners.RemoveValue(entity);
-      const_cast<Thing*>(entity)->RemoveUnit<false>(this);
-   }
-
-   /// Replace one owner instance with another (used when moving things)      
-   ///   @attention assumes both pointers are different, and not nullptr      
-   ///   @param replaceThis - owner to replace                                
-   ///   @param withThis - entity to replace it with                          
-   void Unit::ReplaceOwner(const Thing* replaceThis, const Thing* withThis) {
-      LANGULUS_ASSUME(DevAssumes, replaceThis != withThis, "Pointers are the same");
-      LANGULUS_ASSUME(DevAssumes, replaceThis && withThis, "Nullptr not allowed");
-
-      const auto found = mOwners.Find(replaceThis);
-      if (found)
-         mOwners[found] = const_cast<Thing*>(withThis);
-   }
-
 } // namespace Langulus::Entity

@@ -118,6 +118,7 @@ namespace Langulus::Entity
          }
          return true;
       });
+
       if (!output.IsEmpty())
          return Abandon(output);
 
@@ -193,7 +194,7 @@ namespace Langulus::Entity
    }
 
    /// A fast check whether traits of the given type and value are inside     
-   ///   @param id - trait to check                                           
+   ///   @param prototype - trait to search for                               
    ///   @return the number of matching traits                                
    Count Thing::HasTraits(const Trait& prototype) const {
       const auto found = mTraits.FindKeyIndex(prototype.GetTrait());
@@ -224,7 +225,7 @@ namespace Langulus::Entity
    ///   @return the name, or empty string if no such trait was found here    
    Text Thing::GetName() const {
       Text name;
-      if (!SeekValue<Traits::Name, SeekStyle::Here>(name))
+      if (!SeekTrait<Traits::Name, SeekStyle::Here>(name))
          return {};
       return name;
    }
