@@ -6,7 +6,7 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include "Unit.hpp"
+#include "Hierarchy.hpp"
 
 namespace Langulus::Entity
 {
@@ -18,7 +18,7 @@ namespace Langulus::Entity
    ///   @return the gathered units that match the type                       
    template<SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   TAny<Unit*> Unit::GatherUnits(const Token& token) {
+   TAny<Unit*> Hierarchy::GatherUnits(const Token& token) {
       return mOwners.template GatherUnits<SEEK>(token);
    }
 
@@ -28,7 +28,7 @@ namespace Langulus::Entity
    ///   @return the gathered units that match the type                       
    template<SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   TAny<const Unit*> Unit::GatherUnits(const Token& token) const {
+   TAny<const Unit*> Hierarchy::GatherUnits(const Token& token) const {
       return mOwners.template GatherUnits<SEEK>(token);
    }
 #endif 
@@ -39,7 +39,7 @@ namespace Langulus::Entity
    ///   @return the gathered units that match the type                       
    template<SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   TAny<Unit*> Unit::GatherUnits(DMeta meta) {
+   TAny<Unit*> Hierarchy::GatherUnits(DMeta meta) {
       return mOwners.template GatherUnits<SEEK>(meta);
    }
 
@@ -49,7 +49,7 @@ namespace Langulus::Entity
    ///   @return the gathered units that match the type                       
    template<SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   TAny<const Unit*> Unit::GatherUnits(DMeta meta) const {
+   TAny<const Unit*> Hierarchy::GatherUnits(DMeta meta) const {
       return mOwners.template GatherUnits<SEEK>(meta);
    }
 
@@ -60,7 +60,7 @@ namespace Langulus::Entity
    ///   @return a container filled with the matches                          
    template<CT::Data T, SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   TAny<Decay<T>*> Unit::GatherUnits() {
+   TAny<Decay<T>*> Hierarchy::GatherUnits() {
       return mOwners.template GatherUnits<T, SEEK>();
    }
    
@@ -71,7 +71,7 @@ namespace Langulus::Entity
    ///   @return a container filled with the matches                          
    template<CT::Data T, SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   TAny<const Decay<T>*> Unit::GatherUnits() const {
+   TAny<const Decay<T>*> Hierarchy::GatherUnits() const {
       return mOwners.template GatherUnits<T, SEEK>();
    }
    
@@ -82,7 +82,7 @@ namespace Langulus::Entity
    ///   @return the gathered traits that match the type                      
    template<SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   TAny<Trait> Unit::GatherTraits(const Token& token) {
+   TAny<Trait> Hierarchy::GatherTraits(const Token& token) {
       return mOwners.template GatherTraits<SEEK>(token);
    }
 
@@ -92,7 +92,7 @@ namespace Langulus::Entity
    ///   @return the gathered traits that match the type                      
    template<SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   TAny<Trait> Unit::GatherTraits(const Token& token) const {
+   TAny<Trait> Hierarchy::GatherTraits(const Token& token) const {
       return mOwners.template GatherTraits<SEEK>(token);
    }
 #endif 
@@ -103,7 +103,7 @@ namespace Langulus::Entity
    ///   @return the gathered traits that match the type                      
    template<SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   TAny<Trait> Unit::GatherTraits(TMeta trait) {
+   TAny<Trait> Hierarchy::GatherTraits(TMeta trait) {
       return mOwners.template GatherTraits<SEEK>(trait);
    }
 
@@ -113,19 +113,19 @@ namespace Langulus::Entity
    ///   @return the gathered traits that match the type                      
    template<SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   TAny<Trait> Unit::GatherTraits(TMeta trait) const {
+   TAny<Trait> Hierarchy::GatherTraits(TMeta trait) const {
       return mOwners.template GatherTraits<SEEK>(trait);
    }
 
    template<CT::Trait T, SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   TAny<Trait> Unit::GatherTraits() {
+   TAny<Trait> Hierarchy::GatherTraits() {
       return mOwners.template GatherTraits<T, SEEK>();
    }
 
    template<CT::Trait T, SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   TAny<Trait> Unit::GatherTraits() const {
+   TAny<Trait> Hierarchy::GatherTraits() const {
       return mOwners.template GatherTraits<T, SEEK>();
    }
 
@@ -135,7 +135,7 @@ namespace Langulus::Entity
    ///   @return the gathered values                                          
    template<SeekStyle SEEK, CT::Data D>
    LANGULUS(ALWAYSINLINE)
-   TAny<D> Unit::GatherValues() const {
+   TAny<D> Hierarchy::GatherValues() const {
       return mOwners.template GatherValues<SEEK, D>();
    }
 

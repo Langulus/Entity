@@ -21,6 +21,28 @@
 namespace Langulus::Entity
 {
    
+#if LANGULUS_FEATURE(MANAGED_MEMORY)
+   /// Collects all units of the given type (by token) inside the hierarchy   
+   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
+   ///   @param token - the unit to seek for                                  
+   ///   @return the gathered units that match the type                       
+   template<SeekStyle SEEK>
+   LANGULUS(ALWAYSINLINE)
+   TAny<Unit*> Thing::GatherUnits(const Token& token) {
+      return GatherUnits<SEEK>(RTTI::Database.GetMetaData(token));
+   }
+
+   /// Collects all units of the given type (by token) inside the hierarchy   
+   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
+   ///   @param token - the unit to seek for                                  
+   ///   @return the gathered units that match the type                       
+   template<SeekStyle SEEK>
+   LANGULUS(ALWAYSINLINE)
+   TAny<const Unit*> Thing::GatherUnits(const Token& token) const {
+      return GatherUnits<SEEK>(RTTI::Database.GetMetaData(token));
+   }
+#endif 
+
    /// Collects all units of the given type inside the hierarchy              
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param meta - the units to seek for                                  
@@ -41,8 +63,8 @@ namespace Langulus::Entity
       if constexpr (SEEK & SeekStyle::Above) {
          // Seek in parents up to root, if requested                    
          if (mOwner) {
-            auto inParents =
-               mOwner->GatherUnits<SeekStyle::HereAndAbove>(meta);
+            auto inParents = mOwner->template
+               GatherUnits<SeekStyle::HereAndAbove>(meta);
             result += Abandon(inParents);
          }
       }
@@ -50,8 +72,8 @@ namespace Langulus::Entity
       if constexpr (SEEK & SeekStyle::Below) {
          // Seek children, if requested                                 
          for (auto child : mChildren) {
-            auto inChildren =
-               child->GatherUnits<SeekStyle::HereAndBelow>(meta);
+            auto inChildren = child->template 
+               GatherUnits<SeekStyle::HereAndBelow>(meta);
             result += Abandon(inChildren);
          }
       }
@@ -74,9 +96,10 @@ namespace Langulus::Entity
    ///   @tparam T - the type of unit we're searching for, use Unit for all   
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @return a container filled with the matches                          
-   template<CT::Unit T, SeekStyle SEEK>
+   template<CT::Data T, SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
    TAny<Decay<T>*> Thing::GatherUnits() {
+      static_assert(CT::Unit<T>, "T must be a unit type");
       return GatherUnits<SEEK>(MetaData::Of<Decay<T>>());
    }
    
@@ -85,10 +108,183 @@ namespace Langulus::Entity
    ///   @tparam T - the type of unit we're searching for, use Unit for all   
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @return a container filled with the matches                          
-   template<CT::Unit T, SeekStyle SEEK>
+   template<CT::Data T, SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
    TAny<const Decay<T>*> Thing::GatherUnits() const {
+      static_assert(CT::Unit<T>, "T must be a unit type");
       return GatherUnits<SEEK>(MetaData::Of<Decay<T>>());
+   }
+   
+#if LANGULUS_FEATURE(MANAGED_MEMORY)
+   /// Collects all traits of the given type (by token) inside the hierarchy  
+   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
+   ///   @param token - the trait to seek for                                 
+   ///   @return the gathered traits that match the type                      
+   template<SeekStyle SEEK>
+   LANGULUS(ALWAYSINLINE)
+   TAny<Trait> Thing::GatherTraits(const Token& token) {
+      return GatherTraits<SEEK>(RTTI::Database.GetMetaTrait(token));
+   }
+
+   /// Collects all traits of the given type (by token) inside the hierarchy  
+   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
+   ///   @param token - the trait to seek for                                 
+   ///   @return the gathered traits that match the type                      
+   template<SeekStyle SEEK>
+   LANGULUS(ALWAYSINLINE)
+   TAny<Trait> Thing::GatherTraits(const Token& token) const {
+      return GatherTraits<SEEK>(RTTI::Database.GetMetaTrait(token));
+   }
+#endif 
+
+   /// Collects all traits of the given type inside the hierarchy             
+   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
+   ///   @param trait - the trait to seek for                                 
+   ///   @return the gathered traits that match the type                      
+   template<SeekStyle SEEK>
+   TAny<Trait> Thing::GatherTraits(TMeta trait) {
+      TAny<Trait> results;
+
+      if constexpr (SEEK & SeekStyle::Here) {
+         // Handle some predefined traits here                          
+         if (trait->template Is<Traits::Unit>()) {
+            for (auto unit : mUnits)
+               results << Traits::Unit {unit.mValue};
+         }
+         else if (trait->template Is<Traits::Child>()) {
+            for (auto child : mChildren)
+               results << Traits::Unit {child};
+         }
+         else if (trait->template Is<Traits::Runtime>()) {
+            // Get the nearest runtime                                  
+            results << Traits::Runtime {mRuntime.Get()};
+         }
+         else if (trait->template Is<Traits::Parent>()) {
+            // Get the parent                                           
+            results << Traits::Parent {mOwner.Get()};
+         }
+
+         // Check dynamic traits in the entity                          
+         const auto found = mTraits.FindKeyIndex(trait);
+         if (found)
+            results += mTraits.GetValue(found);
+
+         // Then check each unit's static traits                        
+         mUnits.ForEachValue([&](Unit* unit) {
+            Offset index {};
+            auto t = unit->GetMember(trait, index);
+            while (!t.IsEmpty()) {
+               results <<= Trait::From(trait, t);
+               t = unit->GetMember(trait, ++index);
+            }
+         });
+
+         // Then check the Thing's members                              
+         //TODO isn't this redundant and slower than the code in the beginning of this function?
+         Offset index {};
+         auto t = GetMember(trait, index);
+         while (!t.IsEmpty()) {
+            results <<= Trait::From(trait, t);
+            t = GetMember(trait, ++index);
+         }
+      }
+
+      if constexpr (SEEK & SeekStyle::Above) {
+         // Seek in parents up to root, if requested                    
+         if (mOwner) {
+            results += mOwner->template
+               GatherTraits<SeekStyle::HereAndAbove>(trait);
+         }
+      }
+
+      if constexpr (SEEK & SeekStyle::Below) {
+         // Seek children, if requested                                 
+         for (auto child : mChildren) {
+            results += mOwner->template
+               GatherTraits<SeekStyle::HereAndBelow>(trait);
+         }
+      }
+
+      return Abandon(results);
+   }
+
+   /// Collects all traits of the given type inside the hierarchy             
+   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
+   ///   @param trait - the trait to seek for                                 
+   ///   @return the gathered traits that match the type                      
+   template<SeekStyle SEEK>
+   LANGULUS(ALWAYSINLINE)
+   TAny<Trait> Thing::GatherTraits(TMeta trait) const {
+      return const_cast<Thing*>(this)->template GatherTraits<SEEK>(trait);
+   }
+
+   template<CT::Trait T, SeekStyle SEEK>
+   TAny<Trait> Thing::GatherTraits() {
+      return GatherTraits<SEEK>(MetaTrait::Of<T>());
+   }
+
+   template<CT::Trait T, SeekStyle SEEK>
+   TAny<Trait> Thing::GatherTraits() const {
+      return GatherTraits<SEEK>(MetaTrait::Of<T>());
+   }
+
+   /// Gather all values convertible to a type                                
+   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
+   ///   @tparam D - type to convert to                                       
+   ///   @return the gathered values                                          
+   template<SeekStyle SEEK, CT::Data D>
+   TAny<D> Thing::GatherValues() const {
+      TAny<D> results;
+
+      if constexpr (SEEK & SeekStyle::Here) {
+         // Check dynamic traits in the entity                          
+         for (auto traitGroup : mTraits) {
+            for (auto trait : traitGroup.mValue) {
+               try { results << trait.template AsCast<D>(); }
+               catch (...) {}
+            }
+         }
+
+         // Then check each unit's static traits                        
+         mUnits.ForEachValue([&](Unit* unit) {
+            Offset index {};
+            auto t = unit->GetMember(nullptr, index);
+            while (!t.IsEmpty()) {
+               try { results <<= t.template AsCast<D>(); }
+               catch (...) {}
+
+               t = unit->GetMember(nullptr, ++index);
+            }
+         });
+
+         // Then check the Thing's members                              
+         Offset index {};
+         auto t = GetMember(nullptr, index);
+         while (!t.IsEmpty()) {
+            try { results <<= t.template AsCast<D>(); }
+            catch (...) {}
+
+            t = GetMember(nullptr, ++index);
+         }
+      }
+
+      if constexpr (SEEK & SeekStyle::Above) {
+         // Seek in parents up to root, if requested                    
+         if (mOwner) {
+            results += mOwner->template
+               GatherValues<SeekStyle::HereAndAbove, D>();
+         }
+      }
+
+      if constexpr (SEEK & SeekStyle::Below) {
+         // Seek children, if requested                                 
+         for (auto child : mChildren) {
+            results += mOwner->template
+               GatherValues<SeekStyle::HereAndBelow, D>();
+         }
+      }
+
+      return Abandon(results);
    }
 
 } // namespace Langulus::Entity

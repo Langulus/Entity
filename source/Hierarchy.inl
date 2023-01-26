@@ -64,7 +64,7 @@ namespace Langulus::Entity
    ///   @param descriptor - descriptor to search through                     
    ///   @param value - the value to fill in                                  
    ///   @return true if value changed                                        
-   template<CT::Trait T, SeekStyle SEEK, CT::Data D>
+   /*template<CT::Trait T, SeekStyle SEEK, CT::Data D>
    bool Hierarchy::SeekTrait(const Any& descriptor, D& value) const {
       if constexpr (CT::Pinnable<D>) {
          // Never touch pinned values                                   
@@ -361,6 +361,6 @@ namespace Langulus::Entity
 
       // If reached, nothing was found                                  
       return nullptr;
-   }
+   }*/
 
 } // namespace namespace Langulus::Entity

@@ -79,25 +79,25 @@ namespace Langulus::Entity
    Trait Thing::GetTrait(const Trait& id, const Index& index) {
       if (id.GetTrait()) {
          // Handle some predefined traits here                          
-         if (id.TraitIs<Traits::Unit>()) {
+         if (id.template TraitIs<Traits::Unit>()) {
             // Get a component                                          
             auto unit = GetUnit(nullptr, index);
             if (unit)
                return Traits::Unit {unit};
             return {};
          }
-         else if (id.TraitIs<Traits::Child>()) {
+         else if (id.template TraitIs<Traits::Child>()) {
             // Get a child entity                                       
             auto child = GetChild(index);
             if (child)
                return Traits::Child {child};
             return {};
          }
-         else if (id.TraitIs<Traits::Runtime>()) {
+         else if (id.template TraitIs<Traits::Runtime>()) {
             // Get the nearest runtime                                  
-            return Traits::Runtime {mRuntime};
+            return Traits::Runtime {mRuntime.Get()};
          }
-         else if (id.TraitIs<Traits::Parent>()) {
+         else if (id.template TraitIs<Traits::Parent>()) {
             // Get the parent                                           
             return Traits::Parent {mOwner.Get()};
          }

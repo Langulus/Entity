@@ -28,9 +28,18 @@ namespace Langulus::A
    };
    
    ///                                                                        
-   ///   Abstract platform window unit                                        
+   ///   Abstract platform window                                             
    ///                                                                        
    struct Window : Platform {
+      LANGULUS(PRODUCER) PlatformModule;
+      LANGULUS_BASES(Platform);
+      using Platform::Platform;
+   };
+   
+   ///                                                                        
+   ///   Abstract platform cursor                                             
+   ///                                                                        
+   struct Cursor : Platform {
       LANGULUS(PRODUCER) PlatformModule;
       LANGULUS_BASES(Platform);
       using Platform::Platform;
