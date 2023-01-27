@@ -99,28 +99,24 @@ namespace Langulus::Entity
       \
       template<CT::Data T, SeekStyle SEEK = SeekStyle::HereAndAbove> \
       NOD() LANGULUS(ALWAYSINLINE) Decay<T>* SeekUnit(Index offset = IndexFirst) { \
-         static_assert(CT::Unit<T>, "T must be a Unit type"); \
          return static_cast<Decay<T>*>( \
             SeekUnit<SEEK>(MetaData::Of<Decay<T>>(), offset) \
          ); \
       } \
       template<CT::Data T, SeekStyle SEEK = SeekStyle::HereAndAbove> \
       NOD() LANGULUS(ALWAYSINLINE) const Decay<T>* SeekUnit(Index offset = IndexFirst) const { \
-         static_assert(CT::Unit<T>, "T must be a Unit type"); \
          return static_cast<const Decay<T>*>( \
             SeekUnit<SEEK>(MetaData::Of<Decay<T>>(), offset) \
          ); \
       } \
       template<CT::Data T, SeekStyle SEEK = SeekStyle::HereAndAbove> \
       NOD() LANGULUS(ALWAYSINLINE) Decay<T>* SeekUnit(const Any& descriptor, Index offset = IndexFirst) { \
-         static_assert(CT::Unit<T>, "T must be a Unit type"); \
          return static_cast<Decay<T>*>( \
             SeekUnit<SEEK>(descriptor, MetaData::Of<Decay<T>>(), offset) \
          ); \
       } \
       template<CT::Data T, SeekStyle SEEK = SeekStyle::HereAndAbove> \
       NOD() LANGULUS(ALWAYSINLINE) const Decay<T>* SeekUnit(const Any& descriptor, Index offset = IndexFirst) const { \
-         static_assert(CT::Unit<T>, "T must be a Unit type"); \
          return static_cast<const Decay<T>*>( \
             SeekUnit<SEEK>(descriptor, MetaData::Of<Decay<T>>(), offset) \
          ); \
@@ -128,28 +124,24 @@ namespace Langulus::Entity
       \
       template<CT::Data T, SeekStyle SEEK = SeekStyle::HereAndAbove> \
       NOD() LANGULUS(ALWAYSINLINE) Decay<T>* SeekUnitExt(const Any& descriptor, Index offset = IndexFirst) { \
-         static_assert(CT::Unit<T>, "T must be a Unit type"); \
          return static_cast<Decay<T>*>( \
             SeekUnitExt<SEEK>(descriptor, Construct::From<T>(), offset) \
          ); \
       } \
       template<CT::Data T, SeekStyle SEEK = SeekStyle::HereAndAbove> \
       NOD() LANGULUS(ALWAYSINLINE) const Decay<T>* SeekUnitExt(const Any& descriptor, Index offset = IndexFirst) const { \
-         static_assert(CT::Unit<T>, "T must be a Unit type"); \
          return static_cast<const Decay<T>*>( \
             SeekUnitExt<SEEK>(descriptor, Construct::From<T>(), offset) \
          ); \
       } \
       template<CT::Data T, SeekStyle SEEK = SeekStyle::HereAndAbove> \
       NOD() LANGULUS(ALWAYSINLINE) Decay<T>* SeekUnitExt(const Any& descriptor, const Any& construct, Index offset = IndexFirst) { \
-         static_assert(CT::Unit<T>, "T must be a Unit type"); \
          return static_cast<Decay<T>*>( \
             SeekUnitExt<SEEK>(descriptor, Construct::From<T>(construct), offset) \
          ); \
       } \
       template<CT::Data T, SeekStyle SEEK = SeekStyle::HereAndAbove> \
       NOD() LANGULUS(ALWAYSINLINE) const Decay<T>* SeekUnitExt(const Any& descriptor, const Any& construct, Index offset = IndexFirst) const { \
-         static_assert(CT::Unit<T>, "T must be a Unit type"); \
          return static_cast<const Decay<T>*>( \
             SeekUnitExt<SEEK>(descriptor, Construct::From<T>(construct), offset) \
          ); \
@@ -242,12 +234,10 @@ namespace Langulus::Entity
       \
       template<CT::Data T = Unit, SeekStyle SEEK = SeekStyle::HereAndAbove> \
       NOD() LANGULUS(ALWAYSINLINE) TAny<Decay<T>*> GatherUnits() { \
-         static_assert(CT::Unit<T>, "T must be a Unit type"); \
          return GatherUnits<SEEK>(MetaData::Of<Decay<T>>()); \
       } \
       template<CT::Data T = Unit, SeekStyle SEEK = SeekStyle::HereAndAbove> \
       NOD() LANGULUS(ALWAYSINLINE) TAny<const Decay<T>*> GatherUnits() const { \
-         static_assert(CT::Unit<T>, "T must be a Unit type"); \
          return GatherUnits<SEEK>(MetaData::Of<Decay<T>>()); \
       } \
       template<CT::Trait T = Trait, SeekStyle SEEK = SeekStyle::HereAndAbove> \
