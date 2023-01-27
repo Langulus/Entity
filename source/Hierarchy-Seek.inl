@@ -10,43 +10,7 @@
 
 namespace Langulus::Entity
 {
-   
-#if LANGULUS_FEATURE(MANAGED_MEMORY)
-   /// Find a specific unit, searching into the hierarchy                     
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
-   ///   @param token - the unit token to seek for                            
-   ///   @param offset - which of the matches to return                       
-   ///   @return the found unit, or nullptr if no such unit was found         
-   template<SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   Unit* Hierarchy::SeekUnit(const Token& token, const Index& offset) {
-      return mOwners.template SeekUnit<SEEK>(token, offset);
-   }
-
-   /// Find a unit by type and index from the hierarchy                       
-   ///   @tparam SEEK - where to seek for the unit                            
-   ///   @param token - the unit token to seek for                            
-   ///   @param offset - the index of the unit to return                      
-   ///   @return the unit if found, or nullptr otherwise                      
-   template<SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   const Unit* Hierarchy::SeekUnit(const Token& token, const Index& offset) const {
-      return mOwners.template SeekUnit<SEEK>(token, offset);
-   }
-
-   /// Seek a unit inside descriptor first, and then the hierarchy            
-   ///   @tparam SEEK - the direction we're seeking in the hierarchy          
-   ///   @param descriptor - descriptor to search through                     
-   ///   @param token - the unit token to seek for                            
-   ///   @param offset - the index of the unit to return                      
-   ///   @return a valid unit pointer, if unit was found                      
-   template<SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   const Unit* Hierarchy::SeekUnit(const Any& descriptor, const Token& token, Index offset) const {
-      return mOwners.template SeekUnit<SEEK>(descriptor, token, offset);
-   }
-#endif
-   
+      
    /// Find a specific unit, searching into the hierarchy                     
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param meta - the unit to seek for                                   
@@ -54,22 +18,63 @@ namespace Langulus::Entity
    ///   @return the found unit, or nullptr if no such unit was found         
    template<SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   Unit* Hierarchy::SeekUnit(DMeta meta, const Index& offset) {
-      return mOwners.template SeekUnit<SEEK>(meta, offset);
+   Unit* Hierarchy::SeekUnit(DMeta meta, Index offset) {
+      for (auto owner : *this) {
+         Unit* result = owner->template SeekUnit<SEEK>(meta, offset);
+         if (result)
+            return result;
+      }
+
+      return nullptr;
    }
 
    /// Find a unit by type and index from the hierarchy                       
    ///   @tparam SEEK - where to seek for the unit                            
-   ///   @param unit - the type of the unit to seek for                       
+   ///   @param meta - the type of the unit to seek for                       
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
    template<SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   const Unit* Hierarchy::SeekUnit(DMeta unit, const Index& offset) const {
-      return mOwners.template SeekUnit<SEEK>(unit, offset);
+   const Unit* Hierarchy::SeekUnit(DMeta meta, Index offset) const {
+      return const_cast<Hierarchy*>(this)->template
+         SeekUnit<SEEK>(meta, offset);
    }
 
    /// Find a unit by type and index from the hierarchy                       
+   /// Scan a locally provided descriptor first                               
+   ///   @tparam SEEK - where to seek for the unit                            
+   ///   @param descriptor - descriptor to search through                     
+   ///   @param meta - the type of the unit to seek for                       
+   ///   @param offset - the index of the unit to return                      
+   ///   @return the unit if found, or nullptr otherwise                      
+   template<SeekStyle SEEK>
+   LANGULUS(ALWAYSINLINE)
+   Unit* Hierarchy::SeekUnit(const Any& descriptor, DMeta meta, Index offset) {
+      // Scan descriptor even if hierarchy is empty                     
+      Unit* result {};
+      descriptor.ForEachDeep([&](const Unit* unit) {
+         if (unit->CastsTo(meta)) {
+            // Found match                                              
+            if (offset == 0) {
+               // We're done                                            
+               result = const_cast<Unit*>(unit);
+               return false;
+            }
+            else --offset;
+         }
+         return true;
+      });
+
+      if (result)
+         return result;
+
+      // If reached, then no unit was found in the descriptor           
+      // Let's delve into the hierarchy                                 
+      return SeekUnit<SEEK>(meta, offset);
+   }
+   
+   /// Find a unit by type and index from the hierarchy (const)               
+   /// Scan a locally provided descriptor first                               
    ///   @tparam SEEK - where to seek for the unit                            
    ///   @param descriptor - descriptor to search through                     
    ///   @param unit - the type of the unit to seek for                       
@@ -77,111 +82,88 @@ namespace Langulus::Entity
    ///   @return the unit if found, or nullptr otherwise                      
    template<SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   const Unit* Hierarchy::SeekUnit(const Any& descriptor, DMeta unit, const Index& offset) const {
-      return mOwners.template SeekUnit<SEEK>(descriptor, unit, offset);
+   const Unit* Hierarchy::SeekUnit(const Any& descriptor, DMeta unit, Index offset) const {
+      return const_cast<Hierarchy*>(this)->template
+         SeekUnit<SEEK>(descriptor, unit, offset);
    }
 
-   /// Find a unit by index and static type from the hierarchy                
-   ///   @tparam T - static unit type to search for                           
+   /// Seek a unit with specific properties                                   
    ///   @tparam SEEK - where to seek for the unit                            
+   ///   @param construct - the type and properties of the unit to seek for   
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
-   template<CT::Data T, SeekStyle SEEK>
+   template<SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   Decay<T>* Hierarchy::SeekUnit(const Index& offset) {
-      return mOwners.template SeekUnit<T, SEEK>(offset);
+   Unit* Hierarchy::SeekUnitExt(const Construct& construct, Index offset) {
+      for (auto owner : *this) {
+         Unit* result = owner->template SeekUnitExt<SEEK>(construct, offset);
+         if (result)
+            return result;
+      }
+
+      return nullptr;
    }
 
-   /// Find a unit by index and static type from the hierarchy (const)        
-   ///   @tparam T - static unit type to search for                           
+   /// Seek a unit with specific properties (const)                           
    ///   @tparam SEEK - where to seek for the unit                            
+   ///   @param construct - the type and properties of the unit to seek for   
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
-   template<CT::Data T, SeekStyle SEEK>
+   template<SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   const Decay<T>* Hierarchy::SeekUnit(const Index& offset) const {
-      return mOwners.template SeekUnit<T, SEEK>(offset);
+   const Unit* Hierarchy::SeekUnitExt(const Construct& construct, Index offset) const {
+      return const_cast<Hierarchy*>(this)->template
+         SeekUnitExt<SEEK>(construct, offset);
+   }
+
+   /// Seek a unit with specific properties                                   
+   /// Scan a locally provided descriptor first                               
+   ///   @tparam SEEK - the direction in which we're scanning the hierarchy   
+   ///   @param descriptor - local descriptor to seek through first           
+   ///   @param construct - the unit type and properties to seek for          
+   ///   @param offset - the Nth match to return                              
+   ///   @return a pointer to the found unit, or nullptr if not found         
+   template<SeekStyle SEEK>
+   LANGULUS(ALWAYSINLINE)
+   Unit* Hierarchy::SeekUnitExt(const Any& descriptor, const Construct& construct, Index offset) {
+      // Scan descriptor even if hierarchy is empty                     
+      Unit* result {};
+      descriptor.ForEachDeep([&](const Unit* u) {
+         if (u->CastsTo(construct.GetType())) {
+            //TODO check construct arguments
+            // Found match                                              
+            if (offset == 0) {
+               // We're done                                            
+               result = const_cast<Unit*>(u);
+               return false;
+            }
+            else --offset;
+         }
+         return true;
+      });
+
+      if (result)
+         return result;
+
+      // If reached, then no unit was found in the descriptor           
+      // Let's delve into the hierarchy                                 
+      return SeekUnitExt<SEEK>(construct, offset);
+   }
+
+   /// Seek a unit with specific properties (const)                           
+   /// Scan a locally provided descriptor first                               
+   ///   @tparam SEEK - the direction in which we're scanning the hierarchy   
+   ///   @param descriptor - local descriptor to seek through first           
+   ///   @param construct - the unit type and properties to seek for          
+   ///   @param offset - the Nth match to return                              
+   ///   @return a pointer to the found unit, or nullptr if not found         
+   template<SeekStyle SEEK>
+   LANGULUS(ALWAYSINLINE)
+   const Unit* Hierarchy::SeekUnitExt(const Any& descriptor, const Construct& construct, Index offset) const {
+      return const_cast<Hierarchy*>(this)->template
+         SeekUnitExt<SEEK>(descriptor, construct, offset);
    }
    
-   /// Find a unit by index and static type from the hierarchy (const)        
-   ///   @tparam T - static unit type to search for                           
-   ///   @tparam SEEK - where to seek for the unit                            
-   ///   @param descriptor - descriptor to search through                     
-   ///   @param offset - the index of the unit to return                      
-   ///   @return the unit if found, or nullptr otherwise                      
-   template<CT::Data T, SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   const Decay<T>* Hierarchy::SeekUnit(const Any& descriptor, const Index& offset) const {
-      return mOwners.template SeekUnit<T, SEEK>(descriptor, offset);
-   }
-   
-#if LANGULUS_FEATURE(MANAGED_MEMORY)
-   /// Find a trait by token (and index) from the hierarchy                   
-   ///   @tparam SEEK - where to seek for the trait                           
-   ///   @param token - the trait identifier                                  
-   ///   @param index - the index of the unit to return                       
-   ///   @return the trait (empty if not found)                               
-   template<SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   Trait Hierarchy::SeekTrait(const Token& token, const Index& index) {
-      return mOwners.template SeekTrait<SEEK>(token, index);
-   }
-
-   /// Find a trait by token (and index) from the hierarchy (const)           
-   ///   @tparam SEEK - where to seek for the trait                           
-   ///   @param token - the trait identifier                                  
-   ///   @param index - the index of the unit to return                       
-   ///   @return the trait (empty if not found)                               
-   template<SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   Trait Hierarchy::SeekTrait(const Token& token, const Index& index) const {
-      return mOwners.template SeekTrait<SEEK>(token, index);
-   }
-
-   /// Find a trait by token (and index) from the hierarchy, and attempt      
-   /// converting it to a desired output type                                 
-   /// Supports pinnable outputs                                              
-   ///   @tparam SEEK - where to seek for the trait                           
-   ///   @tparam D - type of output (deducible)                               
-   ///   @param token - the trait identifier                                  
-   ///   @param output - [out] the output                                     
-   ///   @param index - the index of the unit to return                       
-   ///   @return true if output was rewritten                                 
-   template<SeekStyle SEEK, CT::Data D>
-   LANGULUS(ALWAYSINLINE)
-   bool Hierarchy::SeekTrait(const Token& token, D& output, const Index& index) const {
-      return mOwners.template SeekTrait<SEEK, D>(token, output, index);
-   }
-
-   /// Find a trait by token (and index) from the hierarchy                   
-   ///   @tparam SEEK - where to seek for the trait                           
-   ///   @param descriptor - local descriptor to search through first         
-   ///   @param token - the trait identifier                                  
-   ///   @param index - the index of the unit to return                       
-   ///   @return the trait (empty if not found)                               
-   template<SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   Trait Hierarchy::SeekTrait(const Any& descriptor, const Token& token, const Index& index) const {
-      return mOwners.template SeekTrait<SEEK>(descriptor, token, index);
-   }
-
-   /// Find a trait by token (and index) from a local descriptor, and then    
-   /// the hierarchy, and attempt converting it to a desired output type      
-   /// Supports pinnable outputs                                              
-   ///   @tparam SEEK - where to seek for the trait                           
-   ///   @tparam D - type of output (deducible)                               
-   ///   @param descriptor - local descriptor to search through first         
-   ///   @param token - the trait identifier                                  
-   ///   @param output - [out] the output                                     
-   ///   @param index - the index of the unit to return                       
-   ///   @return true if output was rewritten                                 
-   template<SeekStyle SEEK, CT::Data D>
-   LANGULUS(ALWAYSINLINE)
-   bool Hierarchy::SeekTrait(const Any& descriptor, const Token& token, D& output, const Index& index) const {
-      return mOwners.template SeekTrait<SEEK, D>(descriptor, token, output, index);
-   }
-#endif
-
    /// Find a trait by type (and index), searching into the hierarchy         
    ///   @tparam SEEK - direction to search at                                
    ///   @param trait - the trait to search for                               
@@ -189,8 +171,14 @@ namespace Langulus::Entity
    ///   @return the trait, which is not empty, if trait was found            
    template<SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   Trait Hierarchy::SeekTrait(TMeta trait, const Index& offset) {
-      return mOwners.template SeekTrait<SEEK>(trait, offset);
+   Trait Hierarchy::SeekTrait(TMeta trait, Index offset) {
+      for (auto owner : *this) {
+         auto result = owner->template SeekTrait<SEEK>(trait, offset);
+         if (!result.IsEmpty())
+            return result;
+      }
+
+      return {};
    }
 
    /// Find a trait, searching into the hierarchy (const)                     
@@ -200,8 +188,11 @@ namespace Langulus::Entity
    ///   @return the trait, which is not empty, if trait was found            
    template<SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   Trait Hierarchy::SeekTrait(TMeta trait, const Index& offset) const {
-      return mOwners.template SeekTrait<SEEK>(trait, offset);
+   Trait Hierarchy::SeekTrait(TMeta trait, Index offset) const {
+      Trait result = const_cast<Hierarchy*>(this)->template
+         SeekTrait<SEEK>(trait, offset);
+      result.MakeConst();
+      return Abandon(result);
    }
    
    /// Find a trait by type (and index) from the hierarchy, and attempt       
@@ -215,8 +206,23 @@ namespace Langulus::Entity
    ///   @return true if output was rewritten                                 
    template<SeekStyle SEEK, CT::Data D>
    LANGULUS(ALWAYSINLINE)
-   bool Hierarchy::SeekTrait(TMeta trait, D& output, const Index& offset) const {
-      return mOwners.template SeekTrait<SEEK, D>(trait, output, offset);
+   bool Hierarchy::SeekTrait(TMeta trait, D& output, Index offset) const {
+      if constexpr (CT::Pinnable<D>) {
+         // Never touch pinned values                                   
+         if (output.mLocked)
+            return false;
+      }
+
+      // Let's delve into the hierarchy                                 
+      for (auto owner : *this) {
+         if (owner->template SeekTrait<SEEK, D>(trait, output, offset)) {
+            // Value was found                                          
+            return true;
+         }
+      }
+
+      // If reached, nothing was found                                  
+      return false;
    }
    
    /// Find a trait, searching into the hierarchy (const)                     
@@ -227,42 +233,8 @@ namespace Langulus::Entity
    ///   @return the trait, which is not empty, if trait was found            
    template<SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   Trait Hierarchy::SeekTrait(const Any& descriptor, TMeta trait, const Index& offset) const {
+   Trait Hierarchy::SeekTrait(const Any& descriptor, TMeta trait, Index offset) const {
       return mOwners.template SeekTrait<SEEK>(descriptor, trait, offset);
-   }
-
-   /// Find a trait, searching into the hierarchy                             
-   ///   @tparam T - the trait to search for                                  
-   ///   @tparam SEEK - direction to search at                                
-   ///   @param offset - the number of the matching trait to use              
-   ///   @return the trait, which is not empty, if trait was found            
-   template<CT::Trait T, SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   Trait Hierarchy::SeekTrait(const Index& offset) {
-      return mOwners.template SeekTrait<T, SEEK>(offset);
-   }
-
-   /// Find a trait, searching into the hierarchy (const)                     
-   ///   @tparam T - the trait to search for                                  
-   ///   @tparam SEEK - direction to search at                                
-   ///   @param offset - the number of the matching trait to use              
-   ///   @return the trait, which is not empty, if trait was found            
-   template<CT::Trait T, SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   Trait Hierarchy::SeekTrait(const Index& offset) const {
-      return mOwners.template SeekTrait<T, SEEK>(offset);
-   }
-   
-   /// Find a trait, searching into the hierarchy (const)                     
-   ///   @tparam T - the trait to search for                                  
-   ///   @tparam SEEK - direction to search at                                
-   ///   @param descriptor - descriptor to search through first               
-   ///   @param offset - the number of the matching trait to use              
-   ///   @return the trait, which is not empty, if trait was found            
-   template<CT::Trait T, SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   Trait Hierarchy::SeekTrait(const Any& descriptor, const Index& offset) const {
-      return mOwners.template SeekTrait<T, SEEK>(descriptor, offset);
    }
 
    /// Seek a value from static/dynamic/unit traits in the hierarchy          
@@ -273,8 +245,23 @@ namespace Langulus::Entity
    ///   @return true if value has been found and rewritten                   
    template<SeekStyle SEEK, CT::Data D>
    LANGULUS(ALWAYSINLINE)
-   bool Hierarchy::SeekValue(D& output, const Index& offset) const {
-      return mOwners.template SeekValue<SEEK, D>(output, offset);
+   bool Hierarchy::SeekValue(D& output, Index offset) const {
+      if constexpr (CT::Pinnable<D>) {
+         // Never touch pinned values                                   
+         if (output.mLocked)
+            return false;
+      }
+
+      // Let's delve into the hierarchy                                 
+      for (auto owner : *this) {
+         if (owner->template SeekValue<SEEK, D>(output, offset)) {
+            // Value was found                                          
+            return true;
+         }
+      }
+
+      // If reached, nothing was found                                  
+      return false;
    }
 
    /// Find a value (regardless of trait) from the hierarchy, and attempt     
@@ -288,8 +275,39 @@ namespace Langulus::Entity
    ///   @return true if value has been found and rewritten                   
    template<SeekStyle SEEK, CT::Data D>
    LANGULUS(ALWAYSINLINE)
-   bool Hierarchy::SeekValue(const Any& descriptor, D& value, const Index& offset) const {
-      return mOwners.template SeekValue<SEEK, D>(descriptor, value, offset);
+   bool Hierarchy::SeekValue(const Any& descriptor, D& output, Index offset) const {
+      if constexpr (CT::Pinnable<D>) {
+         // Never touch pinned values                                   
+         if (output.mLocked)
+            return false;
+      }
+
+      // Scan descriptor                                                
+      bool done = false;
+      descriptor.ForEachDeep([&](const Block& group) {
+         try {
+            // Found match if these don't throw                         
+            output = group.template AsCast<D>();
+            done = true;
+            return false;
+         }
+         catch(...) { }
+         return true;
+      });
+
+      if (done) {
+         // Data was found in the descriptor                            
+         if constexpr (CT::Pinnable<D>) {
+            // Make sure to pin the pinnable value                      
+            output.mLocked = true;
+         }
+
+         return true;
+      }
+
+      // If reached, then no data was found in the descriptor           
+      // Let's delve into the hierarchy                                 
+      return SeekValue<SEEK, D>(output, offset);
    }
 
 } // namespace Langulus::Entity

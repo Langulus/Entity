@@ -21,28 +21,6 @@
 namespace Langulus::Entity
 {
    
-#if LANGULUS_FEATURE(MANAGED_MEMORY)
-   /// Collects all units of the given type (by token) inside the hierarchy   
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
-   ///   @param token - the unit to seek for                                  
-   ///   @return the gathered units that match the type                       
-   template<SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   TAny<Unit*> Thing::GatherUnits(const Token& token) {
-      return GatherUnits<SEEK>(RTTI::Database.GetMetaData(token));
-   }
-
-   /// Collects all units of the given type (by token) inside the hierarchy   
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
-   ///   @param token - the unit to seek for                                  
-   ///   @return the gathered units that match the type                       
-   template<SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   TAny<const Unit*> Thing::GatherUnits(const Token& token) const {
-      return GatherUnits<SEEK>(RTTI::Database.GetMetaData(token));
-   }
-#endif 
-
    /// Collects all units of the given type inside the hierarchy              
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param meta - the units to seek for                                  
@@ -90,53 +68,7 @@ namespace Langulus::Entity
    TAny<const Unit*> Thing::GatherUnits(DMeta meta) const {
       return const_cast<Thing*>(this)->template GatherUnits<SEEK>(meta);
    }
-
-   /// Gather all units of a specific static type                             
-   /// Use an abstract type to gather a broader range of units                
-   ///   @tparam T - the type of unit we're searching for, use Unit for all   
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
-   ///   @return a container filled with the matches                          
-   template<CT::Data T, SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   TAny<Decay<T>*> Thing::GatherUnits() {
-      static_assert(CT::Unit<T>, "T must be a unit type");
-      return GatherUnits<SEEK>(MetaData::Of<Decay<T>>());
-   }
-   
-   /// Gather all units of a specific static type                             
-   /// Use an abstract type to gather a broader range of units                
-   ///   @tparam T - the type of unit we're searching for, use Unit for all   
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
-   ///   @return a container filled with the matches                          
-   template<CT::Data T, SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   TAny<const Decay<T>*> Thing::GatherUnits() const {
-      static_assert(CT::Unit<T>, "T must be a unit type");
-      return GatherUnits<SEEK>(MetaData::Of<Decay<T>>());
-   }
-   
-#if LANGULUS_FEATURE(MANAGED_MEMORY)
-   /// Collects all traits of the given type (by token) inside the hierarchy  
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
-   ///   @param token - the trait to seek for                                 
-   ///   @return the gathered traits that match the type                      
-   template<SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   TAny<Trait> Thing::GatherTraits(const Token& token) {
-      return GatherTraits<SEEK>(RTTI::Database.GetMetaTrait(token));
-   }
-
-   /// Collects all traits of the given type (by token) inside the hierarchy  
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
-   ///   @param token - the trait to seek for                                 
-   ///   @return the gathered traits that match the type                      
-   template<SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   TAny<Trait> Thing::GatherTraits(const Token& token) const {
-      return GatherTraits<SEEK>(RTTI::Database.GetMetaTrait(token));
-   }
-#endif 
-
+      
    /// Collects all traits of the given type inside the hierarchy             
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param trait - the trait to seek for                                 
@@ -216,16 +148,6 @@ namespace Langulus::Entity
    LANGULUS(ALWAYSINLINE)
    TAny<Trait> Thing::GatherTraits(TMeta trait) const {
       return const_cast<Thing*>(this)->template GatherTraits<SEEK>(trait);
-   }
-
-   template<CT::Trait T, SeekStyle SEEK>
-   TAny<Trait> Thing::GatherTraits() {
-      return GatherTraits<SEEK>(MetaTrait::Of<T>());
-   }
-
-   template<CT::Trait T, SeekStyle SEEK>
-   TAny<Trait> Thing::GatherTraits() const {
-      return GatherTraits<SEEK>(MetaTrait::Of<T>());
    }
 
    /// Gather all values convertible to a type                                

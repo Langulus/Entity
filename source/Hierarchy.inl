@@ -42,13 +42,13 @@ namespace Langulus::Entity
       return mLocked;
    }
 
-   /// Pin the value, it will no longer be overwritten by environment         
+   /// Pin the value, it will no longer be overwritable by environment        
    template<class T>
    void Pinnable<T>::Pin() noexcept {
       mLocked = true;
    }
 
-   /// Unpin the value, it will no longer be overwritten by environment       
+   /// Unpin the value, it now can be overwritten by environment              
    template<class T>
    void Pinnable<T>::Unpin() noexcept {
       mLocked = false;

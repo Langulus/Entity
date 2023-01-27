@@ -11,28 +11,6 @@
 namespace Langulus::Entity
 {
    
-#if LANGULUS_FEATURE(MANAGED_MEMORY)
-   /// Collects all units of the given type (by token) inside the hierarchy   
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
-   ///   @param token - the unit to seek for                                  
-   ///   @return the gathered units that match the type                       
-   template<SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   TAny<Unit*> Unit::GatherUnits(const Token& token) {
-      return mOwners.template GatherUnits<SEEK>(token);
-   }
-
-   /// Collects all units of the given type (by token) inside the hierarchy   
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
-   ///   @param token - the unit to seek for                                  
-   ///   @return the gathered units that match the type                       
-   template<SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   TAny<const Unit*> Unit::GatherUnits(const Token& token) const {
-      return mOwners.template GatherUnits<SEEK>(token);
-   }
-#endif 
-
    /// Collects all units of the given type inside the hierarchy              
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param meta - the units to seek for                                  
@@ -52,51 +30,7 @@ namespace Langulus::Entity
    TAny<const Unit*> Unit::GatherUnits(DMeta meta) const {
       return mOwners.template GatherUnits<SEEK>(meta);
    }
-
-   /// Gather all units of a specific static type                             
-   /// Use an abstract type to gather a broader range of units                
-   ///   @tparam T - the type of unit we're searching for, use Unit for all   
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
-   ///   @return a container filled with the matches                          
-   template<CT::Data T, SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   TAny<Decay<T>*> Unit::GatherUnits() {
-      return mOwners.template GatherUnits<T, SEEK>();
-   }
    
-   /// Gather all units of a specific static type                             
-   /// Use an abstract type to gather a broader range of units                
-   ///   @tparam T - the type of unit we're searching for, use Unit for all   
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
-   ///   @return a container filled with the matches                          
-   template<CT::Data T, SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   TAny<const Decay<T>*> Unit::GatherUnits() const {
-      return mOwners.template GatherUnits<T, SEEK>();
-   }
-   
-#if LANGULUS_FEATURE(MANAGED_MEMORY)
-   /// Collects all traits of the given type (by token) inside the hierarchy  
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
-   ///   @param token - the trait to seek for                                 
-   ///   @return the gathered traits that match the type                      
-   template<SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   TAny<Trait> Unit::GatherTraits(const Token& token) {
-      return mOwners.template GatherTraits<SEEK>(token);
-   }
-
-   /// Collects all traits of the given type (by token) inside the hierarchy  
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
-   ///   @param token - the trait to seek for                                 
-   ///   @return the gathered traits that match the type                      
-   template<SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   TAny<Trait> Unit::GatherTraits(const Token& token) const {
-      return mOwners.template GatherTraits<SEEK>(token);
-   }
-#endif 
-
    /// Collects all traits of the given type inside the hierarchy             
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param trait - the trait to seek for                                 
@@ -115,18 +49,6 @@ namespace Langulus::Entity
    LANGULUS(ALWAYSINLINE)
    TAny<Trait> Unit::GatherTraits(TMeta trait) const {
       return mOwners.template GatherTraits<SEEK>(trait);
-   }
-
-   template<CT::Trait T, SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   TAny<Trait> Unit::GatherTraits() {
-      return mOwners.template GatherTraits<T, SEEK>();
-   }
-
-   template<CT::Trait T, SeekStyle SEEK>
-   LANGULUS(ALWAYSINLINE)
-   TAny<Trait> Unit::GatherTraits() const {
-      return mOwners.template GatherTraits<T, SEEK>();
    }
 
    /// Gather all values convertible to a type                                

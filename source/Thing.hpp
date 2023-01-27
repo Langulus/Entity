@@ -136,18 +136,20 @@ namespace Langulus::Entity
       NOD() Count HasUnits() const;
 
       NOD() const UnitMap& GetUnits() const noexcept;
-      NOD() const Unit* GetUnit(DMeta, const Index& = IndexFirst) const;
-      NOD() Unit* GetUnit(DMeta, const Index& = IndexFirst);
+      NOD() const Unit* GetUnit(DMeta, Index = IndexFirst) const;
+      NOD() Unit* GetUnit(DMeta, Index = IndexFirst);
+      NOD() const Unit* GetUnitExt(const Construct&, Index = IndexFirst) const;
+      NOD() Unit* GetUnitExt(const Construct&, Index = IndexFirst);
       template<CT::Unit T>
-      NOD() Decay<T>* GetUnit(const Index& = IndexFirst);
+      NOD() Decay<T>* GetUnit(Index = IndexFirst);
       template<CT::Unit T>
-      NOD() const Decay<T>* GetUnit(const Index& = IndexFirst) const;
+      NOD() const Decay<T>* GetUnit(Index = IndexFirst) const;
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
-         NOD() const Unit* GetUnit(const Token&, const Index& = IndexFirst) const;
-         NOD() Unit* GetUnit(const Token&, const Index& = IndexFirst);
+         NOD() const Unit* GetUnit(const Token&, Index = IndexFirst) const;
+         NOD() Unit* GetUnit(const Token&, Index = IndexFirst);
          template<CT::Unit T>
-         NOD() Decay<T>* GetUnitAs(const Token&, const Index& = IndexFirst);
+         NOD() Decay<T>* GetUnitAs(const Token&, Index = IndexFirst);
       #endif
 
       ///                                                                     
@@ -182,109 +184,14 @@ namespace Langulus::Entity
       ///                                                                     
       ///   Seek                                                              
       ///                                                                     
-      #if LANGULUS_FEATURE(MANAGED_MEMORY)
-         template<SeekStyle = SeekStyle::HereAndAbove>
-         NOD() Unit* SeekUnit(const Token&, const Index& = IndexFirst);
-         template<SeekStyle = SeekStyle::HereAndAbove>
-         NOD() const Unit* SeekUnit(const Token&, const Index& = IndexFirst) const;
-         template<SeekStyle = SeekStyle::HereAndAbove>
-         NOD() const Unit* SeekUnit(const Any&, const Token&, Index = IndexFirst) const;
-      #endif
-
-      template<SeekStyle = SeekStyle::HereAndAbove>
-      NOD() Unit* SeekUnit(DMeta, const Index& = IndexFirst);
-      template<SeekStyle = SeekStyle::HereAndAbove>
-      NOD() const Unit* SeekUnit(DMeta, const Index& = IndexFirst) const;
-      template<SeekStyle = SeekStyle::HereAndAbove>
-      NOD() const Unit* SeekUnit(const Any&, DMeta, const Index& = IndexFirst) const;
-
-      template<CT::Data T, SeekStyle = SeekStyle::HereAndAbove>
-      NOD() Decay<T>* SeekUnit(const Index& = IndexFirst);
-      template<CT::Data T, SeekStyle = SeekStyle::HereAndAbove>
-      NOD() const Decay<T>* SeekUnit(const Index& = IndexFirst) const;
-      template<CT::Data T, SeekStyle = SeekStyle::HereAndAbove>
-      NOD() const Decay<T>* SeekUnit(const Any&, const Index& = IndexFirst) const;
-
-      #if LANGULUS_FEATURE(MANAGED_MEMORY)
-         template<SeekStyle = SeekStyle::HereAndAbove>
-         NOD() Trait SeekTrait(const Token&, const Index& = IndexFirst);
-         template<SeekStyle = SeekStyle::HereAndAbove>
-         NOD() Trait SeekTrait(const Token&, const Index& = IndexFirst) const;
-         template<SeekStyle = SeekStyle::HereAndAbove, CT::Data D>
-         NOD() bool SeekTrait(const Token&, D&, const Index& = IndexFirst) const;
-
-         template<SeekStyle = SeekStyle::HereAndAbove>
-         NOD() Trait SeekTrait(const Any&, const Token&, const Index& = IndexFirst) const;
-         template<SeekStyle = SeekStyle::HereAndAbove, CT::Data D>
-         NOD() bool SeekTrait(const Any&, const Token&, D&, const Index& = IndexFirst) const;
-      #endif
-
-      template<SeekStyle = SeekStyle::HereAndAbove>
-      NOD() Trait SeekTrait(TMeta, const Index& = IndexFirst);
-      template<SeekStyle = SeekStyle::HereAndAbove>
-      NOD() Trait SeekTrait(TMeta, const Index& = IndexFirst) const;
-      template<SeekStyle = SeekStyle::HereAndAbove, CT::Data D>
-      NOD() bool SeekTrait(TMeta, D&, const Index& = IndexFirst) const;
-
-      template<SeekStyle = SeekStyle::HereAndAbove>
-      NOD() Trait SeekTrait(const Any&, TMeta, const Index& = IndexFirst) const;
-      template<SeekStyle = SeekStyle::HereAndAbove, CT::Data D>
-      NOD() bool SeekTrait(const Any&, TMeta, D&, const Index& = IndexFirst) const;
-
-      template<CT::Trait T = Trait, SeekStyle = SeekStyle::HereAndAbove>
-      NOD() Trait SeekTrait(const Index& = IndexFirst);
-      template<CT::Trait T = Trait, SeekStyle = SeekStyle::HereAndAbove>
-      NOD() Trait SeekTrait(const Index& = IndexFirst) const;
-      template<CT::Trait T = Trait, SeekStyle = SeekStyle::HereAndAbove, CT::Data D>
-      NOD() bool SeekTrait(D&, const Index& = IndexFirst) const;
-
-      template<CT::Trait T = Trait, SeekStyle = SeekStyle::HereAndAbove>
-      NOD() Trait SeekTrait(const Any&, const Index& = IndexFirst) const;
-      template<CT::Trait T = Trait, SeekStyle = SeekStyle::HereAndAbove, CT::Data D>
-      NOD() bool SeekTrait(const Any&, D&, const Index& = IndexFirst) const;
-
-      template<SeekStyle = SeekStyle::HereAndAbove, CT::Data D>
-      bool SeekValue(D&, const Index& = IndexFirst) const;
-      template<SeekStyle = SeekStyle::HereAndAbove, CT::Data D>
-      bool SeekValue(const Any&, D&, const Index& = IndexFirst) const;
+      LANGULUS_SEEK_INTERFACE();
+      LANGULUS_SEEK_TOKEN_INTERFACE();
 
       ///                                                                     
       ///   Gather                                                            
       ///                                                                     
-      #if LANGULUS_FEATURE(MANAGED_MEMORY)
-         template<SeekStyle = SeekStyle::HereAndAbove>
-         NOD() TAny<Unit*> GatherUnits(const Token&);
-         template<SeekStyle = SeekStyle::HereAndAbove>
-         NOD() TAny<const Unit*> GatherUnits(const Token&) const;
-      #endif 
-
-      template<SeekStyle = SeekStyle::HereAndAbove>
-      NOD() TAny<Unit*> GatherUnits(DMeta);
-      template<SeekStyle = SeekStyle::HereAndAbove>
-      NOD() TAny<const Unit*> GatherUnits(DMeta) const;
-      template<CT::Data T = Unit, SeekStyle = SeekStyle::HereAndAbove>
-      NOD() TAny<Decay<T>*> GatherUnits();
-      template<CT::Data T = Unit, SeekStyle = SeekStyle::HereAndAbove>
-      NOD() TAny<const Decay<T>*> GatherUnits() const;
-
-      #if LANGULUS_FEATURE(MANAGED_MEMORY)
-         template<SeekStyle = SeekStyle::HereAndAbove>
-         NOD() TAny<Trait> GatherTraits(const Token&);
-         template<SeekStyle = SeekStyle::HereAndAbove>
-         NOD() TAny<Trait> GatherTraits(const Token&) const;
-      #endif 
-
-      template<SeekStyle = SeekStyle::HereAndAbove>
-      NOD() TAny<Trait> GatherTraits(TMeta);
-      template<SeekStyle = SeekStyle::HereAndAbove>
-      NOD() TAny<Trait> GatherTraits(TMeta) const;
-      template<CT::Trait T = Trait, SeekStyle = SeekStyle::HereAndAbove>
-      NOD() TAny<Trait> GatherTraits();
-      template<CT::Trait T = Trait, SeekStyle = SeekStyle::HereAndAbove>
-      NOD() TAny<Trait> GatherTraits() const;
-
-      template<SeekStyle = SeekStyle::HereAndAbove, CT::Data D>
-      NOD() TAny<D> GatherValues() const;
+      LANGULUS_GATHER_INTERFACE();
+      LANGULUS_GATHER_TOKEN_INTERFACE();
    };
 
 } // namespace Langulus::Entity

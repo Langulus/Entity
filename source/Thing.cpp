@@ -176,9 +176,9 @@ namespace Langulus::Entity
    /// If type is nullptr searches only by offset                             
    /// If type is not nullptr, gets the Nth matching unit, if any             
    ///   @param type - the type of the unit                                   
-   ///   @param offset - the unit index to seek                               
+   ///   @param index - the unit index to seek                                
    ///   @return the unit if found, or nullptr if not                         
-   Unit* Thing::GetUnit(DMeta id, const Index& index) {
+   Unit* Thing::GetUnit(DMeta id, Index index) {
       if (id) {
          // Search a typed trait                                        
          const auto found = mUnits.FindKeyIndex(id);
@@ -188,6 +188,91 @@ namespace Langulus::Entity
       }
 
       // Search unit by index                                           
+      Unit* found {};
+      if (index.IsArithmetic()) {
+         mUnits.ForEachValue([&](TAny<Unit*>& list) noexcept {
+            if (index < list.GetCount()) {
+               found = list[index];
+               return false;
+            }
+
+            index -= list.GetCount();
+            return true;
+         });
+      }
+
+      return found;
+   }
+
+   /// Get a unit by type and offset (const)                                  
+   /// If type is nullptr searches only by offset                             
+   /// If type is not nullptr, gets the Nth matching unit, if any             
+   ///   @param type - the type of the unit                                   
+   ///   @param offset - the unit index to seek                               
+   ///   @return the unit if found, or nullptr if not                         
+   const Unit* Thing::GetUnit(DMeta type, Index offset) const {
+      return const_cast<Thing*>(this)->GetUnit(type, offset);
+   }
+   
+   /// Get a unit by type, properties, and offset                             
+   /// If type is nullptr searches only by offset and properties              
+   /// If type is not nullptr, gets the Nth matching unit, if any             
+   ///   @param what - the type and properties of the unit                    
+   ///   @param index - the unit index to seek                                
+   ///   @return the unit if found, or nullptr if not                         
+   Unit* Thing::GetUnitExt(const Construct& what, Index index) {
+      if (what.GetType()) {
+         // Search a typed unit                                         
+         const auto found = mUnits.FindKeyIndex(what.GetType());
+         if (found) {
+            const auto& bucket = mUnits.GetValue(found);
+            if (what.GetArgument().IsEmpty())
+               return bucket[index];
+
+            // Check all units in that bucket for required properties   
+            for (auto unit : bucket) {
+               bool mismatch {};
+
+               Offset memberOffset {};
+               what.ForEachDeep(
+                  [&](const Trait& trait) {
+                     if (!unit->GetMember(trait.GetTrait(), memberOffset).Compare(trait)) {
+                        mismatch = true;
+                        return false;
+                     }
+
+                     ++memberOffset;
+                     return true;
+                  }
+               );
+
+               memberOffset = {};
+               what.ForEachDeep(
+                  [&](const Block& anythingElse) {
+                     if (!unit->GetMember(nullptr, memberOffset).Compare(anythingElse)) {
+                        mismatch = true;
+                        return false;
+                     }
+
+                     ++memberOffset;
+                     return true;
+                  }
+               );
+
+               if (!mismatch) {
+                  // Match found                                        
+                  if (index == 0)
+                     return unit;
+                  else
+                     --index;
+               }
+            }
+         }
+
+         return nullptr;
+      }
+
+      // Search unit by index and properties only                       
       Unit* found {};
       if (index.IsArithmetic()) {
          auto offset = index.GetOffset();
@@ -205,14 +290,12 @@ namespace Langulus::Entity
       return found;
    }
 
-   /// Get a unit by type and offset (const)                                  
-   /// If type is nullptr searches only by offset                             
-   /// If type is not nullptr, gets the Nth matching unit, if any             
-   ///   @param type - the type of the unit                                   
-   ///   @param offset - the unit index to seek                               
+   /// Get a unit by type, properties, and offset (const)                     
+   ///   @param what - the type and properties of the unit                    
+   ///   @param index - the unit index to seek                                
    ///   @return the unit if found, or nullptr if not                         
-   const Unit* Thing::GetUnit(DMeta type, const Index& offset) const {
-      return const_cast<Thing*>(this)->GetUnit(type, offset);
+   const Unit* Thing::GetUnitExt(const Construct& what, Index index) const {
+      return const_cast<Thing*>(this)->GetUnitExt(what, index);
    }
 
 #if LANGULUS_FEATURE(MANAGED_REFLECTION)
@@ -220,7 +303,7 @@ namespace Langulus::Entity
    ///   @param token - the type name of the unit                             
    ///   @param offset - the unit index                                       
    ///   @return the unit if found, or nullptr if not                         
-   Unit* Thing::GetUnit(const Token& token, const Index& offset) {
+   Unit* Thing::GetUnit(const Token& token, Index offset) {
       return GetUnit(RTTI::Database.GetMetaData(token), offset);
    }
 #endif
