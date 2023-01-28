@@ -238,13 +238,13 @@ namespace Langulus::Entity
       Trait result;
       descriptor.ForEachDeep([&](const Trait& trait) {
          if (trait.TraitIs(meta)) {
-            if (index == 0) {
+            if (offset == 0) {
                // Match found                                           
                result = trait;
                return false;
             }
             
-            --index;
+            --offset;
          }
 
          return true;         // Just keep searching...                 
