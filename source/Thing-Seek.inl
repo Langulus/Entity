@@ -322,7 +322,7 @@ namespace Langulus::Entity
    Trait Thing::SeekTrait(const Any& descriptor, TMeta trait, Index offset) const {
       // Scan descriptor                                                
       Trait result;
-      descriptor.ForEachDeep([this](const Trait& t) {
+      descriptor.ForEachDeep([&](const Trait& t) {
          if (t.TraitIs(trait)) {
             // Found match                                              
             result = t;
@@ -407,7 +407,7 @@ namespace Langulus::Entity
 
       // Scan descriptor                                                
       bool done = false;
-      descriptor.ForEachDeep([&done,&value](const Block& group) {
+      descriptor.ForEachDeep([&](const Block& group) {
          // Found match                                                 
          try {
             value = group.template AsCast<D>();

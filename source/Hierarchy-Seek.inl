@@ -233,8 +233,29 @@ namespace Langulus::Entity
    ///   @return the trait, which is not empty, if trait was found            
    template<SeekStyle SEEK>
    LANGULUS(ALWAYSINLINE)
-   Trait Hierarchy::SeekTrait(const Any& descriptor, TMeta trait, Index offset) const {
-      return mOwners.template SeekTrait<SEEK>(descriptor, trait, offset);
+   Trait Hierarchy::SeekTrait(const Any& descriptor, TMeta meta, Index offset) const {
+      // Scan descriptor                                                
+      Trait result;
+      descriptor.ForEachDeep([&](const Trait& trait) {
+         if (trait.TraitIs(meta)) {
+            if (index == 0) {
+               // Match found                                           
+               result = trait;
+               return false;
+            }
+            
+            --index;
+         }
+
+         return true;         // Just keep searching...                 
+      });
+
+      if (!result.IsEmpty())
+         return Abandon(result);
+
+      // If reached, then no trait was found in the descriptor          
+      // Let's delve into the hierarchy                                 
+      return SeekTrait<SEEK>(meta, offset);
    }
 
    /// Seek a value from static/dynamic/unit traits in the hierarchy          
