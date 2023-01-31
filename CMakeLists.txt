@@ -27,6 +27,7 @@ if (PROJECT_IS_TOP_LEVEL)
 	fetch_langulus_module(SIMD)
 	fetch_langulus_module(Anyness)
 	fetch_langulus_module(Flow)
+	fetch_langulus_module(Math)
 
     add_compile_definitions(LANGULUS_ENABLE_TESTING)
     enable_testing()
@@ -51,4 +52,5 @@ target_link_libraries(Langulus.Entity
                 Langulus.SIMD
                 Langulus.Anyness
                 Langulus.Flow
+                Langulus.Math
 )

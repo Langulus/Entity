@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include <LangulusFlow.hpp>
+#include <LangulusMath.hpp>
 
 #if defined(LANGULUS_EXPORT_ALL) || defined(LANGULUS_EXPORT_ENTITY)
    #define LANGULUS_API_ENTITY() LANGULUS_EXPORT()

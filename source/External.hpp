@@ -8,6 +8,56 @@
 #pragma once
 #include "Module.hpp"
 
+namespace Langulus
+{
+
+   ///                                                                        
+   ///   Vertex/index buffer view                                             
+   ///                                                                        
+   struct GeometryView {
+      // Number of primitives                                           
+      uint32_t mPrimitiveCount {};
+      // Starting primitive                                             
+      uint32_t mPrimitiveStart {};
+      // Number of indices                                              
+      uint32_t mIndexCount {};
+      // Starting index                                                 
+      uint32_t mIndexStart {};
+      // Data topology                                                  
+      RTTI::DMeta mPrimitiveType {};
+      // Double-sidedness                                               
+      bool mBilateral {};
+
+      bool operator == (const GeometryView&) const noexcept;
+
+      GeometryView Decay() const;
+   };
+
+
+   ///                                                                        
+   ///   Universal pixel buffer view                                          
+   ///                                                                        
+   struct TextureView {
+      uint32_t mWidth {1};
+      uint32_t mHeight {1};
+      uint32_t mDepth {1};
+      uint32_t mFrames {1};
+      RTTI::DMeta mFormat {};
+      // Reverse RGBA to BGRA                                           
+      // This is not a scalable solution and would eventually fail      
+      bool mReverseFormat {};
+
+      bool operator == (const TextureView&) const noexcept;
+
+      NOD() constexpr uint32_t GetPixelCount() const noexcept;
+      NOD() constexpr uint32_t GetDimensionCount() const noexcept;
+      NOD() Size GetPixelBytesize() const noexcept;
+      NOD() Size GetBytesize() const noexcept;
+      NOD() uint32_t GetChannelCount() const noexcept;
+   };
+
+} // namespace Langulus
+
 namespace Langulus::A
 {
 
@@ -34,6 +84,10 @@ namespace Langulus::A
       LANGULUS(PRODUCER) PlatformModule;
       LANGULUS_BASES(Platform);
       using Platform::Platform;
+
+      virtual void* GetNativeHandle() const noexcept = 0;
+      virtual Math::Vec2 GetSize() const noexcept = 0;
+      virtual bool IsMinimized() const noexcept = 0;
    };
    
    ///                                                                        
@@ -77,6 +131,11 @@ namespace Langulus::A
       LANGULUS(PRODUCER) World;
       LANGULUS_BASES(Physical);
       using Physical::Physical;
+
+      virtual bool Cull(const Math::LOD&) const noexcept = 0;
+      virtual Math::Level GetLevel() const noexcept = 0;
+      virtual Math::Matrix4 GetModelTransform(const Math::LOD&) const noexcept = 0;
+      virtual Math::Matrix4 GetViewTransform(const Math::LOD&) const noexcept = 0;
    };
    
    ///                                                                        
@@ -193,17 +252,17 @@ namespace Langulus::A
          : Unit {type, descriptor}
          , ProducedFrom {producer, descriptor} {}
 
-      using DataMap = Anyness::TUnorderedMap<Anyness::TMeta, Anyness::Any>;
+      using DataMap = Anyness::TUnorderedMap<Anyness::TMeta, Anyness::TAny<Anyness::Any>>;
 
-      virtual const DataMap& GetData() const noexcept = 0;
-
-      NOD() Anyness::Trait* GetData(Anyness::TMeta, Offset = 0);
-      NOD() const Anyness::Trait* GetData(Anyness::TMeta, Offset = 0) const;
+      virtual const DataMap& GetDataMap() const noexcept = 0;
 
       template<CT::Trait T>
-      NOD() Anyness::Trait* GetData(Offset = 0);
+      NOD() const Anyness::Any* GetData(Offset) const noexcept;
+      NOD() const Anyness::Any* GetData(Anyness::TMeta, Offset) const noexcept;
+
       template<CT::Trait T>
-      NOD() const Anyness::Trait* GetData(Offset = 0) const;
+      NOD() const Anyness::TAny<Anyness::Any>* GetData() const noexcept;
+      NOD() const Anyness::TAny<Anyness::Any>* GetData(Anyness::TMeta) const noexcept;
    };
 
    ///                                                                        
@@ -215,6 +274,8 @@ namespace Langulus::A
       using Content::Content;
 
       virtual Anyness::DMeta GetTopology() const noexcept = 0;
+      virtual GeometryView GetView() const noexcept = 0;
+      virtual const Geometry* GetLOD(const Math::LOD&) const noexcept = 0;
    };
 
    ///                                                                        
@@ -224,6 +285,8 @@ namespace Langulus::A
       LANGULUS(PRODUCER) ContentModule;
       LANGULUS_BASES(Content);
       using Content::Content;
+
+      virtual const Material* GetLOD(const Math::LOD&) const noexcept = 0;
    };
 
    ///                                                                        
@@ -235,6 +298,8 @@ namespace Langulus::A
       using Content::Content;
 
       virtual Anyness::DMeta GetFormat() const noexcept = 0;
+      virtual TextureView GetView() const noexcept = 0;
+      virtual const Texture* GetLOD(const Math::LOD&) const noexcept = 0;
    };
 
 } // namespace Langulus::A
