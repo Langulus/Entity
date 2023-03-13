@@ -52,7 +52,7 @@ namespace Langulus::Entity
       NOD() Runtime* GetRuntime() const noexcept;
       NOD() const Hierarchy& GetOwners() const noexcept;
 
-      template<SeekStyle = SeekStyle::HereAndAbove>
+      template<Seek = Seek::HereAndAbove>
       bool DoInHierarchy(Verb&);
       
       ///                                                                     

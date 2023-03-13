@@ -24,14 +24,14 @@ namespace Langulus::Entity
 
    /// Copy-assignment                                                        
    template<class T>
-   Pinnable<T>& Pinnable<T>::operator = (const T& rhs) requires (CT::Copyable<T>) {
+   Pinnable<T>& Pinnable<T>::operator = (const T& rhs) requires (CT::CopyAssignable<T>) {
       T::operator = (rhs);
       return *this;
    }
 
    /// Move-assignment                                                        
    template<class T>
-   Pinnable<T>& Pinnable<T>::operator = (T&& rhs) noexcept requires (CT::Movable<T>) {
+   Pinnable<T>& Pinnable<T>::operator = (T&& rhs) noexcept requires (CT::MoveAssignable<T>) {
       T::operator = (Forward<T>(rhs));
       return *this;
    }
@@ -64,7 +64,7 @@ namespace Langulus::Entity
    ///   @param descriptor - descriptor to search through                     
    ///   @param value - the value to fill in                                  
    ///   @return true if value changed                                        
-   /*template<CT::Trait T, SeekStyle SEEK, CT::Data D>
+   /*template<CT::Trait T, Seek SEEK, CT::Data D>
    bool Hierarchy::SeekTrait(const Any& descriptor, D& value) const {
       if constexpr (CT::Pinnable<D>) {
          // Never touch pinned values                                   
@@ -129,7 +129,7 @@ namespace Langulus::Entity
    ///   @param descriptor - descriptor to search through                     
    ///   @param value - the value to fill in                                  
    ///   @return true if value changed                                        
-   template<SeekStyle SEEK, CT::Data D>
+   template<Seek SEEK, CT::Data D>
    bool Hierarchy::SeekValue(const Any& descriptor, D& value) const {
       if constexpr (CT::Pinnable<D>) {
          // Never touch pinned values                                   
@@ -184,7 +184,7 @@ namespace Langulus::Entity
    ///   @tparam D - type of data we're filling in (deducible)                
    ///   @param value - the value to fill in                                  
    ///   @return true if value changed                                        
-   template<CT::Trait T, SeekStyle SEEK, CT::Data D>
+   template<CT::Trait T, Seek SEEK, CT::Data D>
    bool Hierarchy::SeekTrait(D& value) const {
       if constexpr (CT::Pinnable<D>) {
          // Never touch pinned values                                   
@@ -210,7 +210,7 @@ namespace Langulus::Entity
    ///   @tparam D - type of data we're filling in (deducible)                
    ///   @param value - the value to fill in                                  
    ///   @return true if value changed                                        
-   template<SeekStyle SEEK, CT::Data D>
+   template<Seek SEEK, CT::Data D>
    bool Hierarchy::SeekValue(D& value) const {
       if constexpr (CT::Pinnable<D>) {
          // Never touch pinned values                                   
@@ -235,7 +235,7 @@ namespace Langulus::Entity
    ///   @tparam SEEK - the direction we're seeking in the hierarchy          
    ///   @param descriptor - descriptor to search through                     
    ///   @return a valid unit pointer, if unit was found                      
-   template<CT::Data T, SeekStyle SEEK>
+   template<CT::Data T, Seek SEEK>
    Unit* Hierarchy::SeekUnit(const Any& descriptor) const {
       static_assert(CT::Unit<T>, "T must be a unit");
 
@@ -272,7 +272,7 @@ namespace Langulus::Entity
    ///   @param token - name of the unit to search for                        
    ///   @param descriptor - descriptor to search through                     
    ///   @return a valid unit pointer, if unit was found                      
-   template<SeekStyle SEEK>
+   template<Seek SEEK>
    Unit* Hierarchy::SeekUnit(const Token& token, const Any& descriptor) const {
       return SeekUnit<SEEK>(Construct::FromToken(token), descriptor);
    }
@@ -282,7 +282,7 @@ namespace Langulus::Entity
    ///   @param what - the unit descriptor to match                           
    ///   @param descriptor - descriptor to search through                     
    ///   @return a valid unit pointer, if unit was found                      
-   template<SeekStyle SEEK>
+   template<Seek SEEK>
    Unit* Hierarchy::SeekUnit(const Construct& what, const Any& descriptor) const {
       if (!what.GetType())
          return nullptr;
@@ -321,7 +321,7 @@ namespace Langulus::Entity
    ///   @tparam T - the type of unit to search for                           
    ///   @tparam SEEK - the direction we're seeking in the hierarchy          
    ///   @return a valid unit pointer, if unit was found                      
-   template<CT::Data T, SeekStyle SEEK>
+   template<CT::Data T, Seek SEEK>
    Unit* Hierarchy::SeekUnit() const {
       static_assert(CT::Unit<T>, "T must be a unit");
 
@@ -340,7 +340,7 @@ namespace Langulus::Entity
    ///   @tparam SEEK - the direction we're seeking in the hierarchy          
    ///   @param token - name of the unit to search for                        
    ///   @return a valid unit pointer, if unit was found                      
-   template<SeekStyle SEEK>
+   template<Seek SEEK>
    Unit* Hierarchy::SeekUnit(const Token& token) const {
       return SeekUnit<SEEK>(Construct::FromToken(token));
    }
@@ -349,7 +349,7 @@ namespace Langulus::Entity
    ///   @tparam SEEK - the direction we're seeking in the hierarchy          
    ///   @param what - the unit descriptor to match                           
    ///   @return a valid unit pointer, if unit was found                      
-   template<SeekStyle SEEK>
+   template<Seek SEEK>
    Unit* Hierarchy::SeekUnit(const Construct& what) const {
       Unit* result {};
       for (auto owner : *this) {

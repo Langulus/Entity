@@ -172,7 +172,7 @@ namespace Langulus::Entity
    Count Thing::RemoveTrait(const Trait& prototype) {
       const auto found = mTraits.FindKeyIndex(prototype.GetTrait());
       if (found) {
-         const auto removed = mTraits.GetValue(found).RemoveValue(prototype);
+         const auto removed = mTraits.GetValue(found).Remove(prototype);
          if (removed) {
             ENTITY_VERBOSE_SELF(prototype << " removed");
             mRefreshRequired = true;
@@ -225,7 +225,7 @@ namespace Langulus::Entity
    ///   @return the name, or empty string if no such trait was found here    
    Text Thing::GetName() const {
       Text name;
-      if (!SeekTrait<Traits::Name, SeekStyle::Here>(name))
+      if (!SeekTrait<Traits::Name, Seek::Here>(name))
          return {};
       return name;
    }

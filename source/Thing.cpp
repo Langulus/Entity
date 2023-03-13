@@ -386,7 +386,7 @@ namespace Langulus::Entity
          return;
 
       list[foundUnit] = withThis;
-      replaceThis->mOwners.RemoveValue(this);
+      replaceThis->mOwners.Remove(this);
       withThis->mOwners << this;
       mRefreshRequired = true;
       ENTITY_VERBOSE_SELF(replaceThis << " replaced with " << withThis);

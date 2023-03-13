@@ -15,7 +15,7 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param meta - the units to seek for                                  
    ///   @return the gathered units that match the type                       
-   template<SeekStyle SEEK>
+   template<Seek SEEK>
    LANGULUS(ALWAYSINLINE)
    TAny<Unit*> Unit::GatherUnits(DMeta meta) {
       return mOwners.template GatherUnits<SEEK>(meta);
@@ -25,7 +25,7 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param meta - the units to seek for                                  
    ///   @return the gathered units that match the type                       
-   template<SeekStyle SEEK>
+   template<Seek SEEK>
    LANGULUS(ALWAYSINLINE)
    TAny<const Unit*> Unit::GatherUnits(DMeta meta) const {
       return mOwners.template GatherUnits<SEEK>(meta);
@@ -35,7 +35,7 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param trait - the trait to seek for                                 
    ///   @return the gathered traits that match the type                      
-   template<SeekStyle SEEK>
+   template<Seek SEEK>
    LANGULUS(ALWAYSINLINE)
    TAny<Trait> Unit::GatherTraits(TMeta trait) {
       return mOwners.template GatherTraits<SEEK>(trait);
@@ -45,7 +45,7 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param trait - the trait to seek for                                 
    ///   @return the gathered traits that match the type                      
-   template<SeekStyle SEEK>
+   template<Seek SEEK>
    LANGULUS(ALWAYSINLINE)
    TAny<Trait> Unit::GatherTraits(TMeta trait) const {
       return mOwners.template GatherTraits<SEEK>(trait);
@@ -55,7 +55,7 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @tparam D - type to convert to                                       
    ///   @return the gathered values                                          
-   template<SeekStyle SEEK, CT::Data D>
+   template<Seek SEEK, CT::Data D>
    LANGULUS(ALWAYSINLINE)
    TAny<D> Unit::GatherValues() const {
       return mOwners.template GatherValues<SEEK, D>();

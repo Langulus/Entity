@@ -117,15 +117,15 @@ namespace Langulus::Entity
          Logger::Error("Registering module `", info->mName, "` failed");
 
          // Make sure we end up in an invariant state                   
-         mModules[info->mPriority].RemoveValue(module);
+         mModules[info->mPriority].Remove(module);
          if (mModules[info->mPriority].IsEmpty())
             mModules.RemoveKey(info->mPriority);
 
-         mInstantiations[library].RemoveValue(module);
+         mInstantiations[library].Remove(module);
          if (mInstantiations[library].IsEmpty())
             mInstantiations.RemoveKey(library);
 
-         mModulesByType[module->GetType()].RemoveValue(module);
+         mModulesByType[module->GetType()].Remove(module);
          if (mModulesByType[module->GetType()].IsEmpty())
             mModulesByType.RemoveKey(module->GetType());
 

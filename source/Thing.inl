@@ -72,7 +72,7 @@ namespace Langulus::Entity
          );
       #endif
       
-      const auto removed = mChildren.RemoveValue<false, true>(entity);
+      const auto removed = mChildren.Remove(entity);
       if constexpr (TWOSIDED) {
          if (removed && entity->mOwner == this) {
             entity->mOwner = nullptr;
@@ -92,25 +92,25 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in the hierarchy to execute                     
    ///   @param verb - the verb to execute                                    
    ///   @return true if succesfully executed                                 
-   template<SeekStyle SEEK>
+   template<Seek SEEK>
    bool Thing::DoInHierarchy(Verb& verb) {
       // Execute in owners directly                                     
-      if constexpr (SEEK & SeekStyle::Here) {
+      if constexpr (SEEK & Seek::Here) {
          Do(verb);
          if (verb.IsDone())
             return true;
       }
 
       // Execute in parents up to root, if requested                    
-      if constexpr (SEEK & SeekStyle::Above) {
-         if (mOwner && mOwner->DoInHierarchy<SeekStyle::HereAndAbove>(verb))
+      if constexpr (SEEK & Seek::Above) {
+         if (mOwner && mOwner->DoInHierarchy<Seek::HereAndAbove>(verb))
             return true;
       }
 
       // Execute in children, if requested                              
-      if constexpr (SEEK & SeekStyle::Below) {
+      if constexpr (SEEK & Seek::Below) {
          for (auto child : mChildren) {
-            if (child->DoInHierarchy<SeekStyle::HereAndBelow>(verb))
+            if (child->DoInHierarchy<Seek::HereAndBelow>(verb))
                return true;
          }
       }
@@ -169,11 +169,11 @@ namespace Langulus::Entity
       if (!foundType)
          return 0;
 
-      const auto removed = mUnits.GetValue(foundType).RemoveValue(unit);
+      const auto removed = mUnits.GetValue(foundType).Remove(unit);
       if (removed) {
          // Decouple before unit is destroyed                           
          if constexpr (TWOSIDED)
-            unit->mOwners.template RemoveValue<false, true>(this);
+            unit->mOwners.Remove(this);
 
          // Notify all other units about the environment change         
          mRefreshRequired = true;
@@ -200,7 +200,7 @@ namespace Langulus::Entity
       for (auto unit : list) {
          ENTITY_VERBOSE_SELF(unit << " removed");
          if constexpr (TWOSIDED)
-            unit->mOwners.template RemoveValue<false, true>(this);
+            unit->mOwners.Remove(this);
       }
 
       const auto removed = list.GetCount();
@@ -324,7 +324,7 @@ namespace Langulus::Entity
    ///   @tparam SEEK - what part of the hierarchy to use for the creation    
    ///   @param construct - instructions for the creation of the data         
    ///   @return created data                                                 
-   template<SeekStyle SEEK>
+   template<Seek SEEK>
    Any Thing::CreateData(const Construct& construct) {
       const auto type = construct.GetType();
       const auto producer = type->mProducer;
@@ -407,7 +407,7 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in hierarchy to execute                         
    ///   @param verb - the verb to execute                                    
    ///   @return true if succesfully executed                                 
-   template<SeekStyle SEEK>
+   template<Seek SEEK>
    bool Unit::DoInHierarchy(Verb& verb) {
       if (mOwners.IsEmpty()) {
          Logger::Warning("No owners available for executing ", verb);

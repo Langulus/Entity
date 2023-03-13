@@ -58,7 +58,7 @@ namespace Langulus::Entity
       // Hierarchy requires an update                                   
       bool mRefreshRequired {};
 
-      template<SeekStyle = SeekStyle::HereAndAbove>
+      template<Seek = Seek::HereAndAbove>
       NOD() Any CreateData(const Construct&);
 
    public:
@@ -77,7 +77,7 @@ namespace Langulus::Entity
       void Select(Verb&);
       void Create(Verb&);
 
-      template<SeekStyle = SeekStyle::HereAndAbove>
+      template<Seek = Seek::HereAndAbove>
       bool DoInHierarchy(Verb&);
 
       Any Run(const Lingua&);

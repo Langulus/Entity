@@ -15,7 +15,7 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param meta - the units to seek for                                  
    ///   @return the gathered units that match the type                       
-   template<SeekStyle SEEK>
+   template<Seek SEEK>
    LANGULUS(ALWAYSINLINE)
    TAny<Unit*> Hierarchy::GatherUnits(DMeta meta) {
       TAny<Unit*> result;
@@ -28,7 +28,7 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param meta - the units to seek for                                  
    ///   @return the gathered units that match the type                       
-   template<SeekStyle SEEK>
+   template<Seek SEEK>
    LANGULUS(ALWAYSINLINE)
    TAny<const Unit*> Hierarchy::GatherUnits(DMeta meta) const {
       TAny<const Unit*> result;
@@ -41,7 +41,7 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param trait - the trait to seek for                                 
    ///   @return the gathered traits that match the type                      
-   template<SeekStyle SEEK>
+   template<Seek SEEK>
    LANGULUS(ALWAYSINLINE)
    TAny<Trait> Hierarchy::GatherTraits(TMeta trait) {
       TAny<Trait> result;
@@ -54,7 +54,7 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param trait - the trait to seek for                                 
    ///   @return the gathered traits that match the type                      
-   template<SeekStyle SEEK>
+   template<Seek SEEK>
    LANGULUS(ALWAYSINLINE)
    TAny<Trait> Hierarchy::GatherTraits(TMeta trait) const {
       TAny<Trait> result;
@@ -67,7 +67,7 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @tparam D - type to convert to                                       
    ///   @return the gathered values                                          
-   template<SeekStyle SEEK, CT::Data D>
+   template<Seek SEEK, CT::Data D>
    LANGULUS(ALWAYSINLINE)
    TAny<D> Hierarchy::GatherValues() const {
       TAny<D> result;

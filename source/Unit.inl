@@ -47,7 +47,7 @@ namespace Langulus::Entity
    void Unit::Decouple(const Thing* entity) {
       if (!entity)
          return;
-      mOwners.RemoveValue(entity);
+      mOwners.Remove(entity);
       const_cast<Thing*>(entity)->RemoveUnit<false>(this);
    }
 

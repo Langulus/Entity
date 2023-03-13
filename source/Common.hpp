@@ -22,7 +22,7 @@ namespace Langulus::Entity
    using ::Langulus::Flow::Verb;
    using ::Langulus::Flow::Construct;
    using ::Langulus::Flow::Charge;
-   using ::Langulus::Flow::SeekStyle;
+   using ::Langulus::Flow::Seek;
    using ::Langulus::Flow::Resolvable;
    using ::Langulus::Flow::Temporal;
    using ::Langulus::Flow::Time;

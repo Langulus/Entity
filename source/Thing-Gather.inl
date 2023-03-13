@@ -25,10 +25,10 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param meta - the units to seek for                                  
    ///   @return the gathered units that match the type                       
-   template<SeekStyle SEEK>
+   template<Seek SEEK>
    TAny<Unit*> Thing::GatherUnits(DMeta meta) {
       TAny<Unit*> result;
-      if constexpr (SEEK & SeekStyle::Here) {
+      if constexpr (SEEK & Seek::Here) {
          // Seek here if requested                                      
          for (auto unitList : mUnits) {
             for (auto unit : unitList.mValue) {
@@ -38,20 +38,20 @@ namespace Langulus::Entity
          }
       }
 
-      if constexpr (SEEK & SeekStyle::Above) {
+      if constexpr (SEEK & Seek::Above) {
          // Seek in parents up to root, if requested                    
          if (mOwner) {
             auto inParents = mOwner->template
-               GatherUnits<SeekStyle::HereAndAbove>(meta);
+               GatherUnits<Seek::HereAndAbove>(meta);
             result += Abandon(inParents);
          }
       }
 
-      if constexpr (SEEK & SeekStyle::Below) {
+      if constexpr (SEEK & Seek::Below) {
          // Seek children, if requested                                 
          for (auto child : mChildren) {
             auto inChildren = child->template 
-               GatherUnits<SeekStyle::HereAndBelow>(meta);
+               GatherUnits<Seek::HereAndBelow>(meta);
             result += Abandon(inChildren);
          }
       }
@@ -63,7 +63,7 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param meta - the units to seek for                                  
    ///   @return the gathered units that match the type                       
-   template<SeekStyle SEEK>
+   template<Seek SEEK>
    LANGULUS(ALWAYSINLINE)
    TAny<const Unit*> Thing::GatherUnits(DMeta meta) const {
       return const_cast<Thing*>(this)->template GatherUnits<SEEK>(meta);
@@ -73,11 +73,11 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param trait - the trait to seek for                                 
    ///   @return the gathered traits that match the type                      
-   template<SeekStyle SEEK>
+   template<Seek SEEK>
    TAny<Trait> Thing::GatherTraits(TMeta trait) {
       TAny<Trait> results;
 
-      if constexpr (SEEK & SeekStyle::Here) {
+      if constexpr (SEEK & Seek::Here) {
          // Handle some predefined traits here                          
          if (trait->template Is<Traits::Unit>()) {
             for (auto unit : mUnits)
@@ -121,19 +121,19 @@ namespace Langulus::Entity
          }
       }
 
-      if constexpr (SEEK & SeekStyle::Above) {
+      if constexpr (SEEK & Seek::Above) {
          // Seek in parents up to root, if requested                    
          if (mOwner) {
             results += mOwner->template
-               GatherTraits<SeekStyle::HereAndAbove>(trait);
+               GatherTraits<Seek::HereAndAbove>(trait);
          }
       }
 
-      if constexpr (SEEK & SeekStyle::Below) {
+      if constexpr (SEEK & Seek::Below) {
          // Seek children, if requested                                 
          for (auto child : mChildren) {
             results += mOwner->template
-               GatherTraits<SeekStyle::HereAndBelow>(trait);
+               GatherTraits<Seek::HereAndBelow>(trait);
          }
       }
 
@@ -144,7 +144,7 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param trait - the trait to seek for                                 
    ///   @return the gathered traits that match the type                      
-   template<SeekStyle SEEK>
+   template<Seek SEEK>
    LANGULUS(ALWAYSINLINE)
    TAny<Trait> Thing::GatherTraits(TMeta trait) const {
       return const_cast<Thing*>(this)->template GatherTraits<SEEK>(trait);
@@ -154,11 +154,11 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @tparam D - type to convert to                                       
    ///   @return the gathered values                                          
-   template<SeekStyle SEEK, CT::Data D>
+   template<Seek SEEK, CT::Data D>
    TAny<D> Thing::GatherValues() const {
       TAny<D> results;
 
-      if constexpr (SEEK & SeekStyle::Here) {
+      if constexpr (SEEK & Seek::Here) {
          // Check dynamic traits in the entity                          
          for (auto traitGroup : mTraits) {
             for (auto trait : traitGroup.mValue) {
@@ -190,19 +190,19 @@ namespace Langulus::Entity
          }
       }
 
-      if constexpr (SEEK & SeekStyle::Above) {
+      if constexpr (SEEK & Seek::Above) {
          // Seek in parents up to root, if requested                    
          if (mOwner) {
             results += mOwner->template
-               GatherValues<SeekStyle::HereAndAbove, D>();
+               GatherValues<Seek::HereAndAbove, D>();
          }
       }
 
-      if constexpr (SEEK & SeekStyle::Below) {
+      if constexpr (SEEK & Seek::Below) {
          // Seek children, if requested                                 
          for (auto child : mChildren) {
             results += mOwner->template
-               GatherValues<SeekStyle::HereAndBelow, D>();
+               GatherValues<Seek::HereAndBelow, D>();
          }
       }
 
