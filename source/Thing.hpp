@@ -6,25 +6,16 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
+#include "Hierarchy.hpp"
 #include "Unit.hpp"
-#include "Runtime.hpp"
 
-LANGULUS_DEFINE_TRAIT(Runtime, "Accesses the runtime of a hierarchy of Things");
-LANGULUS_DEFINE_TRAIT(Unit, "Accesses units (components) of Things");
+LANGULUS_DEFINE_TRAIT(Runtime,
+   "Accesses the runtime of a hierarchy of Things");
+LANGULUS_DEFINE_TRAIT(Unit,
+   "Accesses units (components) of Things");
 
 namespace Langulus::Entity
 {
-
-   using Flow::Code;
-   using UnitMap = TUnorderedMap<DMeta, TAny<Unit*>>;
-   using TraitMap = TUnorderedMap<TMeta, TAny<Trait>>;
-
-   /// A text specialization, dedicated for natural language text             
-   /// It is a placeholder type, that can be extended by external modules     
-   class Lingua : public Text {
-      LANGULUS(ABSTRACT) true;
-   };
-
 
    ///                                                                        
    ///   Thing                                                                
@@ -196,7 +187,7 @@ namespace Langulus::Entity
 
 } // namespace Langulus::Entity
 
-#include "Thing.inl"
+/*#include "Thing.inl"
 #include "Thing-Seek.inl"
 #include "Thing-Gather.inl"
 
@@ -206,4 +197,4 @@ namespace Langulus::Entity
 
 #include "Hierarchy.inl"
 #include "Hierarchy-Seek.inl"
-#include "Hierarchy-Gather.inl"
+#include "Hierarchy-Gather.inl"*/

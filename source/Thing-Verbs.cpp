@@ -105,6 +105,7 @@ namespace Langulus::Entity
                ENTITY_CREATION_VERBOSE_SELF(Logger::Yellow,
                   "Charged creation - creating ", i + 1, " of ", count);
             }
+            Runtime test {this};
 
             if (construct.Is<Thing>()) {
                // Instantiate a child Thing                             

@@ -7,14 +7,9 @@
 ///                                                                           
 #pragma once
 #include "Module.hpp"
-#include "External.hpp"
 
 namespace Langulus::Entity
 {
-
-   class Thing;
-   using ModuleList = TAny<Module*>;
-
 
    ///                                                                        
    ///   Runtime                                                              

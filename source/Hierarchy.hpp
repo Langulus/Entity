@@ -11,12 +11,6 @@
 namespace Langulus::Entity
 {
 
-   struct Unit;
-   class Thing;
-   class Runtime;
-   struct Hierarchy;
-
-
    ///                                                                        
    ///   Pinnable member                                                      
    ///                                                                        

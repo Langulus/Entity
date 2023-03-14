@@ -13,8 +13,6 @@ LANGULUS_EXCEPTION(Module);
 namespace Langulus
 {
 
-   using MetaList = Anyness::TAny<const RTTI::Meta*>;
-
    /// Helper function, that reflects and registers a type list               
    /// All types in the list, as well as their member and base types, will    
    /// be associated with the module library. When library unloads, all       
@@ -26,7 +24,7 @@ namespace Langulus
    ///                 be aware, these does not include bases and members     
    ///                 but only intentionally exposed types                   
    template<class... T>
-   void RegisterTypeList(MetaList& list) {
+   void RegisterTypeList(Entity::MetaList& list) {
       // Merge to avoid duplications                                    
       //TODO use set instead
       (list <<= ... <<= MetaOf<T>());
@@ -36,12 +34,6 @@ namespace Langulus
 
 namespace Langulus::Entity
 {
-
-   /// Predeclarations                                                        
-
-   class Module;
-   class Runtime;
-
 
    ///                                                                        
    ///   External module interface                                            

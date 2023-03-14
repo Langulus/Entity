@@ -7,7 +7,6 @@
 ///                                                                           
 #include "Thing.hpp"
 #include "Runtime.hpp"
-#include "Hierarchy.inl"
 
 #define ENTITY_VERBOSE_SELF(a)            //Logger::Verbose() << this << ": "<< a
 #define ENTITY_VERBOSE(a)                 //Logger::Append() << a

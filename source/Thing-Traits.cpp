@@ -6,7 +6,6 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #include "Thing.hpp"
-#include "Runtime.hpp"
 
 #define ENTITY_VERBOSE_SELF(a)            //Logger::Verbose() << this << ": "<< a
 #define ENTITY_VERBOSE(a)                 //Logger::Append() << a

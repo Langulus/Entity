@@ -19,6 +19,7 @@ namespace Langulus::Entity
 {
 
    using namespace ::Langulus::Anyness;
+
    using ::Langulus::Flow::Verb;
    using ::Langulus::Flow::Construct;
    using ::Langulus::Flow::Charge;
@@ -27,5 +28,60 @@ namespace Langulus::Entity
    using ::Langulus::Flow::Temporal;
    using ::Langulus::Flow::Time;
    using ::Langulus::Flow::Scope;
+   using ::Langulus::Flow::Code;
+
+
+   //                                                                   
+   // Some predeclarations:                                             
+
+   struct Unit;
+   class Thing;
+   class Runtime;
+   class Module;
+   struct Hierarchy;
+
+   using ModuleList = TAny<Module*>;
+   using MetaList = TAny<const RTTI::Meta*>;
+   using UnitMap = TUnorderedMap<DMeta, TAny<Unit*>>;
+   using TraitMap = TUnorderedMap<TMeta, TAny<Trait>>;
+
+   /// A text specialization, dedicated for natural language text             
+   /// It is a placeholder type, that can be extended by external modules     
+   class Lingua : public Text {
+      LANGULUS(ABSTRACT) true;
+   };
 
 } // namespace Langulus::Entity
+
+namespace Langulus::A
+{
+
+   struct PlatformModule;
+   struct Platform;
+   struct Window;
+   struct Cursor;
+
+   struct PhysicalModule;
+   struct Physical;
+   struct World;
+   struct Instance;
+
+   struct FileSystem;
+   struct File;
+   struct Folder;
+
+   struct GraphicsModule;
+   struct Graphics;
+   struct Renderer;
+   struct Layer;
+   struct Camera;
+   struct Renderable;
+   struct Light;
+
+   struct ContentModule;
+   struct Content;
+   struct Geometry;
+   struct Material;
+   struct Texture;
+
+} // namespace Langulus::A
