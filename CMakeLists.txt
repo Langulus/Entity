@@ -43,7 +43,9 @@ if (MSVC)
     target_compile_options(Langulus.Entity PRIVATE /bigobj)
 endif()
 
-target_include_directories(Langulus.Entity PUBLIC include)
+target_include_directories(Langulus.Entity
+    PUBLIC      include
+)
 
 target_link_libraries(Langulus.Entity
     PUBLIC      Langulus.Core
