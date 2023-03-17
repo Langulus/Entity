@@ -65,8 +65,8 @@ namespace Langulus::Entity
       LANGULUS_ASSUME(DevAssumes, nullptr != entity, "Bad entity pointer");
       #if LANGULUS_FEATURE(MANAGED_MEMORY)
          LANGULUS_ASSUME(DevAssumes, 
-            !Anyness::Inner::Allocator::CheckAuthority(MetaOf<Thing>(), entity) ||
-             Anyness::Inner::Allocator::Find(MetaOf<Thing>(), entity)->GetUses() > 1,
+            !Anyness::Inner::Allocator::CheckAuthority(GetType(), entity) ||
+             Anyness::Inner::Allocator::Find(GetType(), entity)->GetUses() > 1,
             "Managed entity pointer has no ownership outside this function, "
             "and will result in a bad pointer after removed from children"
          );
@@ -192,7 +192,7 @@ namespace Langulus::Entity
    ///   @return the number of removed units                                  
    template<CT::Unit T, bool TWOSIDED>
    Count Thing::RemoveUnits() {
-      const auto found = mUnits.FindKeyIndex(MetaData::Of<T>());
+      const auto found = mUnits.FindKeyIndex(MetaData::Of<Decay<T>>());
       if (!found)
          return 0;
 
@@ -336,7 +336,7 @@ namespace Langulus::Entity
       if (producer) {
          // Data has a specific producer, we can narrow the required    
          // contexts for creation a lot                                 
-         if (producer->template CastsTo<Unit>()) {
+         /*if (producer->template CastsTo<Unit>()) {
             // Data is producible from a unit                           
             auto producers = GatherUnits<SEEK>(producer);
             if (!producers.IsEmpty()) {
@@ -363,7 +363,7 @@ namespace Langulus::Entity
          else if (producer->template CastsTo<Thing>()) {
             // Data is producible from a thing                          
             TODO();
-         }
+         }*/
       }
       else if (type->mIsAbstract && !type->mConcrete) {
          // Data doesn't have a specific producer, but it is abstract   

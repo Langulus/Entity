@@ -6,7 +6,6 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include "Hierarchy.hpp"
 #include "Unit.hpp"
 
 LANGULUS_DEFINE_TRAIT(Runtime,
@@ -186,15 +185,3 @@ namespace Langulus::Entity
    };
 
 } // namespace Langulus::Entity
-
-/*#include "Thing.inl"
-#include "Thing-Seek.inl"
-#include "Thing-Gather.inl"
-
-#include "Unit.inl"
-#include "Unit-Seek.inl"
-#include "Unit-Gather.inl"
-
-#include "Hierarchy.inl"
-#include "Hierarchy-Seek.inl"
-#include "Hierarchy-Gather.inl"*/

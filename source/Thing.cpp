@@ -5,14 +5,20 @@
 /// Distributed under GNU General Public License v3+                          
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
-#include "Thing.hpp"
+#include "Thing.inl"
+#include "Hierarchy.inl"
 #include "Runtime.hpp"
+#include "Unit.inl"
 
-#define ENTITY_VERBOSE_SELF(a)            //Logger::Verbose() << this << ": "<< a
-#define ENTITY_VERBOSE(a)                 //Logger::Append() << a
-#define ENTITY_CREATION_VERBOSE_SELF(a)   //Logger::Verbose() << this << ": " <<a
-#define ENTITY_SELECTION_VERBOSE_SELF(a)  //Logger::Verbose() << this << ": " <<a
-
+#if 0
+   #define ENTITY_VERBOSE_ENABLED() 1
+   #define ENTITY_VERBOSE_SELF(...)            Logger::Verbose(Self(), __VA_ARGS__)
+   #define ENTITY_VERBOSE(...)                 Logger::Append(__VA_ARGS__)
+#else
+   #define ENTITY_VERBOSE_ENABLED() 0
+   #define ENTITY_VERBOSE_SELF(...)
+   #define ENTITY_VERBOSE(...)
+#endif
 
 namespace Langulus::Entity
 {
@@ -20,7 +26,7 @@ namespace Langulus::Entity
    /// Construct as a root                                                    
    ///   @param descriptor - instructions for creating the entity             
    Thing::Thing(const Any& descriptor)
-      : Resolvable {MetaOf<Thing>()} {
+      : Resolvable {nullptr /*MetaData::Of<::Langulus::Entity::Thing>()*/} {
       if (!descriptor.IsEmpty()) {
          Verbs::Create creator {descriptor};
          Create(creator);
@@ -31,7 +37,7 @@ namespace Langulus::Entity
    ///   @param parent - the owner of the thing                               
    ///   @param descriptor - instructions for creating the thing              
    Thing::Thing(Thing* parent, const Any& descriptor)
-      : Resolvable {MetaOf<Thing>()}
+      : Resolvable {nullptr /*MetaData::Of<::Langulus::Entity::Thing>()*/}
       , mOwner {parent} {
       if (parent) {
          parent->AddChild<false>(this);

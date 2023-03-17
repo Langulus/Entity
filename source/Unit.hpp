@@ -29,6 +29,7 @@ namespace Langulus::Entity
       // Things that are coupled with this unit                         
       // Owners act as an environment for the unit's context, providing 
       // additional traits and other units for interoperability         
+      static_assert(CT::Complete<Hierarchy>, "Oops");
       Hierarchy mOwners;
 
    public:
@@ -58,14 +59,14 @@ namespace Langulus::Entity
       ///                                                                     
       ///   Seek                                                              
       ///                                                                     
-      LANGULUS_SEEK_INTERFACE();
-      LANGULUS_SEEK_TOKEN_INTERFACE();
+      //LANGULUS_SEEK_INTERFACE();
+      //LANGULUS_SEEK_TOKEN_INTERFACE();
 
       ///                                                                     
       ///   Gather                                                            
       ///                                                                     
-      LANGULUS_GATHER_INTERFACE();
-      LANGULUS_GATHER_TOKEN_INTERFACE();
+      //LANGULUS_GATHER_INTERFACE();
+      //LANGULUS_GATHER_TOKEN_INTERFACE();
 
    protected:
       void Couple(const Thing*);

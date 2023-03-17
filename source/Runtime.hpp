@@ -23,7 +23,7 @@ namespace Langulus::Entity
    /// children, modules, units, etc.                                         
    ///                                                                        
    class Runtime final {
-   protected:
+   public://protected:
       /// Library handle                                                      
       class SharedLibrary {
       friend class Runtime;
@@ -37,6 +37,7 @@ namespace Langulus::Entity
          // Information function, returning module description          
          Module::InfoFunction mInfo {};
          // List of types, that were registered upon entry              
+         static_assert(CT::Complete<MetaList>, "Nope");
          MetaList mTypes;
          // Number of references for the library                        
          Count mReferences {1};

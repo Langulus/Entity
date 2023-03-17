@@ -5,14 +5,22 @@
 /// Distributed under GNU General Public License v3+                          
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
-#include "Thing.hpp"
+#include "Thing.inl"
 #include "Runtime.hpp"
 
-#define ENTITY_VERBOSE_SELF(...)            //Logger::Verbose(this, ": ", __VA_ARGS__)
-#define ENTITY_VERBOSE(...)                 //Logger::Append(__VA_ARGS__)
-#define ENTITY_CREATION_VERBOSE_SELF(...)   //Logger::Verbose(this, ": ", __VA_ARGS__)
-#define ENTITY_SELECTION_VERBOSE_SELF(...)  //Logger::Verbose(this, ": ", __VA_ARGS__)
-
+#if 0
+   #define ENTITY_VERBOSE_ENABLED() 1
+   #define ENTITY_VERBOSE_SELF(...)            Logger::Verbose(Self(), __VA_ARGS__)
+   #define ENTITY_VERBOSE(...)                 Logger::Append(__VA_ARGS__)
+   #define ENTITY_CREATION_VERBOSE_SELF(...)   Logger::Verbose(Self(), __VA_ARGS__)
+   #define ENTITY_SELECTION_VERBOSE_SELF(...)  Logger::Verbose(Self(), __VA_ARGS__)
+#else
+   #define ENTITY_VERBOSE_ENABLED() 0
+   #define ENTITY_VERBOSE_SELF(...)
+   #define ENTITY_VERBOSE(...)
+   #define ENTITY_CREATION_VERBOSE_SELF(...)
+   #define ENTITY_SELECTION_VERBOSE_SELF(...)
+#endif
 
 namespace Langulus::Entity
 {
@@ -98,6 +106,26 @@ namespace Langulus::Entity
       if (verb.IsEmpty())
          return;
 
+      static_assert(CT::Complete<TUnorderedMap<Token, Runtime::SharedLibrary>>, "Nope1");
+      static_assert(CT::Complete<TUnorderedMap<const RTTI::Meta*, Runtime::SharedLibrary>>, "Nope2");
+      static_assert(CT::Complete<TMap<Real, ModuleList>>, "Nope3");
+      static_assert(CT::Complete<TUnorderedMap<Runtime::SharedLibrary, ModuleList>>, "Nope4");
+      static_assert(CT::Complete<TUnorderedMap<DMeta, ModuleList>>, "Nope5");
+
+      static_assert(CT::Complete<Ptr<Thing>>, "Oops22");
+      static_assert(CT::Complete<TAny<Thing*>>, "Oops23");
+      static_assert(CT::Complete<Hierarchy>, "Oops24");
+      static_assert(CT::Complete<UnitMap>, "Oops25");
+      static_assert(CT::Complete<TraitMap>, "Oops26");
+      static_assert(CT::Complete<Pinnable<Ptr<Runtime>>>, "Oops27");
+      static_assert(CT::Complete<Pinnable<Ptr<Temporal>>>, "Oops28");
+
+      static_assert(CT::Complete<Hierarchy>, "Oops1");
+      static_assert(CT::Complete<Unit>, "Oops2");
+      static_assert(CT::Complete<Temporal>, "Oops3");
+      static_assert(CT::Complete<Thing>, "Oops4");
+      static_assert(CT::Complete<Runtime>, "Oops5");
+
       const auto create = [&](const Construct& construct) {
          const auto count = static_cast<Count>(construct.GetCharge().mMass);
          for (Offset i = 0; i < count; ++i) {
@@ -107,19 +135,19 @@ namespace Langulus::Entity
             }
             Runtime test {this};
 
-            if (construct.Is<Thing>()) {
+            if (construct.template Is<Thing>()) {
                // Instantiate a child Thing                             
                verb << CreateChild(construct);
             }
-            else if (construct.Is<Runtime>()) {
+            else if (construct.template Is<Runtime>()) {
                // Instantiate a runtime                                 
                verb << CreateRuntime();
             }
-            else if (construct.Is<Temporal>()) {
+            else if (construct.template Is<Temporal>()) {
                // Instantiate a temporal flow                           
                verb << CreateFlow();
             }
-            else if (construct.CastsTo<Module>()) {
+            else if (construct.template CastsTo<Module>()) {
                // Instantiate a module from the runtime                 
                auto runtime = GetRuntime();
                auto dependency = runtime->GetDependency(construct.GetType());

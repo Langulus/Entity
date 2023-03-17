@@ -5,13 +5,18 @@
 /// Distributed under GNU General Public License v3+                          
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
-#include "Thing.hpp"
+#include "Thing.inl"
+#include "Thing-Seek.inl"
 
-#define ENTITY_VERBOSE_SELF(a)            //Logger::Verbose() << this << ": "<< a
-#define ENTITY_VERBOSE(a)                 //Logger::Append() << a
-#define ENTITY_CREATION_VERBOSE_SELF(a)   //Logger::Verbose() << this << ": " <<a
-#define ENTITY_SELECTION_VERBOSE_SELF(a)  //Logger::Verbose() << this << ": " <<a
-
+#if 0
+   #define ENTITY_VERBOSE_ENABLED() 1
+   #define ENTITY_VERBOSE_SELF(...)            Logger::Verbose(Self(), __VA_ARGS__)
+   #define ENTITY_VERBOSE(...)                 Logger::Append(__VA_ARGS__)
+#else
+   #define ENTITY_VERBOSE_ENABLED() 0
+   #define ENTITY_VERBOSE_SELF(...)
+   #define ENTITY_VERBOSE(...)
+#endif
 
 namespace Langulus::Entity
 {

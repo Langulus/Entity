@@ -5,7 +5,8 @@
 /// Distributed under GNU General Public License v3+                          
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
-#include "Thing.hpp"
+#include "Thing.inl"
+#include "Unit.inl"
 
 namespace Langulus::Entity
 {

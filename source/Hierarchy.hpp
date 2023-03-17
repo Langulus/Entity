@@ -6,7 +6,7 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include "Common.hpp"
+#include "Module.hpp"
 
 namespace Langulus::Entity
 {
@@ -245,20 +245,24 @@ namespace Langulus::Entity
    #if LANGULUS_FEATURE(MANAGED_MEMORY)
       #define LANGULUS_GATHER_TOKEN_INTERFACE() \
          template<Seek SEEK = Seek::HereAndAbove> \
-         NOD() LANGULUS(ALWAYSINLINE) TAny<Unit*> GatherUnits(const Token& token) { \
+         NOD() LANGULUS(ALWAYSINLINE) \
+         TAny<Unit*> GatherUnits(const Token& token) { \
             return GatherUnits<SEEK>(RTTI::Database.GetMetaData(token)); \
          } \
          template<Seek SEEK = Seek::HereAndAbove> \
-         NOD() LANGULUS(ALWAYSINLINE) TAny<const Unit*> GatherUnits(const Token& token) const { \
+         NOD() LANGULUS(ALWAYSINLINE) \
+         TAny<const Unit*> GatherUnits(const Token& token) const { \
             return GatherUnits<SEEK>(RTTI::Database.GetMetaData(token)); \
          } \
          \
          template<Seek SEEK = Seek::HereAndAbove> \
-         NOD() LANGULUS(ALWAYSINLINE) TAny<Trait> GatherTraits(const Token& token) { \
+         NOD() LANGULUS(ALWAYSINLINE) \
+         TAny<Trait> GatherTraits(const Token& token) { \
             return GatherTraits<SEEK>(RTTI::Database.GetMetaTrait(token)); \
          } \
          template<Seek SEEK = Seek::HereAndAbove> \
-         NOD() LANGULUS(ALWAYSINLINE) TAny<Trait> GatherTraits(const Token& token) const { \
+         NOD() LANGULUS(ALWAYSINLINE) \
+         TAny<Trait> GatherTraits(const Token& token) const { \
             return GatherTraits<SEEK>(RTTI::Database.GetMetaTrait(token)); \
          }
    #else
@@ -279,14 +283,14 @@ namespace Langulus::Entity
       ///                                                                     
       ///   Seek                                                              
       ///                                                                     
-      LANGULUS_SEEK_INTERFACE();
-      LANGULUS_SEEK_TOKEN_INTERFACE();
+      //LANGULUS_SEEK_INTERFACE();
+      //LANGULUS_SEEK_TOKEN_INTERFACE();
 
       ///                                                                     
       ///   Gather                                                            
       ///                                                                     
-      LANGULUS_GATHER_INTERFACE();
-      LANGULUS_GATHER_TOKEN_INTERFACE();
+      //LANGULUS_GATHER_INTERFACE();
+      //LANGULUS_GATHER_TOKEN_INTERFACE();
    };
 
 } // namespace Langulus::Entity
