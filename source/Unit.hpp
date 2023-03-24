@@ -59,14 +59,14 @@ namespace Langulus::Entity
       ///                                                                     
       ///   Seek                                                              
       ///                                                                     
-      //LANGULUS_SEEK_INTERFACE();
-      //LANGULUS_SEEK_TOKEN_INTERFACE();
+      LANGULUS_SEEK_INTERFACE();
+      LANGULUS_SEEK_TOKEN_INTERFACE();
 
       ///                                                                     
       ///   Gather                                                            
       ///                                                                     
-      //LANGULUS_GATHER_INTERFACE();
-      //LANGULUS_GATHER_TOKEN_INTERFACE();
+      LANGULUS_GATHER_INTERFACE();
+      LANGULUS_GATHER_TOKEN_INTERFACE();
 
    protected:
       void Couple(const Thing*);

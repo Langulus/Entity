@@ -106,26 +106,6 @@ namespace Langulus::Entity
       if (verb.IsEmpty())
          return;
 
-      static_assert(CT::Complete<TUnorderedMap<Token, Runtime::SharedLibrary>>, "Nope1");
-      static_assert(CT::Complete<TUnorderedMap<const RTTI::Meta*, Runtime::SharedLibrary>>, "Nope2");
-      static_assert(CT::Complete<TMap<Real, ModuleList>>, "Nope3");
-      static_assert(CT::Complete<TUnorderedMap<Runtime::SharedLibrary, ModuleList>>, "Nope4");
-      static_assert(CT::Complete<TUnorderedMap<DMeta, ModuleList>>, "Nope5");
-
-      static_assert(CT::Complete<Ptr<Thing>>, "Oops22");
-      static_assert(CT::Complete<TAny<Thing*>>, "Oops23");
-      static_assert(CT::Complete<Hierarchy>, "Oops24");
-      static_assert(CT::Complete<UnitMap>, "Oops25");
-      static_assert(CT::Complete<TraitMap>, "Oops26");
-      static_assert(CT::Complete<Pinnable<Ptr<Runtime>>>, "Oops27");
-      static_assert(CT::Complete<Pinnable<Ptr<Temporal>>>, "Oops28");
-
-      static_assert(CT::Complete<Hierarchy>, "Oops1");
-      static_assert(CT::Complete<Unit>, "Oops2");
-      static_assert(CT::Complete<Temporal>, "Oops3");
-      static_assert(CT::Complete<Thing>, "Oops4");
-      static_assert(CT::Complete<Runtime>, "Oops5");
-
       const auto create = [&](const Construct& construct) {
          const auto count = static_cast<Count>(construct.GetCharge().mMass);
          for (Offset i = 0; i < count; ++i) {

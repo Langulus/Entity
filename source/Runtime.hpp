@@ -23,7 +23,7 @@ namespace Langulus::Entity
    /// children, modules, units, etc.                                         
    ///                                                                        
    class Runtime final {
-   public://protected:
+   protected:
       /// Library handle                                                      
       class SharedLibrary {
       friend class Runtime;

@@ -26,7 +26,7 @@ namespace Langulus::Entity
    /// Construct as a root                                                    
    ///   @param descriptor - instructions for creating the entity             
    Thing::Thing(const Any& descriptor)
-      : Resolvable {nullptr /*MetaData::Of<::Langulus::Entity::Thing>()*/} {
+      : Resolvable {MetaOf<Thing>()} {
       if (!descriptor.IsEmpty()) {
          Verbs::Create creator {descriptor};
          Create(creator);
@@ -37,7 +37,7 @@ namespace Langulus::Entity
    ///   @param parent - the owner of the thing                               
    ///   @param descriptor - instructions for creating the thing              
    Thing::Thing(Thing* parent, const Any& descriptor)
-      : Resolvable {nullptr /*MetaData::Of<::Langulus::Entity::Thing>()*/}
+      : Resolvable {MetaOf<Thing>()}
       , mOwner {parent} {
       if (parent) {
          parent->AddChild<false>(this);

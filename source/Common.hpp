@@ -47,7 +47,7 @@ namespace Langulus::Entity
 
    /// A text specialization, dedicated for natural language text             
    /// It is a placeholder type, that can be extended by external modules     
-   class Lingua : public Text {
+   struct Lingua : Text {
       LANGULUS(ABSTRACT) true;
    };
 

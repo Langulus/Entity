@@ -336,7 +336,7 @@ namespace Langulus::Entity
       if (producer) {
          // Data has a specific producer, we can narrow the required    
          // contexts for creation a lot                                 
-         /*if (producer->template CastsTo<Unit>()) {
+         if (producer->template CastsTo<Unit>()) {
             // Data is producible from a unit                           
             auto producers = GatherUnits<SEEK>(producer);
             if (!producers.IsEmpty()) {
@@ -363,7 +363,7 @@ namespace Langulus::Entity
          else if (producer->template CastsTo<Thing>()) {
             // Data is producible from a thing                          
             TODO();
-         }*/
+         }
       }
       else if (type->mIsAbstract && !type->mConcrete) {
          // Data doesn't have a specific producer, but it is abstract   
