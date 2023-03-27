@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include "Thing.hpp"
+#include "Runtime.hpp"
 
 #if 0
    #define ENTITY_VERBOSE_ENABLED() 1
