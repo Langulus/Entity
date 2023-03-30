@@ -8,6 +8,17 @@
 #pragma once
 #include "Module.hpp"
 
+LANGULUS_DEFINE_TRAIT(Cursor,
+   "Enables or disables cursor for window");
+LANGULUS_DEFINE_TRAIT(Monitor,
+   "Monitor to which window is bound, making it fullscreen");
+LANGULUS_DEFINE_TRAIT(MousePosition,
+   "Mouse position, relative to a window");
+LANGULUS_DEFINE_TRAIT(MouseScroll,
+   "Mouse scroll for window");
+LANGULUS_DEFINE_TRAIT(NativeWindowHandle,
+   "Native window handle");
+
 namespace Langulus
 {
 
@@ -135,7 +146,9 @@ namespace Langulus::A
       virtual bool Cull(const Math::LOD&) const noexcept = 0;
       virtual Math::Level GetLevel() const noexcept = 0;
       virtual Math::Matrix4 GetModelTransform(const Math::LOD&) const noexcept = 0;
+      virtual Math::Matrix4 GetModelTransform(const Math::Level& = Math::Level::Default) const noexcept = 0;
       virtual Math::Matrix4 GetViewTransform(const Math::LOD&) const noexcept = 0;
+      virtual Math::Matrix4 GetViewTransform(const Math::Level& = Math::Level::Default) const noexcept = 0;
    };
    
    ///                                                                        

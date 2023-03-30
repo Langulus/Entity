@@ -18,11 +18,13 @@
 #include "../source/Thing-Seek.inl"
 
 #include "../source/Hierarchy.inl"
-//#include "../source/Hierarchy-Gather.inl"
-//#include "../source/Hierarchy-Seek.inl"
+#include "../source/Hierarchy-Gather.inl"
+#include "../source/Hierarchy-Seek.inl"
 
 #include "../source/Unit.inl"
-//#include "../source/Unit-Gather.inl"
-//#include "../source/Unit-Seek.inl"
+#include "../source/Unit-Gather.inl"
+#include "../source/Unit-Seek.inl"
+
+#include "../source/External.hpp"
 
 #define LANGULUS_LIBRARY_ENTITY() 1

@@ -118,7 +118,7 @@ namespace Langulus::CT
 #define LANGULUS_DEFINE_MODULE(m, prio, name, info, depo, cat, ...) \
    LANGULUS_RTTI_BOUNDARY(name) \
    extern "C" { \
-      LANGULUS_EXPORT() void LANGULUS_MODULE_ENTRY() (::Langulus::MetaList& list) { \
+      LANGULUS_EXPORT() void LANGULUS_MODULE_ENTRY() (::Langulus::Entity::MetaList& list) { \
          ::Langulus::RegisterTypeList<m, cat, __VA_ARGS__>(list);\
       } \
       \
