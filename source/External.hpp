@@ -41,7 +41,7 @@ namespace Langulus
 
       bool operator == (const GeometryView&) const noexcept;
 
-      GeometryView Decay() const;
+      NOD() GeometryView Decay() const;
    };
 
 
@@ -96,9 +96,9 @@ namespace Langulus::A
       LANGULUS_BASES(Platform);
       using Platform::Platform;
 
-      virtual void* GetNativeHandle() const noexcept = 0;
-      virtual Math::Vec2 GetSize() const noexcept = 0;
-      virtual bool IsMinimized() const noexcept = 0;
+      NOD() virtual void* GetNativeHandle() const noexcept = 0;
+      NOD() virtual Math::Vec2 GetSize() const noexcept = 0;
+      NOD() virtual bool IsMinimized() const noexcept = 0;
    };
    
    ///                                                                        
@@ -143,20 +143,26 @@ namespace Langulus::A
       LANGULUS_BASES(Physical);
       using Physical::Physical;
 
-      virtual bool Cull(const Math::LOD&) const noexcept = 0;
-      virtual Math::Level GetLevel() const noexcept = 0;
-      virtual Math::Matrix4 GetModelTransform(const Math::LOD&) const noexcept = 0;
-      virtual Math::Matrix4 GetModelTransform(const Math::Level& = Math::Level::Default) const noexcept = 0;
-      virtual Math::Matrix4 GetViewTransform(const Math::LOD&) const noexcept = 0;
-      virtual Math::Matrix4 GetViewTransform(const Math::Level& = Math::Level::Default) const noexcept = 0;
+      NOD() virtual bool Cull(const Math::LOD&) const noexcept = 0;
+      NOD() virtual Math::Level GetLevel() const noexcept = 0;
+      NOD() virtual Math::Matrix4 GetModelTransform(const Math::LOD&) const noexcept = 0;
+      NOD() virtual Math::Matrix4 GetModelTransform(const Math::Level& = Math::Level::Default) const noexcept = 0;
+      NOD() virtual Math::Matrix4 GetViewTransform(const Math::LOD&) const noexcept = 0;
+      NOD() virtual Math::Matrix4 GetViewTransform(const Math::Level& = Math::Level::Default) const noexcept = 0;
    };
    
+   struct File;
+   struct Folder;
+
    ///                                                                        
    ///   Abstract file system module                                          
    ///                                                                        
    struct FileSystem : Entity::Module {
       LANGULUS_BASES(Entity::Module);
       using Entity::Module::Module;
+
+      NOD() virtual const File* GetFile(const Anyness::Path&) const = 0;
+      NOD() virtual const Folder* GetFolder(const Anyness::Path&) const = 0;
    };
 
    ///                                                                        
@@ -170,9 +176,7 @@ namespace Langulus::A
       NOD() virtual Anyness::Any ReadAs(Anyness::DMeta) const = 0;
       
       template<class T>
-      NOD() T ReadAs() const {
-         return ReadAs(RTTI::MetaData::Of<T>()).template As<T>();
-      }
+      NOD() T ReadAs() const;
    };
 
    ///                                                                        
@@ -182,6 +186,9 @@ namespace Langulus::A
       LANGULUS(PRODUCER) FileSystem;
       LANGULUS_BASES(Entity::Unit);
       using Entity::Unit::Unit;
+
+      NOD() virtual const File* GetFile(const Anyness::Path&) const = 0;
+      NOD() virtual const Folder* GetFolder(const Anyness::Path&) const = 0;
    };
 
    ///                                                                        
@@ -258,24 +265,25 @@ namespace Langulus::A
    ///                                                                        
    struct Content : Entity::Unit, Flow::ProducedFrom<ContentModule> {
       LANGULUS_BASES(Entity::Unit);
+      using Data = Anyness::Any;
+      using DataList = Anyness::TAny<Data>;
+      using DataListMap = Anyness::TUnorderedMap<Anyness::TMeta, DataList>;
 
-      Content(Anyness::DMeta type, 
-              ContentModule* producer, 
-              const Anyness::Any& descriptor)
-         : Unit {type, descriptor}
-         , ProducedFrom {producer, descriptor} {}
+   protected:
+      DataListMap mDataListMap;
 
-      using DataMap = Anyness::TUnorderedMap<Anyness::TMeta, Anyness::TAny<Anyness::Any>>;
+   public:
+      Content(Anyness::DMeta, ContentModule*, const Anyness::Any&);
 
-      virtual const DataMap& GetDataMap() const noexcept = 0;
-
-      template<CT::Trait T>
-      NOD() const Anyness::Any* GetData(Offset) const noexcept;
-      NOD() const Anyness::Any* GetData(Anyness::TMeta, Offset) const noexcept;
+      NOD() const DataListMap& GetDataListMap() const noexcept;
 
       template<CT::Trait T>
-      NOD() const Anyness::TAny<Anyness::Any>* GetData() const noexcept;
-      NOD() const Anyness::TAny<Anyness::Any>* GetData(Anyness::TMeta) const noexcept;
+      NOD() const Data* GetData(Offset) const noexcept;
+      NOD() const Data* GetData(Anyness::TMeta, Offset) const noexcept;
+
+      template<CT::Trait T>
+      NOD() const DataList* GetDataList() const noexcept;
+      NOD() const DataList* GetDataList(Anyness::TMeta) const noexcept;
    };
 
    ///                                                                        
@@ -284,11 +292,17 @@ namespace Langulus::A
    struct Geometry : Content {
       LANGULUS(PRODUCER) ContentModule;
       LANGULUS_BASES(Content);
+
+   protected:
+      GeometryView mView;
+
+   public:
       using Content::Content;
 
-      virtual Anyness::DMeta GetTopology() const noexcept = 0;
-      virtual GeometryView GetView() const noexcept = 0;
-      virtual const Geometry* GetLOD(const Math::LOD&) const noexcept = 0;
+      NOD() Anyness::DMeta GetTopology() const noexcept;
+      NOD() const GeometryView& GetView() const noexcept;
+
+      NOD() virtual const Geometry* GetLOD(const Math::LOD&) const noexcept = 0;
    };
 
    ///                                                                        
@@ -299,7 +313,7 @@ namespace Langulus::A
       LANGULUS_BASES(Content);
       using Content::Content;
 
-      virtual const Material* GetLOD(const Math::LOD&) const noexcept = 0;
+      NOD() virtual const Material* GetLOD(const Math::LOD&) const noexcept = 0;
    };
 
    ///                                                                        
@@ -308,11 +322,17 @@ namespace Langulus::A
    struct Texture : Content {
       LANGULUS(PRODUCER) ContentModule;
       LANGULUS_BASES(Content);
+
+   protected:
+      TextureView mView;
+
+   public:
       using Content::Content;
 
-      virtual Anyness::DMeta GetFormat() const noexcept = 0;
-      virtual TextureView GetView() const noexcept = 0;
-      virtual const Texture* GetLOD(const Math::LOD&) const noexcept = 0;
+      NOD() Anyness::DMeta GetFormat() const noexcept;
+      NOD() const TextureView& GetView() const noexcept;
+
+      NOD() virtual const Texture* GetLOD(const Math::LOD&) const noexcept = 0;
    };
 
 } // namespace Langulus::A

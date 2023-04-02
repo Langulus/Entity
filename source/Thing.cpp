@@ -313,6 +313,12 @@ namespace Langulus::Entity
    }
 #endif
 
+   /// Get children hierarchy                                                 
+   ///   @return the hierarchy                                                
+   const Hierarchy& Thing::GetChildren() const noexcept {
+      return mChildren;
+   }
+
    /// Get a child by index                                                   
    ///   @param id - the index to pick                                        
    ///   @return the child entity, or nullptr of none was found               

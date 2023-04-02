@@ -25,6 +25,6 @@
 #include "../source/Unit-Gather.inl"
 #include "../source/Unit-Seek.inl"
 
-#include "../source/External.hpp"
+#include "../source/External.inl"
 
 #define LANGULUS_LIBRARY_ENTITY() 1

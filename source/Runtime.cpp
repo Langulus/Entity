@@ -7,6 +7,7 @@
 ///                                                                           
 #include "Thing.hpp"
 #include "Runtime.hpp"
+#include "External.hpp"
 
 #if LANGULUS_OS(WINDOWS)
    #include <Windows.h>
@@ -242,6 +243,10 @@ namespace Langulus::Entity
       // It might throw if out of memory or on meta collision, while    
       // registering new types on the other side                        
       try {
+         // Make sure that const RTTI::Meta* type is registered here,   
+         // and not inside the library (nasty bugs otherwise)           
+         (void)library.mTypes.GetType();
+
          library.mEntry(library.mTypes);
 
          mLibraries.Insert(path, library);
@@ -323,6 +328,25 @@ namespace Langulus::Entity
       return GetModules(RTTI::Database.GetMetaData(token));
    }
 #endif
+
+   /// Get a file interface, relying on external modules to find it           
+   ///   @param path - the path for the file                                  
+   ///   @return the file interface, or nullptr if file doesn't exist         
+   A::File* Runtime::GetFile(const Path& path) {
+      const auto& fileSystems = GetModules(MetaData::Of<A::FileSystem>());
+      for (auto module : fileSystems) {
+         const auto fs = dynamic_cast<const A::FileSystem*>(module);
+         if (!fs)
+            continue;
+
+         const auto file = fs->GetFile(path);
+         if (file)
+            return const_cast<A::File*>(file);
+      }
+
+      return nullptr;
+   }
+
 
    /// Update the runtime, by updating all module instantiations              
    ///   @param dt - delta time between update calls                          
