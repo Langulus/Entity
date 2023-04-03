@@ -329,9 +329,13 @@ namespace Langulus::Entity
    template<Seek SEEK>
    Any Thing::CreateData(const Construct& construct) {
       const auto type = construct.GetType();
+      if (!type)
+         LANGULUS_THROW(Construct, "Invalid construct");
+
       const auto producer = type->mProducer;
 
-      // Always implicitly attach a parent trait to descriptor          
+      // Always implicitly attach a parent trait to descriptor, it      
+      // will be stripped, when normalizing the descriptor              
       Construct descriptor {construct};
       descriptor << Traits::Parent {this};
 
