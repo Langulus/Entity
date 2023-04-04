@@ -24,7 +24,9 @@ namespace Langulus::Entity
    ///                                                                        
    class Runtime final {
    protected:
-      /// Library handle                                                      
+      ///                                                                     
+      ///   Library handle                                                    
+      ///                                                                     
       class SharedLibrary {
       friend class Runtime;
       protected:
@@ -36,8 +38,9 @@ namespace Langulus::Entity
          Module::CreateFunction mCreator {};
          // Information function, returning module description          
          Module::InfoFunction mInfo {};
-         // List of types, that were registered upon entry              
-         static_assert(CT::Complete<MetaList>, "Nope");
+         // Type of the module instance                                 
+         DMeta mModuleType {};
+         // Set of types, that were registered upon entry               
          MetaList mTypes;
          // Number of references for the library                        
          Count mReferences {1};
@@ -71,9 +74,6 @@ namespace Langulus::Entity
 
       // Instantiated modules, sorted by priority                       
       TMap<Real, ModuleList> mModules;
-
-      // Instantiated modules, indexed by library handles               
-      TUnorderedMap<SharedLibrary, ModuleList> mInstantiations;
 
       // Instantiated modules, indexed by type                          
       TUnorderedMap<DMeta, ModuleList> mModulesByType;

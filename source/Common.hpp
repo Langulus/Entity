@@ -41,7 +41,7 @@ namespace Langulus::Entity
    struct Hierarchy;
 
    using ModuleList = TAny<Module*>;
-   using MetaList = TAny<const RTTI::Meta*>;
+   using MetaList = TUnorderedSet<const RTTI::Meta*>;
    using UnitMap = TUnorderedMap<DMeta, TAny<Unit*>>;
    using TraitMap = TUnorderedMap<TMeta, TAny<Trait>>;
 

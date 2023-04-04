@@ -453,7 +453,7 @@ namespace Langulus::Entity
    }
 
    /// Uses the current runtime to load a shared library module, and          
-   /// instantiate it for use                                                 
+   /// instantiate it for use, if not yet instantiated                        
    ///   @attention assumes a runtime is available in the hierarchy           
    ///   @param module - name of the module                                   
    ///   @param descriptor - instructions for module setup                    

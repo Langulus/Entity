@@ -13,21 +13,25 @@ LANGULUS_EXCEPTION(Module);
 namespace Langulus
 {
 
-   /// Helper function, that reflects and registers a type list               
-   /// All types in the list, as well as their member and base types, will    
+   /// Helper function, that reflects and registers a list of any reflection  
+   /// primitives, like data, verbs, and traits.                              
+   /// All types in the list, as well as data member and base types, will     
    /// be associated with the module library. When library unloads, all       
    /// these definitions will be removed, because otherwise they might        
    /// contain lambdas, that no longer will exist after shared object unload. 
    /// This is possible only when managed reflection feature is enabled.      
    /// If it is not, it is your resposibility to manage these dependencies.   
-   ///   @param list - a container with list of all the registered types      
-   ///                 be aware, these does not include bases and members     
-   ///                 but only intentionally exposed types                   
+   ///   @param list - a set of all the registered types. Be aware, these     
+   ///                 do not include bases and members, but only             
+   ///                 intentionally exposed types. Bases and members will    
+   ///                 still be exported if not yet reflected, and associated 
+   ///                 with the currently set RTTI boundary. These types will 
+   ///                 be unloaded when shared library is unloaded. Unload    
+   ///                 will be forbidden, if they're still in use.            
    template<class... T>
    void RegisterTypeList(Entity::MetaList& list) {
       // Merge to avoid duplications                                    
-      //TODO use set instead
-      (list <<= ... <<= MetaOf<T>());
+      (list << ... << MetaOf<T>());
    }
 
 } // namespace Langulus
@@ -74,7 +78,7 @@ namespace Langulus::Entity
          DMeta mCategory;
       };
 
-      using EntryFunction = void(*)(MetaList&);
+      using EntryFunction = void(*)(DMeta&, MetaList&);
       using CreateFunction = Module*(*)(Runtime*, const Any&);
       using InfoFunction = const Info*(*)();
 
@@ -118,8 +122,10 @@ namespace Langulus::CT
 #define LANGULUS_DEFINE_MODULE(m, prio, name, info, depo, cat, ...) \
    LANGULUS_RTTI_BOUNDARY(name) \
    extern "C" { \
-      LANGULUS_EXPORT() void LANGULUS_MODULE_ENTRY() (::Langulus::Entity::MetaList& list) { \
-         ::Langulus::RegisterTypeList<m, cat, __VA_ARGS__>(list);\
+      LANGULUS_EXPORT() void LANGULUS_MODULE_ENTRY() (::Langulus::Entity::DMeta& meta, ::Langulus::Entity::MetaList& list) { \
+         using DM = ::Langulus::Decay<m>; \
+         meta = ::Langulus::RTTI::MetaData::Of<DM>(); \
+         ::Langulus::RegisterTypeList<DM, ::Langulus::Decay<cat>, __VA_ARGS__>(list); \
       } \
       \
       LANGULUS_EXPORT() ::Langulus::Entity::Module* LANGULUS_MODULE_CREATE() ( \

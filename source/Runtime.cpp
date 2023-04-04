@@ -79,8 +79,11 @@ namespace Langulus::Entity
    ///   @param descriptor - module initialization descriptor                 
    ///   @return the new module instance                                      
    Module* Runtime::InstantiateModule(const Token& name, const Any& descriptor) {
+      // Load the library if not loaded yet                             
+      const auto library = LoadSharedLibrary(name);
+
       // Check if module is already instantiated                        
-      auto& foundModules = GetModules(name);
+      auto& foundModules = GetModules(library.mModuleType);
       if (!foundModules.IsEmpty())
          return foundModules[0];
 
@@ -88,7 +91,6 @@ namespace Langulus::Entity
       Logger::Verbose("Module `", name, "` is not instantiated yet"
          ", so attempting to create it...");
 
-      auto library = LoadSharedLibrary(name);
       return InstantiateModule(library, descriptor);
    }
    
@@ -111,8 +113,8 @@ namespace Langulus::Entity
       // Register the module in the various maps, for fast access       
       try {
          mModules[info->mPriority] << module;
-         mInstantiations[library] << module;
          mModulesByType[module->GetType()] << module;
+         //TODO also register by reflected bases in mModulesByType
       }
       catch (...) {
          Logger::Error("Registering module `", info->mName, "` failed");
@@ -122,13 +124,11 @@ namespace Langulus::Entity
          if (mModules[info->mPriority].IsEmpty())
             mModules.RemoveKey(info->mPriority);
 
-         mInstantiations[library].Remove(module);
-         if (mInstantiations[library].IsEmpty())
-            mInstantiations.RemoveKey(library);
-
          mModulesByType[module->GetType()].Remove(module);
          if (mModulesByType[module->GetType()].IsEmpty())
             mModulesByType.RemoveKey(module->GetType());
+
+         //TODO also cleanup by reflected bases in mModulesByType
 
          delete module;
          return nullptr;
@@ -245,11 +245,13 @@ namespace Langulus::Entity
       try {
          // Make sure that const RTTI::Meta* type is registered here,   
          // and not inside the library (nasty bugs otherwise)           
+         //TODO find a more elegant solution to this, preferably one that doesn't involve prebuild steps with cppast
          (void)library.mTypes.GetType();
 
-         library.mEntry(library.mTypes);
+         library.mEntry(library.mModuleType, library.mTypes);
 
-         mLibraries.Insert(path, library);
+         mLibraries.Insert(name, library);
+
          for (auto externalType : library.mTypes)
             mDependencies.Insert(externalType, library);
 
@@ -259,9 +261,6 @@ namespace Langulus::Entity
       catch (...) {
          // Make sure we end up in an invariant state                   
          Logger::Error("Could not enter `", path, "` due to an exception");
-         mLibraries.RemoveKey(path);
-         for (auto externalType : library.mTypes)
-            mDependencies.RemoveKey(externalType);
          UnloadSharedLibrary(library);
          return {};
       }
@@ -275,11 +274,38 @@ namespace Langulus::Entity
       if (library.mHandle == 0)
          return;
 
+      // Remove all references from module instances by type            
+      for (auto list = mModulesByType.begin(); list != mModulesByType.end(); ++list) {
+         for (auto mod = list->mValue.begin(); mod != list->mValue.end(); ++mod) {
+            if (mod->Is(library.mModuleType))
+               mod = list->mValue.RemoveIndex(mod);
+         }
+
+         if (list->mValue.IsEmpty())
+            list = mModulesByType.RemoveIndex(list);
+      }
+
+      // Destroy all associated module instances                        
+      for (auto list = mModules.begin(); list != mModules.end(); ++list) {
+         for (auto mod = list->mValue.begin(); mod != list->mValue.end(); ++mod) {
+            if (mod->Is(library.mModuleType)) {
+               delete *mod;
+               mod = list->mValue.RemoveIndex(mod);
+            }
+         }
+
+         if (list->mValue.IsEmpty())
+            list = mModules.RemoveIndex(list);
+      }
+
+      // Remove dependencies                                            
       for (auto externalType : library.mTypes)
          mDependencies.RemoveKey(externalType);
 
+      // Unregister external types                                      
       RTTI::Database.UnloadLibrary(library.mInfo()->mName);
 
+      // Unload the shared object                                       
       #if LANGULUS_OS(WINDOWS)
          ::Langulus::Entity::UnloadSharedLibrary(
             reinterpret_cast<HMODULE>(library.mHandle));
@@ -289,6 +315,9 @@ namespace Langulus::Entity
       #else 
          #error Unsupported OS
       #endif
+
+      // Finally, unregister the library                                
+      mLibraries.RemoveValue(library);
    }
 
    /// Get the dependency module of a given type                              
@@ -305,9 +334,9 @@ namespace Langulus::Entity
    ///   @param type - the type to search for                                 
    ///   @return the module instance                                          
    const ModuleList& Runtime::GetModules(DMeta type) const noexcept {
-      auto found = mDependencies.FindKeyIndex(type);
+      auto found = mModulesByType.FindKeyIndex(type);
       if (found)
-         return mInstantiations[mDependencies.GetValue(found)];
+         return mModulesByType.GetValue(found);
 
       static const ModuleList emptyFallback {};
       return emptyFallback;
@@ -347,11 +376,11 @@ namespace Langulus::Entity
       return nullptr;
    }
 
-
-   /// Update the runtime, by updating all module instantiations              
+   /// Update the runtime, by updating all module instantiations by order of  
+   /// their priority                                                         
    ///   @param dt - delta time between update calls                          
    void Runtime::Update(Time dt) {
-      for (auto pair : mInstantiations) {
+      for (auto pair : mModules) {
          for (auto module : pair.mValue)
             module->Update(dt);
       }
