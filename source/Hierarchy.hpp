@@ -91,115 +91,115 @@ namespace Langulus::Entity
       bool SeekValueAux(const Any&, D&, Index = IndexFirst) const; \
       \
       template<CT::Data T, Seek SEEK = Seek::HereAndAbove> \
-      NOD() LANGULUS(ALWAYSINLINE) Decay<T>* SeekUnit(Index offset = IndexFirst) { \
+      NOD() LANGULUS(INLINED) Decay<T>* SeekUnit(Index offset = IndexFirst) { \
          return static_cast<Decay<T>*>( \
             SeekUnit<SEEK>(MetaData::Of<Decay<T>>(), offset) \
          ); \
       } \
       template<CT::Data T, Seek SEEK = Seek::HereAndAbove> \
-      NOD() LANGULUS(ALWAYSINLINE) const Decay<T>* SeekUnit(Index offset = IndexFirst) const { \
+      NOD() LANGULUS(INLINED) const Decay<T>* SeekUnit(Index offset = IndexFirst) const { \
          return static_cast<const Decay<T>*>( \
             SeekUnit<SEEK>(MetaData::Of<Decay<T>>(), offset) \
          ); \
       } \
       template<CT::Data T, Seek SEEK = Seek::HereAndAbove> \
-      NOD() LANGULUS(ALWAYSINLINE) Decay<T>* SeekUnitAux(const Any& aux, Index offset = IndexFirst) { \
+      NOD() LANGULUS(INLINED) Decay<T>* SeekUnitAux(const Any& aux, Index offset = IndexFirst) { \
          return static_cast<Decay<T>*>( \
             SeekUnitAux<SEEK>(aux, MetaData::Of<Decay<T>>(), offset) \
          ); \
       } \
       template<CT::Data T, Seek SEEK = Seek::HereAndAbove> \
-      NOD() LANGULUS(ALWAYSINLINE) const Decay<T>* SeekUnitAux(const Any& aux, Index offset = IndexFirst) const { \
+      NOD() LANGULUS(INLINED) const Decay<T>* SeekUnitAux(const Any& aux, Index offset = IndexFirst) const { \
          return static_cast<const Decay<T>*>( \
             SeekUnitAux<SEEK>(aux, MetaData::Of<Decay<T>>(), offset) \
          ); \
       } \
       \
       template<CT::Data T, Seek SEEK = Seek::HereAndAbove> \
-      NOD() LANGULUS(ALWAYSINLINE) Decay<T>* SeekUnitAuxExt(const Any& aux, Index offset = IndexFirst) { \
+      NOD() LANGULUS(INLINED) Decay<T>* SeekUnitAuxExt(const Any& aux, Index offset = IndexFirst) { \
          return static_cast<Decay<T>*>( \
             SeekUnitAuxExt<SEEK>(aux, Construct::From<T>(), offset) \
          ); \
       } \
       template<CT::Data T, Seek SEEK = Seek::HereAndAbove> \
-      NOD() LANGULUS(ALWAYSINLINE) const Decay<T>* SeekUnitAuxExt(const Any& aux, Index offset = IndexFirst) const { \
+      NOD() LANGULUS(INLINED) const Decay<T>* SeekUnitAuxExt(const Any& aux, Index offset = IndexFirst) const { \
          return static_cast<const Decay<T>*>( \
             SeekUnitAuxExt<SEEK>(aux, Construct::From<T>(), offset) \
          ); \
       } \
       template<CT::Data T, Seek SEEK = Seek::HereAndAbove> \
-      NOD() LANGULUS(ALWAYSINLINE) Decay<T>* SeekUnitAuxExt(const Any& aux, const Any& construct, Index offset = IndexFirst) { \
+      NOD() LANGULUS(INLINED) Decay<T>* SeekUnitAuxExt(const Any& aux, const Any& construct, Index offset = IndexFirst) { \
          return static_cast<Decay<T>*>( \
             SeekUnitAuxExt<SEEK>(aux, Construct::From<T>(construct), offset) \
          ); \
       } \
       template<CT::Data T, Seek SEEK = Seek::HereAndAbove> \
-      NOD() LANGULUS(ALWAYSINLINE) const Decay<T>* SeekUnitAuxExt(const Any& aux, const Any& construct, Index offset = IndexFirst) const { \
+      NOD() LANGULUS(INLINED) const Decay<T>* SeekUnitAuxExt(const Any& aux, const Any& construct, Index offset = IndexFirst) const { \
          return static_cast<const Decay<T>*>( \
             SeekUnitAuxExt<SEEK>(aux, Construct::From<T>(construct), offset) \
          ); \
       } \
       \
       template<CT::Trait T = Trait, Seek SEEK = Seek::HereAndAbove> \
-      NOD() LANGULUS(ALWAYSINLINE) Trait SeekTrait(Index offset = IndexFirst) { \
+      NOD() LANGULUS(INLINED) Trait SeekTrait(Index offset = IndexFirst) { \
          return SeekTrait<SEEK>(MetaTrait::Of<T>(), offset); \
       } \
       template<CT::Trait T = Trait, Seek SEEK = Seek::HereAndAbove> \
-      NOD() LANGULUS(ALWAYSINLINE) Trait SeekTrait(Index offset = IndexFirst) const { \
+      NOD() LANGULUS(INLINED) Trait SeekTrait(Index offset = IndexFirst) const { \
          return SeekTrait<SEEK>(MetaTrait::Of<T>(), offset); \
       } \
       template<CT::Trait T = Trait, Seek SEEK = Seek::HereAndAbove, CT::Data D> \
-      LANGULUS(ALWAYSINLINE) bool SeekTrait(D& output, Index offset = IndexFirst) const { \
+      LANGULUS(INLINED) bool SeekTrait(D& output, Index offset = IndexFirst) const { \
          return SeekTrait<SEEK, D>(MetaTrait::Of<T>(), output, offset); \
       } \
       \
       template<CT::Trait T = Trait, Seek SEEK = Seek::HereAndAbove> \
-      NOD() LANGULUS(ALWAYSINLINE) Trait SeekTraitAux(const Any& aux, Index offset = IndexFirst) const { \
+      NOD() LANGULUS(INLINED) Trait SeekTraitAux(const Any& aux, Index offset = IndexFirst) const { \
          return SeekTraitAux<SEEK>(aux, MetaTrait::Of<T>(), offset); \
       } \
       template<CT::Trait T = Trait, Seek SEEK = Seek::HereAndAbove, CT::Data D> \
-      LANGULUS(ALWAYSINLINE) bool SeekTraitAux(const Any& aux, D& output, Index offset = IndexFirst) const { \
+      LANGULUS(INLINED) bool SeekTraitAux(const Any& aux, D& output, Index offset = IndexFirst) const { \
          return SeekTraitAux<SEEK, D>(aux, MetaTrait::Of<T>(), output, offset); \
       }
 
    #if LANGULUS_FEATURE(MANAGED_MEMORY)
       #define LANGULUS_SEEK_TOKEN_INTERFACE() \
          template<Seek SEEK = Seek::HereAndAbove> \
-         NOD() LANGULUS(ALWAYSINLINE) Unit* SeekUnit(const Token& token, Index offset = IndexFirst) { \
+         NOD() LANGULUS(INLINED) Unit* SeekUnit(const Token& token, Index offset = IndexFirst) { \
             return SeekUnit<SEEK>(RTTI::Database.GetMetaData(token), offset); \
          } \
          template<Seek SEEK = Seek::HereAndAbove> \
-         NOD() LANGULUS(ALWAYSINLINE) const Unit* SeekUnit(const Token& token, Index offset = IndexFirst) const { \
+         NOD() LANGULUS(INLINED) const Unit* SeekUnit(const Token& token, Index offset = IndexFirst) const { \
             return SeekUnit<SEEK>(RTTI::Database.GetMetaData(token), offset); \
          } \
          template<Seek SEEK = Seek::HereAndAbove> \
-         NOD() LANGULUS(ALWAYSINLINE) Unit* SeekUnitAux(const Any& aux, const Token& token, Index offset = IndexFirst) { \
+         NOD() LANGULUS(INLINED) Unit* SeekUnitAux(const Any& aux, const Token& token, Index offset = IndexFirst) { \
             return SeekUnitAux<SEEK>(aux, RTTI::Database.GetMetaData(token), offset); \
          } \
          template<Seek SEEK = Seek::HereAndAbove> \
-         NOD() LANGULUS(ALWAYSINLINE) const Unit* SeekUnitAux(const Any& aux, const Token& token, Index offset = IndexFirst) const { \
+         NOD() LANGULUS(INLINED) const Unit* SeekUnitAux(const Any& aux, const Token& token, Index offset = IndexFirst) const { \
             return SeekUnitAux<SEEK>(aux, RTTI::Database.GetMetaData(token), offset); \
          } \
          \
          template<Seek SEEK = Seek::HereAndAbove> \
-         NOD() LANGULUS(ALWAYSINLINE) Trait SeekTrait(const Token& token, Index offset = IndexFirst) { \
+         NOD() LANGULUS(INLINED) Trait SeekTrait(const Token& token, Index offset = IndexFirst) { \
             return SeekTrait<SEEK>(RTTI::Database.GetMetaTrait(token), offset); \
          } \
          template<Seek SEEK = Seek::HereAndAbove> \
-         NOD() LANGULUS(ALWAYSINLINE) Trait SeekTrait(const Token& token, Index offset = IndexFirst) const { \
+         NOD() LANGULUS(INLINED) Trait SeekTrait(const Token& token, Index offset = IndexFirst) const { \
             return SeekTrait<SEEK>(RTTI::Database.GetMetaTrait(token), offset); \
          } \
          template<Seek SEEK = Seek::HereAndAbove, CT::Data D> \
-         LANGULUS(ALWAYSINLINE) bool SeekTrait(const Token& token, D& output, Index offset = IndexFirst) const { \
+         LANGULUS(INLINED) bool SeekTrait(const Token& token, D& output, Index offset = IndexFirst) const { \
             return SeekTrait<SEEK>(RTTI::Database.GetMetaTrait(token), output, offset); \
          } \
          \
          template<Seek SEEK = Seek::HereAndAbove> \
-         NOD() LANGULUS(ALWAYSINLINE) Trait SeekTraitAux(const Any& aux, const Token& token, Index offset = IndexFirst) const { \
+         NOD() LANGULUS(INLINED) Trait SeekTraitAux(const Any& aux, const Token& token, Index offset = IndexFirst) const { \
             return SeekTraitAux<SEEK>(aux, RTTI::Database.GetMetaTrait(token), offset); \
          } \
          template<Seek SEEK = Seek::HereAndAbove, CT::Data D> \
-         LANGULUS(ALWAYSINLINE) bool SeekTraitAux(const Any& aux, const Token& token, D& output, Index offset = IndexFirst) const { \
+         LANGULUS(INLINED) bool SeekTraitAux(const Any& aux, const Token& token, D& output, Index offset = IndexFirst) const { \
             return SeekTraitAux<SEEK>(aux, RTTI::Database.GetMetaTrait(token), output, offset); \
          }
    #else
@@ -226,42 +226,42 @@ namespace Langulus::Entity
       NOD() TAny<D> GatherValues() const; \
       \
       template<CT::Data T = Unit, Seek SEEK = Seek::HereAndAbove> \
-      NOD() LANGULUS(ALWAYSINLINE) TAny<Decay<T>*> GatherUnits() { \
+      NOD() LANGULUS(INLINED) TAny<Decay<T>*> GatherUnits() { \
          return GatherUnits<SEEK>(MetaData::Of<Decay<T>>()); \
       } \
       template<CT::Data T = Unit, Seek SEEK = Seek::HereAndAbove> \
-      NOD() LANGULUS(ALWAYSINLINE) TAny<const Decay<T>*> GatherUnits() const { \
+      NOD() LANGULUS(INLINED) TAny<const Decay<T>*> GatherUnits() const { \
          return GatherUnits<SEEK>(MetaData::Of<Decay<T>>()); \
       } \
       template<CT::Trait T = Trait, Seek SEEK = Seek::HereAndAbove> \
-      NOD() LANGULUS(ALWAYSINLINE) TAny<Trait> GatherTraits() { \
+      NOD() LANGULUS(INLINED) TAny<Trait> GatherTraits() { \
          return GatherTraits<SEEK>(MetaTrait::Of<T>()); \
       } \
       template<CT::Trait T = Trait, Seek SEEK = Seek::HereAndAbove> \
-      NOD() LANGULUS(ALWAYSINLINE) TAny<Trait> GatherTraits() const { \
+      NOD() LANGULUS(INLINED) TAny<Trait> GatherTraits() const { \
          return GatherTraits<SEEK>(MetaTrait::Of<T>()); \
       }
 
    #if LANGULUS_FEATURE(MANAGED_MEMORY)
       #define LANGULUS_GATHER_TOKEN_INTERFACE() \
          template<Seek SEEK = Seek::HereAndAbove> \
-         NOD() LANGULUS(ALWAYSINLINE) \
+         NOD() LANGULUS(INLINED) \
          TAny<Unit*> GatherUnits(const Token& token) { \
             return GatherUnits<SEEK>(RTTI::Database.GetMetaData(token)); \
          } \
          template<Seek SEEK = Seek::HereAndAbove> \
-         NOD() LANGULUS(ALWAYSINLINE) \
+         NOD() LANGULUS(INLINED) \
          TAny<const Unit*> GatherUnits(const Token& token) const { \
             return GatherUnits<SEEK>(RTTI::Database.GetMetaData(token)); \
          } \
          \
          template<Seek SEEK = Seek::HereAndAbove> \
-         NOD() LANGULUS(ALWAYSINLINE) \
+         NOD() LANGULUS(INLINED) \
          TAny<Trait> GatherTraits(const Token& token) { \
             return GatherTraits<SEEK>(RTTI::Database.GetMetaTrait(token)); \
          } \
          template<Seek SEEK = Seek::HereAndAbove> \
-         NOD() LANGULUS(ALWAYSINLINE) \
+         NOD() LANGULUS(INLINED) \
          TAny<Trait> GatherTraits(const Token& token) const { \
             return GatherTraits<SEEK>(RTTI::Database.GetMetaTrait(token)); \
          }

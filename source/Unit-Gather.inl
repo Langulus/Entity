@@ -16,7 +16,7 @@ namespace Langulus::Entity
    ///   @param meta - the units to seek for                                  
    ///   @return the gathered units that match the type                       
    template<Seek SEEK>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    TAny<Unit*> Unit::GatherUnits(DMeta meta) {
       return mOwners.template GatherUnits<SEEK>(meta);
    }
@@ -26,7 +26,7 @@ namespace Langulus::Entity
    ///   @param meta - the units to seek for                                  
    ///   @return the gathered units that match the type                       
    template<Seek SEEK>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    TAny<const Unit*> Unit::GatherUnits(DMeta meta) const {
       return mOwners.template GatherUnits<SEEK>(meta);
    }
@@ -36,7 +36,7 @@ namespace Langulus::Entity
    ///   @param trait - the trait to seek for                                 
    ///   @return the gathered traits that match the type                      
    template<Seek SEEK>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    TAny<Trait> Unit::GatherTraits(TMeta trait) {
       return mOwners.template GatherTraits<SEEK>(trait);
    }
@@ -46,7 +46,7 @@ namespace Langulus::Entity
    ///   @param trait - the trait to seek for                                 
    ///   @return the gathered traits that match the type                      
    template<Seek SEEK>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    TAny<Trait> Unit::GatherTraits(TMeta trait) const {
       return mOwners.template GatherTraits<SEEK>(trait);
    }
@@ -56,7 +56,7 @@ namespace Langulus::Entity
    ///   @tparam D - type to convert to                                       
    ///   @return the gathered values                                          
    template<Seek SEEK, CT::Data D>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    TAny<D> Unit::GatherValues() const {
       return mOwners.template GatherValues<SEEK, D>();
    }

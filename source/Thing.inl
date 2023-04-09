@@ -215,7 +215,7 @@ namespace Langulus::Entity
    ///   @tparam T - the type of units to seach for, use Unit for all         
    ///   @return the number of matching units                                 
    template<CT::Unit T>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    Count Thing::HasUnits() const {
       return HasUnits(MetaData::Of<Decay<T>>());
    }
@@ -227,7 +227,7 @@ namespace Langulus::Entity
    ///   @param arguments... - the arguments to provide for construct         
    ///   @return the created unit(s)                                          
    template<CT::Unit T, class... A>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    Any Thing::CreateUnit(A&&...arguments) {
       return CreateData(
          Construct::From<Decay<T>>(Forward<A>(arguments)...)
@@ -242,7 +242,7 @@ namespace Langulus::Entity
    ///   @param arguments... - the arguments to provide for construct         
    ///   @return the created unit(s)                                          
    template<class... A>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    Any Thing::CreateUnitToken(const Token& token, A&&...arguments) {
       return CreateData(
          Construct::FromToken(token, Forward<A>(arguments)...)
@@ -255,7 +255,7 @@ namespace Langulus::Entity
    ///   @param offset - optional offset (Nth match)                          
    ///   @return the unit if found, or nullptr if not                         
    template<CT::Unit T>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    Decay<T>* Thing::GetUnit(Index offset) {
       return static_cast<Decay<T>*>(
          GetUnit(MetaData::Of<Decay<T>>(), offset));
@@ -266,7 +266,7 @@ namespace Langulus::Entity
    ///   @param offset - optional offset (Nth match)                          
    ///   @return the unit if found, or nullptr if not                         
    template<CT::Unit T>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    const Decay<T>* Thing::GetUnit(Index offset) const {
       return static_cast<const Decay<T>*>(
          GetUnit(MetaData::Of<Decay<T>>(), offset));
@@ -278,7 +278,7 @@ namespace Langulus::Entity
       ///   @param token - unit type token                                    
       ///   @param offset - optional offset (Nth match)                       
       ///   @return the unit if found, or nullptr if not                      
-      LANGULUS(ALWAYSINLINE)
+      LANGULUS(INLINED)
       const Unit* Thing::GetUnit(const Token& token, Index offset) const {
          return const_cast<Thing*>(this)->GetUnit(token, offset);
       }
@@ -290,14 +290,14 @@ namespace Langulus::Entity
       ///   @param offset - optional offset (Nth match)                       
       ///   @return the unit if found, or nullptr if not                      
       template<CT::Unit T>
-      LANGULUS(ALWAYSINLINE)
+      LANGULUS(INLINED)
       Decay<T>* Thing::GetUnitAs(const Token& token, Index offset) {
          return dynamic_cast<Decay<T>*>(GetUnit(token, offset));
       }
    #endif
 
    template<CT::Trait T>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    Trait Thing::GetTrait(const Index& offset) {
       return GetTrait(MetaTrait::Of<T>(), offset);
    }
@@ -307,7 +307,7 @@ namespace Langulus::Entity
    ///   @param offset - the offset of the trait to return (optional)         
    ///   @return the trait or nullptr if none found                           
    template<CT::Trait T>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    Trait* Thing::GetLocalTrait(const Index& offset) {
       return GetLocalTrait(MetaTrait::Of<T>(), offset);
    }
@@ -317,7 +317,7 @@ namespace Langulus::Entity
    ///   @param offset - the offset of the trait to return                    
    ///   @return the trait or nullptr if none found                           
    template<CT::Trait T>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    const Trait* Thing::GetLocalTrait(const Index& offset) const {
       return const_cast<Thing&>(*this).template GetLocalTrait<T>(offset);
    }

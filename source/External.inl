@@ -18,7 +18,7 @@ namespace Langulus
    /// Compare geometry views                                                 
    ///   @param rhs - the geometry view to compare against                    
    ///   @return true if both views are the same                              
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    bool GeometryView::operator == (const GeometryView& rhs) const noexcept {
       return
          mPrimitiveCount == rhs.mPrimitiveCount &&
@@ -33,7 +33,7 @@ namespace Langulus
    /// Decay the geometry view to a simpler primitive type, for example,      
    /// decay triangles to points                                              
    ///   @return the decayed view                                             
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    GeometryView GeometryView::Decay() const {
       TODO();
    }
@@ -46,7 +46,7 @@ namespace Langulus
    /// Compare texture views                                                  
    ///   @param rhs - the texture view to compare against                     
    ///   @return true if both views are the same                              
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    bool TextureView::operator == (const TextureView& rhs) const noexcept {
       return
          mWidth == rhs.mWidth &&
@@ -58,35 +58,35 @@ namespace Langulus
 
    /// Get the number of pixels in the texture                                
    ///   @return the number of pixels                                         
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    constexpr uint32_t TextureView::GetPixelCount() const noexcept {
       return mWidth * mHeight * mDepth * mFrames;
    }
 
    /// Get number of dimensions used for the image                            
    ///   @return return up to 4 dimensions                                    
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    constexpr uint32_t TextureView::GetDimensionCount() const noexcept {
       return (mWidth > 1) + (mHeight > 1) + (mDepth > 1) + (mFrames > 1);
    }
 
    /// Get the size in bytes for a single pixel                               
    ///   @return the size in bytes                                            
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    Size TextureView::GetPixelBytesize() const noexcept {
       return mFormat ? mFormat->mSize : 0;
    }
 
    /// Get the bytesize of the entire image across all dimensions             
    ///   @return the bytesize of the entire image                             
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    Size TextureView::GetBytesize() const noexcept {
       return GetPixelCount() * GetPixelBytesize();
    }
 
    /// Get the number of channels inside the color format                     
    ///   @return the number of channels                                       
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    uint32_t TextureView::GetChannelCount() const noexcept {
       return static_cast<uint32_t>(mFormat->GetMemberCount());
    }
@@ -100,7 +100,7 @@ namespace Langulus::A
    ///   Abstract file interface                                              
    ///                                                                        
    template<class T>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    T File::ReadAs() const {
       return ReadAs(RTTI::MetaData::Of<T>()).template As<T>();
    }
@@ -114,7 +114,7 @@ namespace Langulus::A
    ///   @param type - concrete type of the content                           
    ///   @param producer - the content producer                               
    ///   @param descriptor - messy descriptor for the content                 
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    Content::Content(
       Anyness::DMeta type,
       ContentModule* producer,
@@ -124,7 +124,7 @@ namespace Langulus::A
 
    /// Get the entire content data map                                        
    ///   @return a reference to the contents                                  
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    const Content::DataListMap& Content::GetDataListMap() const noexcept {
       return mDataListMap;
    }
@@ -134,7 +134,7 @@ namespace Langulus::A
    ///   @param index - the Nth data associated to the trait                  
    ///   @return a pointer to the data entry, or nullptr if none exists       
    template<CT::Trait T>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    const Content::Data* Content::GetData(Offset index) const noexcept {
       return GetData(RTTI::MetaTrait::Of<T>(), index);
    }
@@ -143,7 +143,7 @@ namespace Langulus::A
    ///   @param trait - the trait to search for                               
    ///   @param index - the Nth data associated to the trait                  
    ///   @return a pointer to the data entry, or nullptr if none exists       
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    const Content::Data* Content::GetData(Anyness::TMeta trait, Offset index) const noexcept {
       const auto datalist = GetDataList(trait);
       return datalist && datalist->GetCount() > index
@@ -155,7 +155,7 @@ namespace Langulus::A
    ///   @tparam T - the trait to search for                                  
    ///   @return a pointer to the data list, or nullptr if none exists        
    template<CT::Trait T>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    const Content::DataList* Content::GetDataList() const noexcept {
       return GetDataList(RTTI::MetaTrait::Of<T>());
    }
@@ -163,7 +163,7 @@ namespace Langulus::A
    /// Get a data list from the contents                                      
    ///   @param trait - the trait to search for                               
    ///   @return a pointer to the data list, or nullptr if none exists        
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    const Content::DataList* Content::GetDataList(Anyness::TMeta trait) const noexcept {
       const auto found = mDataListMap.FindKeyIndex(trait);
       if (found)
@@ -178,14 +178,14 @@ namespace Langulus::A
    
    /// Get the topology of the geometry                                       
    ///   @return the topology type                                            
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    Anyness::DMeta Geometry::GetTopology() const noexcept {
       return mView.mPrimitiveType;
    }
 
    /// Get the geometry view                                                  
    ///   @return the geometry view                                            
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    const GeometryView& Geometry::GetView() const noexcept {
       return mView;
    }
@@ -197,14 +197,14 @@ namespace Langulus::A
    
    /// Get the pixel format of the texture                                    
    ///   @return the pixel format type                                        
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    Anyness::DMeta Texture::GetFormat() const noexcept {
       return mView.mFormat;
    }
 
    /// Get the texture view                                                   
    ///   @return the texture view                                             
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    const TextureView& Texture::GetView() const noexcept {
       return mView;
    }

@@ -65,7 +65,7 @@ namespace Langulus::Entity
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
    template<Seek SEEK>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    const Unit* Thing::SeekUnit(DMeta meta, Index offset) const {
       return const_cast<Thing*>(this)->template
          SeekUnit<SEEK>(meta, offset);
@@ -79,7 +79,7 @@ namespace Langulus::Entity
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
    template<Seek SEEK>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    Unit* Thing::SeekUnitAux(const Any& aux, DMeta meta, Index offset) {
       Unit* result {};
       aux.ForEachDeep([&](const Unit* unit) {
@@ -112,7 +112,7 @@ namespace Langulus::Entity
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
    template<Seek SEEK>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    const Unit* Thing::SeekUnitAux(const Any& aux, DMeta meta, Index offset) const {
       return const_cast<Thing*>(this)->template
          SeekUnitAux<SEEK>(aux, meta, offset);
@@ -124,7 +124,7 @@ namespace Langulus::Entity
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
    template<Seek SEEK>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    Unit* Thing::SeekUnitExt(const Construct& ext, Index offset) {
       Unit* result = nullptr;
       if constexpr (SEEK & Seek::Here) {
@@ -163,7 +163,7 @@ namespace Langulus::Entity
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
    template<Seek SEEK>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    const Unit* Thing::SeekUnitExt(const Construct& ext, Index offset) const {
       return const_cast<Thing*>(this)->template
          SeekUnitExt<SEEK>(ext, offset);
@@ -177,7 +177,7 @@ namespace Langulus::Entity
    ///   @param offset - the Nth match to return                              
    ///   @return a pointer to the found unit, or nullptr if not found         
    template<Seek SEEK>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    Unit* Thing::SeekUnitAuxExt(const Any& aux, const Construct& ext, Index offset) {
       // Scan descriptor even if hierarchy is empty                     
       Unit* result {};
@@ -211,7 +211,7 @@ namespace Langulus::Entity
    ///   @param offset - the Nth match to return                              
    ///   @return a pointer to the found unit, or nullptr if not found         
    template<Seek SEEK>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    const Unit* Thing::SeekUnitAuxExt(const Any& aux, const Construct& ext, Index offset) const {
       return const_cast<Thing*>(this)->template
          SeekUnitAuxExt<SEEK>(aux, ext, offset);
@@ -260,7 +260,7 @@ namespace Langulus::Entity
    ///   @param offset - the number of the matching trait to use              
    ///   @return the trait, which is not empty, if trait was found            
    template<Seek SEEK>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    Trait Thing::SeekTrait(TMeta meta, Index offset) const {
       auto result = const_cast<Thing*>(this)->template
          SeekTrait<SEEK>(meta, offset);
@@ -278,7 +278,7 @@ namespace Langulus::Entity
    ///   @param offset - the number of the matching trait to use              
    ///   @return true if output was rewritten                                 
    template<Seek SEEK, CT::Data D>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    bool Thing::SeekTrait(TMeta meta, D& output, Index offset) const {
       if constexpr (CT::Pinnable<D>) {
          // Never touch pinned values                                   
@@ -328,7 +328,7 @@ namespace Langulus::Entity
    ///   @param offset - the number of the matching trait to use              
    ///   @return the trait, which is not empty, if trait was found            
    template<Seek SEEK>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    Trait Thing::SeekTraitAux(const Any& aux, TMeta meta, Index offset) const {
       // Scan descriptor                                                
       Trait result;
@@ -358,7 +358,7 @@ namespace Langulus::Entity
    ///   @param offset - the number of the matching trait to use              
    ///   @return true if value has been found and rewritten                   
    template<Seek SEEK, CT::Data D>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    bool Thing::SeekValue(D& output, Index offset) const {
       if constexpr (CT::Pinnable<D>) {
          // Never touch pinned values                                   
@@ -411,7 +411,7 @@ namespace Langulus::Entity
    ///   @param offset - the number of the matching trait to use              
    ///   @return true if value has been found and rewritten                   
    template<Seek SEEK, CT::Data D>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    bool Thing::SeekValueAux(const Any& aux, D& output, Index offset) const {
       if constexpr (CT::Pinnable<D>) {
          // Never touch pinned values                                   

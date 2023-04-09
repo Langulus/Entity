@@ -64,7 +64,7 @@ namespace Langulus::Entity
    ///   @param meta - the units to seek for                                  
    ///   @return the gathered units that match the type                       
    template<Seek SEEK>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    TAny<const Unit*> Thing::GatherUnits(DMeta meta) const {
       return const_cast<Thing*>(this)->template GatherUnits<SEEK>(meta);
    }
@@ -145,7 +145,7 @@ namespace Langulus::Entity
    ///   @param trait - the trait to seek for                                 
    ///   @return the gathered traits that match the type                      
    template<Seek SEEK>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    TAny<Trait> Thing::GatherTraits(TMeta trait) const {
       return const_cast<Thing*>(this)->template GatherTraits<SEEK>(trait);
    }

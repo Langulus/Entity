@@ -13,7 +13,7 @@ namespace Langulus::Entity
 
    /// Get the list of unit owners                                            
    ///   return the owners                                                    
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    const Hierarchy& Unit::GetOwners() const noexcept {
       return mOwners;
    }
@@ -22,7 +22,7 @@ namespace Langulus::Entity
    ///   @attention assumes units are correctly coupled and coupling to       
    ///              different runtimes should be explicitly disallowed        
    ///   @return a pointer to the runtime, if available                       
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    Runtime* Unit::GetRuntime() const noexcept {
       if (mOwners.IsEmpty())
          return nullptr;
@@ -32,7 +32,7 @@ namespace Langulus::Entity
    /// Couple the component with an entity (always two-sided)                 
    /// This will call refresh to all units in that entity on next tick        
    ///   @param entity - the entity to couple with                            
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    void Unit::Couple(const Thing* entity) {
       if (!entity)
          return;
@@ -43,7 +43,7 @@ namespace Langulus::Entity
    /// Decouple the component from an entity (always two-sided)               
    /// This will call refresh to all units in that entity on next frame       
    ///   @param entity - the entity to decouple with                          
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    void Unit::Decouple(const Thing* entity) {
       if (!entity)
          return;
@@ -55,7 +55,7 @@ namespace Langulus::Entity
    ///   @attention assumes both pointers are different, and not nullptr      
    ///   @param replaceThis - owner to replace                                
    ///   @param withThis - entity to replace it with                          
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    void Unit::ReplaceOwner(const Thing* replaceThis, const Thing* withThis) {
       LANGULUS_ASSUME(DevAssumes, replaceThis != withThis, "Pointers are the same");
       LANGULUS_ASSUME(DevAssumes, replaceThis && withThis, "Nullptr not allowed");

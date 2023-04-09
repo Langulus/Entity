@@ -16,7 +16,7 @@ namespace Langulus::Entity
    ///   @param meta - the units to seek for                                  
    ///   @return the gathered units that match the type                       
    template<Seek SEEK>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    TAny<Unit*> Hierarchy::GatherUnits(DMeta meta) {
       TAny<Unit*> result;
       for (auto owner : *this)
@@ -29,7 +29,7 @@ namespace Langulus::Entity
    ///   @param meta - the units to seek for                                  
    ///   @return the gathered units that match the type                       
    template<Seek SEEK>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    TAny<const Unit*> Hierarchy::GatherUnits(DMeta meta) const {
       TAny<const Unit*> result;
       for (auto owner : *this)
@@ -42,7 +42,7 @@ namespace Langulus::Entity
    ///   @param trait - the trait to seek for                                 
    ///   @return the gathered traits that match the type                      
    template<Seek SEEK>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    TAny<Trait> Hierarchy::GatherTraits(TMeta trait) {
       TAny<Trait> result;
       for (auto owner : *this)
@@ -55,7 +55,7 @@ namespace Langulus::Entity
    ///   @param trait - the trait to seek for                                 
    ///   @return the gathered traits that match the type                      
    template<Seek SEEK>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    TAny<Trait> Hierarchy::GatherTraits(TMeta trait) const {
       TAny<Trait> result;
       for (auto owner : *this)
@@ -68,7 +68,7 @@ namespace Langulus::Entity
    ///   @tparam D - type to convert to                                       
    ///   @return the gathered values                                          
    template<Seek SEEK, CT::Data D>
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    TAny<D> Hierarchy::GatherValues() const {
       TAny<D> result;
       for (auto owner : *this)
