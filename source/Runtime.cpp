@@ -66,6 +66,8 @@ namespace Langulus::Entity
 
    /// Runtime destruction                                                    
    Runtime::~Runtime() {
+      Logger::Verbose(IdentityOf(this), ": Shutting down...");
+
       for (auto library = mLibraries.begin(); library != mLibraries.end(); ++library) {
          if (0 == --library->mValue.mReferences) {
             UnloadSharedLibrary(library->mValue);
@@ -192,9 +194,6 @@ namespace Langulus::Entity
          return {};
       }
 
-      // Great success!                                                 
-      Logger::Info("Module `", path, "` loaded");
-
       SharedLibrary library;
       static_assert(sizeof(library.mHandle) == sizeof(dll), "Size mismatch");
       library.mHandle = reinterpret_cast<decltype(library.mHandle)>(dll);
@@ -262,9 +261,12 @@ namespace Langulus::Entity
          // Make sure we end up in an invariant state                   
          Logger::Error("Could not enter `", path, "` due to an exception");
          UnloadSharedLibrary(library);
+         mLibraries.RemoveKey(name);
          return {};
       }
 
+      // Great success!                                                 
+      Logger::Info("Module `", library.mInfo()->mName, "` loaded (", path, ')');
       return library;
    }
 
@@ -304,6 +306,7 @@ namespace Langulus::Entity
 
       // Unregister external types                                      
       RTTI::Database.UnloadLibrary(library.mInfo()->mName);
+      Logger::Info("Module `", library.mInfo()->mName, "` unloaded");
 
       // Unload the shared object                                       
       #if LANGULUS_OS(WINDOWS)
@@ -315,9 +318,6 @@ namespace Langulus::Entity
       #else 
          #error Unsupported OS
       #endif
-
-      // Finally, unregister the library                                
-      mLibraries.RemoveValue(library);
    }
 
    /// Get the dependency module of a given type                              
