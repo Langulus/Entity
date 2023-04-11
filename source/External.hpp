@@ -151,6 +151,63 @@ namespace Langulus::A
       NOD() virtual Math::Matrix4 GetViewTransform(const Math::Level& = Math::Level::Default) const noexcept = 0;
    };
    
+   namespace UI
+   {
+
+      ///                                                                     
+      ///   Abstract UI module                                                
+      ///                                                                     
+      struct Module : Entity::Module {
+         LANGULUS_BASES(Entity::Module);
+         using Entity::Module::Module;
+      };
+
+      ///                                                                     
+      ///   Abstract UI unit                                                  
+      ///                                                                     
+      struct Unit : Entity::Unit {
+         LANGULUS(PRODUCER) Module;
+         LANGULUS_BASES(Entity::Unit);
+         using Entity::Unit::Unit;
+      };
+
+      ///                                                                     
+      ///   Abstract UI system                                                
+      ///                                                                     
+      struct System : Unit {
+         LANGULUS_BASES(Unit);
+         using Unit::Unit;
+      };
+
+      ///                                                                     
+      ///   Abstract UI button                                                
+      ///                                                                     
+      struct Button : Unit {
+         LANGULUS(PRODUCER) System;
+         LANGULUS_BASES(Unit);
+         using Unit::Unit;
+      };
+
+      ///                                                                     
+      ///   Abstract UI text field                                            
+      ///                                                                     
+      struct Text : Unit {
+         LANGULUS(PRODUCER) System;
+         LANGULUS_BASES(Unit);
+         using Unit::Unit;
+      };
+
+      ///                                                                     
+      ///   Abstract UI input field                                           
+      ///                                                                     
+      struct Input : Unit {
+         LANGULUS(PRODUCER) System;
+         LANGULUS_BASES(Unit);
+         using Unit::Unit;
+      };
+
+   } // namespace Langulus::A::UI
+
    struct File;
    struct Folder;
 

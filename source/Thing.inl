@@ -171,8 +171,8 @@ namespace Langulus::Entity
       if (!foundType)
          return 0;
 
-      const auto removed = mUnits.GetValue(foundType).Remove(unit);
-      if (removed) {
+      auto& unitList = mUnits.GetValue(foundType);
+      if (unitList.Remove(unit)) {
          // Decouple before unit is destroyed                           
          if constexpr (TWOSIDED)
             unit->mOwners.Remove(this);
