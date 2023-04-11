@@ -245,7 +245,9 @@ namespace Langulus::Entity
          // Make sure that const RTTI::Meta* type is registered here,   
          // and not inside the library (nasty bugs otherwise)           
          //TODO find a more elegant solution to this, preferably one that doesn't involve prebuild steps with cppast
-         (void)library.mTypes.GetType();
+         (void)MetaOf<DMeta>();
+         (void)MetaOf<Module*>();
+         (void)MetaOf<Unit*>();
 
          library.mEntry(library.mModuleType, library.mTypes);
 
