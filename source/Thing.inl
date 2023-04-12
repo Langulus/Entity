@@ -38,11 +38,15 @@ namespace Langulus::Entity
       const auto added = mChildren.Merge(entity);
 
       if constexpr (TWOSIDED) {
-         if (added && entity->mOwner != this) {
-            if (entity->mOwner)
-               entity->mOwner->RemoveChild<false>(entity);
-            entity->mOwner = this;
-            entity->mRefreshRequired = true;
+         if (added) {
+            entity->Keep();
+
+            if (entity->mOwner != this) {
+               if (entity->mOwner)
+                  entity->mOwner->RemoveChild<false>(entity);
+               entity->mOwner = this;
+               entity->mRefreshRequired = true;
+            }
          }
       }
 
@@ -76,9 +80,13 @@ namespace Langulus::Entity
       
       const auto removed = mChildren.Remove(entity);
       if constexpr (TWOSIDED) {
-         if (removed && entity->mOwner == this) {
-            entity->mOwner = nullptr;
-            entity->mRefreshRequired = true;
+         if (removed) {
+            entity->Free();
+
+            if (entity->mOwner == this) {
+               entity->mOwner = nullptr;
+               entity->mRefreshRequired = true;
+            }
          }
       }
 
@@ -147,13 +155,15 @@ namespace Langulus::Entity
 
       if constexpr (TWOSIDED) {
          #if LANGULUS(SAFE)
-            unit->mOwners <<= this;
+         if (unit->mOwners.Merge(this))
          #else
-            unit->mOwners << this;
+         if (unit->mOwners.Insert(this))
          #endif
+            Keep();
       }
 
       mUnits[unit->GetType()] << unit;
+      unit->Keep();
       mRefreshRequired = true;
       ENTITY_VERBOSE(unit << " added");
       return 1;
@@ -174,10 +184,13 @@ namespace Langulus::Entity
       auto& unitList = mUnits.GetValue(foundType);
       if (unitList.Remove(unit)) {
          // Decouple before unit is destroyed                           
-         if constexpr (TWOSIDED)
-            unit->mOwners.Remove(this);
+         if constexpr (TWOSIDED) {
+            if (unit->mOwners.Remove(this))
+               Free();
+         }
 
          // Notify all other units about the environment change         
+         unit->Free();
          mRefreshRequired = true;
          ENTITY_VERBOSE_SELF(unit << " removed");
          return 1;
@@ -201,8 +214,12 @@ namespace Langulus::Entity
       auto& list = mUnits.GetValue(found);
       for (auto unit : list) {
          ENTITY_VERBOSE_SELF(unit << " removed");
-         if constexpr (TWOSIDED)
-            unit->mOwners.Remove(this);
+         if constexpr (TWOSIDED) {
+            if (unit->mOwners.Remove(this))
+               Free();
+         }
+
+         unit->Free();
       }
 
       const auto removed = list.GetCount();

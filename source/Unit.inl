@@ -36,8 +36,11 @@ namespace Langulus::Entity
    void Unit::Couple(const Thing* entity) {
       if (!entity)
          return;
-      mOwners <<= const_cast<Thing*>(entity);
-      const_cast<Thing*>(entity)->AddUnit<false>(this);
+
+      if (mOwners.Merge(const_cast<Thing*>(entity))) {
+         const_cast<Thing*>(entity)->AddUnit<false>(this);
+         entity->Keep();
+      }
    }
 
    /// Decouple the component from an entity (always two-sided)               
@@ -47,8 +50,11 @@ namespace Langulus::Entity
    void Unit::Decouple(const Thing* entity) {
       if (!entity)
          return;
-      mOwners.Remove(entity);
-      const_cast<Thing*>(entity)->RemoveUnit<false>(this);
+      
+      if (mOwners.Remove(entity)) {
+         const_cast<Thing*>(entity)->RemoveUnit<false>(this);
+         entity->Free();
+      }
    }
 
    /// Replace one owner instance with another (used when moving things)      
@@ -57,12 +63,17 @@ namespace Langulus::Entity
    ///   @param withThis - entity to replace it with                          
    LANGULUS(INLINED)
    void Unit::ReplaceOwner(const Thing* replaceThis, const Thing* withThis) {
-      LANGULUS_ASSUME(DevAssumes, replaceThis != withThis, "Pointers are the same");
-      LANGULUS_ASSUME(DevAssumes, replaceThis && withThis, "Nullptr not allowed");
+      LANGULUS_ASSUME(DevAssumes, replaceThis != withThis,
+         "Pointers are the same");
+      LANGULUS_ASSUME(DevAssumes, replaceThis && withThis,
+         "Nullptr not allowed");
 
       const auto found = mOwners.Find(replaceThis);
-      if (found)
+      if (found) {
          mOwners[found] = const_cast<Thing*>(withThis);
+         replaceThis->Free();
+         withThis->Keep();
+      }
    }
 
 } // namespace Langulus::Entity

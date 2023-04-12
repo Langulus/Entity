@@ -43,6 +43,7 @@ namespace Langulus::Entity
          parent->AddChild<false>(this);
          mRuntime = parent->GetRuntime();
          mFlow = parent->GetFlow();
+         Keep();
       }
 
       if (!descriptor.IsEmpty()) {
@@ -55,7 +56,7 @@ namespace Langulus::Entity
    /// Move constructor                                                       
    ///   @attention owner is never moved, you're moving only the hierarchy    
    ///              below the parent, however other's parent is notified of   
-   ///              the move, 'other' is removed from its children            
+   ///              the move, because 'other' is removed from its children    
    ///   @param other - move that entity                                      
    Thing::Thing(Thing&& other) noexcept
       : Resolvable {Forward<Resolvable>(other)}
@@ -77,6 +78,25 @@ namespace Langulus::Entity
       // Make sure the losing parent is notified of the change          
       if (other.mOwner)
          other.mOwner->RemoveChild(&other);
+   }
+
+   /// Thing destructor                                                       
+   Thing::~Thing() SAFETY_NOEXCEPT() {
+      if (mOwner)
+         mOwner->RemoveChild(this);
+
+      for (auto child : mChildren) {
+         child->Free();
+         child->mOwner.Reset();
+      }
+
+      for (auto unitpair : mUnits) {
+         for (auto unit : unitpair.mValue) {
+            if (unit->mOwners.Remove(this))
+               Free();
+            unit->Free();
+         }
+      }
    }
 
    /// Compare two entities                                                   

@@ -34,7 +34,7 @@ namespace Langulus::Entity
       void ResetFlow(Temporal*);
 
       // The entity's parent                                            
-      Ptr<Thing> mOwner;
+      Ref<Thing> mOwner;
       // Hierarchy                                                      
       Hierarchy mChildren;
       // Units                                                          
@@ -55,6 +55,7 @@ namespace Langulus::Entity
       Thing(const Any& = {});
       Thing(Thing*, const Any& = {});
       Thing(Thing&&) noexcept;
+      ~Thing() SAFETY_NOEXCEPT();
 
       // Shallow copy is disabled, you should be able only to clone,    
       // move, or abandon                                               

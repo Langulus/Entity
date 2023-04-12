@@ -42,15 +42,17 @@ namespace Langulus::Entity
    }
 
    /// Unit destruction                                                       
-   Unit::~Unit() {
+   Unit::~Unit() SAFETY_NOEXCEPT() {
       // Decouple from all owners                                       
-      for (auto owner : mOwners)
+      for (auto owner : mOwners) {
          owner->RemoveUnit<false>(this);
+         owner->Free();
+      }
 
       // Then, the unit should have exactly one reference left          
-      LANGULUS_ASSERT(GetReferences() < 2, Destruct,
+      LANGULUS_ASSUME(DevAssumes, GetReferences() < 2,
          "Unit destroyed while still in use");
-      LANGULUS_ASSERT(GetReferences() > 0, Destruct,
+      LANGULUS_ASSUME(DevAssumes, GetReferences() > 0,
          "Unit destroyed at zero reference hints at potential undefined behavior");
    }
 

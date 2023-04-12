@@ -41,7 +41,7 @@ namespace Langulus::Entity
       /// A unit can only be moved or created with type and owner             
       Unit(DMeta, const Any&) noexcept;
       Unit(Unit&&) noexcept;
-      virtual ~Unit();
+      virtual ~Unit() SAFETY_NOEXCEPT();
 
       Unit& operator = (Unit&&) noexcept;
 

@@ -21,6 +21,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(root.mChildren.IsEmpty());
          REQUIRE(root.mUnits.IsEmpty());
          REQUIRE(root.mTraits.IsEmpty());
+         REQUIRE(root.GetReferences() == 1);
       }
    }
 
@@ -39,6 +40,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(root.mChildren[0] == &child);
          REQUIRE(root.mUnits.IsEmpty());
          REQUIRE(root.mTraits.IsEmpty());
+         REQUIRE(root.GetReferences() == 2);
 
          REQUIRE(child.mOwner == &root);
          REQUIRE(child.mRuntime == nullptr);
@@ -49,6 +51,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(child.mChildren.IsEmpty());
          REQUIRE(child.mUnits.IsEmpty());
          REQUIRE(child.mTraits.IsEmpty());
+         REQUIRE(child.GetReferences() == 2);
       }
    }
    
@@ -86,6 +89,7 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.mChildren.GetCount() == 1);
             REQUIRE(root.mUnits.IsEmpty());
             REQUIRE(root.mTraits.IsEmpty());
+            REQUIRE(root.GetReferences() == 2);
 
             auto child1 = root.mChildren[0];
             REQUIRE(child1 == child);
@@ -98,6 +102,7 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(child1->mChildren.IsEmpty());
             REQUIRE(child1->mUnits.IsEmpty());
             REQUIRE(child1->mTraits.IsEmpty());
+            REQUIRE(child1->GetReferences() == 1);
          }
       }
 
@@ -116,12 +121,15 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.mChildren.IsEmpty());
             REQUIRE(root.mUnits.GetCount() == 1);
             REQUIRE(root.mTraits.IsEmpty());
+            REQUIRE(root.GetReferences() == 2);
 
             auto it = root.mUnits.begin();
             REQUIRE(it->mKey == MetaOf<TestUnit1>());
             REQUIRE(it->mValue.GetCount() == 1);
+            REQUIRE(it->mValue[0] == &testUnit);
             REQUIRE(it->mValue[0]->mOwners.GetCount() == 1);
             REQUIRE(it->mValue[0]->mOwners[0] == &root);
+            REQUIRE(it->mValue[0]->GetReferences() == 2);
          }
       }
 
@@ -138,6 +146,7 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.mChildren.IsEmpty());
             REQUIRE(root.mUnits.GetCount() == 1);
             REQUIRE(root.mTraits.IsEmpty());
+            REQUIRE(root.GetReferences() == 2);
 
             auto it = root.mUnits.begin();
             REQUIRE(it->mKey == MetaOf<TestUnit1>());
@@ -145,6 +154,7 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(it->mValue[0] == unit.As<TestUnit1*>());
             REQUIRE(it->mValue[0]->mOwners.GetCount() == 1);
             REQUIRE(it->mValue[0]->mOwners[0] == &root);
+            REQUIRE(it->mValue[0]->GetReferences() == 2);
          }
       }
 
@@ -163,6 +173,7 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.mChildren.IsEmpty());
             REQUIRE(root.mUnits.IsEmpty());
             REQUIRE(root.mTraits.GetCount() == 1);
+            REQUIRE(root.GetReferences() == 1);
 
             auto it = root.mTraits.begin();
             REQUIRE(it->mKey == MetaOf<Traits::Count>());
@@ -188,6 +199,7 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.mUnits.IsEmpty());
             REQUIRE(root.mTraits.GetCount() == 1);
             REQUIRE(root.GetName() == "Dimo");
+            REQUIRE(root.GetReferences() == 1);
 
             auto it = root.mTraits.begin();
             REQUIRE(it->mKey == MetaOf<Traits::Name>());
@@ -234,6 +246,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(root.mUnits.GetCount() == 2);
          REQUIRE(root.mTraits.GetCount() == 1);
          REQUIRE(root.GetName() == "Root");
+         REQUIRE(root.GetReferences() == 5);
 
          auto child1 = root.mChildren[0];
          REQUIRE(child1->mOwner == &root);
@@ -246,6 +259,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(child1->mUnits.GetCount() == 2);
          REQUIRE(child1->mTraits.GetCount() == 1);
          REQUIRE(child1->GetName() == "Child1");
+         REQUIRE(child1->GetReferences() == 5);
 
          auto child2 = root.mChildren[1];
          REQUIRE(child2->mOwner == &root);
@@ -258,6 +272,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(child2->mUnits.IsEmpty());
          REQUIRE(child2->mTraits.GetCount() == 1);
          REQUIRE(child2->GetName() == "Child2");
+         REQUIRE(child2->GetReferences() == 1);
 
          auto grandchild1 = child1->mChildren[0];
          REQUIRE(grandchild1->mOwner == child1);
@@ -270,6 +285,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(grandchild1->mUnits.IsEmpty());
          REQUIRE(grandchild1->mTraits.GetCount() == 1);
          REQUIRE(grandchild1->GetName() == "GrandChild1");
+         REQUIRE(grandchild1->GetReferences() == 1);
 
          auto grandchild2 = child1->mChildren[1];
          REQUIRE(grandchild2->mOwner == child1);
@@ -282,6 +298,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(grandchild2->mUnits.IsEmpty());
          REQUIRE(grandchild2->mTraits.GetCount() == 1);
          REQUIRE(grandchild2->GetName() == "GrandChild2");
+         REQUIRE(grandchild2->GetReferences() == 1);
       }
    }
 
