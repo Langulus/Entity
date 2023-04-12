@@ -43,7 +43,6 @@ namespace Langulus::Entity
          parent->AddChild<false>(this);
          mRuntime = parent->GetRuntime();
          mFlow = parent->GetFlow();
-         Keep();
       }
 
       if (!descriptor.IsEmpty()) {
@@ -82,10 +81,10 @@ namespace Langulus::Entity
 
    /// Thing destructor                                                       
    Thing::~Thing() SAFETY_NOEXCEPT() {
-      if (mOwner)
-         mOwner->RemoveChild(this);
+      if (mOwner && GetReferences() > 1)
+         mOwner->RemoveChild<false>(this);
 
-      for (auto child : mChildren) {
+      /*for (auto child : mChildren) {
          child->Free();
          child->mOwner.Reset();
       }
@@ -96,7 +95,7 @@ namespace Langulus::Entity
                Free();
             unit->Free();
          }
-      }
+      }*/
    }
 
    /// Compare two entities                                                   
@@ -466,10 +465,10 @@ namespace Langulus::Entity
    /// Create a child thing                                                   
    ///   @param descriptor - instructions for the entity's creation           
    ///   @return the new child instance                                       
-   Thing* Thing::CreateChild(const Any& descriptor) {
-      Ptr<Thing> newThing;
+   Ref<Thing> Thing::CreateChild(const Any& descriptor) {
+      Ref<Thing> newThing;
       newThing.New(this, descriptor);
-      return newThing;
+      return Abandon(newThing);
    }
 
    /// Uses the current runtime to load a shared library module, and          

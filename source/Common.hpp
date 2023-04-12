@@ -40,10 +40,12 @@ namespace Langulus::Entity
    class Module;
    struct Hierarchy;
 
-   using ModuleList = TAny<Module*>;
+   using ModuleList = TAny<Ref<Module>>;
    using MetaList = TUnorderedSet<const RTTI::Meta*>;
-   using UnitMap = TUnorderedMap<DMeta, TAny<Unit*>>;
-   using TraitMap = TUnorderedMap<TMeta, TAny<Trait>>;
+   using UnitList = TAny<Ref<Unit>>;
+   using UnitMap = TUnorderedMap<DMeta, UnitList>;
+   using TraitList = TAny<Trait>;
+   using TraitMap = TUnorderedMap<TMeta, TraitList>;
 
    /// A text specialization, dedicated for natural language text             
    /// It is a placeholder type, that can be extended by external modules     

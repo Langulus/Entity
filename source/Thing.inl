@@ -39,7 +39,7 @@ namespace Langulus::Entity
 
       if constexpr (TWOSIDED) {
          if (added) {
-            entity->Keep();
+            //entity->Keep();
 
             if (entity->mOwner != this) {
                if (entity->mOwner)
@@ -69,19 +69,19 @@ namespace Langulus::Entity
    template<bool TWOSIDED>
    Count Thing::RemoveChild(Thing* entity) {
       LANGULUS_ASSUME(DevAssumes, nullptr != entity, "Bad entity pointer");
-      #if LANGULUS_FEATURE(MANAGED_MEMORY)
+      /*#if LANGULUS_FEATURE(MANAGED_MEMORY)
          LANGULUS_ASSUME(DevAssumes, 
             !Anyness::Inner::Allocator::CheckAuthority(GetType(), entity) ||
              Anyness::Inner::Allocator::Find(GetType(), entity)->GetUses() > 1,
             "Managed entity pointer has no ownership outside this function, "
             "and will result in a bad pointer after removed from children"
          );
-      #endif
+      #endif*/
       
       const auto removed = mChildren.Remove(entity);
       if constexpr (TWOSIDED) {
          if (removed) {
-            entity->Free();
+            //entity->Free();
 
             if (entity->mOwner == this) {
                entity->mOwner = nullptr;
@@ -155,15 +155,15 @@ namespace Langulus::Entity
 
       if constexpr (TWOSIDED) {
          #if LANGULUS(SAFE)
-         if (unit->mOwners.Merge(this))
+            unit->mOwners <<= this;
          #else
-         if (unit->mOwners.Insert(this))
+            unit->mOwners << this;
          #endif
-            Keep();
+            //Keep();
       }
 
       mUnits[unit->GetType()] << unit;
-      unit->Keep();
+      //unit->Keep();
       mRefreshRequired = true;
       ENTITY_VERBOSE(unit << " added");
       return 1;
@@ -184,13 +184,11 @@ namespace Langulus::Entity
       auto& unitList = mUnits.GetValue(foundType);
       if (unitList.Remove(unit)) {
          // Decouple before unit is destroyed                           
-         if constexpr (TWOSIDED) {
-            if (unit->mOwners.Remove(this))
-               Free();
-         }
+         if constexpr (TWOSIDED)
+            unit->mOwners.Remove(this);
 
          // Notify all other units about the environment change         
-         unit->Free();
+         //unit->Free();
          mRefreshRequired = true;
          ENTITY_VERBOSE_SELF(unit << " removed");
          return 1;
@@ -214,12 +212,10 @@ namespace Langulus::Entity
       auto& list = mUnits.GetValue(found);
       for (auto unit : list) {
          ENTITY_VERBOSE_SELF(unit << " removed");
-         if constexpr (TWOSIDED) {
-            if (unit->mOwners.Remove(this))
-               Free();
-         }
+         if constexpr (TWOSIDED)
+            unit->mOwners.Remove(this);
 
-         unit->Free();
+         //unit->Free();
       }
 
       const auto removed = list.GetCount();

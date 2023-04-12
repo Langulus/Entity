@@ -61,7 +61,7 @@ namespace Langulus::Entity
       // move, or abandon                                               
       Thing(const Thing&) = delete;
 
-      NOD() Runtime* GetRuntime() const noexcept;
+      NOD() Runtime*  GetRuntime() const noexcept;
       NOD() Temporal* GetFlow() const noexcept;
 
       void Do(Verb&);
@@ -88,7 +88,7 @@ namespace Langulus::Entity
       ///                                                                     
       Runtime*    CreateRuntime();
       Temporal*   CreateFlow();
-      Thing*      CreateChild(const Any& = {});
+      Ref<Thing>  CreateChild(const Any& = {});
       template<bool TWOSIDED = true>
       Count       AddChild(Thing*);
       template<bool TWOSIDED = true>
@@ -128,19 +128,20 @@ namespace Langulus::Entity
 
       NOD() const UnitMap& GetUnits() const noexcept;
       NOD() const Unit* GetUnit(DMeta, Index = IndexFirst) const;
-      NOD() Unit* GetUnit(DMeta, Index = IndexFirst);
+      NOD()       Unit* GetUnit(DMeta, Index = IndexFirst);
       NOD() const Unit* GetUnitExt(const Construct&, Index = IndexFirst) const;
-      NOD() Unit* GetUnitExt(const Construct&, Index = IndexFirst);
+      NOD()       Unit* GetUnitExt(const Construct&, Index = IndexFirst);
+
       template<CT::Unit T>
-      NOD() Decay<T>* GetUnit(Index = IndexFirst);
+      NOD()       Decay<T>* GetUnit(Index = IndexFirst);
       template<CT::Unit T>
       NOD() const Decay<T>* GetUnit(Index = IndexFirst) const;
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
          NOD() const Unit* GetUnit(const Token&, Index = IndexFirst) const;
-         NOD() Unit* GetUnit(const Token&, Index = IndexFirst);
+         NOD()       Unit* GetUnit(const Token&, Index = IndexFirst);
          template<CT::Unit T>
-         NOD() Decay<T>* GetUnitAs(const Token&, Index = IndexFirst);
+         NOD() Decay<T>*   GetUnitAs(const Token&, Index = IndexFirst);
       #endif
 
       ///                                                                     
@@ -163,9 +164,9 @@ namespace Langulus::Entity
       NOD() Trait GetTrait(const Trait&, const Index& = IndexFirst);
 
       NOD() const Trait* GetLocalTrait(TMeta, const Index& = IndexFirst) const;
-      NOD() Trait* GetLocalTrait(TMeta, const Index& = IndexFirst);
+      NOD()       Trait* GetLocalTrait(TMeta, const Index& = IndexFirst);
       template<CT::Trait = Trait>
-      NOD() Trait* GetLocalTrait(const Index& = IndexFirst);
+      NOD()       Trait* GetLocalTrait(const Index& = IndexFirst);
       template<CT::Trait = Trait>
       NOD() const Trait* GetLocalTrait(const Index& = IndexFirst) const;
 

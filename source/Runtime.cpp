@@ -366,7 +366,7 @@ namespace Langulus::Entity
    A::File* Runtime::GetFile(const Path& path) {
       const auto& fileSystems = GetModules(MetaData::Of<A::FileSystem>());
       for (auto module : fileSystems) {
-         const auto fs = dynamic_cast<const A::FileSystem*>(module);
+         const auto fs = module.As<A::FileSystem>();
          if (!fs)
             continue;
 

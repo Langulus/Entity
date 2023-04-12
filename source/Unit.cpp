@@ -44,9 +44,9 @@ namespace Langulus::Entity
    /// Unit destruction                                                       
    Unit::~Unit() SAFETY_NOEXCEPT() {
       // Decouple from all owners                                       
-      for (auto owner : mOwners) {
-         owner->RemoveUnit<false>(this);
-         owner->Free();
+      if (GetReferences() > 1) {
+         for (auto owner : mOwners)
+            owner->RemoveUnit<false>(this);
       }
 
       // Then, the unit should have exactly one reference left          

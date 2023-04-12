@@ -39,7 +39,7 @@ namespace Langulus::Entity
 
       if (mOwners.Merge(const_cast<Thing*>(entity))) {
          const_cast<Thing*>(entity)->AddUnit<false>(this);
-         entity->Keep();
+         //entity->Keep();
       }
    }
 
@@ -53,7 +53,7 @@ namespace Langulus::Entity
       
       if (mOwners.Remove(entity)) {
          const_cast<Thing*>(entity)->RemoveUnit<false>(this);
-         entity->Free();
+         //entity->Free();
       }
    }
 
@@ -71,8 +71,8 @@ namespace Langulus::Entity
       const auto found = mOwners.Find(replaceThis);
       if (found) {
          mOwners[found] = const_cast<Thing*>(withThis);
-         replaceThis->Free();
-         withThis->Keep();
+         //replaceThis->Free();
+         //withThis->Keep();
       }
    }
 
