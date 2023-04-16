@@ -337,6 +337,7 @@ namespace Langulus::CT
 
 } // namespace Langulus::CT
 
+#include "../source/Hierarchy.inl"
 
 namespace fmt
 {
