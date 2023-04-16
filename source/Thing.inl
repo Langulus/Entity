@@ -10,7 +10,7 @@
 #include "Runtime.hpp"
 #include "Thing-Gather.inl"
 
-#if 0
+#if 1
    #define ENTITY_VERBOSE_ENABLED() 1
    #define ENTITY_VERBOSE_SELF(...)            Logger::Verbose(Self(), __VA_ARGS__)
    #define ENTITY_VERBOSE(...)                 Logger::Append(__VA_ARGS__)
@@ -29,71 +29,55 @@ namespace Langulus::Entity
    
    /// Remove a child                                                         
    ///   @attention assumes entity is a valid pointer                         
-   ///   @tparam TWOSIDED - true to also set the entity's owner               
+   ///   @tparam TWOSIDED - true to also set the entity's owner;              
+   ///                      used mainly internally to avoid endless loops     
    ///   @param entity - entity instance to add as child                      
    ///   @return the number of added children                                 
    template<bool TWOSIDED>
    Count Thing::AddChild(Thing* entity) {
-      LANGULUS_ASSUME(DevAssumes, nullptr != entity, "Bad entity pointer");
+      LANGULUS_ASSUME(UserAssumes, nullptr != entity, "Bad entity pointer");
       const auto added = mChildren.Merge(entity);
 
       if constexpr (TWOSIDED) {
          if (added) {
-            //entity->Keep();
-
             if (entity->mOwner != this) {
                if (entity->mOwner)
                   entity->mOwner->RemoveChild<false>(entity);
+
                entity->mOwner = this;
                entity->mRefreshRequired = true;
+               ENTITY_VERBOSE_SELF(entity, "'s owner overwritten");
             }
+
+            ENTITY_VERBOSE_SELF(entity, " added as child");
          }
       }
-
-      #if ENTITY_VERBOSE_ENABLED()
-         if (added)
-            ENTITY_VERBOSE_SELF(entity << " added");
-      #endif
 
       return added;
    }
       
-   /// Destroy a child that matched pointer                                   
+   /// Remove a child that matches pointer                                    
    ///   @attention assumes entity is a valid pointer                         
-   ///   @attention assumes you have ownership of that entity outside call    
-   ///              otherwise you risk deallocation of the memory behind it,  
-   ///              if managed memory is enabled, and we have jurisdiction    
-   ///   @tparam TWOSIDED - true to also remove entity's owner                
+   ///   @tparam TWOSIDED - true to also remove entity's owner;               
+   ///                      used mainly internally to avoid endless loops     
    ///   @param entity - entity instance to remove from children              
    ///   @return the number of removed children                               
    template<bool TWOSIDED>
    Count Thing::RemoveChild(Thing* entity) {
-      LANGULUS_ASSUME(DevAssumes, nullptr != entity, "Bad entity pointer");
-      /*#if LANGULUS_FEATURE(MANAGED_MEMORY)
-         LANGULUS_ASSUME(DevAssumes, 
-            !Anyness::Inner::Allocator::CheckAuthority(GetType(), entity) ||
-             Anyness::Inner::Allocator::Find(GetType(), entity)->GetUses() > 1,
-            "Managed entity pointer has no ownership outside this function, "
-            "and will result in a bad pointer after removed from children"
-         );
-      #endif*/
+      LANGULUS_ASSUME(UserAssumes, nullptr != entity, "Bad entity pointer");
       
       const auto removed = mChildren.Remove(entity);
       if constexpr (TWOSIDED) {
          if (removed) {
-            //entity->Free();
-
             if (entity->mOwner == this) {
                entity->mOwner = nullptr;
                entity->mRefreshRequired = true;
+               ENTITY_VERBOSE_SELF(entity, "'s owner overwritten");
             }
+
+            ENTITY_VERBOSE_SELF(entity, " removed from children");
          }
       }
-
-      #if ENTITY_VERBOSE_ENABLED()
-         if (removed)
-            ENTITY_VERBOSE_SELF(entity << " removed");
-      #endif
 
       return removed;
    }
@@ -159,13 +143,11 @@ namespace Langulus::Entity
          #else
             unit->mOwners << this;
          #endif
-            //Keep();
       }
 
       mUnits[unit->GetType()] << unit;
-      //unit->Keep();
       mRefreshRequired = true;
-      ENTITY_VERBOSE(unit << " added");
+      ENTITY_VERBOSE(unit, " added as unit");
       return 1;
    }
 
@@ -182,15 +164,23 @@ namespace Langulus::Entity
          return 0;
 
       auto& unitList = mUnits.GetValue(foundType);
-      if (unitList.Remove(unit)) {
+      const auto unitIndex = unitList.Find(unit);
+      if (unitIndex) {
          // Decouple before unit is destroyed                           
          if constexpr (TWOSIDED)
             unit->mOwners.Remove(this);
 
          // Notify all other units about the environment change         
-         //unit->Free();
          mRefreshRequired = true;
-         ENTITY_VERBOSE_SELF(unit << " removed");
+         ENTITY_VERBOSE_SELF(unit, " removed from units");
+
+         // Dereference (and eventually destroy) unit                   
+         unitList.RemoveIndex(unitIndex);
+
+         // Cleanup the unit's map if the unit was the last entry for   
+         // its type                                                    
+         if (unitList.IsEmpty())
+            mUnits.RemoveIndex(foundType);
          return 1;
       }
 
@@ -205,23 +195,45 @@ namespace Langulus::Entity
    ///   @return the number of removed units                                  
    template<CT::Unit T, bool TWOSIDED>
    Count Thing::RemoveUnits() {
-      const auto found = mUnits.FindKeyIndex(MetaData::Of<Decay<T>>());
-      if (!found)
-         return 0;
+      if constexpr (CT::Same<T, Unit>) {
+         // Remove all units                                            
+         Count removed {};
+         for (auto pair : mUnits) {
+            for (auto unit : pair.mValue) {
+               // Decouple before units are destroyed                   
+               if constexpr (TWOSIDED)
+                  unit->mOwners.Remove(this);
+            }
 
-      auto& list = mUnits.GetValue(found);
-      for (auto unit : list) {
-         ENTITY_VERBOSE_SELF(unit << " removed");
-         if constexpr (TWOSIDED)
-            unit->mOwners.Remove(this);
+            removed += pair.mValue.GetCount();
+         }
 
-         //unit->Free();
+         mUnits.Clear();
+         mRefreshRequired = true;
+         ENTITY_VERBOSE_SELF("All ", removed, " units were removed");
+         return removed;
       }
+      else {
+         // Remove units of a specific type                             
+         const auto meta = MetaData::Of<Decay<T>>();
+         const auto found = mUnits.FindKeyIndex(meta);
+         if (!found)
+            return 0;
 
-      const auto removed = list.GetCount();
-      mUnits.RemoveIndex(found);
-      mRefreshRequired = true;
-      return removed;
+         auto& list = mUnits.GetValue(found);
+         for (auto unit : list) {
+            // Decouple before units are destroyed                      
+            if constexpr (TWOSIDED)
+               unit->mOwners.Remove(this);
+         }
+
+         // Cleanup the entire map entry                                
+         const auto removed = list.GetCount();
+         mUnits.RemoveIndex(found);
+         mRefreshRequired = true;
+         ENTITY_VERBOSE_SELF(removed, " units of type ", meta, " were removed");
+         return removed;
+      }
    }
 
    /// Count the number of matching units in this entity                      
@@ -270,8 +282,16 @@ namespace Langulus::Entity
    template<CT::Unit T>
    LANGULUS(INLINED)
    Decay<T>* Thing::GetUnit(Index offset) {
-      return static_cast<Decay<T>*>(
-         GetUnit(MetaData::Of<Decay<T>>(), offset));
+      if constexpr (!CT::Same<T, Unit>) {
+         return static_cast<Decay<T>*>(
+            GetUnitMeta(MetaData::Of<Decay<T>>(), offset)
+         );
+      }
+      else {
+         return static_cast<Decay<T>*>(
+            GetUnitMeta(nullptr, offset)
+         );
+      }
    }
 
    /// Get a unit by a static type and an optional offset (const)             
@@ -281,8 +301,16 @@ namespace Langulus::Entity
    template<CT::Unit T>
    LANGULUS(INLINED)
    const Decay<T>* Thing::GetUnit(Index offset) const {
-      return static_cast<const Decay<T>*>(
-         GetUnit(MetaData::Of<Decay<T>>(), offset));
+      if constexpr (!CT::Same<T, Unit>) {
+         return static_cast<const Decay<T>*>(
+            GetUnitMeta(MetaData::Of<Decay<T>>(), offset)
+         );
+      }
+      else {
+         return static_cast<const Decay<T>*>(
+            GetUnitMeta(nullptr, offset)
+         );
+      }
    }
 
    #if LANGULUS_FEATURE(MANAGED_REFLECTION)
@@ -292,8 +320,8 @@ namespace Langulus::Entity
       ///   @param offset - optional offset (Nth match)                       
       ///   @return the unit if found, or nullptr if not                      
       LANGULUS(INLINED)
-      const Unit* Thing::GetUnit(const Token& token, Index offset) const {
-         return const_cast<Thing*>(this)->GetUnit(token, offset);
+      const Unit* Thing::GetUnitMeta(const Token& token, Index offset) const {
+         return const_cast<Thing*>(this)->GetUnitMeta(token, offset);
       }
 
       /// Get a unit by a token, and an optional offset, then dynamic_cast it 
@@ -305,7 +333,7 @@ namespace Langulus::Entity
       template<CT::Unit T>
       LANGULUS(INLINED)
       Decay<T>* Thing::GetUnitAs(const Token& token, Index offset) {
-         return dynamic_cast<Decay<T>*>(GetUnit(token, offset));
+         return dynamic_cast<Decay<T>*>(GetUnitMeta(token, offset));
       }
    #endif
 
@@ -420,7 +448,6 @@ namespace Langulus::Entity
 
       return {};
    }
-
 
    /// Execute verb in all owners                                             
    ///   @tparam SEEK - where in hierarchy to execute                         

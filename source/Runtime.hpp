@@ -81,6 +81,8 @@ namespace Langulus::Entity
       void UnloadSharedLibrary(const SharedLibrary&);
 
    public:
+      LANGULUS_CONVERSIONS(Debug);
+
       Runtime() = delete;
       Runtime(Thing*) noexcept;
       Runtime(Runtime&&) noexcept = default;
@@ -103,6 +105,8 @@ namespace Langulus::Entity
       NOD() A::File* GetFile(const Path&);
 
       void Update(Time);
+
+      NOD() explicit operator Debug() const;
    };
 
 } // namespace Langulus::Entity

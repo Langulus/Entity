@@ -18,11 +18,13 @@ namespace Langulus::Entity
    /// Usually, unpinned values may change on Unit::Refresh()                 
    ///                                                                        
    template<class T>
-   struct Pinnable : T {
+   struct Pinnable {
+   protected:
       friend struct Hierarchy;
 
       // Is the pinnable value pinned?                                  
-      bool mLocked = false;
+      bool mLocked {};
+      T mValue {};
 
       LANGULUS(POD) CT::POD<T>;
       LANGULUS(NULLIFIABLE) CT::Nullifiable<T>;
@@ -50,6 +52,11 @@ namespace Langulus::Entity
       void Unpin() noexcept;
 
       NOD() bool IsPinned() const noexcept;
+      NOD() const T& Get() const noexcept;
+      NOD() T& Get() noexcept;
+
+      NOD() operator const T&() const noexcept;
+      NOD() operator T&() noexcept;
    };
 
 
@@ -329,3 +336,28 @@ namespace Langulus::CT
    concept Pinnable = requires { Decay<T>::CTTI_Pinnable; };
 
 } // namespace Langulus::CT
+
+
+namespace fmt
+{
+
+   ///                                                                        
+   /// Extend FMT to be capable of logging any pinnable values                
+   ///                                                                        
+   template<::Langulus::CT::Pinnable T>
+   struct formatter<T> {
+      template<class CONTEXT>
+      constexpr auto parse(CONTEXT& ctx) {
+         return ctx.begin();
+      }
+
+      template<class CONTEXT>
+      LANGULUS(INLINED)
+      auto format(T const& element, CONTEXT& ctx) {
+         using namespace ::Langulus;
+         return fmt::vformat_to(ctx.out(), "{}",
+            fmt::make_format_args(element.Get()));
+      }
+   };
+
+}

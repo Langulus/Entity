@@ -118,28 +118,28 @@ namespace Langulus::Entity
          Any CreateUnitToken(const Token&, A&&...);
       #endif
 
-      template<CT::Unit T, bool TWOSIDED = true>
+      template<CT::Unit T = Unit, bool TWOSIDED = true>
       Count RemoveUnits();
 
-      void ReplaceUnit(Unit*, Unit*);
+      Count ReplaceUnit(Unit*, Unit*);
       NOD() Count HasUnits(DMeta) const;
       template<CT::Unit T>
       NOD() Count HasUnits() const;
 
       NOD() const UnitMap& GetUnits() const noexcept;
-      NOD() const Unit* GetUnit(DMeta, Index = IndexFirst) const;
-      NOD()       Unit* GetUnit(DMeta, Index = IndexFirst);
+      NOD() const Unit* GetUnitMeta(DMeta, Index = IndexFirst) const;
+      NOD()       Unit* GetUnitMeta(DMeta, Index = IndexFirst);
       NOD() const Unit* GetUnitExt(const Construct&, Index = IndexFirst) const;
       NOD()       Unit* GetUnitExt(const Construct&, Index = IndexFirst);
 
-      template<CT::Unit T>
+      template<CT::Unit T = Unit>
       NOD()       Decay<T>* GetUnit(Index = IndexFirst);
-      template<CT::Unit T>
+      template<CT::Unit T = Unit>
       NOD() const Decay<T>* GetUnit(Index = IndexFirst) const;
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
-         NOD() const Unit* GetUnit(const Token&, Index = IndexFirst) const;
-         NOD()       Unit* GetUnit(const Token&, Index = IndexFirst);
+         NOD() const Unit* GetUnitMeta(const Token&, Index = IndexFirst) const;
+         NOD()       Unit* GetUnitMeta(const Token&, Index = IndexFirst);
          template<CT::Unit T>
          NOD() Decay<T>*   GetUnitAs(const Token&, Index = IndexFirst);
       #endif

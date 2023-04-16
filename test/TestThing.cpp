@@ -13,9 +13,9 @@ SCENARIO("Testing Thing", "[thing]") {
 
       THEN("Properties should match") {
          REQUIRE(root.mOwner == nullptr);
-         REQUIRE(root.mRuntime == nullptr);
+         REQUIRE(root.mRuntime.Get() == nullptr);
          REQUIRE(root.mRuntime.IsPinned() == false);
-         REQUIRE(root.mFlow == nullptr);
+         REQUIRE(root.mFlow.Get() == nullptr);
          REQUIRE(root.mFlow.IsPinned() == false);
          REQUIRE(root.mRefreshRequired == false);
          REQUIRE(root.mChildren.IsEmpty());
@@ -31,9 +31,9 @@ SCENARIO("Testing Thing", "[thing]") {
 
       THEN("Properties should match") {
          REQUIRE(root.mOwner == nullptr);
-         REQUIRE(root.mRuntime == nullptr);
+         REQUIRE(root.mRuntime.Get() == nullptr);
          REQUIRE(root.mRuntime.IsPinned() == false);
-         REQUIRE(root.mFlow == nullptr);
+         REQUIRE(root.mFlow.Get() == nullptr);
          REQUIRE(root.mFlow.IsPinned() == false);
          REQUIRE(root.mRefreshRequired == false);
          REQUIRE(root.mChildren.GetCount() == 1);
@@ -43,9 +43,9 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(root.GetReferences() == 2);
 
          REQUIRE(child.mOwner == &root);
-         REQUIRE(child.mRuntime == nullptr);
+         REQUIRE(child.mRuntime.Get() == nullptr);
          REQUIRE(child.mRuntime.IsPinned() == false);
-         REQUIRE(child.mFlow == nullptr);
+         REQUIRE(child.mFlow.Get() == nullptr);
          REQUIRE(child.mFlow.IsPinned() == false);
          REQUIRE(child.mRefreshRequired == false);
          REQUIRE(child.mChildren.IsEmpty());
@@ -62,7 +62,7 @@ SCENARIO("Testing Thing", "[thing]") {
          auto runtime = root.CreateRuntime();
 
          THEN("Properties should match") {
-            REQUIRE(root.mRuntime == runtime);
+            REQUIRE(root.mRuntime.Get() == runtime);
             REQUIRE(root.mRuntime.IsPinned() == true);
          }
       }
@@ -71,7 +71,7 @@ SCENARIO("Testing Thing", "[thing]") {
          auto flow = root.CreateFlow();
 
          THEN("Properties should match") {
-            REQUIRE(root.mFlow == flow);
+            REQUIRE(root.mFlow.Get() == flow);
             REQUIRE(root.mFlow.IsPinned() == true);
          }
       }
@@ -81,9 +81,9 @@ SCENARIO("Testing Thing", "[thing]") {
 
          THEN("Properties should match") {
             REQUIRE(root.mOwner == nullptr);
-            REQUIRE(root.mRuntime == nullptr);
+            REQUIRE(root.mRuntime.Get() == nullptr);
             REQUIRE(root.mRuntime.IsPinned() == false);
-            REQUIRE(root.mFlow == nullptr);
+            REQUIRE(root.mFlow.Get() == nullptr);
             REQUIRE(root.mFlow.IsPinned() == false);
             REQUIRE(root.mRefreshRequired == false);
             REQUIRE(root.mChildren.GetCount() == 1);
@@ -94,9 +94,9 @@ SCENARIO("Testing Thing", "[thing]") {
             auto child1 = root.mChildren[0];
             REQUIRE(child1 == child);
             REQUIRE(child1->mOwner == &root);
-            REQUIRE(child1->mRuntime == root.mRuntime);
+            REQUIRE(child1->mRuntime.Get() == root.mRuntime);
             REQUIRE(child1->mRuntime.IsPinned() == false);
-            REQUIRE(child1->mFlow == root.mFlow);
+            REQUIRE(child1->mFlow.Get() == root.mFlow);
             REQUIRE(child1->mFlow.IsPinned() == false);
             REQUIRE(child1->mRefreshRequired == false);
             REQUIRE(child1->mChildren.IsEmpty());
@@ -165,9 +165,9 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(trait != nullptr);
 
             REQUIRE(root.mOwner == nullptr);
-            REQUIRE(root.mRuntime == nullptr);
+            REQUIRE(root.mRuntime.Get() == nullptr);
             REQUIRE(root.mRuntime.IsPinned() == false);
-            REQUIRE(root.mFlow == nullptr);
+            REQUIRE(root.mFlow.Get() == nullptr);
             REQUIRE(root.mFlow.IsPinned() == false);
             REQUIRE(root.mRefreshRequired == true);
             REQUIRE(root.mChildren.IsEmpty());
@@ -190,9 +190,9 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(trait != nullptr);
 
             REQUIRE(root.mOwner == nullptr);
-            REQUIRE(root.mRuntime == nullptr);
+            REQUIRE(root.mRuntime.Get() == nullptr);
             REQUIRE(root.mRuntime.IsPinned() == false);
-            REQUIRE(root.mFlow == nullptr);
+            REQUIRE(root.mFlow.Get() == nullptr);
             REQUIRE(root.mFlow.IsPinned() == false);
             REQUIRE(root.mRefreshRequired == true);
             REQUIRE(root.mChildren.IsEmpty());
@@ -211,6 +211,7 @@ SCENARIO("Testing Thing", "[thing]") {
    }
 
    WHEN("Creating a Thing by descriptor") {
+      Logger::Special("Start: Creating a Thing by descriptor");
       auto descriptor = Any::Wrap(
          Traits::Name {"Root"_text},
          Construct::From<Runtime>(),
@@ -237,9 +238,9 @@ SCENARIO("Testing Thing", "[thing]") {
 
       THEN("Properties should match") {
          REQUIRE(root.mOwner == nullptr);
-         REQUIRE(root.mRuntime != nullptr);
+         REQUIRE(root.mRuntime.Get() != nullptr);
          REQUIRE(root.mRuntime.IsPinned() == true);
-         REQUIRE(root.mFlow != nullptr);
+         REQUIRE(root.mFlow.Get() != nullptr);
          REQUIRE(root.mFlow.IsPinned() == true);
          REQUIRE(root.mRefreshRequired == true);
          REQUIRE(root.mChildren.GetCount() == 2);
@@ -250,9 +251,9 @@ SCENARIO("Testing Thing", "[thing]") {
 
          auto child1 = root.mChildren[0];
          REQUIRE(child1->mOwner == &root);
-         REQUIRE(child1->mRuntime == root.mRuntime);
+         REQUIRE(child1->mRuntime.Get() == root.mRuntime);
          REQUIRE(child1->mRuntime.IsPinned() == false);
-         REQUIRE(child1->mFlow == root.mFlow);
+         REQUIRE(child1->mFlow.Get() == root.mFlow);
          REQUIRE(child1->mFlow.IsPinned() == false);
          REQUIRE(child1->mRefreshRequired == true);
          REQUIRE(child1->mChildren.GetCount() == 2);
@@ -263,9 +264,9 @@ SCENARIO("Testing Thing", "[thing]") {
 
          auto child2 = root.mChildren[1];
          REQUIRE(child2->mOwner == &root);
-         REQUIRE(child2->mRuntime == root.mRuntime);
+         REQUIRE(child2->mRuntime.Get() == root.mRuntime);
          REQUIRE(child2->mRuntime.IsPinned() == false);
-         REQUIRE(child2->mFlow == root.mFlow);
+         REQUIRE(child2->mFlow.Get() == root.mFlow);
          REQUIRE(child2->mFlow.IsPinned() == false);
          REQUIRE(child2->mRefreshRequired == true);
          REQUIRE(child2->mChildren.IsEmpty());
@@ -276,9 +277,9 @@ SCENARIO("Testing Thing", "[thing]") {
 
          auto grandchild1 = child1->mChildren[0];
          REQUIRE(grandchild1->mOwner == child1);
-         REQUIRE(grandchild1->mRuntime == root.mRuntime);
+         REQUIRE(grandchild1->mRuntime.Get() == root.mRuntime);
          REQUIRE(grandchild1->mRuntime.IsPinned() == false);
-         REQUIRE(grandchild1->mFlow == root.mFlow);
+         REQUIRE(grandchild1->mFlow.Get() == root.mFlow);
          REQUIRE(grandchild1->mFlow.IsPinned() == false);
          REQUIRE(grandchild1->mRefreshRequired == true);
          REQUIRE(grandchild1->mChildren.IsEmpty());
@@ -289,9 +290,9 @@ SCENARIO("Testing Thing", "[thing]") {
 
          auto grandchild2 = child1->mChildren[1];
          REQUIRE(grandchild2->mOwner == child1);
-         REQUIRE(grandchild2->mRuntime == root.mRuntime);
+         REQUIRE(grandchild2->mRuntime.Get() == root.mRuntime);
          REQUIRE(grandchild2->mRuntime.IsPinned() == false);
-         REQUIRE(grandchild2->mFlow == root.mFlow);
+         REQUIRE(grandchild2->mFlow.Get() == root.mFlow);
          REQUIRE(grandchild2->mFlow.IsPinned() == false);
          REQUIRE(grandchild2->mRefreshRequired == true);
          REQUIRE(grandchild2->mChildren.IsEmpty());
@@ -300,6 +301,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(grandchild2->GetName() == "GrandChild2");
          REQUIRE(grandchild2->GetReferences() == 2);
       }
+      Logger::Special("End: Creating a Thing by descriptor");
    }
 
    GIVEN("A complex hierarchy with runtime, flow, units, and traits") {
@@ -373,23 +375,58 @@ SCENARIO("Testing Thing", "[thing]") {
 
       WHEN("Get a local unit by index") {
          auto unit = root.GetUnit(0);
+
+         THEN("Properties should match") { 
+            REQUIRE(unit);
+            REQUIRE(unit->Is<TestUnit1>());
+            REQUIRE(unit == root.mUnits[MetaOf<TestUnit1>()][0]);
+         }
       }
 
       WHEN("Get a local unit by type and index") {
-         auto unit = root.GetUnit(MetaOf<TestUnit1>());
+         auto unit = root.GetUnitMeta(MetaOf<TestUnit1>());
+
+         THEN("Properties should match") {
+            REQUIRE(unit);
+            REQUIRE(unit->Is<TestUnit1>());
+            REQUIRE(unit == root.mUnits[MetaOf<TestUnit1>()][0]);
+         }
       }
 
       WHEN("Removing a specific local unit") {
+         auto unitmemory = root.GetUnit(0);
          auto removed = root.RemoveUnit(root.GetUnit(0));
+
+         THEN("Properties should match") {
+            REQUIRE(removed == 1);
+            REQUIRE(root.mUnits.GetCount() == 1);
+            REQUIRE(nullptr == Anyness::Inner::Allocator::Find(MetaOf<TestUnit1>(), unitmemory));
+         }
       }
 
-      WHEN("Removing all local units of a specific type") {
-         auto removed = root.RemoveUnits<Unit>();
+      WHEN("Removing all local units") {
+         auto unitmemory1 = root.GetUnit(0);
+         auto unitmemory2 = root.GetUnit(1);
+         auto removed = root.RemoveUnits();
+
+         THEN("Properties should match") {
+            REQUIRE(removed == 2);
+            REQUIRE(root.mUnits.IsEmpty());
+            REQUIRE(nullptr == Anyness::Inner::Allocator::Find(MetaOf<TestUnit1>(), unitmemory1));
+            REQUIRE(nullptr == Anyness::Inner::Allocator::Find(MetaOf<TestUnit2>(), unitmemory2));
+         }
       }
 
       WHEN("Replace local units") {
          TestUnit2 replacement;
-         root.ReplaceUnit(root.GetUnit(0), &replacement);
+         auto replaced = root.ReplaceUnit(root.GetUnit<TestUnit1>(), &replacement);
+
+         THEN("Properties should match") {
+            REQUIRE(replaced == 1);
+            REQUIRE(root.mUnits.GetCount() == 1);
+            REQUIRE(root.mUnits[MetaOf<TestUnit2>()].GetCount() == 2);
+            REQUIRE(root.mUnits[MetaOf<TestUnit2>()][1] == &replacement);
+         }
       }
 
       WHEN("Count available units") {

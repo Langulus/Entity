@@ -10,7 +10,7 @@
 #include "Runtime.hpp"
 #include "Unit.inl"
 
-#if 0
+#if 1
    #define ENTITY_VERBOSE_ENABLED() 1
    #define ENTITY_VERBOSE_SELF(...)            Logger::Verbose(Self(), __VA_ARGS__)
    #define ENTITY_VERBOSE(...)                 Logger::Append(__VA_ARGS__)
@@ -31,6 +31,7 @@ namespace Langulus::Entity
          Verbs::Create creator {descriptor};
          Create(creator);
       }
+      ENTITY_VERBOSE_SELF("Created (root, ", GetReferences(), " references)");
    }
    
    /// Construct as a child of another thing                                  
@@ -49,6 +50,13 @@ namespace Langulus::Entity
          // Create any subthings/traits/unit in this thing              
          Verbs::Create creator {descriptor};
          Create(creator);
+      }
+
+      if (parent) {
+         ENTITY_VERBOSE_SELF("Created as child to ", parent, " (", GetReferences(), " references)");
+      }
+      else {
+         ENTITY_VERBOSE_SELF("Created (root, ", GetReferences(), " references)");
       }
    }
 
@@ -77,25 +85,38 @@ namespace Langulus::Entity
       // Make sure the losing parent is notified of the change          
       if (other.mOwner)
          other.mOwner->RemoveChild(&other);
+
+      ENTITY_VERBOSE_SELF("moved from ", other);
    }
 
    /// Thing destructor                                                       
    Thing::~Thing() SAFETY_NOEXCEPT() {
+      const auto tabs = ENTITY_VERBOSE_SELF(
+         "Destroying (", GetReferences(), " references)", Logger::Tabs {}
+      );
+
+      // The thing might be on the stack, make sure we decouple it from 
+      // its owner, if that's the case                                  
       if (mOwner && GetReferences() > 1)
          mOwner->RemoveChild<false>(this);
 
-      /*for (auto child : mChildren) {
-         child->Free();
+      // Decouple all children from their parent                        
+      for (auto child : mChildren) {
+         ENTITY_VERBOSE_SELF(
+            "Decoupling child ", child, " (", child->GetReferences(), " references)"
+         );
          child->mOwner.Reset();
       }
 
+      // Decouple all units from this owner                             
       for (auto unitpair : mUnits) {
          for (auto unit : unitpair.mValue) {
-            if (unit->mOwners.Remove(this))
-               Free();
-            unit->Free();
+            ENTITY_VERBOSE_SELF(
+               "Decoupling unit ", unit, " (", unit->GetReferences(), " references)"
+            );
+            unit->mOwners.Remove(this);
          }
-      }*/
+      }
    }
 
    /// Compare two entities                                                   
@@ -199,10 +220,10 @@ namespace Langulus::Entity
    /// Get a unit by type and offset                                          
    /// If type is nullptr searches only by offset                             
    /// If type is not nullptr, gets the Nth matching unit, if any             
-   ///   @param type - the type of the unit                                   
+   ///   @param id - the type of the unit                                     
    ///   @param index - the unit index to seek                                
    ///   @return the unit if found, or nullptr if not                         
-   Unit* Thing::GetUnit(DMeta id, Index index) {
+   Unit* Thing::GetUnitMeta(DMeta id, Index index) {
       if (id) {
          // Search a typed trait                                        
          const auto found = mUnits.FindKeyIndex(id);
@@ -214,15 +235,15 @@ namespace Langulus::Entity
       // Search unit by index                                           
       Unit* found {};
       if (index.IsArithmetic()) {
-         mUnits.ForEachValue([&](TAny<Unit*>& list) noexcept {
+         for (auto pair : mUnits) {
+            auto& list = pair.mValue;
             if (index < list.GetCount()) {
                found = list[index];
-               return false;
+               break;
             }
 
             index -= list.GetCount();
-            return true;
-         });
+         }
       }
 
       return found;
@@ -234,8 +255,8 @@ namespace Langulus::Entity
    ///   @param type - the type of the unit                                   
    ///   @param offset - the unit index to seek                               
    ///   @return the unit if found, or nullptr if not                         
-   const Unit* Thing::GetUnit(DMeta type, Index offset) const {
-      return const_cast<Thing*>(this)->GetUnit(type, offset);
+   const Unit* Thing::GetUnitMeta(DMeta type, Index offset) const {
+      return const_cast<Thing*>(this)->GetUnitMeta(type, offset);
    }
    
    /// Get a unit by type, properties, and offset                             
@@ -299,16 +320,15 @@ namespace Langulus::Entity
       // Search unit by index and properties only                       
       Unit* found {};
       if (index.IsArithmetic()) {
-         auto offset = index.GetOffset();
-         mUnits.ForEachValue([&](TAny<Unit*>& list) noexcept {
-            if (offset < list.GetCount()) {
-               found = list[offset];
-               return false;
+         for (auto pair : mUnits) {
+            auto& list = pair.mValue;
+            if (index < list.GetCount()) {
+               found = list[index];
+               break;
             }
 
-            offset -= list.GetCount();
-            return true;
-         });
+            index -= list.GetCount();
+         }
       }
 
       return found;
@@ -327,8 +347,8 @@ namespace Langulus::Entity
    ///   @param token - the type name of the unit                             
    ///   @param offset - the unit index                                       
    ///   @return the unit if found, or nullptr if not                         
-   Unit* Thing::GetUnit(const Token& token, Index offset) {
-      return GetUnit(RTTI::Database.GetMetaData(token), offset);
+   Unit* Thing::GetUnitMeta(const Token& token, Index offset) {
+      return GetUnitMeta(RTTI::Database.GetMetaData(token), offset);
    }
 #endif
 
@@ -405,21 +425,9 @@ namespace Langulus::Entity
    ///   @attention assumes both units are different and not nullptr          
    ///   @param replaceThis - the unit to replace                             
    ///   @param withThis - the unit to replace with                           
-   void Thing::ReplaceUnit(Unit* replaceThis, Unit* withThis) {
-      const auto foundType = mUnits.FindKeyIndex(replaceThis->GetType());
-      if (!foundType)
-         return;
-
-      auto& list = mUnits.GetValue(foundType);
-      const auto foundUnit = list.Find(replaceThis);
-      if (!foundUnit)
-         return;
-
-      list[foundUnit] = withThis;
-      replaceThis->mOwners.Remove(this);
-      withThis->mOwners << this;
-      mRefreshRequired = true;
-      ENTITY_VERBOSE_SELF(replaceThis << " replaced with " << withThis);
+   Count Thing::ReplaceUnit(Unit* replaceThis, Unit* withThis) {
+      RemoveUnit(replaceThis);
+      return AddUnit(withThis);
    }
 
    /// Count the number of matching units in this entity                      
@@ -433,39 +441,42 @@ namespace Langulus::Entity
    /// Get the current runtime                                                
    ///   @return the pointer to the runtime                                   
    Runtime* Thing::GetRuntime() const noexcept {
-      return mRuntime;
+      return mRuntime.Get();
    }
 
    /// Get the current temporal flow                                          
    ///   @return the pointer to the flow                                      
    Temporal* Thing::GetFlow() const noexcept {
-      return mFlow;
+      return mFlow.Get();
    }
 
    /// Create a local runtime for this thing                                  
    ///   @return the new runtime instance, or the old one if already created  
    Runtime* Thing::CreateRuntime() {
       if (mRuntime.IsPinned())
-         return mRuntime;
-      mRuntime.New(this);
+         return mRuntime.Get();
+      mRuntime.Get().New(this);
       mRuntime.Pin();
-      return mRuntime;
+      ENTITY_VERBOSE_SELF("New runtime: ", mRuntime);
+      return mRuntime.Get();
    }
 
    /// Create a local flow for this thing                                     
    ///   @return the new flow instance, or the old one, if already created    
    Temporal* Thing::CreateFlow() {
       if (mFlow.IsPinned())
-         return mFlow;
-      mFlow.New(this);
+         return mFlow.Get();
+      mFlow.Get().New(this);
       mFlow.Pin();
-      return mFlow;
+      ENTITY_VERBOSE_SELF("New flow: ", mFlow);
+      return mFlow.Get();
    }
 
    /// Create a child thing                                                   
    ///   @param descriptor - instructions for the entity's creation           
    ///   @return the new child instance                                       
    Ref<Thing> Thing::CreateChild(const Any& descriptor) {
+      const auto tab = ENTITY_VERBOSE_SELF("Producing child: ", Logger::Tabs {});
       Ref<Thing> newThing;
       newThing.New(this, descriptor);
       return Abandon(newThing);

@@ -43,10 +43,11 @@ namespace Langulus::Entity
 
    /// Unit destruction                                                       
    Unit::~Unit() SAFETY_NOEXCEPT() {
-      // Decouple from all owners                                       
-      if (GetReferences() > 1) {
-         for (auto owner : mOwners)
-            owner->RemoveUnit<false>(this);
+      // The unit might be on the stack, make sure we decouple it from  
+      // all its owners, if that's the case                             
+      for (auto owner = mOwners.begin(); owner != mOwners.end() && GetReferences() > 1; ++owner) {
+         owner->RemoveUnit<false>(this);
+         //owner = mOwners.RemoveIndex(owner);
       }
 
       // Then, the unit should have exactly one reference left          

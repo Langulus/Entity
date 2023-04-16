@@ -55,18 +55,17 @@ namespace Langulus::Entity
       #error Unsupported OS
    #endif
 
-
    /// Runtime construction                                                   
    ///   @param owner - the owner of the runtime                              
    Runtime::Runtime(Thing* owner) noexcept
       : mOwner {owner} {
-      Logger::Verbose(IdentityOf(this), ": Initializing...");
-      Logger::Verbose(IdentityOf(this), ": Initialized");
+      Logger::Verbose(this, ": Initializing...");
+      Logger::Verbose(this, ": Initialized");
    }
 
    /// Runtime destruction                                                    
    Runtime::~Runtime() {
-      Logger::Verbose(IdentityOf(this), ": Shutting down...");
+      Logger::Verbose(this, ": Shutting down...");
 
       for (auto library = mLibraries.begin(); library != mLibraries.end(); ++library) {
          if (0 == --library->mValue.mReferences) {
@@ -386,6 +385,11 @@ namespace Langulus::Entity
          for (auto module : pair.mValue)
             module->Update(dt);
       }
+   }
+
+   /// Stringify the runtime, for debugging purposes                          
+   Runtime::operator Debug() const {
+      return IdentityOf(this);
    }
 
 } // namespace Langulus::Entity

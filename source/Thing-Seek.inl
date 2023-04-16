@@ -31,7 +31,7 @@ namespace Langulus::Entity
       Unit* result = nullptr;
       if constexpr (SEEK & Seek::Here) {
          // Seek here if requested                                      
-         result = GetUnit(meta, offset);
+         result = GetUnitMeta(meta, offset);
          if (result)
             return result;
       }

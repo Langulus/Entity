@@ -85,7 +85,7 @@ namespace Langulus::Entity
          // Handle some predefined traits here                          
          if (id.template TraitIs<Traits::Unit>()) {
             // Get a component                                          
-            auto unit = GetUnit(nullptr, index);
+            auto unit = GetUnitMeta(nullptr, index);
             if (unit)
                return Traits::Unit {unit};
             return {};
