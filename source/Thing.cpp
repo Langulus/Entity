@@ -6,7 +6,6 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #include "Thing.inl"
-#include "Hierarchy.inl"
 #include "Runtime.hpp"
 #include "Unit.inl"
 

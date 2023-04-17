@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include "Hierarchy.hpp"
+#include "Pinnable.hpp"
 
 namespace Langulus::Entity
 {
