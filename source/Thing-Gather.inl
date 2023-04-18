@@ -30,11 +30,10 @@ namespace Langulus::Entity
       TAny<Unit*> result;
       if constexpr (SEEK & Seek::Here) {
          // Seek here if requested                                      
-         for (auto unitList : mUnits) {
-            for (auto unit : unitList.mValue) {
-               if (unit->CastsTo(meta))
-                  result << unit;
-            }
+         const auto found = mUnitsAmbiguous.FindKeyIndex(meta);
+         if (found) {
+            for (auto& unit : mUnitsAmbiguous.GetValue(found))
+               result << unit;
          }
       }
 
@@ -49,7 +48,7 @@ namespace Langulus::Entity
 
       if constexpr (SEEK & Seek::Below) {
          // Seek children, if requested                                 
-         for (auto child : mChildren) {
+         for (auto& child : mChildren) {
             auto inChildren = child->template 
                GatherUnits<Seek::HereAndBelow>(meta);
             result += Abandon(inChildren);
@@ -80,11 +79,13 @@ namespace Langulus::Entity
       if constexpr (SEEK & Seek::Here) {
          // Handle some predefined traits here                          
          if (trait->template Is<Traits::Unit>()) {
-            for (auto unit : mUnits)
-               results << Traits::Unit {unit.mValue};
+            // Gather all units                                         
+            for (auto& unit : mUnitsList)
+               results << Traits::Unit {unit};
          }
          else if (trait->template Is<Traits::Child>()) {
-            for (auto child : mChildren)
+            // Gather all children                                      
+            for (auto& child : mChildren)
                results << Traits::Unit {child};
          }
          else if (trait->template Is<Traits::Runtime>()) {
@@ -102,23 +103,23 @@ namespace Langulus::Entity
             results += mTraits.GetValue(found);
 
          // Then check each unit's static traits                        
-         mUnits.ForEachValue([&](Unit* unit) {
+         for (auto& unit : mUnitsList) {
             Offset index {};
             auto t = unit->GetMember(trait, index);
             while (!t.IsEmpty()) {
                results <<= Trait::From(trait, t);
                t = unit->GetMember(trait, ++index);
             }
-         });
+         }
 
          // Then check the Thing's members                              
          //TODO isn't this redundant and slower than the code in the beginning of this function?
-         Offset index {};
+         /*Offset index {};
          auto t = GetMember(trait, index);
          while (!t.IsEmpty()) {
             results <<= Trait::From(trait, t);
             t = GetMember(trait, ++index);
-         }
+         }*/
       }
 
       if constexpr (SEEK & Seek::Above) {
@@ -131,8 +132,8 @@ namespace Langulus::Entity
 
       if constexpr (SEEK & Seek::Below) {
          // Seek children, if requested                                 
-         for (auto child : mChildren) {
-            results += mOwner->template
+         for (auto& child : mChildren) {
+            results += child->template
                GatherTraits<Seek::HereAndBelow>(trait);
          }
       }

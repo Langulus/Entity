@@ -197,25 +197,22 @@ namespace Langulus::Entity
    Count Thing::RemoveUnits() {
       if constexpr (CT::Same<T, Unit>) {
          // Remove all units                                            
-         Count removed {};
-         for (auto pair : mUnits) {
-            for (auto unit : pair.mValue) {
-               // Decouple before units are destroyed                   
-               if constexpr (TWOSIDED)
-                  unit->mOwners.Remove(this);
-            }
-
-            removed += pair.mValue.GetCount();
+         const auto removed = mUnitsList.GetCount();
+         for (auto& unit : mUnitsList) {
+            // Decouple before units are (potentially) destroyed        
+            if constexpr (TWOSIDED)
+               unit->mOwners.Remove(this);
          }
 
-         mUnits.Clear();
+         mUnitsList.Clear();
+         mUnitsAmbiguous.Clear();
          mRefreshRequired = true;
          ENTITY_VERBOSE_SELF("All ", removed, " units were removed");
          return removed;
       }
       else {
          // Remove units of a specific type                             
-         const auto meta = MetaData::Of<Decay<T>>();
+         const auto meta = MetaOf<Decay<T>>();
          const auto found = mUnits.FindKeyIndex(meta);
          if (!found)
             return 0;
@@ -386,25 +383,31 @@ namespace Langulus::Entity
          if (producer->template CastsTo<Unit>()) {
             // Data is producible from a unit                           
             auto producers = GatherUnits<SEEK>(producer);
-            if (!producers.IsEmpty()) {
-               // Potential unit producers found, attempt creation      
-               auto creator = Verbs::Create {&descriptor};
-               if (Flow::DispatchFlat(producers, creator)) {
-                  // Great success                                      
-                  return Abandon(creator.GetOutput());
-               }
+            if (producers.IsEmpty()) {
+               LANGULUS_THROW(Construct,
+                  "No viable unit producers available");
+            }
+
+            // Potential unit producers found, attempt creation         
+            auto creator = Verbs::Create {&descriptor};
+            if (Flow::DispatchFlat(producers, creator)) {
+               // Great success                                         
+               return Abandon(creator.GetOutput());
             }
          }
          else if (producer->template CastsTo<Module>()) {
             // Data is producible from a module                         
             auto producers = GetRuntime()->GetModules(producer);
-            if (!producers.IsEmpty()) {
-               // Potential module producers found, attempt creation    
-               auto creator = Verbs::Create {&descriptor};
-               if (Flow::DispatchFlat(producers, creator)) {
-                  // Great success                                      
-                  return Abandon(creator.GetOutput());
-               }
+            if (producers.IsEmpty()) {
+               LANGULUS_THROW(Construct,
+                  "No viable module producers available");
+            }
+
+            // Potential module producers found, attempt creation       
+            auto creator = Verbs::Create {&descriptor};
+            if (Flow::DispatchFlat(producers, creator)) {
+               // Great success                                         
+               return Abandon(creator.GetOutput());
             }
          }
          else if (producer->template CastsTo<Thing>()) {
@@ -432,6 +435,7 @@ namespace Langulus::Entity
          // right here if possible, passing the descriptor over, if     
          // such constructor is reflected. If it's a unit, its          
          // descriptor is resposible for registering it with the parent 
+         // via the Traits::Parent trait                                
          if (type->mDescriptorConstructor) {
             auto result = Any::FromMeta(type);
             result.Emplace(descriptor.GetArgument());

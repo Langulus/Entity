@@ -90,8 +90,8 @@ namespace Langulus::Entity
       NOD() const T* operator -> () const noexcept;
       NOD() T* operator -> () noexcept;
 
-      NOD() const T& operator * () const noexcept;
-      NOD() T& operator * () noexcept;
+      NOD() const Deptr<T>& operator * () const noexcept;
+      NOD() Deptr<T>& operator * () noexcept;
 
       template<class INDEX>
       NOD() decltype(auto) operator [] (const INDEX&) const requires Inner::HasSubscriptConst<T, INDEX>;

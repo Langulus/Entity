@@ -109,15 +109,17 @@ namespace Langulus::Entity
    /// Dereference the contained type, if possible (const)                    
    ///   @return the dereferenced value                                       
    TEMPLATE() LANGULUS(INLINED)
-   const T& PINNED()::operator * () const noexcept {
-      return *mValue;
+   const Deptr<T>& PINNED()::operator * () const noexcept {
+      if constexpr (CT::Sparse<T>) return *mValue;
+      else return mValue;
    }
 
    /// Dereference the contained type, if possible                            
    ///   @return the dereferenced value                                       
    TEMPLATE() LANGULUS(INLINED)
-   T& PINNED()::operator * () noexcept {
-      return *mValue;
+   Deptr<T>& PINNED()::operator * () noexcept {
+      if constexpr (CT::Sparse<T>) return *mValue;
+      else return mValue;
    }
 
    /// Relay a subscript operator to the contained type, if it has it (const) 

@@ -52,10 +52,15 @@ namespace Langulus::Entity
       }
 
       if (parent) {
-         ENTITY_VERBOSE_SELF("Created as child to ", parent, " (", GetReferences(), " references)");
+         ENTITY_VERBOSE_SELF(
+            "Created as child to ", parent,
+            " (", GetReferences(), " references)"
+         );
       }
       else {
-         ENTITY_VERBOSE_SELF("Created (root, ", GetReferences(), " references)");
+         ENTITY_VERBOSE_SELF(
+            "Created (root, ", GetReferences(), " references)"
+         );
       }
    }
 
@@ -91,7 +96,8 @@ namespace Langulus::Entity
    /// Thing destructor                                                       
    Thing::~Thing() SAFETY_NOEXCEPT() {
       const auto tabs = ENTITY_VERBOSE_SELF(
-         "Destroying (", GetReferences(), " references)", Logger::Tabs {}
+         "Destroying (", GetReferences(), " references)", 
+         Logger::Tabs {}
       );
 
       // The thing might be on the stack, make sure we decouple it from 
@@ -102,7 +108,8 @@ namespace Langulus::Entity
       // Decouple all children from their parent                        
       for (auto child : mChildren) {
          ENTITY_VERBOSE_SELF(
-            "Decoupling child ", child, " (", child->GetReferences(), " references)"
+            "Decoupling child ", child,
+            " (", child->GetReferences(), " references)"
          );
          child->mOwner.Reset();
       }
@@ -111,7 +118,8 @@ namespace Langulus::Entity
       for (auto unitpair : mUnits) {
          for (auto unit : unitpair.mValue) {
             ENTITY_VERBOSE_SELF(
-               "Decoupling unit ", unit, " (", unit->GetReferences(), " references)"
+               "Decoupling unit ", unit,
+               " (", unit->GetReferences(), " references)"
             );
             unit->mOwners.Remove(this);
          }
@@ -475,7 +483,9 @@ namespace Langulus::Entity
    ///   @param descriptor - instructions for the entity's creation           
    ///   @return the new child instance                                       
    Ref<Thing> Thing::CreateChild(const Any& descriptor) {
-      const auto tab = ENTITY_VERBOSE_SELF("Producing child: ", Logger::Tabs {});
+      const auto tab = ENTITY_VERBOSE_SELF(
+         "Producing child: ", Logger::Tabs {}
+      );
       Ref<Thing> newThing;
       newThing.New(this, descriptor);
       return Abandon(newThing);
@@ -491,7 +501,8 @@ namespace Langulus::Entity
       const auto runtime = GetRuntime();
       LANGULUS_ASSUME(UserAssumes, runtime != nullptr,
          "No runtime available for loading a module");
-      const auto instance = runtime->InstantiateModule(module, descriptor);
+      const auto instance =
+         runtime->InstantiateModule(module, descriptor);
       LANGULUS_ASSERT(instance, Module, "Missing module");
       return instance;
    }

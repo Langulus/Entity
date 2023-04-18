@@ -95,6 +95,32 @@ namespace Langulus::Entity
       return InstantiateModule(library, descriptor);
    }
    
+   /// Register by all bases in mModulesByType                                
+   ///   @param map - [in/out] the map to fill                                
+   ///   @param module - the module instance to push                          
+   ///   @param type - the type to register the module as                     
+   void RegisterAllBases(TUnorderedMap<DMeta, ModuleList>& map, Module* module, DMeta type) {
+      map[type] << module;
+      for (auto& base : type->mBases)
+         RegisterAllBases(map, module, base.mType);
+   }
+
+   /// Unregister by all bases in mModulesByType                              
+   ///   @param map - [in/out] the map to unregister from                     
+   ///   @param module - the module instance to push                          
+   ///   @param type - the type to register the module as                     
+   void UnregisterAllBases(TUnorderedMap<DMeta, ModuleList>& map, Module* module, DMeta type) {
+      const auto found = map.FindKeyIndex(type);
+      if (found) {
+         auto& list = map.GetValue(found);
+         if (list.Remove(module) && list.IsEmpty())
+            map.RemoveIndex(found);
+      }
+
+      for (auto& base : type->mBases)
+         UnregisterAllBases(map, module, base.mType);
+   }
+
    /// Create a module instance or return an already instantiated one         
    ///   @param library - the library handle                                  
    ///   @param descriptor - module initialization descriptor                 
@@ -111,11 +137,10 @@ namespace Langulus::Entity
          return nullptr;
       }
 
-      // Register the module in the various maps, for fast access       
+      // Register the module in the various maps, for fast retrieval    
       try {
          mModules[info->mPriority] << module;
-         mModulesByType[module->GetType()] << module;
-         //TODO also register by reflected bases in mModulesByType
+         RegisterAllBases(mModulesByType, module, module->GetType());
       }
       catch (...) {
          Logger::Error("Registering module `", info->mName, "` failed");
@@ -125,12 +150,7 @@ namespace Langulus::Entity
          if (mModules[info->mPriority].IsEmpty())
             mModules.RemoveKey(info->mPriority);
 
-         mModulesByType[module->GetType()].Remove(module);
-         if (mModulesByType[module->GetType()].IsEmpty())
-            mModulesByType.RemoveKey(module->GetType());
-
-         //TODO also cleanup by reflected bases in mModulesByType
-
+         UnregisterAllBases(mModulesByType, module, module->GetType());
          delete module;
          return nullptr;
       }
@@ -365,7 +385,7 @@ namespace Langulus::Entity
    A::File* Runtime::GetFile(const Path& path) {
       const auto& fileSystems = GetModules(MetaData::Of<A::FileSystem>());
       for (auto module : fileSystems) {
-         const auto fs = module.As<A::FileSystem>();
+         const auto fs = dynamic_cast<A::FileSystem*>(module);
          if (!fs)
             continue;
 

@@ -37,8 +37,10 @@ namespace Langulus::Entity
       Ref<Thing> mOwner;
       // Hierarchy                                                      
       Hierarchy mChildren;
-      // Units                                                          
-      UnitMap mUnits;
+      // Units indexed by concrete type, in order of addition           
+      UnitList mUnitsList;
+      // Units indexed by all their relevant reflected bases            
+      UnitMap mUnitsAmbiguous;
       // Traits                                                         
       TraitMap mTraits;
       // Runtime                                                        

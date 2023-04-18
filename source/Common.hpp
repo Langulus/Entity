@@ -30,6 +30,11 @@ namespace Langulus::Entity
    using ::Langulus::Flow::Scope;
    using ::Langulus::Flow::Code;
 
+   /// A text specialization, dedicated for natural language text             
+   /// It is a placeholder type, that can be extended by external modules     
+   struct Lingua : Text {
+      LANGULUS(ABSTRACT) true;
+   };
 
    //                                                                   
    // Some predeclarations:                                             
@@ -40,18 +45,12 @@ namespace Langulus::Entity
    class Module;
    struct Hierarchy;
 
-   using ModuleList = TAny<Ref<Module>>;
+   using ModuleList = TAny<Module*>;
    using MetaList = TUnorderedSet<const RTTI::Meta*>;
    using UnitList = TAny<Ref<Unit>>;
    using UnitMap = TUnorderedMap<DMeta, UnitList>;
    using TraitList = TAny<Trait>;
    using TraitMap = TUnorderedMap<TMeta, TraitList>;
-
-   /// A text specialization, dedicated for natural language text             
-   /// It is a placeholder type, that can be extended by external modules     
-   struct Lingua : Text {
-      LANGULUS(ABSTRACT) true;
-   };
 
 } // namespace Langulus::Entity
 
