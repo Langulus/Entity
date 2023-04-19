@@ -227,14 +227,14 @@ namespace Langulus::Entity
       if constexpr (CT::Same<T, Unit>) {
          // Remove all units                                            
          const auto removed = mUnitsList.GetCount();
-         for (auto& unit : mUnitsList) {
+         if constexpr (TWOSIDED) {
             // Decouple before units are (potentially) destroyed        
-            if constexpr (TWOSIDED)
+            for (auto& unit : mUnitsList)
                unit->mOwners.Remove(this);
          }
 
-         mUnitsList.Clear();
-         mUnitsAmbiguous.Clear();
+         mUnitsList.Reset();
+         mUnitsAmbiguous.Reset();
          mRefreshRequired = true;
          ENTITY_VERBOSE_SELF("All ", removed, " units were removed");
          return removed;
@@ -242,22 +242,16 @@ namespace Langulus::Entity
       else {
          // Remove units of a specific type                             
          const auto meta = MetaOf<Decay<T>>();
-         const auto found = mUnits.FindKeyIndex(meta);
+         const auto found = mUnitsAmbiguous.FindKeyIndex(meta);
          if (!found)
             return 0;
 
-         auto& list = mUnits.GetValue(found);
-         for (auto unit : list) {
-            // Decouple before units are destroyed                      
-            if constexpr (TWOSIDED)
-               unit->mOwners.Remove(this);
-         }
-
-         // Cleanup the entire map entry                                
-         const auto removed = list.GetCount();
-         mUnits.RemoveIndex(found);
-         mRefreshRequired = true;
-         ENTITY_VERBOSE_SELF(removed, " units of type ", meta, " were removed");
+         // List intentionally shallow-copied, its memory will diverge  
+         // upon RemoveUnit                                             
+         auto list = mUnitsAmbiguous.GetValue(found);
+         Count removed {};
+         for (auto& unit : list)
+            removed += RemoveUnit(unit);
          return removed;
       }
    }

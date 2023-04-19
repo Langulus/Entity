@@ -32,7 +32,8 @@ namespace Langulus::Entity
          // Seek here if requested                                      
          const auto found = mUnitsAmbiguous.FindKeyIndex(meta);
          if (found) {
-            for (auto& unit : mUnitsAmbiguous.GetValue(found))
+            auto& list = mUnitsAmbiguous.GetValue(found);
+            for (auto& unit : list)
                result << unit;
          }
       }
@@ -111,15 +112,6 @@ namespace Langulus::Entity
                t = unit->GetMember(trait, ++index);
             }
          }
-
-         // Then check the Thing's members                              
-         //TODO isn't this redundant and slower than the code in the beginning of this function?
-         /*Offset index {};
-         auto t = GetMember(trait, index);
-         while (!t.IsEmpty()) {
-            results <<= Trait::From(trait, t);
-            t = GetMember(trait, ++index);
-         }*/
       }
 
       if constexpr (SEEK & Seek::Above) {
@@ -141,17 +133,17 @@ namespace Langulus::Entity
       return Abandon(results);
    }
 
-   /// Collects all traits of the given type inside the hierarchy             
+   /// Collects all traits/members of the given type inside the hierarchy     
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param trait - the trait to seek for                                 
-   ///   @return the gathered traits that match the type                      
+   ///   @return the gathered traits that match the trait                     
    template<Seek SEEK>
    LANGULUS(INLINED)
    TAny<Trait> Thing::GatherTraits(TMeta trait) const {
       return const_cast<Thing*>(this)->template GatherTraits<SEEK>(trait);
    }
 
-   /// Gather all values convertible to a type                                
+   /// Gather all traits/members convertible to a type                        
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @tparam D - type to convert to                                       
    ///   @return the gathered values                                          
@@ -169,22 +161,22 @@ namespace Langulus::Entity
          }
 
          // Then check each unit's static traits                        
-         mUnits.ForEachValue([&](Unit* unit) {
+         for (auto& unit : mUnitsList) {
             Offset index {};
             auto t = unit->GetMember(nullptr, index);
             while (!t.IsEmpty()) {
-               try { results <<= t.template AsCast<D>(); }
+               try { results << t.template AsCast<D>(); }
                catch (...) {}
 
                t = unit->GetMember(nullptr, ++index);
             }
-         });
+         }
 
          // Then check the Thing's members                              
          Offset index {};
          auto t = GetMember(nullptr, index);
          while (!t.IsEmpty()) {
-            try { results <<= t.template AsCast<D>(); }
+            try { results << t.template AsCast<D>(); }
             catch (...) {}
 
             t = GetMember(nullptr, ++index);
@@ -201,8 +193,8 @@ namespace Langulus::Entity
 
       if constexpr (SEEK & Seek::Below) {
          // Seek children, if requested                                 
-         for (auto child : mChildren) {
-            results += mOwner->template
+         for (auto& child : mChildren) {
+            results += child->template
                GatherValues<Seek::HereAndBelow, D>();
          }
       }
