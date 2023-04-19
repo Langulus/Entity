@@ -98,7 +98,7 @@ namespace Langulus::Entity
    /// Register by all bases in mModulesByType                                
    ///   @param map - [in/out] the map to fill                                
    ///   @param module - the module instance to push                          
-   ///   @param type - the type to register the module as                     
+   ///   @param type - the type to unregister the module as                   
    void RegisterAllBases(TUnorderedMap<DMeta, ModuleList>& map, Module* module, DMeta type) {
       map[type] << module;
       for (auto& base : type->mBases)

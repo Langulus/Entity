@@ -76,4 +76,38 @@ namespace Langulus::Entity
       return *this;
    }
    
+   /// Check if this unit has a given set of properties                       
+   ///   @param messyDescriptor - descriptor with required properties         
+   ///   @return true if the unit has the given properties                    
+   bool Unit::CompareDescriptor(const Block& messyDescriptor) const {
+      bool mismatch {};
+      Offset memberOffset {};
+      messyDescriptor.ForEachDeep(
+         [&](const Trait& trait) {
+            if (!GetMember(trait.GetTrait(), memberOffset).Compare(trait)) {
+               mismatch = true;
+               return false;
+            }
+
+            ++memberOffset;
+            return true;
+         }
+      );
+
+      memberOffset = {};
+      messyDescriptor.ForEachDeep(
+         [&](const Block& anythingElse) {
+            if (!GetMember(nullptr, memberOffset).Compare(anythingElse)) {
+               mismatch = true;
+               return false;
+            }
+
+            ++memberOffset;
+            return true;
+         }
+      );
+
+      return !mismatch;
+   }
+
 } // namespace Langulus::Entity

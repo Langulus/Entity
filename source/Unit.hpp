@@ -56,6 +56,8 @@ namespace Langulus::Entity
 
       template<Seek = Seek::HereAndAbove>
       bool DoInHierarchy(Verb&);
+
+      NOD() bool CompareDescriptor(const Block&) const;
       
       ///                                                                     
       ///   Seek                                                              

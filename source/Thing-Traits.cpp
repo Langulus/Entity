@@ -114,14 +114,13 @@ namespace Langulus::Entity
 
       // Then check each unit's static traits                           
       Trait output;
-      mUnits.ForEachValue([&](Unit* unit) {
+      for (auto& unit : mUnitsList) {
          auto t = unit->GetMember(id.GetTrait(), index);
          if (!t.IsEmpty()) {
             output = Trait::From(id.GetTrait(), t);
-            return false;
+            break;
          }
-         return true;
-      });
+      }
 
       if (!output.IsEmpty())
          return Abandon(output);

@@ -93,11 +93,11 @@ namespace Langulus::Entity
          return;
 
       // If verb is still not satisfied, dispatch to ALL units          
-      mUnits.ForEachValue([&](Unit* unit) {
+      for (auto& unit : mUnitsList) {
          Verb local {verb};
          local.ShortCircuit(false);
          verb << Abandon(unit->Run(local));
-      });
+      }
    }
 
    /// Create/Destroy stuff inside entity's context                           

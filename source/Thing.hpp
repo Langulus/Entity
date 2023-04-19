@@ -146,6 +146,11 @@ namespace Langulus::Entity
          NOD() Decay<T>*   GetUnitAs(const Token&, Index = IndexFirst);
       #endif
 
+   private:
+      void AddUnitBases(Unit*, DMeta);
+      void RemoveUnitBases(Unit*, DMeta);
+
+   public:
       ///                                                                     
       ///   Trait management                                                  
       ///                                                                     

@@ -72,19 +72,18 @@ namespace Langulus::Entity
    Thing::Thing(Thing&& other) noexcept
       : Resolvable {Forward<Resolvable>(other)}
       , mChildren {::std::move(other.mChildren)}
-      , mUnits {::std::move(other.mUnits)}
+      , mUnitsList {::std::move(other.mUnitsList)}
+      , mUnitsAmbiguous {::std::move(other.mUnitsAmbiguous)}
       , mTraits {::std::move(other.mTraits)}
       , mRuntime {::std::move(other.mRuntime)}
       , mRefreshRequired {true} {
       // Remap children                                                 
-      for (auto child : mChildren)
+      for (auto& child : mChildren)
          child->mOwner = this;
 
-      // Remap components                                               
-      for (auto unitpair : mUnits) {
-         for (auto unit : unitpair.mValue)
-            unit->ReplaceOwner(&other, this);
-      }
+      // Remap units                                                    
+      for (auto& unit : mUnitsList)
+         unit->ReplaceOwner(&other, this);
 
       // Make sure the losing parent is notified of the change          
       if (other.mOwner)
@@ -106,7 +105,7 @@ namespace Langulus::Entity
          mOwner->RemoveChild<false>(this);
 
       // Decouple all children from their parent                        
-      for (auto child : mChildren) {
+      for (auto& child : mChildren) {
          ENTITY_VERBOSE_SELF(
             "Decoupling child ", child,
             " (", child->GetReferences(), " references)"
@@ -115,14 +114,12 @@ namespace Langulus::Entity
       }
 
       // Decouple all units from this owner                             
-      for (auto unitpair : mUnits) {
-         for (auto unit : unitpair.mValue) {
-            ENTITY_VERBOSE_SELF(
-               "Decoupling unit ", unit,
-               " (", unit->GetReferences(), " references)"
-            );
-            unit->mOwners.Remove(this);
-         }
+      for (auto& unit : mUnitsList) {
+         ENTITY_VERBOSE_SELF(
+            "Decoupling unit ", unit,
+            " (", unit->GetReferences(), " references)"
+         );
+         unit->mOwners.Remove(this);
       }
    }
 
@@ -132,8 +129,8 @@ namespace Langulus::Entity
    ///           the exact same behavior (actual state is ignored)            
    bool Thing::operator == (const Thing& other) const {
       return mChildren == other.mChildren
-         && mUnits == other.mUnits
-         && mTraits == other.mTraits;
+          && mUnitsList == other.mUnitsList
+          && mTraits == other.mTraits;
    }
 
    /// Convert to text, by writing a short name or address                    
@@ -154,24 +151,22 @@ namespace Langulus::Entity
       const auto tab = Logger::Verbose("** ", *this, Logger::Tabs {});
 
       if (!mTraits.IsEmpty()) {
-         Logger::Verbose(".. contains ", mTraits.GetCount(), " traits");
+         Logger::Verbose(".. contains ", mTraits.GetCount(), " traits:");
          for (auto traitpair : mTraits) {
-            for (auto trait : traitpair.mValue)
+            for (auto& trait : traitpair.mValue)
                Logger::Verbose(". ", trait);
          }
       }
 
-      if (!mUnits.IsEmpty()) {
-         Logger::Verbose("++ contains ", mUnits.GetCount(), " units");
-         for (auto unitpair : mUnits) {
-            for (auto unit : unitpair.mValue)
-               Logger::Verbose("+ ", *unit);
-         }
+      if (!mUnitsList.IsEmpty()) {
+         Logger::Verbose("++ contains ", mUnitsList.GetCount(), " units:");
+         for (auto& unit : mUnitsList)
+            Logger::Verbose("+ ", *unit);
       }
 
       if (!mChildren.IsEmpty()) {
-         Logger::Verbose("** contains ", mChildren.GetCount(), " child entities");
-         for (auto child : mChildren)
+         Logger::Verbose("** contains ", mChildren.GetCount(), " child entities:");
+         for (auto& child : mChildren)
             child->DumpHierarchy();
       }
    }
@@ -219,9 +214,10 @@ namespace Langulus::Entity
 
    /// Reset the entity, clearing all children, units, traits                 
    void Thing::Reset() {
-      mChildren.Clear();
-      mUnits.Clear();
-      mTraits.Clear();
+      mChildren.Reset();
+      mUnitsList.Reset();
+      mUnitsAmbiguous.Reset();
+      mTraits.Reset();
    }
 
    /// Get a unit by type and offset                                          
@@ -233,27 +229,14 @@ namespace Langulus::Entity
    Unit* Thing::GetUnitMeta(DMeta id, Index index) {
       if (id) {
          // Search a typed trait                                        
-         const auto found = mUnits.FindKeyIndex(id);
+         const auto found = mUnitsAmbiguous.FindKeyIndex(id);
          if (found)
-            return mUnits.GetValue(found)[index];
+            return mUnitsAmbiguous.GetValue(found)[index];
          return nullptr;
       }
 
-      // Search unit by index                                           
-      Unit* found {};
-      if (index.IsArithmetic()) {
-         for (auto pair : mUnits) {
-            auto& list = pair.mValue;
-            if (index < list.GetCount()) {
-               found = list[index];
-               break;
-            }
-
-            index -= list.GetCount();
-         }
-      }
-
-      return found;
+      // Get unit by index only                                         
+      return mUnitsList[index];
    }
 
    /// Get a unit by type and offset (const)                                  
@@ -267,51 +250,25 @@ namespace Langulus::Entity
    }
    
    /// Get a unit by type, properties, and offset                             
-   /// If type is nullptr searches only by offset and properties              
-   /// If type is not nullptr, gets the Nth matching unit, if any             
+   /// If construct's type is nullptr searches only by offset and properties  
+   /// If construct's type is not nullptr, gets the Nth matching unit, if any 
    ///   @param what - the type and properties of the unit                    
    ///   @param index - the unit index to seek                                
    ///   @return the unit if found, or nullptr if not                         
    Unit* Thing::GetUnitExt(const Construct& what, Index index) {
-      if (what.GetType()) {
+      const auto meta = what.GetType();
+
+      if (meta) {
          // Search a typed unit                                         
-         const auto found = mUnits.FindKeyIndex(what.GetType());
+         const auto found = mUnitsAmbiguous.FindKeyIndex(meta);
          if (found) {
-            const auto& bucket = mUnits.GetValue(found);
+            const auto& bucket = mUnitsAmbiguous.GetValue(found);
             if (what.GetArgument().IsEmpty())
                return bucket[index];
 
             // Check all units in that bucket for required properties   
-            for (auto unit : bucket) {
-               bool mismatch {};
-
-               Offset memberOffset {};
-               what.ForEachDeep(
-                  [&](const Trait& trait) {
-                     if (!unit->GetMember(trait.GetTrait(), memberOffset).Compare(trait)) {
-                        mismatch = true;
-                        return false;
-                     }
-
-                     ++memberOffset;
-                     return true;
-                  }
-               );
-
-               memberOffset = {};
-               what.ForEachDeep(
-                  [&](const Block& anythingElse) {
-                     if (!unit->GetMember(nullptr, memberOffset).Compare(anythingElse)) {
-                        mismatch = true;
-                        return false;
-                     }
-
-                     ++memberOffset;
-                     return true;
-                  }
-               );
-
-               if (!mismatch) {
+            for (auto& unit : bucket) {
+               if (unit->CompareDescriptor(what)) {
                   // Match found                                        
                   if (index == 0)
                      return unit;
@@ -320,25 +277,21 @@ namespace Langulus::Entity
                }
             }
          }
-
-         return nullptr;
       }
-
-      // Search unit by index and properties only                       
-      Unit* found {};
-      if (index.IsArithmetic()) {
-         for (auto pair : mUnits) {
-            auto& list = pair.mValue;
-            if (index < list.GetCount()) {
-               found = list[index];
-               break;
+      else {
+         // Search unit by index and properties only                    
+         for (auto& unit : mUnitsList) {
+            if (unit->CompareDescriptor(what)) {
+               // Match found                                           
+               if (index == 0)
+                  return unit;
+               else
+                  --index;
             }
-
-            index -= list.GetCount();
          }
       }
 
-      return found;
+      return nullptr;
    }
 
    /// Get a unit by type, properties, and offset (const)                     
@@ -355,7 +308,10 @@ namespace Langulus::Entity
    ///   @param offset - the unit index                                       
    ///   @return the unit if found, or nullptr if not                         
    Unit* Thing::GetUnitMeta(const Token& token, Index offset) {
-      return GetUnitMeta(RTTI::Database.GetMetaData(token), offset);
+      const auto meta = dynamic_cast<DMeta>(
+         RTTI::Database.DisambiguateMeta(token)
+      );
+      return GetUnitMeta(meta, offset);
    }
 #endif
 
@@ -379,21 +335,13 @@ namespace Langulus::Entity
       return const_cast<Thing*>(this)->GetChild(offset);
    }
 
-   /// Get child entity by name and offset                                    
-   ///   @param name - the name trait to search for                           
-   ///   @param offset - the offset of the matching entity to return          
-   ///   @return the child or nullptr if none found                           
-   const Thing* Thing::GetNamedChild(const Token& name, const Index& offset) const {
-      return const_cast<Thing*>(this)->GetNamedChild(name, offset);
-   }
-
    /// Get child by name and offset (searches for Traits::Name in children)   
    ///   @param name - name to seek                                           
    ///   @param offset - offset to seek                                       
    ///   @return the child entity, or nullptr of none was found               
    Thing* Thing::GetNamedChild(const Token& name, const Index& offset) {
       Index matches = 0;
-      for (auto child : mChildren) {
+      for (auto& child : mChildren) {
          if (child->GetName() == name) {
             if (matches == offset)
                return child;
@@ -404,6 +352,14 @@ namespace Langulus::Entity
       return nullptr;
    }
 
+   /// Get child entity by name and offset                                    
+   ///   @param name - the name trait to search for                           
+   ///   @param offset - the offset of the matching entity to return          
+   ///   @return the child or nullptr if none found                           
+   const Thing* Thing::GetNamedChild(const Token& name, const Index& offset) const {
+      return const_cast<Thing*>(this)->GetNamedChild(name, offset);
+   }
+
    /// Do a cascading runtime reset - all children that do not have own       
    /// runtime, will incorporate the provided one                             
    ///   @param newrt - the new runtime to set                                
@@ -412,7 +368,7 @@ namespace Langulus::Entity
          return;
 
       mRuntime = newrt;
-      for (auto child : mChildren)
+      for (auto& child : mChildren)
          child->ResetRuntime(newrt);
    }
 
@@ -424,7 +380,7 @@ namespace Langulus::Entity
          return;
 
       mFlow = newflow;
-      for (auto child : mChildren)
+      for (auto& child : mChildren)
          child->ResetFlow(newflow);
    }
 
@@ -438,11 +394,11 @@ namespace Langulus::Entity
    }
 
    /// Count the number of matching units in this entity                      
-   ///   @param type - the type of units to seach for                         
+   ///   @param type - the type of units to search for                        
    ///   @return the number of matching units                                 
    Count Thing::HasUnits(DMeta type) const {
-      const auto found = mUnits.FindKeyIndex(type);
-      return found ? mUnits.GetValue(found).GetCount() : 0;
+      const auto found = mUnitsAmbiguous.FindKeyIndex(type);
+      return found ? mUnitsAmbiguous.GetValue(found).GetCount() : 0;
    }
 
    /// Get the current runtime                                                

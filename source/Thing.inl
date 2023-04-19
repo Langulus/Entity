@@ -112,6 +112,36 @@ namespace Langulus::Entity
       return false;
    }
    
+   /// Register unit by all its bases in mUnitsAmbiguous                      
+   ///   @param unit - the unit instance to register                          
+   ///   @param type - the type to register the unit as                       
+   inline void Thing::AddUnitBases(Unit* unit, DMeta type) {
+      mUnitsAmbiguous[type] << unit;
+      for (auto& base : type->mBases) {
+         if (base.mType->template Is<Unit>())
+            break;
+         AddUnitBases(unit, base.mType);
+      }
+   }
+
+   /// Unregister unit by all its bases in mUnitsAmbiguous                    
+   ///   @param unit - the unit instance to unregister                        
+   ///   @param type - the type to unregister the unit as                     
+   inline void Thing::RemoveUnitBases(Unit* unit, DMeta type) {
+      const auto found = mUnitsAmbiguous.FindKeyIndex(type);
+      if (found) {
+         auto& set = mUnitsAmbiguous.GetValue(found);
+         if (set.Remove(unit) && set.IsEmpty())
+            mUnitsAmbiguous.RemoveIndex(found);
+      }
+
+      for (auto& base : type->mBases) {
+         if (base.mType->template Is<Unit>())
+            break;
+         RemoveUnitBases(unit, base.mType);
+      }
+   }
+
    /// Add a new unit to the entity                                           
    /// Adding units coupled with different runtimes is not allowed            
    /// You can only duplicate units, if they're unique instances memorywise   
@@ -123,13 +153,14 @@ namespace Langulus::Entity
    template<bool TWOSIDED>
    Count Thing::AddUnit(Unit* unit) {
       // Check if the unit instance is already registered here          
-      const auto foundType = mUnits.FindKeyIndex(unit->GetType());
-      if (foundType && mUnits.GetValue(foundType).Find(unit))
+      const auto meta = unit->GetType();
+      const auto found = mUnitsAmbiguous.FindKeyIndex(meta);
+      if (found && mUnitsAmbiguous.GetValue(found).Find(unit))
          return 0;
 
       // We must guarantee, that no unit is coupled to entities with    
       // different runtimes!                                            
-      for (auto owners : unit->mOwners) {
+      for (const auto& owners : unit->mOwners) {
          LANGULUS_ASSERT(owners->GetRuntime() == GetRuntime(), Access,
             "Coupling a unit to multiple runtimes is not allowed");
       }
@@ -145,7 +176,8 @@ namespace Langulus::Entity
          #endif
       }
 
-      mUnits[unit->GetType()] << unit;
+      mUnitsList << unit;
+      AddUnitBases(unit, meta);
       mRefreshRequired = true;
       ENTITY_VERBOSE(unit, " added as unit");
       return 1;
@@ -159,12 +191,13 @@ namespace Langulus::Entity
    ///   @return 1 if unit has been removed                                   
    template<bool TWOSIDED>
    Count Thing::RemoveUnit(Unit* unit) {
-      const auto foundType = mUnits.FindKeyIndex(unit->GetType());
+      const auto meta = unit->GetType();
+      const auto foundType = mUnitsAmbiguous.FindKeyIndex(meta);
       if (!foundType)
          return 0;
 
-      auto& unitList = mUnits.GetValue(foundType);
-      const auto unitIndex = unitList.Find(unit);
+      auto& unitSet = mUnitsAmbiguous.GetValue(foundType);
+      const auto unitIndex = unitSet.Find(unit);
       if (unitIndex) {
          // Decouple before unit is destroyed                           
          if constexpr (TWOSIDED)
@@ -175,12 +208,8 @@ namespace Langulus::Entity
          ENTITY_VERBOSE_SELF(unit, " removed from units");
 
          // Dereference (and eventually destroy) unit                   
-         unitList.RemoveIndex(unitIndex);
-
-         // Cleanup the unit's map if the unit was the last entry for   
-         // its type                                                    
-         if (unitList.IsEmpty())
-            mUnits.RemoveIndex(foundType);
+         mUnitsList.Remove(unit);
+         RemoveUnitBases(unit, meta);
          return 1;
       }
 

@@ -48,7 +48,7 @@ namespace Langulus::Entity
    using ModuleList = TAny<Module*>;
    using MetaList = TUnorderedSet<const RTTI::Meta*>;
    using UnitList = TAny<Ref<Unit>>;
-   using UnitMap = TUnorderedMap<DMeta, UnitList>;
+   using UnitMap = TUnorderedMap<DMeta, TUnorderedSet<Ref<Unit>>>;
    using TraitList = TAny<Trait>;
    using TraitMap = TUnorderedMap<TMeta, TraitList>;
 
