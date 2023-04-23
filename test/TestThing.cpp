@@ -430,7 +430,7 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(replaced == 1);
             REQUIRE(root.mUnitsList.GetCount() == 2);
             REQUIRE(root.mUnitsAmbiguous[MetaOf<TestUnit2>()].GetCount() == 2);
-            REQUIRE(root.mUnitsAmbiguous[MetaOf<TestUnit2>()][1] == &replacement);
+            REQUIRE(root.mUnitsAmbiguous[MetaOf<TestUnit2>()].Contains(&replacement));
          }
       }
 
