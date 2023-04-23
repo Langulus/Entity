@@ -19,7 +19,8 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(root.mFlow.IsPinned() == false);
          REQUIRE(root.mRefreshRequired == false);
          REQUIRE(root.mChildren.IsEmpty());
-         REQUIRE(root.mUnits.IsEmpty());
+         REQUIRE(root.mUnitsList.IsEmpty());
+         REQUIRE(root.mUnitsAmbiguous.IsEmpty());
          REQUIRE(root.mTraits.IsEmpty());
          REQUIRE(root.GetReferences() == 1);
       }
@@ -38,7 +39,8 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(root.mRefreshRequired == false);
          REQUIRE(root.mChildren.GetCount() == 1);
          REQUIRE(root.mChildren[0] == &child);
-         REQUIRE(root.mUnits.IsEmpty());
+         REQUIRE(root.mUnitsList.IsEmpty());
+         REQUIRE(root.mUnitsAmbiguous.IsEmpty());
          REQUIRE(root.mTraits.IsEmpty());
          REQUIRE(root.GetReferences() == 2);
 
@@ -49,7 +51,8 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(child.mFlow.IsPinned() == false);
          REQUIRE(child.mRefreshRequired == false);
          REQUIRE(child.mChildren.IsEmpty());
-         REQUIRE(child.mUnits.IsEmpty());
+         REQUIRE(child.mUnitsList.IsEmpty());
+         REQUIRE(child.mUnitsAmbiguous.IsEmpty());
          REQUIRE(child.mTraits.IsEmpty());
          REQUIRE(child.GetReferences() == 2);
       }
@@ -87,7 +90,7 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.mFlow.IsPinned() == false);
             REQUIRE(root.mRefreshRequired == false);
             REQUIRE(root.mChildren.GetCount() == 1);
-            REQUIRE(root.mUnits.IsEmpty());
+            REQUIRE(root.mUnitsList.IsEmpty());
             REQUIRE(root.mTraits.IsEmpty());
             REQUIRE(root.GetReferences() == 2);
 
@@ -100,7 +103,7 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(child1->mFlow.IsPinned() == false);
             REQUIRE(child1->mRefreshRequired == false);
             REQUIRE(child1->mChildren.IsEmpty());
-            REQUIRE(child1->mUnits.IsEmpty());
+            REQUIRE(child1->mUnitsList.IsEmpty());
             REQUIRE(child1->mTraits.IsEmpty());
             REQUIRE(child1->GetReferences() == 3);
          }
@@ -171,7 +174,8 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.mFlow.IsPinned() == false);
             REQUIRE(root.mRefreshRequired == true);
             REQUIRE(root.mChildren.IsEmpty());
-            REQUIRE(root.mUnits.IsEmpty());
+            REQUIRE(root.mUnitsList.IsEmpty());
+            REQUIRE(root.mUnitsAmbiguous.IsEmpty());
             REQUIRE(root.mTraits.GetCount() == 1);
             REQUIRE(root.GetReferences() == 1);
 
@@ -196,7 +200,8 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.mFlow.IsPinned() == false);
             REQUIRE(root.mRefreshRequired == true);
             REQUIRE(root.mChildren.IsEmpty());
-            REQUIRE(root.mUnits.IsEmpty());
+            REQUIRE(root.mUnitsList.IsEmpty());
+            REQUIRE(root.mUnitsAmbiguous.IsEmpty());
             REQUIRE(root.mTraits.GetCount() == 1);
             REQUIRE(root.GetName() == "Dimo");
             REQUIRE(root.GetReferences() == 1);
@@ -244,7 +249,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(root.mFlow.IsPinned() == true);
          REQUIRE(root.mRefreshRequired == true);
          REQUIRE(root.mChildren.GetCount() == 2);
-         REQUIRE(root.mUnits.GetCount() == 2);
+         REQUIRE(root.mUnitsList.GetCount() == 2);
          REQUIRE(root.mTraits.GetCount() == 1);
          REQUIRE(root.GetName() == "Root");
          REQUIRE(root.GetReferences() == 5);
@@ -257,7 +262,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(child1->mFlow.IsPinned() == false);
          REQUIRE(child1->mRefreshRequired == true);
          REQUIRE(child1->mChildren.GetCount() == 2);
-         REQUIRE(child1->mUnits.GetCount() == 2);
+         REQUIRE(child1->mUnitsList.GetCount() == 2);
          REQUIRE(child1->mTraits.GetCount() == 1);
          REQUIRE(child1->GetName() == "Child1");
          REQUIRE(child1->GetReferences() == 6);
@@ -270,7 +275,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(child2->mFlow.IsPinned() == false);
          REQUIRE(child2->mRefreshRequired == true);
          REQUIRE(child2->mChildren.IsEmpty());
-         REQUIRE(child2->mUnits.IsEmpty());
+         REQUIRE(child2->mUnitsList.IsEmpty());
          REQUIRE(child2->mTraits.GetCount() == 1);
          REQUIRE(child2->GetName() == "Child2");
          REQUIRE(child2->GetReferences() == 2);
@@ -283,7 +288,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(grandchild1->mFlow.IsPinned() == false);
          REQUIRE(grandchild1->mRefreshRequired == true);
          REQUIRE(grandchild1->mChildren.IsEmpty());
-         REQUIRE(grandchild1->mUnits.IsEmpty());
+         REQUIRE(grandchild1->mUnitsList.IsEmpty());
          REQUIRE(grandchild1->mTraits.GetCount() == 1);
          REQUIRE(grandchild1->GetName() == "GrandChild1");
          REQUIRE(grandchild1->GetReferences() == 2);
@@ -296,7 +301,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(grandchild2->mFlow.IsPinned() == false);
          REQUIRE(grandchild2->mRefreshRequired == true);
          REQUIRE(grandchild2->mChildren.IsEmpty());
-         REQUIRE(grandchild2->mUnits.IsEmpty());
+         REQUIRE(grandchild2->mUnitsList.IsEmpty());
          REQUIRE(grandchild2->mTraits.GetCount() == 1);
          REQUIRE(grandchild2->GetName() == "GrandChild2");
          REQUIRE(grandchild2->GetReferences() == 2);
@@ -379,7 +384,7 @@ SCENARIO("Testing Thing", "[thing]") {
          THEN("Properties should match") { 
             REQUIRE(unit);
             REQUIRE(unit->Is<TestUnit1>());
-            REQUIRE(unit == root.mUnits[MetaOf<TestUnit1>()][0]);
+            REQUIRE(unit == root.mUnitsAmbiguous[MetaOf<TestUnit1>()][0]);
          }
       }
 
@@ -389,7 +394,7 @@ SCENARIO("Testing Thing", "[thing]") {
          THEN("Properties should match") {
             REQUIRE(unit);
             REQUIRE(unit->Is<TestUnit1>());
-            REQUIRE(unit == root.mUnits[MetaOf<TestUnit1>()][0]);
+            REQUIRE(unit == root.mUnitsAmbiguous[MetaOf<TestUnit1>()][0]);
          }
       }
 
@@ -399,7 +404,7 @@ SCENARIO("Testing Thing", "[thing]") {
 
          THEN("Properties should match") {
             REQUIRE(removed == 1);
-            REQUIRE(root.mUnits.GetCount() == 1);
+            REQUIRE(root.mUnitsList.GetCount() == 1);
             REQUIRE(nullptr == Anyness::Inner::Allocator::Find(MetaOf<TestUnit1>(), unitmemory));
          }
       }
@@ -411,7 +416,7 @@ SCENARIO("Testing Thing", "[thing]") {
 
          THEN("Properties should match") {
             REQUIRE(removed == 2);
-            REQUIRE(root.mUnits.IsEmpty());
+            REQUIRE(root.mUnitsList.IsEmpty());
             REQUIRE(nullptr == Anyness::Inner::Allocator::Find(MetaOf<TestUnit1>(), unitmemory1));
             REQUIRE(nullptr == Anyness::Inner::Allocator::Find(MetaOf<TestUnit2>(), unitmemory2));
          }
@@ -423,19 +428,28 @@ SCENARIO("Testing Thing", "[thing]") {
 
          THEN("Properties should match") {
             REQUIRE(replaced == 1);
-            REQUIRE(root.mUnits.GetCount() == 1);
-            REQUIRE(root.mUnits[MetaOf<TestUnit2>()].GetCount() == 2);
-            REQUIRE(root.mUnits[MetaOf<TestUnit2>()][1] == &replacement);
+            REQUIRE(root.mUnitsList.GetCount() == 2);
+            REQUIRE(root.mUnitsAmbiguous[MetaOf<TestUnit2>()].GetCount() == 2);
+            REQUIRE(root.mUnitsAmbiguous[MetaOf<TestUnit2>()][1] == &replacement);
          }
       }
 
       WHEN("Count available units") {
          auto found = root.HasUnits<TestUnit1>();
+
+         THEN("Properties should match") {
+            REQUIRE(found == 1);
+         }
       }
 
       WHEN("Gather units of a specific type") {
          auto found1 = root.GatherUnits<TestUnit1>();
          auto found2 = root.GatherUnits();
+
+         THEN("Properties should match") {
+            REQUIRE(found1.GetCount() == 1);
+            //REQUIRE(found2.GetCount() == 2);
+         }
       }
 
       WHEN("Seek a unit by index") {
