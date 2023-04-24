@@ -22,7 +22,7 @@ namespace Langulus::Entity
    /// will act as the environment for that Thing, as well as all of its      
    /// children, modules, units, etc.                                         
    ///                                                                        
-   class Runtime final {
+   class LANGULUS_API(ENTITY) Runtime final {
    protected:
       ///                                                                     
       ///   Library handle                                                    

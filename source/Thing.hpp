@@ -23,7 +23,7 @@ namespace Langulus::Entity
    /// and children/owner's units. The Thing is an aggregate of traits,       
    /// units, and subthings.                                                  
    ///                                                                        
-   class Thing final : public Resolvable {
+   class LANGULUS_API(ENTITY) Thing final : public Resolvable {
       LANGULUS(ABSTRACT) false;
       LANGULUS(PRODUCER) Thing;
       LANGULUS(UNINSERTABLE) false;

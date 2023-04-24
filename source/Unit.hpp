@@ -20,7 +20,7 @@ namespace Langulus::Entity
    /// inside external, dynamically loaded modules. There are units for       
    /// graphics, input, AI, content, and whatever extensions you make.        
    ///                                                                        
-   struct Unit : Resolvable {
+   struct LANGULUS_API(ENTITY) Unit : Resolvable {
       LANGULUS(UNINSERTABLE) false;
       LANGULUS_BASES(Resolvable);
 

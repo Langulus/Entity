@@ -217,7 +217,7 @@ SCENARIO("Testing Thing", "[thing]") {
 
    WHEN("Creating a Thing by descriptor") {
       Logger::Special("Start: Creating a Thing by descriptor");
-      auto descriptor = Any::Wrap(
+      Any descriptor = {
          Traits::Name {"Root"_text},
          Construct::From<Runtime>(),
          Construct::From<Temporal>(),
@@ -237,7 +237,7 @@ SCENARIO("Testing Thing", "[thing]") {
          Construct::From<Thing>(
             Traits::Name {"Child2"_text}
          )
-      );
+      };
 
       Thing root {descriptor};
 
@@ -310,7 +310,7 @@ SCENARIO("Testing Thing", "[thing]") {
    }
 
    GIVEN("A complex hierarchy with runtime, flow, units, and traits") {
-      auto descriptor = Any::Wrap(
+      Any descriptor = {
          Traits::Name {"Root"_text},
          Construct::From<Runtime>(),
          Construct::From<Temporal>(),
@@ -333,7 +333,7 @@ SCENARIO("Testing Thing", "[thing]") {
          Construct::From<Thing>(
             Traits::Name {"Child2"_text}
          )
-      );
+      };
 
       Thing root {descriptor};
 
