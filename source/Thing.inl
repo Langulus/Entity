@@ -10,6 +10,7 @@
 #include "Runtime.hpp"
 #include "Thing-Gather.inl"
 #include <Flow/Verbs/Interpret.hpp>
+#include <Flow/Verbs/Create.hpp>
 
 #if 1
    #define ENTITY_VERBOSE_ENABLED() 1
