@@ -7,9 +7,15 @@
 ///                                                                           
 #pragma once
 #include "Module.hpp"
+#include <Anyness/TMap.hpp>
+#include <Anyness/TAny.hpp>
+
 
 namespace Langulus::Entity
 {
+
+   using ModuleList = TAny<Module*>;
+
 
    ///                                                                        
    ///   Runtime                                                              
@@ -22,7 +28,7 @@ namespace Langulus::Entity
    /// will act as the environment for that Thing, as well as all of its      
    /// children, modules, units, etc.                                         
    ///                                                                        
-   class LANGULUS_API(ENTITY) Runtime final {
+   class Runtime final {
    protected:
       ///                                                                     
       ///   Library handle                                                    
@@ -84,29 +90,44 @@ namespace Langulus::Entity
       LANGULUS_CONVERSIONS(Debug);
 
       Runtime() = delete;
-      Runtime(Thing*) noexcept;
       Runtime(Runtime&&) noexcept = default;
-      ~Runtime();
+
+      LANGULUS_API(ENTITY) Runtime(Thing*) noexcept;
+      LANGULUS_API(ENTITY) ~Runtime();
 
       NOD() auto GetOwner() const noexcept { return mOwner; }
 
-      NOD() SharedLibrary LoadSharedLibrary(const Token&);
-      NOD() Module* InstantiateModule(const Token&, const Any& = {});
-      NOD() Module* InstantiateModule(const SharedLibrary&, const Any& = {});
+      NOD() LANGULUS_API(ENTITY)
+      SharedLibrary LoadSharedLibrary(const Token&);
 
-      NOD() SharedLibrary GetDependency(DMeta) const noexcept;
-      NOD() const ModuleList& GetModules(DMeta) const noexcept;
+      NOD() LANGULUS_API(ENTITY)
+      Module* InstantiateModule(const Token&, const Any& = {});
+
+      NOD() LANGULUS_API(ENTITY)
+      Module* InstantiateModule(const SharedLibrary&, const Any& = {});
+
+      NOD() LANGULUS_API(ENTITY)
+      SharedLibrary GetDependency(DMeta) const noexcept;
+
+      NOD() LANGULUS_API(ENTITY)
+      const ModuleList& GetModules(DMeta) const noexcept;
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
-         NOD() SharedLibrary GetDependency(const Token&) const noexcept;
-         NOD() const ModuleList& GetModules(const Token&) const noexcept;
+         NOD() LANGULUS_API(ENTITY)
+         SharedLibrary GetDependency(const Token&) const noexcept;
+
+         NOD() LANGULUS_API(ENTITY)
+         const ModuleList& GetModules(const Token&) const noexcept;
       #endif
 
-      NOD() A::File* GetFile(const Path&);
+      NOD() LANGULUS_API(ENTITY)
+      A::File* GetFile(const Path&);
 
+      LANGULUS_API(ENTITY)
       void Update(Time);
 
-      NOD() explicit operator Debug() const;
+      NOD() LANGULUS_API(ENTITY)
+      explicit operator Debug() const;
    };
 
 } // namespace Langulus::Entity

@@ -20,7 +20,7 @@ namespace Langulus::Entity
    /// inside external, dynamically loaded modules. There are units for       
    /// graphics, input, AI, content, and whatever extensions you make.        
    ///                                                                        
-   struct LANGULUS_API(ENTITY) Unit : Resolvable {
+   struct Unit : Resolvable {
       LANGULUS(UNINSERTABLE) false;
       LANGULUS_BASES(Resolvable);
 
@@ -40,24 +40,24 @@ namespace Langulus::Entity
       Unit& operator = (const Unit&) = delete;
 
       /// A unit can only be moved or created with type and owner             
-      Unit(DMeta, const Any&) noexcept;
-      Unit(Unit&&) noexcept;
-      virtual ~Unit() SAFETY_NOEXCEPT();
+      LANGULUS_API(ENTITY) Unit(DMeta, const Any&) noexcept;
+      LANGULUS_API(ENTITY) Unit(Unit&&) noexcept;
+      LANGULUS_API(ENTITY) virtual ~Unit() SAFETY_NOEXCEPT();
 
-      Unit& operator = (Unit&&) noexcept;
+      LANGULUS_API(ENTITY) Unit& operator = (Unit&&) noexcept;
 
-      void Select(Verb&);
+      LANGULUS_API(ENTITY) void Select(Verb&);
 
    public:
       virtual void Refresh() {}
 
-      NOD() Runtime* GetRuntime() const noexcept;
-      NOD() const Hierarchy& GetOwners() const noexcept;
+      NOD() LANGULUS_API(ENTITY) Runtime* GetRuntime() const noexcept;
+      NOD() LANGULUS_API(ENTITY) const Hierarchy& GetOwners() const noexcept;
 
       template<Seek = Seek::HereAndAbove>
       bool DoInHierarchy(Verb&);
 
-      NOD() bool CompareDescriptor(const Block&) const;
+      NOD() LANGULUS_API(ENTITY) bool CompareDescriptor(const Block&) const;
       
       ///                                                                     
       ///   Seek                                                              
@@ -72,9 +72,9 @@ namespace Langulus::Entity
       LANGULUS_GATHER_TOKEN_INTERFACE();
 
    protected:
-      void Couple(const Thing*);
-      void Decouple(const Thing*);
-      void ReplaceOwner(const Thing*, const Thing*);
+      LANGULUS_API(ENTITY) void Couple(const Thing*);
+      LANGULUS_API(ENTITY) void Decouple(const Thing*);
+      LANGULUS_API(ENTITY) void ReplaceOwner(const Thing*, const Thing*);
    };
 
 } // namespace Langulus::Entity

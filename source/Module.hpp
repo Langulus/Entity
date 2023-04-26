@@ -7,11 +7,17 @@
 ///                                                                           
 #pragma once
 #include "Common.hpp"
+#include <Anyness/TUnorderedSet.hpp>
+#include <Flow/Resolvable.hpp>
 
 LANGULUS_EXCEPTION(Module);
 
 namespace Langulus
 {
+   namespace Entity
+   {
+      using MetaList = TUnorderedSet<const RTTI::Meta*>;
+   }
 
    /// Helper function, that reflects and registers a list of any reflection  
    /// primitives, like data, verbs, and traits.                              

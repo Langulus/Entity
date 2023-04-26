@@ -7,6 +7,14 @@
 ///                                                                           
 #pragma once
 #include "Module.hpp"
+#include <Anyness/Ref.hpp>
+#include <Anyness/TAny.hpp>
+#include <Anyness/Trait.hpp>
+
+namespace Langulus::Entity
+{
+   using TraitList = TAny<Trait>;
+}
 
 /// Seek interface for Hierarchy/Thing/Unit                                   
 #define LANGULUS_SEEK_INTERFACE() \

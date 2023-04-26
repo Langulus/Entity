@@ -7,6 +7,10 @@
 ///                                                                           
 #pragma once
 #include "Module.hpp"
+#include "Unit.hpp"
+#include "Runtime.hpp"
+#include <Math/LOD.hpp>
+#include <Flow/Factory.hpp>
 
 LANGULUS_DEFINE_TRAIT(Cursor,
    "Enables or disables cursor for window");

@@ -7,6 +7,7 @@
 ///                                                                           
 #include "Thing.inl"
 #include "Runtime.hpp"
+#include <Flow/Verbs/Interpret.hpp>
 
 #if 0
    #define ENTITY_VERBOSE_ENABLED() 1

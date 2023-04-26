@@ -8,6 +8,7 @@
 #include "Thing.hpp"
 #include "Runtime.hpp"
 #include "External.hpp"
+#include <Anyness/Path.hpp>
 
 #if LANGULUS_OS(WINDOWS)
    #include <Windows.h>
@@ -100,25 +101,28 @@ namespace Langulus::Entity
    ///   @param module - the module instance to push                          
    ///   @param type - the type to unregister the module as                   
    void RegisterAllBases(TUnorderedMap<DMeta, ModuleList>& map, Module* module, DMeta type) {
+      Logger::Verbose("Registering `", type, '`');
       map[type] << module;
       for (auto& base : type->mBases)
          RegisterAllBases(map, module, base.mType);
    }
 
-   /// Unregister by all bases in mModulesByType                              
+   /// Unregister by all bases in mModulesByType (in reverse order)           
    ///   @param map - [in/out] the map to unregister from                     
    ///   @param module - the module instance to push                          
    ///   @param type - the type to register the module as                     
    void UnregisterAllBases(TUnorderedMap<DMeta, ModuleList>& map, Module* module, DMeta type) {
+      for (auto& base : type->mBases)
+         UnregisterAllBases(map, module, base.mType);
+
       const auto found = map.FindKeyIndex(type);
       if (found) {
          auto& list = map.GetValue(found);
-         if (list.Remove(module) && list.IsEmpty())
+         if (list.Remove(module) && list.IsEmpty()) {
+            Logger::Verbose("Unregistering `", type, '`');
             map.RemoveIndex(found);
+         }
       }
-
-      for (auto& base : type->mBases)
-         UnregisterAllBases(map, module, base.mType);
    }
 
    /// Create a module instance or return an already instantiated one         
@@ -264,9 +268,11 @@ namespace Langulus::Entity
          // Make sure that const RTTI::Meta* type is registered here,   
          // and not inside the library (nasty bugs otherwise)           
          //TODO find a more elegant solution to this, preferably one that doesn't involve prebuild steps with cppast
+         (void)MetaOf<Resolvable>();
+         (void)MetaOf<Runtime>();
          (void)MetaOf<DMeta>();
-         (void)MetaOf<Module*>();
-         (void)MetaOf<Unit*>();
+         (void)MetaOf<Module>();
+         (void)MetaOf<Unit>();
 
          library.mEntry(library.mModuleType, library.mTypes);
 
@@ -297,8 +303,15 @@ namespace Langulus::Entity
       if (library.mHandle == 0)
          return;
 
+      /*mModules[info->mPriority].Remove(module);
+      if (mModules[info->mPriority].IsEmpty())
+         mModules.RemoveKey(info->mPriority);
+
+      UnregisterAllBases(mModulesByType, module, module->GetType());*/
+
+
       // Remove all references from module instances by type            
-      for (auto list = mModulesByType.begin(); list != mModulesByType.end(); ++list) {
+      /*for (auto list = mModulesByType.begin(); list != mModulesByType.end(); ++list) {
          for (auto mod = list->mValue.begin(); mod != list->mValue.end(); ++mod) {
             if (mod->Is(library.mModuleType))
                mod = list->mValue.RemoveIndex(mod);
@@ -306,9 +319,16 @@ namespace Langulus::Entity
 
          if (list->mValue.IsEmpty())
             list = mModulesByType.RemoveIndex(list);
-      }
+      }*/
 
       // Destroy all associated module instances                        
+      for (auto list = mModules.begin(); list != mModules.end(); ++list) {
+         for (auto mod = list->mValue.begin(); mod != list->mValue.end(); ++mod) {
+            if (mod->Is(library.mModuleType))
+               UnregisterAllBases(mModulesByType, mod, mod->GetType());
+         }
+      }
+
       for (auto list = mModules.begin(); list != mModules.end(); ++list) {
          for (auto mod = list->mValue.begin(); mod != list->mValue.end(); ++mod) {
             if (mod->Is(library.mModuleType)) {
@@ -331,10 +351,10 @@ namespace Langulus::Entity
 
       // Unload the shared object                                       
       #if LANGULUS_OS(WINDOWS)
-         ::Langulus::Entity::UnloadSharedLibrary(
+         Entity::UnloadSharedLibrary(
             reinterpret_cast<HMODULE>(library.mHandle));
       #elif LANGULUS_OS(LINUX)
-         ::Langulus::Entity::UnloadSharedLibrary(
+         Entity::UnloadSharedLibrary(
             reinterpret_cast<void*>(library.mHandle));
       #else 
          #error Unsupported OS

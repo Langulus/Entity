@@ -6,8 +6,7 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include <LangulusFlow.hpp>
-#include <LangulusMath.hpp>
+#include <Flow/Flow.hpp>
 
 #if defined(LANGULUS_EXPORT_ALL) || defined(LANGULUS_EXPORT_ENTITY)
    #define LANGULUS_API_ENTITY() LANGULUS_EXPORT()
@@ -20,21 +19,15 @@ namespace Langulus::Entity
 
    using namespace ::Langulus::Anyness;
 
-   using ::Langulus::Flow::Verb;
-   using ::Langulus::Flow::Construct;
-   using ::Langulus::Flow::Charge;
-   using ::Langulus::Flow::Seek;
-   using ::Langulus::Flow::Resolvable;
-   using ::Langulus::Flow::Temporal;
-   using ::Langulus::Flow::Time;
-   using ::Langulus::Flow::Scope;
-   using ::Langulus::Flow::Code;
-
-   /// A text specialization, dedicated for natural language text             
-   /// It is a placeholder type, that can be extended by external modules     
-   struct Lingua : Text {
-      LANGULUS(ABSTRACT) true;
-   };
+   using Flow::Verb;
+   using Flow::Construct;
+   using Flow::Charge;
+   using Flow::Seek;
+   using Flow::Resolvable;
+   using Flow::Temporal;
+   using Flow::Time;
+   using Flow::Scope;
+   using Flow::Code;
 
    //                                                                   
    // Some predeclarations:                                             
@@ -44,13 +37,6 @@ namespace Langulus::Entity
    class Runtime;
    class Module;
    struct Hierarchy;
-
-   using ModuleList = TAny<Module*>;
-   using MetaList = TUnorderedSet<const RTTI::Meta*>;
-   using UnitList = TAny<Ref<Unit>>;
-   using UnitMap = TUnorderedMap<DMeta, TUnorderedSet<Ref<Unit>>>;
-   using TraitList = TAny<Trait>;
-   using TraitMap = TUnorderedMap<TMeta, TraitList>;
 
 } // namespace Langulus::Entity
 
@@ -86,3 +72,6 @@ namespace Langulus::A
    struct Texture;
 
 } // namespace Langulus::A
+
+/// Make the rest of the code aware, that Langulus::Entity has been included  
+#define LANGULUS_LIBRARY_ENTITY() 1
