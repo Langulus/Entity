@@ -9,13 +9,15 @@
 #include "Runtime.hpp"
 #include <Flow/Verbs/Interpret.hpp>
 
-#if 1
+#if 0
    #define ENTITY_VERBOSE_ENABLED() 1
    #define ENTITY_VERBOSE_SELF(...)            Logger::Verbose(Self(), __VA_ARGS__)
+   #define ENTITY_VERBOSE_SELF_TAB(...)        const auto scoped = Logger::Verbose(Self(), __VA_ARGS__, Logger::Tabs {})
    #define ENTITY_VERBOSE(...)                 Logger::Append(__VA_ARGS__)
 #else
    #define ENTITY_VERBOSE_ENABLED() 0
    #define ENTITY_VERBOSE_SELF(...)
+   #define ENTITY_VERBOSE_SELF_TAB(...)
    #define ENTITY_VERBOSE(...)
 #endif
 
@@ -71,11 +73,12 @@ namespace Langulus::Entity
    ///   @param other - move that entity                                      
    Thing::Thing(Thing&& other) noexcept
       : Resolvable {Forward<Resolvable>(other)}
-      , mChildren {::std::move(other.mChildren)}
-      , mUnitsList {::std::move(other.mUnitsList)}
-      , mUnitsAmbiguous {::std::move(other.mUnitsAmbiguous)}
-      , mTraits {::std::move(other.mTraits)}
       , mRuntime {::std::move(other.mRuntime)}
+      , mFlow {::std::move(other.mFlow)}
+      , mChildren {::std::move(other.mChildren)}
+      , mUnitsAmbiguous {::std::move(other.mUnitsAmbiguous)}
+      , mUnitsList {::std::move(other.mUnitsList)}
+      , mTraits {::std::move(other.mTraits)}
       , mRefreshRequired {true} {
       // Remap children                                                 
       for (auto& child : mChildren)
@@ -94,10 +97,7 @@ namespace Langulus::Entity
 
    /// Thing destructor                                                       
    Thing::~Thing() SAFETY_NOEXCEPT() {
-      const auto tabs = ENTITY_VERBOSE_SELF(
-         "Destroying (", GetReferences(), " references)", 
-         Logger::Tabs {}
-      );
+      ENTITY_VERBOSE_SELF_TAB("Destroying (", GetReferences(), " uses)");
 
       // The thing might be on the stack, make sure we decouple it from 
       // its owner, if that's the case                                  
@@ -105,22 +105,12 @@ namespace Langulus::Entity
          mOwner->RemoveChild<false>(this);
 
       // Decouple all children from their parent                        
-      for (auto& child : mChildren) {
-         ENTITY_VERBOSE_SELF(
-            "Decoupling child ", child,
-            " (", child->GetReferences(), " references)"
-         );
+      for (auto& child : mChildren)
          child->mOwner.Reset();
-      }
 
       // Decouple all units from this owner                             
-      for (auto& unit : mUnitsList) {
-         ENTITY_VERBOSE_SELF(
-            "Decoupling unit ", unit,
-            " (", unit->GetReferences(), " references)"
-         );
+      for (auto& unit : mUnitsList)
          unit->mOwners.Remove(this);
-      }
    }
 
    /// Compare two entities                                                   
@@ -439,9 +429,7 @@ namespace Langulus::Entity
    ///   @param descriptor - instructions for the entity's creation           
    ///   @return the new child instance                                       
    Ref<Thing> Thing::CreateChild(const Any& descriptor) {
-      const auto tab = ENTITY_VERBOSE_SELF(
-         "Producing child: ", Logger::Tabs {}
-      );
+      ENTITY_VERBOSE_SELF_TAB("Producing child: ");
       Ref<Thing> newThing;
       newThing.New(this, descriptor);
       return Abandon(newThing);

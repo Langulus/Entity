@@ -34,7 +34,9 @@
    //TODO
 #endif
 
-LANGULUS_RTTI_BOUNDARY("Langulus")
+LANGULUS_RTTI_BOUNDARY("MAIN")
+
+#define VERBOSE(...) //Logger::Verbose(this, ": ", ...)
 
 namespace Langulus::Entity
 {
@@ -60,14 +62,13 @@ namespace Langulus::Entity
    ///   @param owner - the owner of the runtime                              
    Runtime::Runtime(Thing* owner) noexcept
       : mOwner {owner} {
-      Logger::Verbose(this, ": Initializing...");
-      Logger::Verbose(this, ": Initialized");
+      VERBOSE("Initializing...");
+      VERBOSE("Initialized");
    }
 
    /// Runtime destruction                                                    
    Runtime::~Runtime() {
-      Logger::Verbose(this, ": Shutting down...");
-
+      VERBOSE("Shutting down...");
       for (auto library = mLibraries.begin(); library != mLibraries.end(); ++library) {
          if (0 == --library->mValue.mReferences) {
             UnloadSharedLibrary(library->mValue);
@@ -90,9 +91,8 @@ namespace Langulus::Entity
          return foundModules[0];
 
       // A module instance doesn't exist yet, so instantiate it         
-      Logger::Verbose("Module `", name, "` is not instantiated yet"
+      VERBOSE("Module `", name, "` is not instantiated yet"
          ", so attempting to create it...");
-
       return InstantiateModule(library, descriptor);
    }
    
@@ -101,10 +101,13 @@ namespace Langulus::Entity
    ///   @param module - the module instance to push                          
    ///   @param type - the type to unregister the module as                   
    void RegisterAllBases(TUnorderedMap<DMeta, ModuleList>& map, Module* module, DMeta type) {
-      Logger::Verbose("Registering `", type, '`');
+      VERBOSE("Registering `", type, '`');
       map[type] << module;
-      for (auto& base : type->mBases)
+      for (auto& base : type->mBases) {
+         if (base.mType->template Is<Resolvable>())
+            break;
          RegisterAllBases(map, module, base.mType);
+      }
    }
 
    /// Unregister by all bases in mModulesByType (in reverse order)           
@@ -112,14 +115,17 @@ namespace Langulus::Entity
    ///   @param module - the module instance to push                          
    ///   @param type - the type to register the module as                     
    void UnregisterAllBases(TUnorderedMap<DMeta, ModuleList>& map, Module* module, DMeta type) {
-      for (auto& base : type->mBases)
+      for (auto& base : type->mBases) {
+         if (base.mType->template Is<Resolvable>())
+            break;
          UnregisterAllBases(map, module, base.mType);
+      }
 
       const auto found = map.FindKeyIndex(type);
       if (found) {
          auto& list = map.GetValue(found);
          if (list.Remove(module) && list.IsEmpty()) {
-            Logger::Verbose("Unregistering `", type, '`');
+            VERBOSE("Unregistering `", type, '`');
             map.RemoveIndex(found);
          }
       }
@@ -160,7 +166,7 @@ namespace Langulus::Entity
       }
 
       // Done, if reached                                               
-      Logger::Verbose("Module `", info->mName,
+      VERBOSE("Module `", info->mName,
          "` registered with priority ", info->mPriority);
       return module;
    }
@@ -268,7 +274,6 @@ namespace Langulus::Entity
          // Make sure that const RTTI::Meta* type is registered here,   
          // and not inside the library (nasty bugs otherwise)           
          //TODO find a more elegant solution to this, preferably one that doesn't involve prebuild steps with cppast
-         (void)MetaOf<Resolvable>();
          (void)MetaOf<Runtime>();
          (void)MetaOf<DMeta>();
          (void)MetaOf<Module>();
@@ -303,35 +308,12 @@ namespace Langulus::Entity
       if (library.mHandle == 0)
          return;
 
-      /*mModules[info->mPriority].Remove(module);
-      if (mModules[info->mPriority].IsEmpty())
-         mModules.RemoveKey(info->mPriority);
-
-      UnregisterAllBases(mModulesByType, module, module->GetType());*/
-
-
-      // Remove all references from module instances by type            
-      /*for (auto list = mModulesByType.begin(); list != mModulesByType.end(); ++list) {
-         for (auto mod = list->mValue.begin(); mod != list->mValue.end(); ++mod) {
-            if (mod->Is(library.mModuleType))
-               mod = list->mValue.RemoveIndex(mod);
-         }
-
-         if (list->mValue.IsEmpty())
-            list = mModulesByType.RemoveIndex(list);
-      }*/
-
-      // Destroy all associated module instances                        
-      for (auto list = mModules.begin(); list != mModules.end(); ++list) {
-         for (auto mod = list->mValue.begin(); mod != list->mValue.end(); ++mod) {
-            if (mod->Is(library.mModuleType))
-               UnregisterAllBases(mModulesByType, mod, mod->GetType());
-         }
-      }
+      Logger::Info("Unloading module `", library.mInfo()->mName, "`...");
 
       for (auto list = mModules.begin(); list != mModules.end(); ++list) {
          for (auto mod = list->mValue.begin(); mod != list->mValue.end(); ++mod) {
             if (mod->Is(library.mModuleType)) {
+               UnregisterAllBases(mModulesByType, *mod, mod->GetType());
                delete *mod;
                mod = list->mValue.RemoveIndex(mod);
             }
@@ -345,9 +327,23 @@ namespace Langulus::Entity
       for (auto externalType : library.mTypes)
          mDependencies.RemoveKey(externalType);
 
-      // Unregister external types                                      
-      RTTI::Database.UnloadLibrary(library.mInfo()->mName);
-      Logger::Info("Module `", library.mInfo()->mName, "` unloaded");
+      // Collect garbage, and check if library's boundary is still used 
+      const auto boundary = library.mInfo()->mName;
+
+      Anyness::Fractalloc.CollectGarbage();
+      const auto poolsInUse = Anyness::Fractalloc.CheckBoundary(boundary);
+      if (poolsInUse) {
+         // Maybe simply postpone unload, instead of reporting error?   
+         Logger::Error("Module `", boundary, "` can't be unloaded, "
+            "because exposed data is still in use in ", poolsInUse, " memory pools");
+         Anyness::Fractalloc.DumpPools();
+         LANGULUS_THROW(Destruct, "Can't unload shared library");
+      }
+
+      // Unregister external types, if no longer used                   
+      RTTI::Database.UnloadLibrary(boundary);
+
+      Logger::Info("Module `", boundary, "` unloaded");
 
       // Unload the shared object                                       
       #if LANGULUS_OS(WINDOWS)

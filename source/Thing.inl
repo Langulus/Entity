@@ -12,7 +12,7 @@
 #include <Flow/Verbs/Interpret.hpp>
 #include <Flow/Verbs/Create.hpp>
 
-#if 1
+#if 0
    #define ENTITY_VERBOSE_ENABLED() 1
    #define ENTITY_VERBOSE_SELF(...)            Logger::Verbose(Self(), __VA_ARGS__)
    #define ENTITY_VERBOSE(...)                 Logger::Append(__VA_ARGS__)
@@ -119,6 +119,7 @@ namespace Langulus::Entity
    ///   @param type - the type to register the unit as                       
    inline void Thing::AddUnitBases(Unit* unit, DMeta type) {
       mUnitsAmbiguous[type] << unit;
+
       for (auto& base : type->mBases) {
          if (base.mType->template Is<Unit>())
             break;
@@ -210,8 +211,8 @@ namespace Langulus::Entity
          ENTITY_VERBOSE_SELF(unit, " removed from units");
 
          // Dereference (and eventually destroy) unit                   
-         mUnitsList.Remove(unit);
          RemoveUnitBases(unit, meta);
+         mUnitsList.Remove(unit);
          return 1;
       }
 
@@ -414,7 +415,7 @@ namespace Langulus::Entity
             }
 
             // Potential unit producers found, attempt creation         
-            auto creator = Verbs::Create {&descriptor};
+            Verbs::Create creator {&descriptor};
             if (Flow::DispatchFlat(producers, creator)) {
                // Great success                                         
                return Abandon(creator.GetOutput());
@@ -429,7 +430,7 @@ namespace Langulus::Entity
             }
 
             // Potential module producers found, attempt creation       
-            auto creator = Verbs::Create {&descriptor};
+            Verbs::Create creator {&descriptor};
             if (Flow::DispatchFlat(producers, creator)) {
                // Great success                                         
                return Abandon(creator.GetOutput());
@@ -447,7 +448,7 @@ namespace Langulus::Entity
          auto producers = GatherUnits<Unit, SEEK>();
          if (!producers.IsEmpty()) {
             // Potential unit producers found, attempt creation there   
-            auto creator = Verbs::Create {&descriptor};
+            Verbs::Create creator {&descriptor};
             if (Flow::DispatchFlat(producers, creator))
                return Abandon(creator.GetOutput());
          }
@@ -475,6 +476,7 @@ namespace Langulus::Entity
             "Requested data is not default- nor descriptor-constructible");
       }
 
+      Logger::Error("Unable to create data: ", construct);
       return {};
    }
 

@@ -44,9 +44,9 @@ namespace Langulus::Entity
    Unit::~Unit() SAFETY_NOEXCEPT() {
       // The unit might be on the stack, make sure we decouple it from  
       // all its owners, if that's the case                             
-      for (auto owner = mOwners.begin(); owner != mOwners.end() && GetReferences() > 1; ++owner) {
-         owner->RemoveUnit<false>(this);
-         //owner = mOwners.RemoveIndex(owner);
+      if (GetReferences() > 1) {
+         for (auto owner : mOwners)
+            owner->RemoveUnit<false>(this);
       }
 
       // Then, the unit should have exactly one reference left          

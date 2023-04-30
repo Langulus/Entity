@@ -49,22 +49,25 @@ namespace Langulus::Entity
       LANGULUS_API(ENTITY) void ResetRuntime(Runtime*);
       LANGULUS_API(ENTITY) void ResetFlow(Temporal*);
 
-      // The entity's parent                                            
-      Ref<Thing> mOwner;
-      // Hierarchy                                                      
-      Hierarchy mChildren;
-      // Units indexed by concrete type, in order of addition           
-      UnitList mUnitsList;
-      // Units indexed by all their relevant reflected bases            
-      UnitMap mUnitsAmbiguous;
-      // Traits                                                         
-      TraitMap mTraits;
+      // The order of members is critical!                              
+      // Runtime should be destroyed last, hence it is the first member 
+
       // Runtime                                                        
       Pinnable<Ptr<Runtime>> mRuntime;
       // Temporal flow                                                  
       Pinnable<Ptr<Temporal>> mFlow;
+      // Hierarchy                                                      
+      Hierarchy mChildren;
+      // Units indexed by all their relevant reflected bases            
+      UnitMap mUnitsAmbiguous;
+      // Units indexed by concrete type, in order of addition           
+      UnitList mUnitsList;
+      // Traits                                                         
+      TraitMap mTraits;
       // Hierarchy requires an update                                   
       bool mRefreshRequired {};
+      // The entity's parent                                            
+      Ref<Thing> mOwner;
 
       template<Seek = Seek::HereAndAbove>
       NOD() Any CreateData(const Construct&);
