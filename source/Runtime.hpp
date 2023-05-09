@@ -101,10 +101,10 @@ namespace Langulus::Entity
       SharedLibrary LoadSharedLibrary(const Token&);
 
       NOD() LANGULUS_API(ENTITY)
-      Module* InstantiateModule(const Token&, const Any& = {});
+      Module* InstantiateModule(const Token&, const Descriptor& = {});
 
       NOD() LANGULUS_API(ENTITY)
-      Module* InstantiateModule(const SharedLibrary&, const Any& = {});
+      Module* InstantiateModule(const SharedLibrary&, const Descriptor& = {});
 
       NOD() LANGULUS_API(ENTITY)
       SharedLibrary GetDependency(DMeta) const noexcept;

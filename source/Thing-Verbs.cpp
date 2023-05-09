@@ -107,39 +107,6 @@ namespace Langulus::Entity
       if (verb.IsEmpty())
          return;
 
-      const auto create = [&](const Construct& construct) {
-         const auto count = static_cast<Count>(construct.GetCharge().mMass);
-         for (Offset i = 0; i < count; ++i) {
-            if (count != 1) {
-               ENTITY_CREATION_VERBOSE_SELF(Logger::Yellow,
-                  "Charged creation - creating ", i + 1, " of ", count);
-            }
-
-            if (construct.template Is<Thing>()) {
-               // Instantiate a child Thing                             
-               verb << CreateChild(construct);
-            }
-            else if (construct.template Is<Runtime>()) {
-               // Instantiate a runtime                                 
-               verb << CreateRuntime();
-            }
-            else if (construct.template Is<Temporal>()) {
-               // Instantiate a temporal flow                           
-               verb << CreateFlow();
-            }
-            else if (construct.template CastsTo<Module>()) {
-               // Instantiate a module from the runtime                 
-               auto runtime = GetRuntime();
-               auto dependency = runtime->GetDependency(construct.GetType());
-               verb << runtime->InstantiateModule(dependency, construct);
-            }
-            else {
-               // Instantiate anything else                             
-               verb << CreateData(construct);
-            }
-         }
-      };
-
       // Scan the request                                               
       verb.ForEachDeep([&](const Block& group) {
          group.ForEach(
@@ -152,16 +119,54 @@ namespace Langulus::Entity
                if (construct.GetCharge().mMass > 0) {
                   ENTITY_CREATION_VERBOSE_SELF(
                      "Creating: ", Logger::Yellow, construct);
-                  create(construct);
+                  CreateInner(verb, construct);
                }
             },
             [&](const MetaData* type) {
                ENTITY_CREATION_VERBOSE_SELF(
                   "Creating: ", Logger::Yellow, type->mToken);
-               create(Construct(type));
+               CreateInner(verb, Construct {type});
             }
          );
       });
+   }
+
+   /// Inner creation routine                                                 
+   ///   @param verb - original create verb to output to                      
+   ///   @param construct - the construct to create                           
+   void Thing::CreateInner(Verb& verb, const Construct& construct) {
+      const auto count = static_cast<Count>(construct.GetCharge().mMass);
+      for (Offset i = 0; i < count; ++i) {
+         if (count != 1) {
+            ENTITY_CREATION_VERBOSE_SELF(Logger::Yellow,
+               "Charged creation - creating ", i + 1, " of ", count);
+         }
+
+         if (construct.template Is<Thing>()) {
+            // Instantiate a child Thing                                
+            Descriptor d {construct.GetArgument()};
+            verb << CreateChild(d);
+         }
+         else if (construct.template Is<Runtime>()) {
+            // Instantiate a runtime                                    
+            verb << CreateRuntime();
+         }
+         else if (construct.template Is<Temporal>()) {
+            // Instantiate a temporal flow                              
+            verb << CreateFlow();
+         }
+         else if (construct.template CastsTo<Module>()) {
+            // Instantiate a module from the runtime                    
+            auto runtime = GetRuntime();
+            auto dependency = runtime->GetDependency(construct.GetType());
+            Descriptor d {construct.GetArgument()};
+            verb << runtime->InstantiateModule(dependency, d);
+         }
+         else {
+            // Instantiate anything else                                
+            verb << CreateData(construct);
+         }
+      }
    }
 
    /// Pick something from the entity - children, traits, units, modules      
