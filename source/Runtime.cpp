@@ -336,7 +336,9 @@ namespace Langulus::Entity
          // Maybe simply postpone unload, instead of reporting error?   
          Logger::Error("Module `", boundary, "` can't be unloaded, "
             "because exposed data is still in use in ", poolsInUse, " memory pools");
-         Anyness::Fractalloc.DumpPools();
+         #if LANGULUS_FEATURE(MEMORY_STATISTICS)
+            Anyness::Fractalloc.DumpPools();
+         #endif
          LANGULUS_THROW(Destruct, "Can't unload shared library");
       }
 
