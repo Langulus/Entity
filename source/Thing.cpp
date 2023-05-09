@@ -26,7 +26,7 @@ namespace Langulus::Entity
 
    /// Construct as a root                                                    
    ///   @param descriptor - instructions for creating the entity             
-   Thing::Thing(const Any& descriptor)
+   Thing::Thing(const Descriptor& descriptor)
       : Resolvable {MetaOf<Thing>()} {
       if (!descriptor.IsEmpty()) {
          Verbs::Create creator {descriptor};
@@ -38,7 +38,7 @@ namespace Langulus::Entity
    /// Construct as a child of another thing                                  
    ///   @param parent - the owner of the thing                               
    ///   @param descriptor - instructions for creating the thing              
-   Thing::Thing(Thing* parent, const Any& descriptor)
+   Thing::Thing(Thing* parent, const Descriptor& descriptor)
       : Resolvable {MetaOf<Thing>()}
       , mOwner {parent} {
       if (parent) {
@@ -428,7 +428,7 @@ namespace Langulus::Entity
    /// Create a child thing                                                   
    ///   @param descriptor - instructions for the entity's creation           
    ///   @return the new child instance                                       
-   Ref<Thing> Thing::CreateChild(const Any& descriptor) {
+   Ref<Thing> Thing::CreateChild(const Descriptor& descriptor) {
       ENTITY_VERBOSE_SELF_TAB("Producing child: ");
       Ref<Thing> newThing;
       newThing.New(this, descriptor);
@@ -441,12 +441,11 @@ namespace Langulus::Entity
    ///   @param module - name of the module                                   
    ///   @param descriptor - instructions for module setup                    
    ///   @return the instantiated module interface                            
-   Module* Thing::LoadMod(const Token& module, const Any& descriptor) {
+   Module* Thing::LoadMod(const Token& module, const Descriptor& descriptor) {
       const auto runtime = GetRuntime();
       LANGULUS_ASSUME(UserAssumes, runtime != nullptr,
          "No runtime available for loading a module");
-      const auto instance =
-         runtime->InstantiateModule(module, descriptor);
+      const auto instance = runtime->InstantiateModule(module, descriptor);
       LANGULUS_ASSERT(instance, Module, "Missing module");
       return instance;
    }

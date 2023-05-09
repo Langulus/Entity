@@ -217,7 +217,7 @@ SCENARIO("Testing Thing", "[thing]") {
 
    WHEN("Creating a Thing by descriptor") {
       Logger::Special("Start: Creating a Thing by descriptor");
-      Any descriptor = {
+      Descriptor descriptor {
          Traits::Name {"Root"_text},
          Construct::From<Runtime>(),
          Construct::From<Temporal>(),
@@ -310,7 +310,7 @@ SCENARIO("Testing Thing", "[thing]") {
    }
 
    GIVEN("A complex hierarchy with runtime, flow, units, and traits") {
-      Any descriptor = {
+      Descriptor descriptor {
          Traits::Name {"Root"_text},
          Construct::From<Runtime>(),
          Construct::From<Temporal>(),

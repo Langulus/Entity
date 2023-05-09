@@ -73,8 +73,8 @@ namespace Langulus::Entity
       NOD() Any CreateData(const Construct&);
 
    public:
-      LANGULUS_API(ENTITY) Thing(const Any& = {});
-      LANGULUS_API(ENTITY) Thing(Thing*, const Any& = {});
+      LANGULUS_API(ENTITY) Thing(const Descriptor& = {});
+      LANGULUS_API(ENTITY) Thing(Thing*, const Descriptor& = {});
       LANGULUS_API(ENTITY) Thing(Thing&&) noexcept;
       LANGULUS_API(ENTITY) ~Thing() SAFETY_NOEXCEPT();
 
@@ -82,8 +82,11 @@ namespace Langulus::Entity
       // move, or abandon                                               
       Thing(const Thing&) = delete;
 
-      NOD() LANGULUS_API(ENTITY) Runtime*  GetRuntime() const noexcept;
-      NOD() LANGULUS_API(ENTITY) Temporal* GetFlow() const noexcept;
+      NOD() LANGULUS_API(ENTITY)
+      Runtime*  GetRuntime() const noexcept;
+
+      NOD() LANGULUS_API(ENTITY)
+      Temporal* GetFlow() const noexcept;
 
       LANGULUS_API(ENTITY) void Do(Verb&);
       LANGULUS_API(ENTITY) void Select(Verb&);
@@ -99,30 +102,50 @@ namespace Langulus::Entity
       LANGULUS_API(ENTITY) void Update(Time);
       LANGULUS_API(ENTITY) void Reset();
 
-      NOD() LANGULUS_API(ENTITY) bool operator == (const Thing&) const;
+      NOD() LANGULUS_API(ENTITY)
+      bool operator == (const Thing&) const;
 
-      NOD() LANGULUS_API(ENTITY) explicit operator Debug() const;
+      NOD() LANGULUS_API(ENTITY)
+      explicit operator Debug() const;
 
    public:
       ///                                                                     
       ///   Hierarchy management                                              
       ///                                                                     
-      LANGULUS_API(ENTITY) Runtime*    CreateRuntime();
-      LANGULUS_API(ENTITY) Temporal*   CreateFlow();
-      LANGULUS_API(ENTITY) Ref<Thing>  CreateChild(const Any& = {});
-      template<bool TWOSIDED = true>
-      Count       AddChild(Thing*);
-      template<bool TWOSIDED = true>
-      Count       RemoveChild(Thing*);
-      LANGULUS_API(ENTITY) Module*     LoadMod(const Token&, const Any& = {});
+      LANGULUS_API(ENTITY)
+      Runtime* CreateRuntime();
 
-      NOD() LANGULUS_API(ENTITY) const Hierarchy& GetChildren() const noexcept;
-      NOD() LANGULUS_API(ENTITY)       Thing* GetChild(const Index& = IndexFirst);
-      NOD() LANGULUS_API(ENTITY) const Thing* GetChild(const Index& = IndexFirst) const;
-      NOD() LANGULUS_API(ENTITY)       Thing* GetNamedChild(const Token&, const Index& = IndexFirst);
-      NOD() LANGULUS_API(ENTITY) const Thing* GetNamedChild(const Token&, const Index& = IndexFirst) const;
+      LANGULUS_API(ENTITY)
+      Temporal* CreateFlow();
 
-      LANGULUS_API(ENTITY) void DumpHierarchy() const;
+      LANGULUS_API(ENTITY)
+      Ref<Thing> CreateChild(const Descriptor& = {});
+
+      template<bool TWOSIDED = true>
+      Count AddChild(Thing*);
+      template<bool TWOSIDED = true>
+      Count RemoveChild(Thing*);
+
+      LANGULUS_API(ENTITY)
+      Module* LoadMod(const Token&, const Descriptor& = {});
+
+      NOD() LANGULUS_API(ENTITY)
+      const Hierarchy& GetChildren() const noexcept;
+
+      NOD() LANGULUS_API(ENTITY)
+      Thing* GetChild(const Index& = IndexFirst);
+
+      NOD() LANGULUS_API(ENTITY)
+      const Thing* GetChild(const Index& = IndexFirst) const;
+
+      NOD() LANGULUS_API(ENTITY)
+      Thing* GetNamedChild(const Token&, const Index& = IndexFirst);
+
+      NOD() LANGULUS_API(ENTITY)
+      const Thing* GetNamedChild(const Token&, const Index& = IndexFirst) const;
+
+      LANGULUS_API(ENTITY)
+      void DumpHierarchy() const;
 
       ///                                                                     
       ///   Unit management                                                   
@@ -142,17 +165,29 @@ namespace Langulus::Entity
       template<CT::Unit T = Unit, bool TWOSIDED = true>
       Count RemoveUnits();
 
-      LANGULUS_API(ENTITY) Count ReplaceUnit(Unit*, Unit*);
+      LANGULUS_API(ENTITY)
+      Count ReplaceUnit(Unit*, Unit*);
 
-      NOD() LANGULUS_API(ENTITY) Count HasUnits(DMeta) const;
+      NOD() LANGULUS_API(ENTITY)
+      Count HasUnits(DMeta) const;
+
       template<CT::Unit T>
       NOD() Count HasUnits() const;
 
-      NOD() LANGULUS_API(ENTITY) const UnitMap& GetUnits() const noexcept;
-      NOD() LANGULUS_API(ENTITY) const Unit* GetUnitMeta(DMeta, Index = IndexFirst) const;
-      NOD() LANGULUS_API(ENTITY)       Unit* GetUnitMeta(DMeta, Index = IndexFirst);
-      NOD() LANGULUS_API(ENTITY) const Unit* GetUnitExt(const Construct&, Index = IndexFirst) const;
-      NOD() LANGULUS_API(ENTITY)       Unit* GetUnitExt(const Construct&, Index = IndexFirst);
+      NOD() LANGULUS_API(ENTITY)
+      const UnitMap& GetUnits() const noexcept;
+
+      NOD() LANGULUS_API(ENTITY)
+      const Unit* GetUnitMeta(DMeta, Index = IndexFirst) const;
+
+      NOD() LANGULUS_API(ENTITY)
+      Unit* GetUnitMeta(DMeta, Index = IndexFirst);
+
+      NOD() LANGULUS_API(ENTITY)
+      const Unit* GetUnitExt(const Construct&, Index = IndexFirst) const;
+
+      NOD() LANGULUS_API(ENTITY)
+      Unit* GetUnitExt(const Construct&, Index = IndexFirst);
 
       template<CT::Unit T = Unit>
       NOD()       Decay<T>* GetUnit(Index = IndexFirst);
@@ -160,10 +195,14 @@ namespace Langulus::Entity
       NOD() const Decay<T>* GetUnit(Index = IndexFirst) const;
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
-         NOD() LANGULUS_API(ENTITY) const Unit* GetUnitMeta(const Token&, Index = IndexFirst) const;
-         NOD() LANGULUS_API(ENTITY)       Unit* GetUnitMeta(const Token&, Index = IndexFirst);
+         NOD() LANGULUS_API(ENTITY)
+         const Unit* GetUnitMeta(const Token&, Index = IndexFirst) const;
+
+         NOD() LANGULUS_API(ENTITY)
+         Unit* GetUnitMeta(const Token&, Index = IndexFirst);
+
          template<CT::Unit T>
-         NOD() Decay<T>*   GetUnitAs(const Token&, Index = IndexFirst);
+         NOD() Decay<T>* GetUnitAs(const Token&, Index = IndexFirst);
       #endif
 
    private:
@@ -179,26 +218,46 @@ namespace Langulus::Entity
       LANGULUS_API(ENTITY) Count RemoveTrait(TMeta);
       LANGULUS_API(ENTITY) Count RemoveTrait(const Trait&);
 
-      NOD() LANGULUS_API(ENTITY) Count HasTraits(TMeta) const;
-      NOD() LANGULUS_API(ENTITY) Count HasTraits(const Trait&) const;
+      NOD() LANGULUS_API(ENTITY)
+      Count HasTraits(TMeta) const;
 
-      NOD() LANGULUS_API(ENTITY) const TraitMap& GetTraits() const noexcept;
-      NOD() LANGULUS_API(ENTITY) Trait GetTrait(TMeta, const Index& = IndexFirst) const;
-      NOD() LANGULUS_API(ENTITY) Trait GetTrait(TMeta, const Index& = IndexFirst);
-      NOD() LANGULUS_API(ENTITY) Trait GetTrait(const Trait&, const Index& = IndexFirst) const;
-      NOD() LANGULUS_API(ENTITY) Trait GetTrait(const Trait&, const Index& = IndexFirst);
+      NOD() LANGULUS_API(ENTITY)
+      Count HasTraits(const Trait&) const;
+
+      NOD() LANGULUS_API(ENTITY)
+      const TraitMap& GetTraits() const noexcept;
+
+      NOD() LANGULUS_API(ENTITY)
+      Trait GetTrait(TMeta, const Index& = IndexFirst) const;
+
+      NOD() LANGULUS_API(ENTITY)
+      Trait GetTrait(TMeta, const Index& = IndexFirst);
+
+      NOD() LANGULUS_API(ENTITY)
+      Trait GetTrait(const Trait&, const Index& = IndexFirst) const;
+
+      NOD() LANGULUS_API(ENTITY)
+      Trait GetTrait(const Trait&, const Index& = IndexFirst);
+
       template<CT::Trait T = Trait>
       NOD() Trait GetTrait(const Index & = IndexFirst);
 
-      NOD() LANGULUS_API(ENTITY) const Trait* GetLocalTrait(TMeta, const Index& = IndexFirst) const;
-      NOD() LANGULUS_API(ENTITY)       Trait* GetLocalTrait(TMeta, const Index& = IndexFirst);
+      NOD() LANGULUS_API(ENTITY)
+      const Trait* GetLocalTrait(TMeta, const Index& = IndexFirst) const;
+
+      NOD() LANGULUS_API(ENTITY)
+      Trait* GetLocalTrait(TMeta, const Index& = IndexFirst);
+
       template<CT::Trait = Trait>
       NOD()       Trait* GetLocalTrait(const Index& = IndexFirst);
       template<CT::Trait = Trait>
       NOD() const Trait* GetLocalTrait(const Index& = IndexFirst) const;
 
-      LANGULUS_API(ENTITY) void SetName(const Text&);
-      NOD() LANGULUS_API(ENTITY) Text GetName() const;
+      LANGULUS_API(ENTITY)
+      void SetName(const Text&);
+
+      NOD() LANGULUS_API(ENTITY)
+      Text GetName() const;
 
       ///                                                                     
       ///   Seek                                                              
