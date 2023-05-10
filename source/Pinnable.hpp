@@ -59,6 +59,8 @@ namespace Langulus::Entity
       LANGULUS(NULLIFIABLE) CT::Nullifiable<T>;
       LANGULUS(TYPED) T;
       LANGULUS_BASES(A::Pinnable);
+      LANGULUS_CONVERSIONS(T);
+
       LANGULUS_PROPERTIES_START(Pinnable)
          LANGULUS_PROPERTY_TRAIT(mLocked, State),
       LANGULUS_PROPERTIES_END();

@@ -44,6 +44,7 @@ namespace Langulus::Entity
       LANGULUS(PRODUCER) Thing;
       LANGULUS(UNINSERTABLE) false;
       LANGULUS_BASES(Resolvable);
+      LANGULUS_VERBS(Verbs::Create, Verbs::Select);
 
    protected: TESTING(public:)
       LANGULUS_API(ENTITY) void ResetRuntime(Runtime*);
