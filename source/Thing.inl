@@ -462,17 +462,11 @@ namespace Langulus::Entity
          // such constructor is reflected. If it's a unit, its          
          // descriptor is resposible for registering it with the parent 
          // via the Traits::Parent trait                                
-         if (type->mDescriptorConstructor) {
-            auto result = Any::FromMeta(type);
-            result.Emplace(descriptor.GetArgument());
-            return Abandon(result);
-         }
-         else if (type->mDefaultConstructor) {
-            auto result = Any::FromMeta(type);
-            result.Emplace();
-            return Abandon(result);
-         }
-         else LANGULUS_THROW(Construct, 
+         Verbs::Create creator {&descriptor};
+         if (Verbs::Create::ExecuteStateless(creator))
+            return Abandon(creator.GetOutput());
+         
+         LANGULUS_THROW(Construct, 
             "Requested data is not default- nor descriptor-constructible");
       }
 
