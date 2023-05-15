@@ -1,4 +1,4 @@
-project(Langulus::Entity::Test)
+project(LangulusEntityTest)
 
 add_executable(LangulusEntityTest 
 	Main.cpp
@@ -13,7 +13,7 @@ target_link_libraries(LangulusEntityTest
 )
 
 add_test(
-	NAME		Langulus::Entity::Test
+	NAME		LangulusEntityTest
 	COMMAND		LangulusEntityTest
 )
 
