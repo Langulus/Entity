@@ -13,6 +13,8 @@
 #define CATCH_CONFIG_RUNNER
 #include <catch2/catch.hpp>
 
+LANGULUS_RTTI_BOUNDARY("MAIN");
+
 int main(int argc, char* argv[]) {
 	static_assert(CT::Complete<Hierarchy>, "Oops1");
 	static_assert(CT::Complete<Unit>, "Oops2");

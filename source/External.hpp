@@ -101,7 +101,7 @@ namespace Langulus::A
       using Platform::Platform;
 
       NOD() virtual void* GetNativeHandle() const noexcept = 0;
-      NOD() virtual Math::Vec2 GetSize() const noexcept = 0;
+      NOD() virtual Math::Scale2 GetSize() const noexcept = 0;
       NOD() virtual bool IsMinimized() const noexcept = 0;
    };
    

@@ -34,8 +34,6 @@
    //TODO
 #endif
 
-LANGULUS_RTTI_BOUNDARY("MAIN")
-
 #define VERBOSE(...) //Logger::Verbose(this, ": ", ...)
 
 namespace Langulus::Entity
@@ -191,7 +189,7 @@ namespace Langulus::Entity
          path += "./lib";
       #endif
 
-      path += "Mod.";
+      path += "LangulusMod";
       path += name;
 
       // File postfix                                                   

@@ -287,9 +287,9 @@ namespace Langulus::Entity
          if (trait.TraitIs(meta)) {
             // Found match                                              
             try {
-               if constexpr (CT::Pinnable<D>)
-                  output = trait.template AsCast<TypeOf<D>>();
-               else
+               //if constexpr (CT::Pinnable<D>)
+               //   output = trait.template AsCast<TypeOf<D>>();
+               //else
                   output = trait.template AsCast<D>();
 
                // Didn't throw, but we're done only if offset matches   

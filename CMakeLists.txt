@@ -1,26 +1,18 @@
-cmake_minimum_required(VERSION 3.22)
-project(Langulus.Entity)
-
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+cmake_minimum_required(VERSION 3.24)
+project(LangulusEntity)
 
 # Check if this project is built as standalone, or a part of something else 
-if (PROJECT_IS_TOP_LEVEL)
-    if(LANGULUS_BUILD_SHARED_LIBRARIES)
-        add_compile_definitions(LANGULUS_EXPORT_ALL)
-        set(LANGULUS_LIBRARY_TYPE SHARED)
-    else()
-        set(LANGULUS_LIBRARY_TYPE STATIC)
-    endif()
-
+if(PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
+    # Populate the cmake directory											
     include(LangulusUtilities.cmake)
-    langulus_init_git_submodule(cmake)
-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-    include(FetchLangulusModule)
-    include(HandleLangulusFeatures)
+    langulus_fetch_cmake()
 
+    # Handle feature flags and global definitions/requirements				
+    include(HandleLangulusFeatures)
     handle_langulus_features()
 
+    # Add Langulus::Core library                                            
+    include(FetchLangulusModule)
 	fetch_langulus_module(Core)
 	fetch_langulus_module(Logger)
 	fetch_langulus_module(RTTI)
@@ -28,31 +20,44 @@ if (PROJECT_IS_TOP_LEVEL)
 	fetch_langulus_module(Anyness)
 	fetch_langulus_module(Flow)
 	fetch_langulus_module(Math)
-
-    add_compile_definitions(LANGULUS_ENABLE_TESTING)
-    enable_testing()
-	add_subdirectory(test)
 endif()
 
 # Build and install Entity library                                          
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/source LANGULUS_ENTITY_SOURCES)
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/source/modules LANGULUS_ENTITY_SOURCES)
-add_library(Langulus.Entity ${LANGULUS_LIBRARY_TYPE} ${LANGULUS_ENTITY_SOURCES})
+add_library(LangulusEntity ${LANGULUS_LIBRARY_TYPE}
+    $<TARGET_OBJECTS:LangulusLogger>
+    $<TARGET_OBJECTS:LangulusRTTI>
+    $<TARGET_OBJECTS:LangulusAnyness>
+    $<TARGET_OBJECTS:LangulusFlow>
+    source/Thing.cpp
+    source/Thing-Traits.cpp
+    source/Thing-Verbs.cpp
+    source/Runtime.cpp
+    source/Unit.cpp
+)
 
-if (MSVC)
-    target_compile_options(Langulus.Entity PRIVATE /bigobj)
+target_include_directories(LangulusEntity
+    PUBLIC      include
+                $<TARGET_PROPERTY:LangulusLogger,INTERFACE_INCLUDE_DIRECTORIES>
+                $<TARGET_PROPERTY:LangulusRTTI,INTERFACE_INCLUDE_DIRECTORIES>
+                $<TARGET_PROPERTY:LangulusAnyness,INTERFACE_INCLUDE_DIRECTORIES>
+                $<TARGET_PROPERTY:LangulusFlow,INTERFACE_INCLUDE_DIRECTORIES>
+                $<TARGET_PROPERTY:LangulusMath,INTERFACE_INCLUDE_DIRECTORIES>
+)
+
+target_link_libraries(LangulusEntity
+    PUBLIC      LangulusCore
+                fmt
+)
+
+if(NOT MSVC)
+    target_link_libraries(LangulusEntity PRIVATE dl)
 endif()
 
-target_include_directories(Langulus.Entity
-    PUBLIC      include
+target_compile_definitions(LangulusEntity
+    PRIVATE     LANGULUS_EXPORT_ALL
 )
 
-target_link_libraries(Langulus.Entity
-    PUBLIC      Langulus.Core
-                Langulus.Logger
-                Langulus.RTTI
-                Langulus.SIMD
-                Langulus.Anyness
-                Langulus.Flow
-                Langulus.Math
-)
+if(LANGULUS_ENABLE_TESTING)
+	add_subdirectory(test)
+    langulus_copy_dlls(LangulusEntityTest ON LangulusEntity)
+endif()
