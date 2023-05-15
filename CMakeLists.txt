@@ -58,6 +58,6 @@ target_compile_definitions(LangulusEntity
 )
 
 if(LANGULUS_ENABLE_TESTING)
+    enable_testing()
 	add_subdirectory(test)
-    langulus_copy_dlls(LangulusEntityTest ON LangulusEntity)
 endif()
