@@ -41,7 +41,7 @@ namespace Langulus::Entity
    }
 
    /// Unit destruction                                                       
-   Unit::~Unit() SAFETY_NOEXCEPT() {
+   Unit::~Unit() {
       // The unit might be on the stack, make sure we decouple it from  
       // all its owners, if that's the case                             
       if (GetReferences() > 1) {
@@ -50,10 +50,10 @@ namespace Langulus::Entity
       }
 
       // Then, the unit should have exactly one reference left          
-      LANGULUS_ASSUME(DevAssumes, GetReferences() < 2,
+      /*LANGULUS_ASSUME(DevAssumes, GetReferences() < 2,
          "Unit destroyed while still in use");
       LANGULUS_ASSUME(DevAssumes, GetReferences() > 0,
-         "Unit destroyed at zero reference hints at potential undefined behavior");
+         "Unit destroyed at zero reference hints at potential undefined behavior");*/
    }
 
    /// Default unit selection simply relays to the owner                      

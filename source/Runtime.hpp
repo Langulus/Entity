@@ -50,6 +50,8 @@ namespace Langulus::Entity
          MetaList mTypes;
          // Number of references for the library                        
          Count mReferences {1};
+         // Whether or not library is marked for unload                 
+         bool mMarkedForUnload {};
 
       public:
          /// Check if the shared library handle is valid                      
@@ -68,7 +70,13 @@ namespace Langulus::Entity
          }
       };
 
+      // The owner of the runtime                                       
       Thing* mOwner {};
+
+      // Number of modules that are waiting to be destroyed             
+      Count mMarkedForDeletion {};
+      // Number of libraries that are waiting to be unloaded            
+      Count mMarkedForUnload {};
 
       // Loaded shared libraries, indexed by filename                   
       // This is a static registry - all Runtimes use the same shared   

@@ -311,7 +311,9 @@ namespace Langulus::Entity
       for (auto list = mModules.begin(); list != mModules.end(); ++list) {
          for (auto mod = list->mValue.begin(); mod != list->mValue.end(); ++mod) {
             if (mod->Is(library.mModuleType)) {
-               UnregisterAllBases(mModulesByType, *mod, mod->GetType());
+               // Delete module instance                                
+               const auto modType = mod->GetType();
+               UnregisterAllBases(mModulesByType, *mod, modType);
                delete *mod;
                mod = list->mValue.RemoveIndex(mod);
             }
@@ -326,23 +328,36 @@ namespace Langulus::Entity
          mDependencies.RemoveKey(externalType);
 
       // Collect garbage, and check if library's boundary is still used 
+      const auto wasMarked = library.mMarkedForUnload;
       const auto boundary = library.mInfo()->mName;
 
       Anyness::Fractalloc.CollectGarbage();
       const auto poolsInUse = Anyness::Fractalloc.CheckBoundary(boundary);
       if (poolsInUse) {
-         // Maybe simply postpone unload, instead of reporting error?   
-         Logger::Error("Module `", boundary, "` can't be unloaded, "
-            "because exposed data is still in use in ", poolsInUse, " memory pools");
-         #if LANGULUS_FEATURE(MEMORY_STATISTICS)
+         // We can't allow the shared object to be unloaded!            
+         // It will be attempted again on Update, so that dependent     
+         // libraries have a chance of being unloaded first, releasing  
+         // required resources.                                         
+         if (!wasMarked) {
+            Logger::Warning(
+               "Module `", boundary, "` can't be unloaded yet, because "
+               "exposed data is still in use in ", poolsInUse, " memory pools. "
+               "Unload has been postponed to the next library unload."
+            );
+            const_cast<SharedLibrary&>(library).mMarkedForUnload = true;
+            ++mMarkedForUnload;
+         }
+
+         return;
+
+         /*#if LANGULUS_FEATURE(MEMORY_STATISTICS)
             Anyness::Fractalloc.DumpPools();
          #endif
-         LANGULUS_THROW(Destruct, "Can't unload shared library");
+         LANGULUS_THROW(Destruct, "Can't unload shared library");*/
       }
 
       // Unregister external types, if no longer used                   
       RTTI::Database.UnloadLibrary(boundary);
-
       Logger::Info("Module `", boundary, "` unloaded");
 
       // Unload the shared object                                       
@@ -355,6 +370,10 @@ namespace Langulus::Entity
       #else 
          #error Unsupported OS
       #endif
+
+      // Done, account for it, if it was marked for deletion            
+      if (wasMarked)
+         --mMarkedForUnload;
    }
 
    /// Get the dependency module of a given type                              
