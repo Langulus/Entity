@@ -67,12 +67,21 @@ namespace Langulus::Entity
    /// Runtime destruction                                                    
    Runtime::~Runtime() {
       VERBOSE("Shutting down...");
-      for (auto library = mLibraries.begin(); library != mLibraries.end(); ++library) {
-         if (0 == --library->mValue.mReferences) {
-            UnloadSharedLibrary(library->mValue);
-            library = mLibraries.RemoveIndex(library);
+
+      auto attempts = mLibraries.GetCount();
+      while (attempts) {
+         for (auto library = mLibraries.begin(); library != mLibraries.end(); ++library) {
+            if (UnloadSharedLibrary(library->mValue))
+               library = mLibraries.RemoveIndex(library);
          }
+
+         --attempts;
       }
+
+      // If after all attempts there's still active libraries, then     
+      // nothing is definitely not right                                
+      if (!mLibraries.IsEmpty())
+         LANGULUS_THROW(Destruct, "Can't unload last module (s)");
    }
 
    /// Create a module instance or return an already instantiated one         
@@ -247,21 +256,21 @@ namespace Langulus::Entity
       if (!library.mEntry) {
          Logger::Error("Module `", path, "` has no valid entry point - ",
             "the function " LANGULUS_MODULE_ENTRY_TOKEN() " is missing");
-         UnloadSharedLibrary(library);
+         (void)UnloadSharedLibrary(library);
          return {};
       }
 
       if (!library.mCreator) {
          Logger::Error("Module `", path, "` has no valid instantiation point - ",
             "the function " LANGULUS_MODULE_CREATE_TOKEN() " is missing");
-         UnloadSharedLibrary(library);
+         (void)UnloadSharedLibrary(library);
          return {};
       }
 
       if (!library.mInfo) {
          Logger::Error("Module `", path, "` has no valid information point - ",
             "the function " LANGULUS_MODULE_INFO_TOKEN() " is missing");
-         UnloadSharedLibrary(library);
+         (void)UnloadSharedLibrary(library);
          return {};
       }
 
@@ -290,8 +299,8 @@ namespace Langulus::Entity
       catch (...) {
          // Make sure we end up in an invariant state                   
          Logger::Error("Could not enter `", path, "` due to an exception");
-         UnloadSharedLibrary(library);
-         mLibraries.RemoveKey(name);
+         if (UnloadSharedLibrary(library))
+            mLibraries.RemoveKey(name);
          return {};
       }
 
@@ -302,9 +311,10 @@ namespace Langulus::Entity
 
    /// Unload a DLL/SO extension module                                       
    ///   @param library - the library handle to unload                        
-   void Runtime::UnloadSharedLibrary(const SharedLibrary& library) {
+   ///   @return true if shared library was unloaded successfully             
+   bool Runtime::UnloadSharedLibrary(const SharedLibrary& library) {
       if (library.mHandle == 0)
-         return;
+         return true;
 
       Logger::Info("Unloading module `", library.mInfo()->mName, "`...");
 
@@ -335,7 +345,7 @@ namespace Langulus::Entity
       const auto poolsInUse = Anyness::Fractalloc.CheckBoundary(boundary);
       if (poolsInUse) {
          // We can't allow the shared object to be unloaded!            
-         // It will be attempted again on Update, so that dependent     
+         // It will be attempted on next unload, so that dependent      
          // libraries have a chance of being unloaded first, releasing  
          // required resources.                                         
          if (!wasMarked) {
@@ -348,17 +358,12 @@ namespace Langulus::Entity
             ++mMarkedForUnload;
          }
 
-         return;
-
-         /*#if LANGULUS_FEATURE(MEMORY_STATISTICS)
-            Anyness::Fractalloc.DumpPools();
-         #endif
-         LANGULUS_THROW(Destruct, "Can't unload shared library");*/
+         return false;
       }
 
       // Unregister external types, if no longer used                   
       RTTI::Database.UnloadLibrary(boundary);
-      Logger::Info("Module `", boundary, "` unloaded");
+      Logger::Info("Module `", boundary, "` unloaded ", (wasMarked ? "(scheduled)" : ""));
 
       // Unload the shared object                                       
       #if LANGULUS_OS(WINDOWS)
@@ -374,6 +379,8 @@ namespace Langulus::Entity
       // Done, account for it, if it was marked for deletion            
       if (wasMarked)
          --mMarkedForUnload;
+
+      return true;
    }
 
    /// Get the dependency module of a given type                              

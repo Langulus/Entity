@@ -48,8 +48,6 @@ namespace Langulus::Entity
          DMeta mModuleType {};
          // Set of types, that were registered upon entry               
          MetaList mTypes;
-         // Number of references for the library                        
-         Count mReferences {1};
          // Whether or not library is marked for unload                 
          bool mMarkedForUnload {};
 
@@ -92,7 +90,7 @@ namespace Langulus::Entity
       // Instantiated modules, indexed by type                          
       TUnorderedMap<DMeta, ModuleList> mModulesByType;
 
-      void UnloadSharedLibrary(const SharedLibrary&);
+      NOD() bool UnloadSharedLibrary(const SharedLibrary&);
 
    public:
       LANGULUS_CONVERSIONS(Debug);

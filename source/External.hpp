@@ -394,6 +394,7 @@ namespace Langulus::A
       NOD() const TextureView& GetView() const noexcept;
 
       NOD() virtual const Texture* GetLOD(const Math::LOD&) const noexcept = 0;
+      NOD() virtual void* GetGPUHandle() const noexcept = 0;
    };
 
 } // namespace Langulus::A

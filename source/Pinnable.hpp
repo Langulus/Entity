@@ -62,6 +62,7 @@ namespace Langulus::Entity
       Pinnable(Pinnable&&) noexcept = default;
       using T::T;
 
+      Pinnable(const Descriptor&) requires (CT::DescriptorMakable<T>);
       Pinnable(const Descriptor&) requires (!CT::DescriptorMakable<T>);
 
       Pinnable& operator = (const Pinnable&) = default;
