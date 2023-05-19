@@ -50,7 +50,7 @@ namespace Langulus::Entity
 
    public:
       LANGULUS(ABSTRACT) false;
-      LANGULUS(NAME) RTTI::NameOf<Pinnable>();
+      LANGULUS(NAME) RTTI::CppNameOf<Pinnable>();
       LANGULUS_BASES(T, A::Pinnable);
 
       LANGULUS_PROPERTIES_START(Pinnable)
