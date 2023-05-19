@@ -314,18 +314,21 @@ namespace Langulus::A
    };
 
    ///                                                                        
-   ///   Abstract content module                                              
+   ///   Abstract asset module                                                
    ///                                                                        
-   struct ContentModule : Entity::Module {
+   struct AssetModule : Entity::Module {
       LANGULUS_BASES(Entity::Module);
       using Entity::Module::Module;
    };
 
    ///                                                                        
-   ///   Abstract content unit                                                
+   ///   Abstract asset unit                                                  
    ///                                                                        
-   struct Content : Entity::Unit, Flow::ProducedFrom<ContentModule> {
+   struct Asset : Entity::Unit, Flow::ProducedFrom<AssetModule> {
+      LANGULUS(PRODUCER) AssetModule;
       LANGULUS_BASES(Entity::Unit);
+      using Entity::Unit::Unit;
+
       using Data = Anyness::Any;
       using DataList = Anyness::TAny<Data>;
       using DataListMap = Anyness::TUnorderedMap<Anyness::TMeta, DataList>;
@@ -334,8 +337,6 @@ namespace Langulus::A
       DataListMap mDataListMap;
 
    public:
-      Content(Anyness::DMeta, ContentModule*, const Anyness::Any&);
-
       NOD() const DataListMap& GetDataListMap() const noexcept;
 
       template<CT::Trait T>
@@ -350,16 +351,15 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract geometry content                                            
    ///                                                                        
-   struct Geometry : Content {
-      LANGULUS(PRODUCER) ContentModule;
-      LANGULUS_BASES(Content);
+   struct Geometry : Asset {
+      LANGULUS(PRODUCER) AssetModule;
+      LANGULUS_BASES(Asset);
+      using Asset::Asset;
 
    protected:
       GeometryView mView;
 
    public:
-      using Content::Content;
-
       NOD() Anyness::DMeta GetTopology() const noexcept;
       NOD() const GeometryView& GetView() const noexcept;
 
@@ -369,10 +369,10 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract material content                                            
    ///                                                                        
-   struct Material : Content {
-      LANGULUS(PRODUCER) ContentModule;
-      LANGULUS_BASES(Content);
-      using Content::Content;
+   struct Material : Asset {
+      LANGULUS(PRODUCER) AssetModule;
+      LANGULUS_BASES(Asset);
+      using Asset::Asset;
 
       NOD() virtual const Material* GetLOD(const Math::LOD&) const noexcept = 0;
    };
@@ -380,16 +380,15 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract texture content                                             
    ///                                                                        
-   struct Texture : Content {
-      LANGULUS(PRODUCER) ContentModule;
-      LANGULUS_BASES(Content);
+   struct Texture : Asset {
+      LANGULUS(PRODUCER) AssetModule;
+      LANGULUS_BASES(Asset);
+      using Asset::Asset;
 
    protected:
       TextureView mView;
 
    public:
-      using Content::Content;
-
       NOD() Anyness::DMeta GetFormat() const noexcept;
       NOD() const TextureView& GetView() const noexcept;
 
@@ -412,7 +411,7 @@ namespace Langulus::CT
 
    /// A concept for any kind of content unit                                 
    template<class T>
-   concept Content = DerivedFrom<T, A::Content>;
+   concept Asset = DerivedFrom<T, A::Asset>;
 
    /// A concept for any kind of image content unit                           
    template<class T>

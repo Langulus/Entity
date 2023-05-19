@@ -109,23 +109,10 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract content unit                                                
    ///                                                                        
-   
-   /// Construct abstract content                                             
-   ///   @param type - concrete type of the content                           
-   ///   @param producer - the content producer                               
-   ///   @param descriptor - messy descriptor for the content                 
-   LANGULUS(INLINED)
-   Content::Content(
-      Anyness::DMeta type,
-      ContentModule* producer,
-      const Anyness::Any& descriptor)
-      : Unit {type, descriptor}
-      , ProducedFrom {producer, descriptor} {}
-
    /// Get the entire content data map                                        
    ///   @return a reference to the contents                                  
    LANGULUS(INLINED)
-   const Content::DataListMap& Content::GetDataListMap() const noexcept {
+   const Asset::DataListMap& Asset::GetDataListMap() const noexcept {
       return mDataListMap;
    }
 
@@ -135,7 +122,7 @@ namespace Langulus::A
    ///   @return a pointer to the data entry, or nullptr if none exists       
    template<CT::Trait T>
    LANGULUS(INLINED)
-   const Content::Data* Content::GetData(Offset index) const noexcept {
+   const Asset::Data* Asset::GetData(Offset index) const noexcept {
       return GetData(RTTI::MetaTrait::Of<T>(), index);
    }
 
@@ -144,7 +131,7 @@ namespace Langulus::A
    ///   @param index - the Nth data associated to the trait                  
    ///   @return a pointer to the data entry, or nullptr if none exists       
    LANGULUS(INLINED)
-   const Content::Data* Content::GetData(Anyness::TMeta trait, Offset index) const noexcept {
+   const Asset::Data* Asset::GetData(Anyness::TMeta trait, Offset index) const noexcept {
       const auto datalist = GetDataList(trait);
       return datalist && datalist->GetCount() > index
          ? &(*datalist)[index]
@@ -156,7 +143,7 @@ namespace Langulus::A
    ///   @return a pointer to the data list, or nullptr if none exists        
    template<CT::Trait T>
    LANGULUS(INLINED)
-   const Content::DataList* Content::GetDataList() const noexcept {
+   const Asset::DataList* Asset::GetDataList() const noexcept {
       return GetDataList(RTTI::MetaTrait::Of<T>());
    }
 
@@ -164,7 +151,7 @@ namespace Langulus::A
    ///   @param trait - the trait to search for                               
    ///   @return a pointer to the data list, or nullptr if none exists        
    LANGULUS(INLINED)
-   const Content::DataList* Content::GetDataList(Anyness::TMeta trait) const noexcept {
+   const Asset::DataList* Asset::GetDataList(Anyness::TMeta trait) const noexcept {
       const auto found = mDataListMap.FindKeyIndex(trait);
       if (found)
          return &mDataListMap.GetValue(found);
@@ -175,7 +162,6 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract geometry content                                            
    ///                                                                        
-   
    /// Get the topology of the geometry                                       
    ///   @return the topology type                                            
    LANGULUS(INLINED)
@@ -194,7 +180,6 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract texture content                                             
    ///                                                                        
-   
    /// Get the pixel format of the texture                                    
    ///   @return the pixel format type                                        
    LANGULUS(INLINED)

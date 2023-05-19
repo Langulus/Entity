@@ -51,13 +51,17 @@ namespace Langulus::Entity
    public:
       virtual void Refresh() {}
 
-      NOD() LANGULUS_API(ENTITY) Runtime* GetRuntime() const noexcept;
-      NOD() LANGULUS_API(ENTITY) const Hierarchy& GetOwners() const noexcept;
+      NOD() LANGULUS_API(ENTITY)
+      Runtime* GetRuntime() const noexcept;
+
+      NOD() LANGULUS_API(ENTITY)
+      const Hierarchy& GetOwners() const noexcept;
 
       template<Seek = Seek::HereAndAbove>
       bool DoInHierarchy(Verb&);
 
-      NOD() LANGULUS_API(ENTITY) bool CompareDescriptor(const Block&) const;
+      NOD() LANGULUS_API(ENTITY)
+      bool CompareDescriptor(const Block&) const;
       
       ///                                                                     
       ///   Seek                                                              
