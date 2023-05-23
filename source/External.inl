@@ -7,6 +7,9 @@
 ///                                                                           
 #pragma once
 #include "External.hpp"
+#include <Math/Primitives/TTriangle.hpp>
+#include <Math/Primitives/TLine.hpp>
+#include <Math/Primitives/TPoint.hpp>
 
 namespace Langulus
 {
@@ -25,8 +28,7 @@ namespace Langulus
          mPrimitiveStart == rhs.mPrimitiveStart &&
          mIndexCount == rhs.mIndexCount &&
          mIndexStart == rhs.mIndexStart &&
-         (mPrimitiveType == rhs.mPrimitiveType ||
-            (mPrimitiveType && mPrimitiveType->IsExact(rhs.mPrimitiveType))) &&
+         (mTopology == rhs.mTopology || (mTopology && mTopology->IsExact(rhs.mTopology))) &&
          mBilateral == rhs.mBilateral;
    }
 
@@ -166,13 +168,57 @@ namespace Langulus::A
    ///   @return the topology type                                            
    LANGULUS(INLINED)
    Anyness::DMeta Geometry::GetTopology() const noexcept {
-      return mView.mPrimitiveType;
+      return mView.mTopology;
+   }
+
+   /// Check if topology matches a static type                                
+   ///   @tparam T type to check                                              
+   ///   @return true if T matches topology                                   
+   template<CT::Topology T>
+   LANGULUS(INLINED)
+   bool Geometry::CheckTopology() const {
+      return mView.mTopology && mView.mTopology->template Is<T>();
+   }
+
+   /// Is geometry made up of triangles/triangle strips/triangle fans?        
+   ///   @return true if geometry is made of triangles                        
+   LANGULUS(INLINED)
+   bool Geometry::MadeOfTriangles() const noexcept {
+      return CheckTopology<A::Triangle>();
+   }
+
+   /// Is geometry made up of lines/line strips                               
+   ///   @return true if geometry is made of lines                            
+   LANGULUS(INLINED)
+   bool Geometry::MadeOfLines() const noexcept {
+      return CheckTopology<A::Line>();
+   }
+
+   /// Is geometry made up of points                                          
+   ///   @return true if geometry is made of points                           
+   LANGULUS(INLINED)
+   bool Geometry::MadeOfPoints() const noexcept {
+      return CheckTopology<A::Point>();
+   }
+
+   /// Get texture mapping mode                                               
+   ///   @return the texturing mode                                           
+   LANGULUS(INLINED)
+   Math::MapMode Geometry::GetTextureMapper() const noexcept {
+      return mView.mTextureMapping;
    }
 
    /// Get the geometry view                                                  
    ///   @return the geometry view                                            
    LANGULUS(INLINED)
    const GeometryView& Geometry::GetView() const noexcept {
+      return mView;
+   }
+
+   /// Get the geometry view                                                  
+   ///   @return the geometry view                                            
+   LANGULUS(INLINED)
+   GeometryView& Geometry::GetView() noexcept {
       return mView;
    }
 

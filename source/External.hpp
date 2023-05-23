@@ -10,7 +10,9 @@
 #include "Unit.hpp"
 #include "Runtime.hpp"
 #include <Math/LOD.hpp>
+#include <Math/Mapping.hpp>
 #include <Flow/Factory.hpp>
+#include <Anyness/Path.hpp>
 
 LANGULUS_DEFINE_TRAIT(Cursor,
    "Enables or disables cursor for window");
@@ -39,9 +41,11 @@ namespace Langulus
       // Starting index                                                 
       uint32_t mIndexStart {};
       // Data topology                                                  
-      RTTI::DMeta mPrimitiveType {};
+      RTTI::DMeta mTopology {};
       // Double-sidedness                                               
       bool mBilateral {};
+      // Texture mapping mode                                           
+      Math::MapMode mTextureMapping {};
 
       bool operator == (const GeometryView&) const noexcept;
 
@@ -230,23 +234,46 @@ namespace Langulus::A
    ///   Abstract file interface                                              
    ///                                                                        
    struct File : Entity::Unit {
+   protected:
+      Anyness::Path mFilePath;
+
+   public:
       LANGULUS(PRODUCER) FileSystem;
       LANGULUS_BASES(Entity::Unit);
       using Entity::Unit::Unit;
+
+      NOD() const Anyness::Path& GetFilePath() const noexcept;
 
       NOD() virtual Anyness::Any ReadAs(Anyness::DMeta) const = 0;
       
       template<class T>
       NOD() T ReadAs() const;
+
+      struct StreamIn {
+         virtual Offset Read(Anyness::Block&) = 0;
+      };
+
+      struct StreamOut {
+         virtual Offset Write(const Anyness::Block&) = 0;
+      };
+
+      NOD() virtual Anyness::Ptr<StreamIn>  NewStreamIn() = 0;
+      NOD() virtual Anyness::Ptr<StreamOut> NewStreamOut() = 0;
    };
 
    ///                                                                        
    ///   Abstract folder interface                                            
    ///                                                                        
    struct Folder : Entity::Unit {
+   protected:
+      Anyness::Path mFolderPath;
+
+   public:
       LANGULUS(PRODUCER) FileSystem;
       LANGULUS_BASES(Entity::Unit);
       using Entity::Unit::Unit;
+
+      NOD() const Anyness::Path& GetFolderPath() const noexcept;
 
       NOD() virtual const File* GetFile(const Anyness::Path&) const = 0;
       NOD() virtual const Folder* GetFolder(const Anyness::Path&) const = 0;
@@ -327,7 +354,8 @@ namespace Langulus::A
    struct Asset : Entity::Unit, Flow::ProducedFrom<AssetModule> {
       LANGULUS(PRODUCER) AssetModule;
       LANGULUS_BASES(Entity::Unit);
-      using Entity::Unit::Unit;
+      
+      Asset(RTTI::DMeta, AssetModule*, const Anyness::Descriptor&);
 
       using Data = Anyness::Any;
       using DataList = Anyness::TAny<Data>;
@@ -340,12 +368,15 @@ namespace Langulus::A
       NOD() const DataListMap& GetDataListMap() const noexcept;
 
       template<CT::Trait T>
-      NOD() const Data* GetData(Offset) const noexcept;
-      NOD() const Data* GetData(Anyness::TMeta, Offset) const noexcept;
+      NOD() const Data* GetData(Offset = 0) const noexcept;
+      NOD() const Data* GetData(Anyness::TMeta, Offset = 0) const noexcept;
 
       template<CT::Trait T>
       NOD() const DataList* GetDataList() const noexcept;
       NOD() const DataList* GetDataList(Anyness::TMeta) const noexcept;
+
+      template<CT::Trait T, CT::Semantic S>
+      void Commit(S&&);
    };
 
    ///                                                                        
@@ -360,10 +391,19 @@ namespace Langulus::A
       GeometryView mView;
 
    public:
+      template<CT::Topology T>
+      NOD() bool CheckTopology() const;
       NOD() Anyness::DMeta GetTopology() const noexcept;
-      NOD() const GeometryView& GetView() const noexcept;
+      NOD() bool MadeOfTriangles() const noexcept;
+      NOD() bool MadeOfLines() const noexcept;
+      NOD() bool MadeOfPoints() const noexcept;
 
-      NOD() virtual const Geometry* GetLOD(const Math::LOD&) const noexcept = 0;
+      NOD() Math::MapMode GetTextureMapper() const noexcept;
+
+      NOD() const GeometryView& GetView() const noexcept;
+      NOD() GeometryView& GetView() noexcept;
+
+      NOD() virtual const Geometry* GetLOD(const Math::LOD&) const = 0;
    };
 
    ///                                                                        
@@ -374,7 +414,7 @@ namespace Langulus::A
       LANGULUS_BASES(Asset);
       using Asset::Asset;
 
-      NOD() virtual const Material* GetLOD(const Math::LOD&) const noexcept = 0;
+      NOD() virtual const Material* GetLOD(const Math::LOD&) const = 0;
    };
 
    ///                                                                        
@@ -391,8 +431,9 @@ namespace Langulus::A
    public:
       NOD() Anyness::DMeta GetFormat() const noexcept;
       NOD() const TextureView& GetView() const noexcept;
+      NOD() TextureView& GetView() noexcept;
 
-      NOD() virtual const Texture* GetLOD(const Math::LOD&) const noexcept = 0;
+      NOD() virtual const Texture* GetLOD(const Math::LOD&) const = 0;
       NOD() virtual void* GetGPUHandle() const noexcept = 0;
    };
 
@@ -422,3 +463,23 @@ namespace Langulus::CT
    concept Geometry = DerivedFrom<T, A::Geometry>;
 
 } // namespace Langulus::CT
+
+
+LANGULUS_DEFINE_TRAIT(Shader,
+   "Shader unit");
+LANGULUS_DEFINE_TRAIT(Tesselation,
+   "Tesselation level, usually an integer");
+LANGULUS_DEFINE_TRAIT(Interpolator,
+   "Interpolation mode");
+LANGULUS_DEFINE_TRAIT(Material,
+   "Material unit");
+LANGULUS_DEFINE_TRAIT(Texture,
+   "Texture unit");
+LANGULUS_DEFINE_TRAIT(Geometry,
+   "Geometry unit");
+LANGULUS_DEFINE_TRAIT(FOV,
+   "Horizontal field of view angle, usually a real number");
+LANGULUS_DEFINE_TRAIT(AspectRatio,
+   "Aspect ratio trait (width / height), usually a real number");
+LANGULUS_DEFINE_TRAIT(Viewport,
+   "Viewport and depth clipping, usually a Range4");
