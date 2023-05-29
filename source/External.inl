@@ -101,6 +101,17 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract file interface                                              
    ///                                                                        
+   /// Get the full path of the file                                          
+   ///   @return a reference to the path                                      
+   LANGULUS(INLINED)
+   const Anyness::Path& File::GetFilePath() const noexcept {
+      return mFilePath;
+   }
+
+   /// Read a file and attempt to deserialize it as provided type T           
+   /// Throws if deserialization isn't possible                               
+   ///   @tparam T - the type to deserialize as, if possible                  
+   ///   @return the deserialized instance of T                               
    template<class T>
    LANGULUS(INLINED)
    T File::ReadAs() const {
@@ -109,8 +120,28 @@ namespace Langulus::A
 
 
    ///                                                                        
+   ///   Abstract folder interface                                            
+   ///                                                                        
+   /// Get the full path of the folder                                        
+   ///   @return a reference to the path                                      
+   LANGULUS(INLINED)
+      const Anyness::Path& Folder::GetFolderPath() const noexcept {
+      return mFolderPath;
+   }
+
+
+   ///                                                                        
    ///   Abstract content unit                                                
    ///                                                                        
+   /// Asset constructor                                                      
+   ///   @param type - concrete type of the asset                             
+   ///   @param producer - the asset library and producer                     
+   ///   @param desc - messy descriptor for the content                       
+   LANGULUS(INLINED)
+   Asset::Asset(RTTI::DMeta type, AssetModule* producer, const Anyness::Descriptor& desc)
+      : Unit {type, desc}
+      , ProducedFrom<AssetModule> {producer, desc} {}
+
    /// Get the entire content data map                                        
    ///   @return a reference to the contents                                  
    LANGULUS(INLINED)
@@ -158,6 +189,19 @@ namespace Langulus::A
       if (found)
          return &mDataListMap.GetValue(found);
       return nullptr;
+   }
+
+   /// Commit data to an asset                                                
+   ///   @attention data is always commited, even if such trait already exists
+   ///   @tparam T - data trait, the intent we're commiting with              
+   ///   @tparam S - semantic and data type to commit (deducible)             
+   ///   @param content - the data and semantic to commit                     
+   template<CT::Trait T, CT::Semantic S>
+   LANGULUS(INLINED)
+   void Asset::Commit(S&& content) {
+      static_assert(CT::Deep<TypeOf<S>>, "Content should be CT::Deep");
+      const auto meta = RTTI::MetaTrait::Of<T>();
+      mDataListMap[meta] << content.Forward();
    }
 
 
@@ -208,7 +252,7 @@ namespace Langulus::A
       return mView.mTextureMapping;
    }
 
-   /// Get the geometry view                                                  
+   /// Get the geometry view (const)                                          
    ///   @return the geometry view                                            
    LANGULUS(INLINED)
    const GeometryView& Geometry::GetView() const noexcept {
@@ -233,10 +277,17 @@ namespace Langulus::A
       return mView.mFormat;
    }
 
-   /// Get the texture view                                                   
+   /// Get the texture view (const)                                           
    ///   @return the texture view                                             
    LANGULUS(INLINED)
    const TextureView& Texture::GetView() const noexcept {
+      return mView;
+   }
+   
+   /// Get the texture view                                                   
+   ///   @return the texture view                                             
+   LANGULUS(INLINED)
+   TextureView& Texture::GetView() noexcept {
       return mView;
    }
 
