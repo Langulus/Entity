@@ -38,8 +38,8 @@ namespace Langulus::Entity
    template<bool TWOSIDED>
    Count Thing::AddChild(Thing* entity) {
       LANGULUS_ASSUME(UserAssumes, nullptr != entity, "Bad entity pointer");
-      const auto added = mChildren.Merge(entity);
 
+      const auto added = mChildren.Merge(entity);
       if constexpr (TWOSIDED) {
          if (added) {
             if (entity->mOwner != this) {

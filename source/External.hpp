@@ -74,6 +74,51 @@ namespace Langulus
       NOD() Size GetBytesize() const noexcept;
       NOD() uint32_t GetChannelCount() const noexcept;
    };
+   
+   ///                                                                        
+   ///   Shader stages                                                        
+   ///                                                                        
+   namespace ShaderStage
+   {
+      enum Enum : uint32_t {
+         Vertex = 0,          // Vertex shader stage                    
+         Geometry,            // Geometry shader stage                  
+         TessCtrl,            // Tesselation control stage              
+         TessEval,            // Tesselation evaluation stage           
+         Pixel,               // Pixel shader stage                     
+         Compute,             // Compute shader stage                   
+
+         Counter              // Shader stage counter (keep at end)     
+      };
+
+      /// Shader names                                                        
+      constexpr Token Names[Enum::Counter] = {
+         "vertex",
+         "geometry",
+         "tesselation control",
+         "tesselation evaluation",
+         "fragment",
+         "compute"
+      };
+   }
+
+   ///                                                                        
+   ///   Shader layout tokens                                                 
+   ///                                                                        
+   namespace ShaderToken
+   {
+      constexpr Token Version       = "//#VERSION\n";
+      constexpr Token Defines       = "//#DEFINES\n";
+      constexpr Token Input         = "//#INPUT\n";
+      constexpr Token Output        = "//#OUTPUT\n";
+      constexpr Token Dependencies  = "//#DEPENDENCY\n";
+      constexpr Token Colorize      = "//#COLORIZE\n";
+      constexpr Token Transform     = "//#TRANSFORM\n";
+      constexpr Token Position      = "//#POSITION\n";
+      constexpr Token Uniform       = "//#UNIFORM\n";
+      constexpr Token Texturize     = "//#TEXTURIZE\n";
+      constexpr Token Functions     = "//#FUNCTIONS\n";
+   }
 
 } // namespace Langulus
 
@@ -153,10 +198,10 @@ namespace Langulus::A
 
       NOD() virtual bool Cull(const Math::LOD&) const noexcept = 0;
       NOD() virtual Math::Level GetLevel() const noexcept = 0;
-      NOD() virtual Math::Matrix4 GetModelTransform(const Math::LOD&) const noexcept = 0;
-      NOD() virtual Math::Matrix4 GetModelTransform(const Math::Level& = Math::Level::Default) const noexcept = 0;
-      NOD() virtual Math::Matrix4 GetViewTransform(const Math::LOD&) const noexcept = 0;
-      NOD() virtual Math::Matrix4 GetViewTransform(const Math::Level& = Math::Level::Default) const noexcept = 0;
+      NOD() virtual Math::Mat4 GetModelTransform(const Math::LOD&) const noexcept = 0;
+      NOD() virtual Math::Mat4 GetModelTransform(const Math::Level& = {}) const noexcept = 0;
+      NOD() virtual Math::Mat4 GetViewTransform(const Math::LOD&) const noexcept = 0;
+      NOD() virtual Math::Mat4 GetViewTransform(const Math::Level& = {}) const noexcept = 0;
    };
    
    namespace UI
@@ -383,7 +428,6 @@ namespace Langulus::A
    ///   Abstract geometry content                                            
    ///                                                                        
    struct Geometry : Asset {
-      LANGULUS(PRODUCER) AssetModule;
       LANGULUS_BASES(Asset);
       using Asset::Asset;
 
@@ -410,7 +454,6 @@ namespace Langulus::A
    ///   Abstract material content                                            
    ///                                                                        
    struct Material : Asset {
-      LANGULUS(PRODUCER) AssetModule;
       LANGULUS_BASES(Asset);
       using Asset::Asset;
 
@@ -421,7 +464,6 @@ namespace Langulus::A
    ///   Abstract texture content                                             
    ///                                                                        
    struct Texture : Asset {
-      LANGULUS(PRODUCER) AssetModule;
       LANGULUS_BASES(Asset);
       using Asset::Asset;
 
