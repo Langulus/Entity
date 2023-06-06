@@ -85,11 +85,11 @@ namespace Langulus::Entity
          [&](const Trait& trait) {
             if (!GetMember(trait.GetTrait(), memberOffset).Compare(trait)) {
                mismatch = true;
-               return false;
+               return Flow::Break;
             }
 
             ++memberOffset;
-            return true;
+            return Flow::Continue;
          }
       );
 
@@ -98,11 +98,11 @@ namespace Langulus::Entity
          [&](const Block& anythingElse) {
             if (!GetMember(nullptr, memberOffset).Compare(anythingElse)) {
                mismatch = true;
-               return false;
+               return Flow::Break;
             }
 
             ++memberOffset;
-            return true;
+            return Flow::Continue;
          }
       );
 

@@ -57,11 +57,11 @@ namespace Langulus::Entity
          mTraits.ForEachValue([&](TAny<Trait>& list) noexcept {
             if (offset < list.GetCount()) {
                found = &list[offset];
-               return false;
+               return Flow::Break;
             }
 
             offset -= list.GetCount();
-            return true;
+            return Flow::Continue;
          });
       }
 

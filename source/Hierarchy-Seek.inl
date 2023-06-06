@@ -58,12 +58,12 @@ namespace Langulus::Entity
             if (offset == 0) {
                // We're done                                            
                result = const_cast<Unit*>(unit);
-               return false;
+               return Flow::Break;
             }
             else --offset;
          }
 
-         return true;         // Just keep searching...                 
+         return Flow::Continue;
       });
 
       if (result)
@@ -136,12 +136,12 @@ namespace Langulus::Entity
             if (offset == 0) {
                // We're done                                            
                result = const_cast<Unit*>(u);
-               return false;
+               return Flow::Break;
             }
             else --offset;
          }
 
-         return true;         // Just keep searching...                 
+         return Flow::Continue;
       });
 
       if (result)
@@ -243,13 +243,13 @@ namespace Langulus::Entity
             if (offset == 0) {
                // Match found                                           
                result = trait;
-               return false;
+               return Flow::Break;
             }
             
             --offset;
          }
 
-         return true;         // Just keep searching...                 
+         return Flow::Continue;
       });
 
       if (!result.IsEmpty())
@@ -287,10 +287,7 @@ namespace Langulus::Entity
          if (trait.TraitIs(meta)) {
             // Found match                                              
             try {
-               //if constexpr (CT::Pinnable<D>)
-               //   output = trait.template AsCast<TypeOf<D>>();
-               //else
-                  output = trait.template AsCast<D>();
+               output = trait.template AsCast<D>();
 
                // Didn't throw, but we're done only if offset matches   
                done = offset == 0;
@@ -300,7 +297,7 @@ namespace Langulus::Entity
             catch (...) { }
          }
 
-         return true;         // Just keep searching...                 
+         return Flow::Continue;
       });
 
       if (done) {
@@ -380,7 +377,7 @@ namespace Langulus::Entity
          }
          catch(...) { }
 
-         return true;         // Just keep searching...                 
+         return Flow::Continue;
       });
 
       if (done) {

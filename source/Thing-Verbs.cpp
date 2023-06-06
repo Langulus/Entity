@@ -184,25 +184,25 @@ namespace Langulus::Entity
          auto found = GetTrait(trait);
          if (found.IsEmpty()) {
             mismatch = true;
-            return false;
+            return Flow::Break;
          }
 
          selectedTraits << Abandon(found);
-         return true;
+         return Flow::Continue;
       };
 
       const auto selectUnit = [&](const MetaData* type) {
          if (type->Is<Thing>())
-            return true;
+            return Flow::Continue;
 
          auto found = GetUnitMeta(type);
          if (!found) {
             mismatch = true;
-            return false;
+            return Flow::Break;
          }
 
          selectedUnits << found;
-         return true;
+         return Flow::Continue;
       };
 
       const auto selectConstruct = [&](const Construct& construct) {
@@ -213,13 +213,13 @@ namespace Langulus::Entity
             Select(selector);
             if (!selector.GetOutput().IsEmpty()) {
                selectedEntities << this;
-               return true;
+               return Flow::Continue;
             }
          }
          else if (construct.CastsTo<Unit>()) {
             // Find a unit containing construct arguments               
             if (!selectUnit(construct.GetType()))
-               return false;
+               return Flow::Break;
 
             // selectedComponents has been populated with results       
             // Filter them additionally by construct arguments          
@@ -234,11 +234,11 @@ namespace Langulus::Entity
                      if (!Flow::DispatchFlat(unitBlock, selector)) {
                         // Abort on first failure                       
                         localMismatch = true;
-                        return false;
+                        return Flow::Break;
                      }
                   }
 
-                  return true;
+                  return Flow::Continue;
                });
 
                if (!localMismatch) {
@@ -251,7 +251,7 @@ namespace Langulus::Entity
             selectedUnits = Move(filteredSelectedComponents);
          }
 
-         return false;
+         return Flow::Break;
       };
 
       verb.ForEachDeep([&](const Block& part) {
