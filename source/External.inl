@@ -268,6 +268,20 @@ namespace Langulus::A
 
 
    ///                                                                        
+   ///   Abstract material content                                            
+   ///                                                                        
+   /// Get input traits for a given rate (const)                              
+   ///   @param rate - the rate                                               
+   ///   @return the input trait list                                         
+   LANGULUS(INLINED)
+   const Entity::TraitList& Material::GetInputs(Flow::Rate rate) const noexcept {
+      return *reinterpret_cast<const Entity::TraitList*>(
+         Asset::GetData<Traits::Trait>(rate.GetInputIndex())
+      );
+   }
+
+
+   ///                                                                        
    ///   Abstract texture content                                             
    ///                                                                        
    /// Get the pixel format of the texture                                    

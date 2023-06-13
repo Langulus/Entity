@@ -9,10 +9,11 @@
 #include "Module.hpp"
 #include "Unit.hpp"
 #include "Runtime.hpp"
+#include <Anyness/Path.hpp>
+#include <Flow/Factory.hpp>
+#include <Flow/Rate.hpp>
 #include <Math/LOD.hpp>
 #include <Math/Mapping.hpp>
-#include <Flow/Factory.hpp>
-#include <Anyness/Path.hpp>
 
 LANGULUS_DEFINE_TRAIT(Cursor,
    "Enables or disables cursor for window");
@@ -458,6 +459,8 @@ namespace Langulus::A
       using Asset::Asset;
 
       NOD() virtual const Material* GetLOD(const Math::LOD&) const = 0;
+
+      NOD() const Entity::TraitList& GetInputs(Flow::Rate) const noexcept;
    };
 
    ///                                                                        

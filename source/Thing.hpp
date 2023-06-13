@@ -99,8 +99,8 @@ namespace Langulus::Entity
       bool DoInHierarchy(Verb&);
 
       LANGULUS_API(ENTITY) Any Run(const Lingua&);
-      LANGULUS_API(ENTITY) Any Run(const Code&);
-      LANGULUS_API(ENTITY) Any Run(const Scope&);
+      //LANGULUS_API(ENTITY) Any Run(const Code&);
+      //LANGULUS_API(ENTITY) Any Run(const Scope&);
 
       LANGULUS_API(ENTITY) void Update(Time);
       LANGULUS_API(ENTITY) void Reset();
@@ -160,6 +160,7 @@ namespace Langulus::Entity
 
       template<CT::Unit T, class... A>
       Any CreateUnit(A&&...);
+
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
          template<class... A>
          Any CreateUnitToken(const Token&, A&&...);
