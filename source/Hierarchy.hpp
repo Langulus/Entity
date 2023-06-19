@@ -114,28 +114,28 @@ namespace Langulus::Entity
    template<CT::Trait T = Trait, Seek SEEK = Seek::HereAndAbove> \
    NOD() LANGULUS(INLINED) \
    Trait SeekTrait(Index offset = IndexFirst) { \
-      return SeekTrait<SEEK>(MetaTrait::Of<T>(), offset); \
+      return SeekTrait<SEEK>(T::GetTrait(), offset); \
    } \
    template<CT::Trait T = Trait, Seek SEEK = Seek::HereAndAbove> \
    NOD() LANGULUS(INLINED) \
    Trait SeekTrait(Index offset = IndexFirst) const { \
-      return SeekTrait<SEEK>(MetaTrait::Of<T>(), offset); \
+      return SeekTrait<SEEK>(T::GetTrait(), offset); \
    } \
    template<CT::Trait T = Trait, Seek SEEK = Seek::HereAndAbove, CT::Data D> \
    LANGULUS(INLINED) \
    bool SeekTrait(D& output, Index offset = IndexFirst) const { \
-      return SeekTrait<SEEK, D>(MetaTrait::Of<T>(), output, offset); \
+      return SeekTrait<SEEK, D>(T::GetTrait(), output, offset); \
    } \
    \
    template<CT::Trait T = Trait, Seek SEEK = Seek::HereAndAbove> \
    NOD() LANGULUS(INLINED) \
    Trait SeekTraitAux(const Any& aux, Index offset = IndexFirst) const { \
-      return SeekTraitAux<SEEK>(aux, MetaTrait::Of<T>(), offset); \
+      return SeekTraitAux<SEEK>(aux, T::GetTrait(), offset); \
    } \
    template<CT::Trait T = Trait, Seek SEEK = Seek::HereAndAbove, CT::Data D> \
    LANGULUS(INLINED) \
    bool SeekTraitAux(const Any& aux, D& output, Index offset = IndexFirst) const { \
-      return SeekTraitAux<SEEK, D>(aux, MetaTrait::Of<T>(), output, offset); \
+      return SeekTraitAux<SEEK, D>(aux, T::GetTrait(), output, offset); \
    }
 
 #if LANGULUS_FEATURE(MANAGED_MEMORY)
@@ -223,12 +223,12 @@ namespace Langulus::Entity
    template<CT::Trait T = Trait, Seek SEEK = Seek::HereAndAbove> \
    NOD() LANGULUS(INLINED) \
    TraitList GatherTraits() { \
-      return GatherTraits<SEEK>(MetaTrait::Of<T>()); \
+      return GatherTraits<SEEK>(T::GetTrait()); \
    } \
    template<CT::Trait T = Trait, Seek SEEK = Seek::HereAndAbove> \
    NOD() LANGULUS(INLINED) \
    TraitList GatherTraits() const { \
-      return GatherTraits<SEEK>(MetaTrait::Of<T>()); \
+      return GatherTraits<SEEK>(T::GetTrait()); \
    }
 
 #if LANGULUS_FEATURE(MANAGED_MEMORY)

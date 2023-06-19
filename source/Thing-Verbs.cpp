@@ -26,15 +26,6 @@
 namespace Langulus::Entity
 {
 
-   /// Execute a piece of langulus code in the closest possible temporal flow 
-   ///   @param code - the code to parse and execute                          
-   ///   @return the results of the execution                                 
-   /*Any Thing::Run(const Code& code) {
-      if (code.IsEmpty())
-         return {};
-      return Run(code.Parse());
-   }*/
-
    /// Find an AIAD component that can process speech and interpret using it  
    /// This function completely relies on external modules                    
    ///   @param text - text to execute                                        
@@ -66,20 +57,6 @@ namespace Langulus::Entity
 
       return Abandon(results);
    }
-
-   /// Execute a scope in the entity's context                                
-   ///   @param scope - the scope to execute                                  
-   ///   @return the results of the execution                                 
-   /*Any Thing::Run(const Scope& scope) {
-      Any context {GetBlock()};
-      Any output;
-      if (!scope.Execute(context, output)) {
-         Logger::Error("Can't execute scope: ", scope);
-         return {};
-      }
-
-      return output;
-   }*/
 
    /// Custom dispatcher, reflected via CT::Dispatcher                        
    /// Entity is a composite type, and its behavior depends on the coupled    

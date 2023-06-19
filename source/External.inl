@@ -156,7 +156,7 @@ namespace Langulus::A
    template<CT::Trait T>
    LANGULUS(INLINED)
    const Asset::Data* Asset::GetData(Offset index) const noexcept {
-      return GetData(RTTI::MetaTrait::Of<T>(), index);
+      return GetData(T::GetTrait(), index);
    }
 
    /// Get a single data entry from the contents                              
@@ -177,7 +177,7 @@ namespace Langulus::A
    template<CT::Trait T>
    LANGULUS(INLINED)
    const Asset::DataList* Asset::GetDataList() const noexcept {
-      return GetDataList(RTTI::MetaTrait::Of<T>());
+      return GetDataList(T::GetTrait());
    }
 
    /// Get a data list from the contents                                      
@@ -200,8 +200,7 @@ namespace Langulus::A
    LANGULUS(INLINED)
    void Asset::Commit(S&& content) {
       static_assert(CT::Deep<TypeOf<S>>, "Content should be CT::Deep");
-      const auto meta = RTTI::MetaTrait::Of<T>();
-      mDataListMap[meta] << content.Forward();
+      mDataListMap[T::GetTrait()] << content.Forward();
    }
 
 
@@ -274,9 +273,63 @@ namespace Langulus::A
    ///   @param rate - the rate                                               
    ///   @return the input trait list                                         
    LANGULUS(INLINED)
-   const Entity::TraitList& Material::GetInputs(Flow::Rate rate) const noexcept {
+   const Entity::TraitList& Material::GetInputs(Flow::Rate rate) const {
+      return GetInputs(rate.GetInputIndex());
+   }
+
+   /// Get input traits for a given input offset (const)                      
+   ///   @attention offset must be in the range [0; Rate::InputCount)         
+   ///   @param rate - the input offset                                       
+   ///   @return the input trait list                                         
+   LANGULUS(INLINED)
+   const Entity::TraitList& Material::GetInputs(Offset rate) const {
+      LANGULUS_ASSUME(DevAssumes,
+         Asset::mDataListMap.ContainsKey(Traits::Input::GetTrait()),
+         "Material doesn't contain inputs"
+      );
+      LANGULUS_ASSUME(DevAssumes,
+         Asset::GetDataList<Traits::Input>()->GetCount() == Flow::Rate::InputCount,
+         "Material doesn't contain the correct number of rates"
+      );
+      LANGULUS_ASSUME(DevAssumes,
+         rate < Flow::Rate::InputCount,
+         "Input offset out of range"
+      );
+
       return *reinterpret_cast<const Entity::TraitList*>(
-         Asset::GetData<Traits::Trait>(rate.GetInputIndex())
+         Asset::GetData<Traits::Input>(rate)
+      );
+   }
+
+   /// Get output traits for a given rate (const)                             
+   ///   @param rate - the rate                                               
+   ///   @return the output trait list                                        
+   LANGULUS(INLINED)
+   const Entity::TraitList& Material::GetOutputs(Flow::Rate rate) const {
+      return GetOutputs(rate.GetInputIndex());
+   }
+
+   /// Get output traits for a given input offset (const)                     
+   ///   @attention offset must be in the range [0; Rate::InputCount)         
+   ///   @param rate - the input offset                                       
+   ///   @return the output trait list                                        
+   LANGULUS(INLINED)
+   const Entity::TraitList& Material::GetOutputs(Offset rate) const {
+      LANGULUS_ASSUME(DevAssumes,
+         Asset::mDataListMap.ContainsKey(Traits::Output::GetTrait()),
+         "Material doesn't contain inputs"
+      );
+      LANGULUS_ASSUME(DevAssumes,
+         Asset::GetDataList<Traits::Output>()->GetCount() == Flow::Rate::InputCount,
+         "Material doesn't contain the correct number of rates"
+      );
+      LANGULUS_ASSUME(DevAssumes,
+         rate < Flow::Rate::InputCount,
+         "Input offset out of range"
+      );
+
+      return *reinterpret_cast<const Entity::TraitList*>(
+         Asset::GetData<Traits::Output>(rate)
       );
    }
 

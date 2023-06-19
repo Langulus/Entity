@@ -127,14 +127,17 @@ namespace Langulus::CT
 ///   @param ... - a type list to reflect upon module load                    
 #define LANGULUS_DEFINE_MODULE(m, prio, name, info, depo, cat, ...) \
    LANGULUS_RTTI_BOUNDARY(name) \
+   \
    extern "C" { \
-      LANGULUS_EXPORT() void LANGULUS_MODULE_ENTRY() (::Langulus::Entity::DMeta& meta, ::Langulus::Entity::MetaList& list) { \
+      LANGULUS_EXPORT() \
+      void LANGULUS_MODULE_ENTRY() (::Langulus::Entity::DMeta& meta, ::Langulus::Entity::MetaList& list) { \
          using DM = ::Langulus::Decay<m>; \
          meta = ::Langulus::RTTI::MetaData::Of<DM>(); \
          ::Langulus::RegisterTypeList<DM, ::Langulus::Decay<cat>, __VA_ARGS__>(list); \
       } \
       \
-      LANGULUS_EXPORT() ::Langulus::Entity::Module* LANGULUS_MODULE_CREATE() ( \
+      LANGULUS_EXPORT() \
+      ::Langulus::Entity::Module* LANGULUS_MODULE_CREATE() ( \
          ::Langulus::Entity::Runtime* rt, const ::Langulus::Anyness::Any& desc) { \
          static_assert(::Langulus::CT::DerivedFrom<m, ::Langulus::Entity::Module>, \
             "Langulus module class interface " \
@@ -145,7 +148,8 @@ namespace Langulus::CT
          return new m {rt, desc}; \
       } \
       \
-      LANGULUS_EXPORT() const ::Langulus::Entity::Module::Info* LANGULUS_MODULE_INFO() () { \
+      LANGULUS_EXPORT() \
+      const ::Langulus::Entity::Module::Info* LANGULUS_MODULE_INFO() () { \
          static const ::Langulus::Entity::Module::Info i { \
             prio, name, info, depo, ::Langulus::MetaOf<cat>() \
          }; \

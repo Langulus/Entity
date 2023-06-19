@@ -296,10 +296,12 @@ namespace Langulus::A
       NOD() T ReadAs() const;
 
       struct StreamIn {
+         virtual ~StreamIn() {}
          virtual Offset Read(Anyness::Block&) = 0;
       };
 
       struct StreamOut {
+         virtual ~StreamOut() {}
          virtual Offset Write(const Anyness::Block&) = 0;
       };
 
@@ -460,7 +462,11 @@ namespace Langulus::A
 
       NOD() virtual const Material* GetLOD(const Math::LOD&) const = 0;
 
-      NOD() const Entity::TraitList& GetInputs(Flow::Rate) const noexcept;
+      NOD() const Entity::TraitList& GetInputs(Flow::Rate) const;
+      NOD() const Entity::TraitList& GetInputs(Offset) const;
+
+      NOD() const Entity::TraitList& GetOutputs(Flow::Rate) const;
+      NOD() const Entity::TraitList& GetOutputs(Offset) const;
    };
 
    ///                                                                        

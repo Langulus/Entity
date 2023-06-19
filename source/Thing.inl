@@ -265,7 +265,7 @@ namespace Langulus::Entity
    template<CT::Unit T>
    LANGULUS(INLINED)
    Count Thing::HasUnits() const {
-      return HasUnits(MetaData::Of<Decay<T>>());
+      return HasUnits(MetaOf<Decay<T>>());
    }
 
    /// Create a unit by static type and arguments, relying on producers       
@@ -307,7 +307,7 @@ namespace Langulus::Entity
    Decay<T>* Thing::GetUnit(Index offset) {
       if constexpr (!CT::Same<T, Unit>) {
          return static_cast<Decay<T>*>(
-            GetUnitMeta(MetaData::Of<Decay<T>>(), offset)
+            GetUnitMeta(MetaOf<Decay<T>>(), offset)
          );
       }
       else {
@@ -326,7 +326,7 @@ namespace Langulus::Entity
    const Decay<T>* Thing::GetUnit(Index offset) const {
       if constexpr (!CT::Same<T, Unit>) {
          return static_cast<const Decay<T>*>(
-            GetUnitMeta(MetaData::Of<Decay<T>>(), offset)
+            GetUnitMeta(MetaOf<Decay<T>>(), offset)
          );
       }
       else {
@@ -363,7 +363,7 @@ namespace Langulus::Entity
    template<CT::Trait T>
    LANGULUS(INLINED)
    Trait Thing::GetTrait(const Index& offset) {
-      return GetTrait(MetaTrait::Of<T>(), offset);
+      return GetTrait(T::GetTrait(), offset);
    }
 
    /// Get local trait by static type and offset                              
@@ -373,7 +373,7 @@ namespace Langulus::Entity
    template<CT::Trait T>
    LANGULUS(INLINED)
    Trait* Thing::GetLocalTrait(const Index& offset) {
-      return GetLocalTrait(MetaTrait::Of<T>(), offset);
+      return GetLocalTrait(T::GetTrait(), offset);
    }
 
    /// Get local trait by static type and offset                              

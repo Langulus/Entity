@@ -425,7 +425,7 @@ namespace Langulus::Entity
    ///   @param path - the path for the file                                  
    ///   @return the file interface, or nullptr if file doesn't exist         
    A::File* Runtime::GetFile(const Path& path) {
-      const auto& fileSystems = GetModules(MetaData::Of<A::FileSystem>());
+      const auto& fileSystems = GetModules(MetaOf<A::FileSystem>());
       for (auto module : fileSystems) {
          const auto fs = dynamic_cast<A::FileSystem*>(module);
          if (!fs)
