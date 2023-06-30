@@ -99,8 +99,6 @@ namespace Langulus::Entity
       bool DoInHierarchy(Verb&);
 
       LANGULUS_API(ENTITY) Any Run(const Lingua&);
-      //LANGULUS_API(ENTITY) Any Run(const Code&);
-      //LANGULUS_API(ENTITY) Any Run(const Scope&);
 
       LANGULUS_API(ENTITY) void Update(Time);
       LANGULUS_API(ENTITY) void Reset();
