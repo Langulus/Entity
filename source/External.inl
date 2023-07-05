@@ -23,21 +23,44 @@ namespace Langulus
    ///   @return true if both views are the same                              
    LANGULUS(INLINED)
    bool GeometryView::operator == (const GeometryView& rhs) const noexcept {
-      return
-         mPrimitiveCount == rhs.mPrimitiveCount &&
-         mPrimitiveStart == rhs.mPrimitiveStart &&
-         mIndexCount == rhs.mIndexCount &&
-         mIndexStart == rhs.mIndexStart &&
-         (mTopology == rhs.mTopology || (mTopology && mTopology->IsExact(rhs.mTopology))) &&
-         mBilateral == rhs.mBilateral;
+      return mPrimitiveCount == rhs.mPrimitiveCount &&
+             mPrimitiveStart == rhs.mPrimitiveStart &&
+             mIndexCount == rhs.mIndexCount &&
+             mIndexStart == rhs.mIndexStart &&
+             (mTopology == rhs.mTopology
+                || (mTopology && mTopology->IsExact(rhs.mTopology))) &&
+             mBilateral == rhs.mBilateral;
    }
 
-   /// Decay the geometry view to a simpler primitive type, for example,      
-   /// decay triangles to points                                              
+   /// Decay the geometry view to a list of points                            
    ///   @return the decayed view                                             
    LANGULUS(INLINED)
    GeometryView GeometryView::Decay() const {
-      TODO();
+      LANGULUS_ASSERT(mPrimitiveCount && mTopology, Convert, "Bad vertex view");
+      if (mTopology->template Is<A::Point>())
+         return *this;
+
+      GeometryView result {*this};
+      result.mTopology = MetaOf<A::Point>();
+
+      // mPrimitiveCount corresponds to the number of points in these   
+      // cases:                                                         
+      if (  mTopology->template Is<A::TriangleStrip>()
+         || mTopology->template Is<A::TriangleFan>()
+         || mTopology->template Is<A::LineStrip>()
+         || mTopology->template Is<A::LineLoop>())
+         return result;
+
+      if (mTopology->template Is<A::Triangle>())
+         // Decay triangles to points                                   
+         result.mPrimitiveCount *= 3;
+      if (mTopology->template Is<A::Line>())
+         // Decay lines to points                                       
+         result.mPrimitiveCount *= 2;
+      else
+         LANGULUS_THROW(Convert, "Bad primitive type");
+
+      return result;
    }
 
 
@@ -50,12 +73,12 @@ namespace Langulus
    ///   @return true if both views are the same                              
    LANGULUS(INLINED)
    bool TextureView::operator == (const TextureView& rhs) const noexcept {
-      return
-         mWidth == rhs.mWidth &&
-         mHeight == rhs.mHeight &&
-         mDepth == rhs.mDepth &&
-         mFrames == rhs.mFrames &&
-         (mFormat == rhs.mFormat || (mFormat && mFormat->IsExact(rhs.mFormat)));
+      return mWidth == rhs.mWidth &&
+             mHeight == rhs.mHeight &&
+             mDepth == rhs.mDepth &&
+             mFrames == rhs.mFrames &&
+             (mFormat == rhs.mFormat
+                || (mFormat && mFormat->IsExact(rhs.mFormat)));
    }
 
    /// Get the number of pixels in the texture                                
@@ -101,6 +124,7 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract file interface                                              
    ///                                                                        
+   
    /// Get the full path of the file                                          
    ///   @return a reference to the path                                      
    LANGULUS(INLINED)
@@ -122,6 +146,7 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract folder interface                                            
    ///                                                                        
+   
    /// Get the full path of the folder                                        
    ///   @return a reference to the path                                      
    LANGULUS(INLINED)
@@ -133,6 +158,7 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract content unit                                                
    ///                                                                        
+   
    /// Asset constructor                                                      
    ///   @param type - concrete type of the asset                             
    ///   @param producer - the asset library and producer                     
@@ -207,6 +233,7 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract geometry content                                            
    ///                                                                        
+   
    /// Get the topology of the geometry                                       
    ///   @return the topology type                                            
    LANGULUS(INLINED)
@@ -223,27 +250,318 @@ namespace Langulus::A
       return mView.mTopology && mView.mTopology->template Is<T>();
    }
 
-   /// Is geometry made up of triangles/triangle strips/triangle fans?        
-   ///   @return true if geometry is made of triangles                        
-   LANGULUS(INLINED)
-   bool Geometry::MadeOfTriangles() const noexcept {
-      return CheckTopology<A::Triangle>();
+   /// Helper that indirects in case there is an index buffer                 
+   ///   @param indices - index buffer                                        
+   ///   @param where - line indices                                          
+   ///   @return the (eventually indirected) line indices                     
+   inline Math::Vec2u Geometry::InnerGetIndices(const Data* indices, const Math::Vec2u& where) const {
+      if (!indices || indices->IsEmpty())
+         return where;
+
+      if (indices->IsExact<std::uint8_t>()) {
+         auto idx = indices->As<std::uint8_t*>();
+         return {idx[where[0]], idx[where[1]]};
+      }
+      
+      if (indices->IsExact<std::uint16_t>()) {
+         auto idx = indices->As<std::uint16_t*>();
+         return {idx[where[0]], idx[where[1]]};
+      }
+
+      if (indices->IsExact<std::uint32_t>()) {
+         auto idx = indices->As<std::uint32_t*>();
+         return {idx[where[0]], idx[where[1]]};
+      }
+
+      if (indices->IsExact<std::uint64_t>()) {
+         auto idx = indices->As<std::uint64_t*>();
+         return {
+            static_cast<std::uint32_t>(idx[where[0]]),
+            static_cast<std::uint32_t>(idx[where[1]])
+         };
+      }
+
+      LANGULUS_THROW(Access, "Trying to get index from incompatible index buffer");
    }
 
-   /// Is geometry made up of lines/line strips                               
-   ///   @return true if geometry is made of lines                            
-   LANGULUS(INLINED)
-   bool Geometry::MadeOfLines() const noexcept {
-      return CheckTopology<A::Line>();
+   /// Helper that indirects in case there is an index buffer                 
+   ///   @param indices - index buffer                                        
+   ///   @param where - triangle indices                                      
+   ///   @return the (eventually indirected) triangle indices                 
+   inline Math::Vec3u Geometry::InnerGetIndices(const Data* indices, const Math::Vec3u& where) const {
+      if (!indices || indices->IsEmpty())
+         return where;
+
+      if (indices->IsExact<std::uint8_t>()) {
+         auto idx = indices->As<std::uint8_t*>();
+         return {idx[where[0]], idx[where[1]], idx[where[2]]};
+      }
+
+      if (indices->IsExact<std::uint16_t>()) {
+         auto idx = indices->As<std::uint16_t*>();
+         return {idx[where[0]], idx[where[1]], idx[where[2]]};
+      }
+
+      if (indices->IsExact<std::uint32_t>()) {
+         auto idx = indices->As<std::uint32_t*>();
+         return {idx[where[0]], idx[where[1]], idx[where[2]]};
+      }
+
+      if (indices->IsExact<std::uint64_t>()) {
+         auto idx = indices->As<std::uint64_t*>();
+         return {
+            static_cast<std::uint32_t>(idx[where[0]]),
+            static_cast<std::uint32_t>(idx[where[1]]),
+            static_cast<std::uint32_t>(idx[where[2]])
+         };
+      }
+
+      LANGULUS_THROW(Access, "Trying to get index from incompatible index buffer");
    }
 
-   /// Is geometry made up of points                                          
+   /// Is topology a point list?                                              
    ///   @return true if geometry is made of points                           
    LANGULUS(INLINED)
    bool Geometry::MadeOfPoints() const noexcept {
       return CheckTopology<A::Point>();
    }
 
+   /// Get the number of points inside the geometry                           
+   ///   @return the number of points                                         
+   LANGULUS(INLINED)
+   Count Geometry::GetPointCount() const {
+      TODO();
+   }
+
+   template<CT::Trait T>
+   Anyness::Any Geometry::GetPointTrait(Offset) const {
+      TODO();
+   }
+
+   /// Is topology line list/strip/loop?                                      
+   ///   @return true if geometry is made of lines                            
+   LANGULUS(INLINED)
+   bool Geometry::MadeOfLines() const noexcept {
+      return CheckTopology<A::Line>();
+   }
+
+   /// Get the number of lines inside the geometry                            
+   ///   @return the number of points                                         
+   inline Count Geometry::GetLineCount() const {
+      if (MadeOfPoints())
+         return 0;
+      
+      if (CheckTopology<A::Line>()) {
+         if (mView.mIndexCount > 1)
+            return mView.mIndexCount / 2;
+         else {
+            auto decayed = mView.Decay();
+            if (decayed.mPrimitiveCount > 1)
+               return decayed.mPrimitiveCount / 2;
+         }
+         return 0;
+      }
+      else if (CheckTopology<A::LineStrip>()) {
+         if (mView.mIndexCount > 1)
+            return mView.mIndexCount - 1;
+         else if (mView.mPrimitiveCount > 1)
+            return mView.mPrimitiveCount - 1;
+         return 0;
+      }
+      else if (CheckTopology<A::LineLoop>()) {
+         if (mView.mIndexCount > 1)
+            return mView.mIndexCount;
+         else if (mView.mPrimitiveCount > 1)
+            return mView.mPrimitiveCount;
+         return 0;
+      }
+      else if (CheckTopology<A::Triangle>()) {
+         if (mView.mIndexCount > 2)
+            return mView.mIndexCount / 3;
+         else {
+            auto decayed = mView.Decay();
+            if (decayed.mPrimitiveCount > 2)
+               return decayed.mPrimitiveCount;
+         }
+         return 0;
+      }
+      else if (CheckTopology<A::TriangleStrip>() || CheckTopology<A::TriangleFan>()) {
+         if (mView.mIndexCount > 2)
+            return 1 + (mView.mIndexCount - 2) * 2;
+         else if (mView.mPrimitiveCount > 2)
+            return 1 + (mView.mPrimitiveCount - 2) * 2;
+         return 0;
+      }
+
+      LANGULUS_THROW(Access, "Trying to count lines for unknown topology");
+   }
+
+   /// Get the point indices of a given line                                  
+   ///   @param index - line index                                            
+   ///   @return the point indices as a 32bit unsigned 2D vector              
+   inline Math::Vec2u Geometry::GetLineIndices(Offset index) const {
+      const auto indices = GetData<Traits::Index>();
+
+      if (CheckTopology<A::Line>()) {
+         return InnerGetIndices(indices, Math::Vec2u(index * 2, index * 2 + 1));
+      }
+      else if (CheckTopology<A::LineStrip>()) {
+         return InnerGetIndices(indices, Math::Vec2u(index > 0 ? index - 1 : 0, index > 0 ? index : 1));
+      }
+      else if (CheckTopology<A::LineLoop>()) {
+         if (index == GetLineCount() - 1)
+            return InnerGetIndices(indices, Math::Vec2u(index, 0));
+         else
+            return InnerGetIndices(indices, Math::Vec2u(index > 0 ? index - 1 : 0, index > 0 ? index : 1));
+      }
+      else if (CheckTopology<A::Triangle>()) {
+         switch (index % 3) {
+         case 0: case 1:
+            return InnerGetIndices(indices, Math::Vec2u(index, index + 1));
+         case 2:
+            return InnerGetIndices(indices, Math::Vec2u(index, index - 2));
+         }
+      }
+      else if (CheckTopology<A::TriangleStrip>()) {
+         switch (index % 3) {
+         case 0:
+            return InnerGetIndices(indices, Math::Vec2u(index == 0 ? 0 : index - 2, index == 0 ? 1 : index - 1));
+         case 1:
+            return InnerGetIndices(indices, Math::Vec2u(index - 1, index));
+         case 2:
+            return InnerGetIndices(indices, Math::Vec2u(index, index - 2));
+         }
+      }
+      else if (CheckTopology<A::TriangleFan>()) {
+         switch (index % 3) {
+         case 0:
+            return InnerGetIndices(indices, Math::Vec2u(0, index == 0 ? 1 : index - 1));
+         case 1:
+            return InnerGetIndices(indices, Math::Vec2u(index - 1, index));
+         case 2:
+            return InnerGetIndices(indices, Math::Vec2u(index, 0));
+         }
+      }
+
+      LANGULUS_THROW(Access, "Trying to count lines for unknown topology");
+   }
+
+   /// Get a specific property of a specific line                             
+   ///   @tparam T - the trait to retrieve                                    
+   ///   @param lineIndex - the line index                                    
+   ///   @return data for the specific line                                   
+   template<CT::Trait T>
+   Anyness::Any Geometry::GetLineTrait(Offset lineIndex) const {
+      const auto indices = GetLineIndices(lineIndex);
+      const auto soughtt = GetData<T>(0);
+      if (!soughtt || soughtt->IsEmpty())
+         return {};
+
+      Anyness::Block soughtDecayed;
+      if (soughtt->CastsTo<Math::Triangle3>())
+         soughtDecayed = Anyness::Block::From(
+            soughtt->As<Math::Point3*>(), soughtt->GetCount() * 3);
+      else if (soughtt->CastsTo<Math::Triangle2>())
+         soughtDecayed = Anyness::Block::From(
+            soughtt->As<Math::Point2*>(), soughtt->GetCount() * 3);
+      else
+         soughtDecayed = *static_cast<const Anyness::Block*>(soughtt);
+
+      Anyness::Any result;
+      result.InsertBlock(soughtDecayed.GetElement(indices[0]));
+      result.InsertBlock(soughtDecayed.GetElement(indices[1]));
+      return result;
+   }
+   
+   /// Is geometry made up of triangles list/strip/fan?                       
+   ///   @return true if geometry is made of triangles                        
+   LANGULUS(INLINED)
+   bool Geometry::MadeOfTriangles() const noexcept {
+      return CheckTopology<A::Triangle>();
+   }
+   
+   /// Get the number of triangles inside the geometry                        
+   ///   @return the number of points                                         
+   inline Count Geometry::GetTriangleCount() const {
+      if (MadeOfPoints() || MadeOfLines())
+         return 0;
+
+      if (CheckTopology<A::Triangle>()) {
+         if (mView.mIndexCount > 2)
+            return mView.mIndexCount / 3;
+
+         auto decayed = mView.Decay();
+         LANGULUS_ASSERT(decayed.mPrimitiveCount % 3, Access, "Bad topology");
+         return decayed.mPrimitiveCount / 3;
+      }
+      else if (CheckTopology<A::TriangleStrip>() || CheckTopology<A::TriangleFan>()) {
+         if (mView.mIndexCount > 2)
+            return mView.mIndexCount - 2;
+
+         LANGULUS_ASSERT(mView.mPrimitiveCount < 3, Access, "Bad topology");
+         return mView.mPrimitiveCount - 2;
+      }
+
+      LANGULUS_THROW(Access, "Trying to count triangles for unknown topology");
+   }
+
+   /// Get the indices of a given triangle                                    
+   ///   @param index - triangle index                                        
+   ///   @return the indices as a 32bit unsigned 3D vector                    
+   inline Math::Vec3u Geometry::GetTriangleIndices(Offset index) const {
+      const auto indices = GetData<Traits::Index>(0);
+
+      if (CheckTopology<A::Triangle>()) {
+         return InnerGetIndices(indices, Math::Vec3u(
+            index * 3,
+            index * 3 + 1,
+            index * 3 + 2)
+         );
+      }
+      else if (CheckTopology<A::TriangleStrip>()) {
+         return InnerGetIndices(indices, Math::Vec3u(
+            index == 0 ? 0 : index - 1,
+            index == 0 ? 1 : index,
+            index == 0 ? 2 : index + 1)
+         );
+      }
+      else if (CheckTopology<A::TriangleFan>()) {
+         return InnerGetIndices(indices, Math::Vec3u(
+            0,
+            index == 0 ? 1 : index,
+            index == 0 ? 2 : index + 1)
+         );
+      }
+
+      LANGULUS_THROW(Access, "Trying to count triangles for unknown topology");
+   }
+
+   /// Get a specific property of a specific triangle                         
+   ///   @tparam T - the trait to retrieve                                    
+   ///   @param triangleIndex - the triangle index                            
+   ///   @return data for the specific triangle                               
+   template<CT::Trait T>
+   Anyness::Any Geometry::GetTriangleTrait(Offset triangleIndex) const {
+      const auto indices = GetTriangleIndices(triangleIndex);
+      const auto soughtt = GetData<T>(0);
+      if (!soughtt || soughtt->IsEmpty())
+         return {};
+
+      Anyness::Block soughtDecayed;
+      if (soughtt->CastsTo<Math::Triangle3>())
+         soughtDecayed = soughtt->Decay<Math::Point3>();
+      else if (soughtt->CastsTo<Math::Triangle2>())
+         soughtDecayed = soughtt->Decay<Math::Point2>();
+      else
+         soughtDecayed = *static_cast<const Anyness::Block*>(soughtt);
+
+      Anyness::Any result;
+      result.InsertBlock(soughtDecayed.GetElement(indices[0]));
+      result.InsertBlock(soughtDecayed.GetElement(indices[1]));
+      result.InsertBlock(soughtDecayed.GetElement(indices[2]));
+      return result;
+   }
+   
    /// Get texture mapping mode                                               
    ///   @return the texturing mode                                           
    LANGULUS(INLINED)
@@ -269,6 +587,7 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract material content                                            
    ///                                                                        
+   
    /// Get input traits for a given rate (const)                              
    ///   @param rate - the rate                                               
    ///   @return the input trait list                                         
@@ -337,6 +656,7 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract texture content                                             
    ///                                                                        
+   
    /// Get the pixel format of the texture                                    
    ///   @return the pixel format type                                        
    LANGULUS(INLINED)

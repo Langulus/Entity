@@ -441,9 +441,6 @@ namespace Langulus::A
       template<CT::Topology T>
       NOD() bool CheckTopology() const;
       NOD() Anyness::DMeta GetTopology() const noexcept;
-      NOD() bool MadeOfTriangles() const noexcept;
-      NOD() bool MadeOfLines() const noexcept;
-      NOD() bool MadeOfPoints() const noexcept;
 
       NOD() Math::MapMode GetTextureMapper() const noexcept;
 
@@ -451,6 +448,29 @@ namespace Langulus::A
       NOD() GeometryView& GetView() noexcept;
 
       NOD() virtual const Geometry* GetLOD(const Math::LOD&) const = 0;
+
+      NOD() Math::Vec2u InnerGetIndices(const Data*, const Math::Vec2u&) const;
+      NOD() Math::Vec3u InnerGetIndices(const Data*, const Math::Vec3u&) const;
+
+      //                                                                
+      NOD() bool MadeOfPoints() const noexcept;
+      NOD() Count GetPointCount() const;
+      template<CT::Trait T>
+      NOD() Anyness::Any GetPointTrait(Offset) const;
+
+      //                                                                
+      NOD() bool MadeOfLines() const noexcept;
+      NOD() Count GetLineCount() const;
+      NOD() Math::Vec2u GetLineIndices(Offset) const;
+      template<CT::Trait T>
+      NOD() Anyness::Any GetLineTrait(Offset) const;
+
+      //                                                                
+      NOD() bool MadeOfTriangles() const noexcept;
+      NOD() Count GetTriangleCount() const;
+      NOD() Math::Vec3u GetTriangleIndices(Offset) const;
+      template<CT::Trait T>
+      NOD() Anyness::Any GetTriangleTrait(Offset) const;
    };
 
    ///                                                                        
