@@ -458,12 +458,12 @@ namespace Langulus::A
          return {};
 
       Anyness::Block soughtDecayed;
-      if (soughtt->CastsTo<Math::Triangle3>())
+      if (soughtt->template CastsTo<Math::Triangle3>())
          soughtDecayed = Anyness::Block::From(
-            soughtt->As<Math::Point3*>(), soughtt->GetCount() * 3);
-      else if (soughtt->CastsTo<Math::Triangle2>())
+            soughtt->template As<Math::Point3*>(), soughtt->GetCount() * 3);
+      else if (soughtt->template CastsTo<Math::Triangle2>())
          soughtDecayed = Anyness::Block::From(
-            soughtt->As<Math::Point2*>(), soughtt->GetCount() * 3);
+            soughtt->template As<Math::Point2*>(), soughtt->GetCount() * 3);
       else
          soughtDecayed = *static_cast<const Anyness::Block*>(soughtt);
 
@@ -548,10 +548,10 @@ namespace Langulus::A
          return {};
 
       Anyness::Block soughtDecayed;
-      if (soughtt->CastsTo<Math::Triangle3>())
-         soughtDecayed = soughtt->Decay<Math::Point3>();
+      if (soughtt->template CastsTo<Math::Triangle3>())
+         soughtDecayed = soughtt->ReinterpretAs<Math::Point3>();
       else if (soughtt->CastsTo<Math::Triangle2>())
-         soughtDecayed = soughtt->Decay<Math::Point2>();
+         soughtDecayed = soughtt->ReinterpretAs<Math::Point2>();
       else
          soughtDecayed = *static_cast<const Anyness::Block*>(soughtt);
 
