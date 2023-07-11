@@ -549,9 +549,9 @@ namespace Langulus::A
 
       Anyness::Block soughtDecayed;
       if (soughtt->template CastsTo<Math::Triangle3>())
-         soughtDecayed = soughtt->ReinterpretAs<Math::Point3>();
+         soughtDecayed = soughtt->template ReinterpretAs<Math::Point3>();
       else if (soughtt->CastsTo<Math::Triangle2>())
-         soughtDecayed = soughtt->ReinterpretAs<Math::Point2>();
+         soughtDecayed = soughtt->template ReinterpretAs<Math::Point2>();
       else
          soughtDecayed = *static_cast<const Anyness::Block*>(soughtt);
 
