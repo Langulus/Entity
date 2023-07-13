@@ -538,10 +538,6 @@ namespace Langulus::CT
 
 LANGULUS_DEFINE_TRAIT(Shader,
    "Shader unit");
-LANGULUS_DEFINE_TRAIT(Tesselation,
-   "Tesselation level, usually an integer");
-LANGULUS_DEFINE_TRAIT(Interpolator,
-   "Interpolation mode");
 LANGULUS_DEFINE_TRAIT(Material,
    "Material unit");
 LANGULUS_DEFINE_TRAIT(Texture,
