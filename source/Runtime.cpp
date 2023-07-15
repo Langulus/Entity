@@ -68,6 +68,8 @@ namespace Langulus::Entity
    Runtime::~Runtime() {
       VERBOSE("Shutting down...");
 
+      // Cycle through all libraries N^2 times, unloading anything      
+      // that is no longer in use each time                             
       auto attempts = mLibraries.GetCount();
       while (attempts) {
          for (auto library = mLibraries.begin(); library != mLibraries.end(); ++library) {
@@ -79,9 +81,16 @@ namespace Langulus::Entity
       }
 
       // If after all attempts there's still active libraries, then     
-      // nothing is definitely not right                                
-      if (!mLibraries.IsEmpty())
+      // something is definitely not right. This will always result in  
+      // a crash, since we can't really throw inside a destructor       
+      if (!mLibraries.IsEmpty()) {
+         Logger::Error(this, ": Can't unload last module(s): ");
+         for (auto library : mLibraries)
+            Logger::Append(library->mKey, " ");
+         Logger::Error(this, ": This likely involves a memory leak, "
+            "that withholds managed data, reflected by the given modules");
          LANGULUS_THROW(Destruct, "Can't unload last module (s)");
+      }
    }
 
    /// Create a module instance or return an already instantiated one         
