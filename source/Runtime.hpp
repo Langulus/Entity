@@ -129,6 +129,9 @@ namespace Langulus::Entity
       NOD() LANGULUS_API(ENTITY)
       A::File* GetFile(const Path&);
 
+      NOD() LANGULUS_API(ENTITY)
+      A::Folder* GetFolder(const Path&);
+
       LANGULUS_API(ENTITY)
       void Update(Time);
 

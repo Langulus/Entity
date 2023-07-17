@@ -157,9 +157,20 @@ namespace Langulus::Entity
 
       // Use the creation point of the library to instantiate module    
       const auto info = library.mInfo();
-      auto module = library.mCreator(this, descriptor);
+      Module* module {};
+
+      try {
+         module = library.mCreator(this, descriptor);
+      }
+      catch (...) {
+         Logger::Error("Module `", info->mName,
+            "` creator has thrown an exception");
+         return nullptr;
+      }
+
       if (!module) {
-         Logger::Error("Module `", info->mName, "` creator didn't provide a module");
+         Logger::Error("Module `", info->mName,
+            "` creator didn't provide a module");
          return nullptr;
       }
 
@@ -443,6 +454,24 @@ namespace Langulus::Entity
          const auto file = fs->GetFile(path);
          if (file)
             return const_cast<A::File*>(file);
+      }
+
+      return nullptr;
+   }
+   
+   /// Get a folder interface, relying on external modules to find it         
+   ///   @param path - the path for the folder                                
+   ///   @return the folder interface, or nullptr if folder doesn't exist     
+   A::Folder* Runtime::GetFolder(const Path& path) {
+      const auto& fileSystems = GetModules(MetaOf<A::FileSystem>());
+      for (auto module : fileSystems) {
+         const auto fs = dynamic_cast<A::FileSystem*>(module);
+         if (!fs)
+            continue;
+
+         const auto file = fs->GetFolder(path);
+         if (file)
+            return const_cast<A::Folder*>(file);
       }
 
       return nullptr;
