@@ -282,13 +282,19 @@ namespace Langulus::A
    struct File : Entity::Unit {
    protected:
       Anyness::Path mFilePath;
+      bool mExists {};
+      Anyness::DMeta mFormat {};
+      Size mByteCount {};
 
    public:
       LANGULUS(PRODUCER) FileSystem;
       LANGULUS_BASES(Entity::Unit);
       using Entity::Unit::Unit;
 
+      NOD() bool Exists() const noexcept;
       NOD() const Anyness::Path& GetFilePath() const noexcept;
+      NOD() Anyness::DMeta GetFormat() const noexcept;
+      NOD() Size GetByteSize() const noexcept;
 
       NOD() virtual Anyness::Any ReadAs(Anyness::DMeta) const = 0;
       
@@ -296,11 +302,19 @@ namespace Langulus::A
       NOD() T ReadAs() const;
 
       struct StreamIn {
+      protected:
+         Offset mProgress {};
+
+      public:
          virtual ~StreamIn() {}
          virtual Offset Read(Anyness::Block&) = 0;
       };
 
       struct StreamOut {
+      protected:
+         Offset mProgress {};
+
+      public:
          virtual ~StreamOut() {}
          virtual Offset Write(const Anyness::Block&) = 0;
       };
