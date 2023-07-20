@@ -285,6 +285,7 @@ namespace Langulus::A
       bool mExists {};
       Anyness::DMeta mFormat {};
       Size mByteCount {};
+      bool mIsReadOnly {};
 
    public:
       LANGULUS(PRODUCER) FileSystem;
@@ -292,6 +293,7 @@ namespace Langulus::A
       using Entity::Unit::Unit;
 
       NOD() bool Exists() const noexcept;
+      NOD() bool IsReadOnly() const noexcept;
       NOD() const Anyness::Path& GetFilePath() const noexcept;
       NOD() Anyness::DMeta GetFormat() const noexcept;
       NOD() Size GetByteSize() const noexcept;
@@ -301,26 +303,37 @@ namespace Langulus::A
       template<class T>
       NOD() T ReadAs() const;
 
-      struct StreamIn {
+      /// Abstract file reader stream                                         
+      struct Reader {
       protected:
+         File* mFile;
          Offset mProgress {};
 
       public:
-         virtual ~StreamIn() {}
+         Reader() = delete;
+         Reader(File* f) : mFile {f} {}
+         virtual ~Reader() {}
+
          virtual Offset Read(Anyness::Block&) = 0;
       };
 
-      struct StreamOut {
+      /// Abstract file writer stream                                         
+      struct Writer {
       protected:
+         File* mFile;
          Offset mProgress {};
+         bool mAppend {};
 
       public:
-         virtual ~StreamOut() {}
+         Writer() = delete;
+         Writer(File* f, bool append) : mFile {f}, mAppend {append} {}
+         virtual ~Writer() {}
+
          virtual Offset Write(const Anyness::Block&) = 0;
       };
 
-      NOD() virtual Anyness::Ptr<StreamIn>  NewStreamIn() = 0;
-      NOD() virtual Anyness::Ptr<StreamOut> NewStreamOut() = 0;
+      NOD() virtual Anyness::Ptr<Reader> NewReader() = 0;
+      NOD() virtual Anyness::Ptr<Writer> NewWriter(bool append) = 0;
    };
 
    ///                                                                        
@@ -329,12 +342,14 @@ namespace Langulus::A
    struct Folder : Entity::Unit {
    protected:
       Anyness::Path mFolderPath;
+      bool mExists {};
 
    public:
       LANGULUS(PRODUCER) FileSystem;
       LANGULUS_BASES(Entity::Unit);
       using Entity::Unit::Unit;
 
+      NOD() bool Exists() const noexcept;
       NOD() const Anyness::Path& GetFolderPath() const noexcept;
 
       NOD() virtual const File* GetFile(const Anyness::Path&) const = 0;

@@ -125,6 +125,35 @@ namespace Langulus::A
    ///   Abstract file interface                                              
    ///                                                                        
    
+   /// Check if file physically exists                                        
+   ///   @return true if file exists                                          
+   LANGULUS(INLINED)
+   bool File::Exists() const noexcept {
+      return mExists;
+   }
+
+   /// Check if file is read-only                                             
+   ///   @return true if file exists and is read-only                         
+   LANGULUS(INLINED)
+   bool File::IsReadOnly() const noexcept {
+      return mIsReadOnly;
+   }
+
+   /// Check file format, that is deduced from file extension, and compared   
+   /// against all reflected file extensions                                  
+   ///   @return the file format                                              
+   LANGULUS(INLINED)
+   Anyness::DMeta File::GetFormat() const noexcept {
+      return mFormat;
+   }
+
+   /// Get the size of the file in bytes (if file exists)                     
+   ///   @return the size of the file in bytes, or 0 if it doesn't exist      
+   LANGULUS(INLINED)
+   Size File::GetByteSize() const noexcept {
+      return mByteCount;
+   }
+
    /// Get the full path of the file                                          
    ///   @return a reference to the path                                      
    LANGULUS(INLINED)
@@ -150,8 +179,15 @@ namespace Langulus::A
    /// Get the full path of the folder                                        
    ///   @return a reference to the path                                      
    LANGULUS(INLINED)
-      const Anyness::Path& Folder::GetFolderPath() const noexcept {
+   const Anyness::Path& Folder::GetFolderPath() const noexcept {
       return mFolderPath;
+   }
+
+   /// Check if folder physically exists                                      
+   ///   @return true if folder exists                                        
+   LANGULUS(INLINED)
+   bool Folder::Exists() const noexcept {
+      return mExists;
    }
 
 
@@ -211,7 +247,7 @@ namespace Langulus::A
    ///   @return a pointer to the data list, or nullptr if none exists        
    LANGULUS(INLINED)
    const Asset::DataList* Asset::GetDataList(Anyness::TMeta trait) const noexcept {
-      const auto found = mDataListMap.FindKeyIndex(trait);
+      const auto found = mDataListMap.Find(trait);
       if (found)
          return &mDataListMap.GetValue(found);
       return nullptr;

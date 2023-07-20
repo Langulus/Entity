@@ -137,7 +137,7 @@ namespace Langulus::Entity
          UnregisterAllBases(map, module, base.mType);
       }
 
-      const auto found = map.FindKeyIndex(type);
+      const auto found = map.Find(type);
       if (found) {
          auto& list = map.GetValue(found);
          if (list.Remove(module) && list.IsEmpty()) {
@@ -205,7 +205,7 @@ namespace Langulus::Entity
    ///   @return the module handle (OS dependent)                             
    Runtime::SharedLibrary Runtime::LoadSharedLibrary(const Token& name) {
       // Check if this library is already loaded                        
-      const auto preloaded = mLibraries.FindKeyIndex(name);
+      const auto preloaded = mLibraries.Find(name);
       if (preloaded) {
          // Never even attempt to load libraries more than once         
          return mLibraries.GetValue(preloaded);
@@ -407,7 +407,7 @@ namespace Langulus::Entity
    ///   @param type - the type to search for                                 
    ///   @return the shared library handle, you should check if it's valid    
    Runtime::SharedLibrary Runtime::GetDependency(DMeta type) const noexcept {
-      auto found = mDependencies.FindKeyIndex(type);
+      auto found = mDependencies.Find(type);
       if (found)
          return mDependencies.GetValue(found);
       return {};
@@ -417,7 +417,7 @@ namespace Langulus::Entity
    ///   @param type - the type to search for                                 
    ///   @return the module instance                                          
    const ModuleList& Runtime::GetModules(DMeta type) const noexcept {
-      auto found = mModulesByType.FindKeyIndex(type);
+      auto found = mModulesByType.Find(type);
       if (found)
          return mModulesByType.GetValue(found);
 

@@ -30,7 +30,7 @@ namespace Langulus::Entity
       TAny<Unit*> result;
       if constexpr (SEEK & Seek::Here) {
          // Seek here if requested                                      
-         const auto found = mUnitsAmbiguous.FindKeyIndex(meta);
+         const auto found = mUnitsAmbiguous.Find(meta);
          if (found) {
             auto& list = mUnitsAmbiguous.GetValue(found);
             for (auto& unit : list)

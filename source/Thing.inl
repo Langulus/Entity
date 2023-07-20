@@ -131,7 +131,7 @@ namespace Langulus::Entity
    ///   @param unit - the unit instance to unregister                        
    ///   @param type - the type to unregister the unit as                     
    inline void Thing::RemoveUnitBases(Unit* unit, DMeta type) {
-      const auto found = mUnitsAmbiguous.FindKeyIndex(type);
+      const auto found = mUnitsAmbiguous.Find(type);
       if (found) {
          auto& set = mUnitsAmbiguous.GetValue(found);
          if (set.Remove(unit) && set.IsEmpty())
@@ -157,7 +157,7 @@ namespace Langulus::Entity
    Count Thing::AddUnit(Unit* unit) {
       // Check if the unit instance is already registered here          
       const auto meta = unit->GetType();
-      const auto found = mUnitsAmbiguous.FindKeyIndex(meta);
+      const auto found = mUnitsAmbiguous.Find(meta);
       if (found && mUnitsAmbiguous.GetValue(found).Find(unit))
          return 0;
 
@@ -195,7 +195,7 @@ namespace Langulus::Entity
    template<bool TWOSIDED>
    Count Thing::RemoveUnit(Unit* unit) {
       const auto meta = unit->GetType();
-      const auto foundType = mUnitsAmbiguous.FindKeyIndex(meta);
+      const auto foundType = mUnitsAmbiguous.Find(meta);
       if (!foundType)
          return 0;
 
@@ -245,7 +245,7 @@ namespace Langulus::Entity
       else {
          // Remove units of a specific type                             
          const auto meta = MetaOf<Decay<T>>();
-         const auto found = mUnitsAmbiguous.FindKeyIndex(meta);
+         const auto found = mUnitsAmbiguous.Find(meta);
          if (!found)
             return 0;
 

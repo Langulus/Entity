@@ -219,7 +219,7 @@ namespace Langulus::Entity
    Unit* Thing::GetUnitMeta(DMeta id, Index index) {
       if (id) {
          // Search a typed trait                                        
-         const auto found = mUnitsAmbiguous.FindKeyIndex(id);
+         const auto found = mUnitsAmbiguous.Find(id);
          if (found)
             return mUnitsAmbiguous.GetValue(found)[index];
          return nullptr;
@@ -250,7 +250,7 @@ namespace Langulus::Entity
 
       if (meta) {
          // Search a typed unit                                         
-         const auto found = mUnitsAmbiguous.FindKeyIndex(meta);
+         const auto found = mUnitsAmbiguous.Find(meta);
          if (found) {
             const auto& bucket = mUnitsAmbiguous.GetValue(found);
             if (what.GetArgument().IsEmpty())
@@ -387,7 +387,7 @@ namespace Langulus::Entity
    ///   @param type - the type of units to search for                        
    ///   @return the number of matching units                                 
    Count Thing::HasUnits(DMeta type) const {
-      const auto found = mUnitsAmbiguous.FindKeyIndex(type);
+      const auto found = mUnitsAmbiguous.Find(type);
       return found ? mUnitsAmbiguous.GetValue(found).GetCount() : 0;
    }
 

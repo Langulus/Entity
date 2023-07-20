@@ -44,7 +44,7 @@ namespace Langulus::Entity
    Trait* Thing::GetLocalTrait(TMeta id, const Index& index) {
       if (id) {
          // Search a typed trait                                        
-         const auto found = mTraits.FindKeyIndex(id);
+         const auto found = mTraits.Find(id);
          if (found)
             return &mTraits.GetValue(found)[index];
          return nullptr;
@@ -157,7 +157,7 @@ namespace Langulus::Entity
    ///   @param id - type of trait to remove                                  
    ///   @return the number of removed traits                                 
    Count Thing::RemoveTrait(TMeta id) {
-      const auto found = mTraits.FindKeyIndex(id);
+      const auto found = mTraits.Find(id);
       if (found) {
          const auto removed = mTraits.GetValue(found).GetCount();
          mTraits.RemoveIndex(found);
@@ -173,7 +173,7 @@ namespace Langulus::Entity
    ///   @param id - type and value to remove                                 
    ///   @return the number of removed traits                                 
    Count Thing::RemoveTrait(const Trait& prototype) {
-      const auto found = mTraits.FindKeyIndex(prototype.GetTrait());
+      const auto found = mTraits.Find(prototype.GetTrait());
       if (found) {
          const auto removed = mTraits.GetValue(found).Remove(prototype);
          if (removed) {
@@ -190,7 +190,7 @@ namespace Langulus::Entity
    ///   @param id - type of trait to check                                   
    ///   @return the number of matching traits                                
    Count Thing::HasTraits(TMeta id) const {
-      const auto found = mTraits.FindKeyIndex(id);
+      const auto found = mTraits.Find(id);
       if (found)
          return mTraits.GetValue(found).GetCount();
       return 0;
@@ -200,7 +200,7 @@ namespace Langulus::Entity
    ///   @param prototype - trait to search for                               
    ///   @return the number of matching traits                                
    Count Thing::HasTraits(const Trait& prototype) const {
-      const auto found = mTraits.FindKeyIndex(prototype.GetTrait());
+      const auto found = mTraits.Find(prototype.GetTrait());
       if (!found)
          return 0;
 
