@@ -99,7 +99,7 @@ namespace Langulus::Entity
          }
 
          // Check dynamic traits in the entity                          
-         const auto found = mTraits.FindKeyIndex(trait);
+         const auto found = mTraits.Find(trait);
          if (found)
             results += mTraits.GetValue(found);
 
