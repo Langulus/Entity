@@ -227,7 +227,7 @@ namespace Langulus::Entity
       if constexpr (SEEK & Seek::Here) {
          // Seek here if requested                                      
          auto output = GetTrait(meta, offset);
-         if (!output.IsEmpty())
+         if (output)
             return Abandon(output);
       }
 
@@ -236,7 +236,7 @@ namespace Langulus::Entity
          if (mOwner) {
             auto output = mOwner->template
                SeekTrait<Seek::HereAndAbove>(meta, offset);
-            if (!output.IsEmpty())
+            if (output)
                return Abandon(output);
          }
       }
@@ -246,7 +246,7 @@ namespace Langulus::Entity
          for (auto child : mChildren) {
             auto output = child->template
                SeekTrait<Seek::HereAndBelow>(meta, offset);
-            if (!output.IsEmpty())
+            if (output)
                return Abandon(output);
          }
       }
@@ -343,7 +343,7 @@ namespace Langulus::Entity
          return Flow::Continue;
       });
 
-      if (!result.IsEmpty())
+      if (result)
          return Abandon(result);
 
       // If reached, then no trait was found in the descriptor          

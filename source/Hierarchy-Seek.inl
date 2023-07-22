@@ -176,7 +176,7 @@ namespace Langulus::Entity
    Trait Hierarchy::SeekTrait(TMeta meta, Index offset) {
       for (auto owner : *this) {
          auto result = owner->template SeekTrait<SEEK>(meta, offset);
-         if (!result.IsEmpty())
+         if (result)
             return result;
       }
 
@@ -252,7 +252,7 @@ namespace Langulus::Entity
          return Flow::Continue;
       });
 
-      if (!result.IsEmpty())
+      if (result)
          return Abandon(result);
 
       // If reached, then no trait was found in the descriptor          

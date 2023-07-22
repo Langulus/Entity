@@ -83,7 +83,7 @@ namespace Langulus::Entity
       // If after all attempts there's still active libraries, then     
       // something is definitely not right. This will always result in  
       // a crash, since we can't really throw inside a destructor       
-      if (!mLibraries.IsEmpty()) {
+      if (mLibraries) {
          Logger::Error(this, ": Can't unload last module(s): ");
          for (auto library : mLibraries)
             Logger::Append(library->mKey, " ");
@@ -103,7 +103,7 @@ namespace Langulus::Entity
 
       // Check if module is already instantiated                        
       auto& foundModules = GetModules(library.mModuleType);
-      if (!foundModules.IsEmpty())
+      if (foundModules)
          return foundModules[0];
 
       // A module instance doesn't exist yet, so instantiate it         
@@ -140,7 +140,7 @@ namespace Langulus::Entity
       const auto found = map.Find(type);
       if (found) {
          auto& list = map.GetValue(found);
-         if (list.Remove(module) && list.IsEmpty()) {
+         if (list.Remove(module) && !list) {
             VERBOSE("Unregistering `", type, '`');
             map.RemoveIndex(found);
          }
@@ -184,7 +184,7 @@ namespace Langulus::Entity
 
          // Make sure we end up in an invariant state                   
          mModules[info->mPriority].Remove(module);
-         if (mModules[info->mPriority].IsEmpty())
+         if (!mModules[info->mPriority])
             mModules.RemoveKey(info->mPriority);
 
          UnregisterAllBases(mModulesByType, module, module->GetType());
@@ -349,7 +349,7 @@ namespace Langulus::Entity
             }
          }
 
-         if (list->mValue.IsEmpty())
+         if (!list->mValue)
             list = mModules.RemoveIndex(list);
       }
 

@@ -31,7 +31,7 @@ namespace Langulus::Entity
    ///   @param text - text to execute                                        
    ///   @return the results of the execution                                 
    Any Thing::Run(const Lingua& text) {
-      if (text.IsEmpty())
+      if (!text)
          return {};
 
       // Message is still contextless, we don't know where exactly to   
@@ -81,7 +81,7 @@ namespace Langulus::Entity
    /// Create/Destroy stuff inside entity's context                           
    ///   @param verb - creation verb                                          
    void Thing::Create(Verb& verb) {
-      if (verb.IsEmpty())
+      if (!verb)
          return;
 
       // Scan the request                                               
@@ -159,7 +159,7 @@ namespace Langulus::Entity
 
       const auto selectTrait = [&](const MetaTrait* trait) {
          auto found = GetTrait(trait);
-         if (found.IsEmpty()) {
+         if (!found) {
             mismatch = true;
             return Flow::Break;
          }
@@ -188,7 +188,7 @@ namespace Langulus::Entity
             // Start with this one                                      
             Verbs::Select selector {construct.GetArgument()};
             Select(selector);
-            if (!selector.GetOutput().IsEmpty()) {
+            if (selector.GetOutput()) {
                selectedEntities << this;
                return Flow::Continue;
             }
@@ -252,19 +252,19 @@ namespace Langulus::Entity
 
       if (!mismatch) {
          // We're not seeking an entity, but components/traits          
-         if (!selectedTraits.IsEmpty()) {
+         if (selectedTraits) {
             ENTITY_SELECTION_VERBOSE_SELF(Logger::Green,
                "Trait(s) selected: ", selectedTraits);
             verb << selectedTraits;
          }
 
-         if (!selectedUnits.IsEmpty()) {
+         if (selectedUnits) {
             ENTITY_SELECTION_VERBOSE_SELF(Logger::Green,
                "Unit(s) selected: ", selectedUnits);
             verb << selectedUnits;
          }
 
-         if (!selectedEntities.IsEmpty()) {
+         if (selectedEntities) {
             ENTITY_SELECTION_VERBOSE_SELF(Logger::Green,
                "Entity(s) selected: ", selectedEntities);
             verb << selectedEntities;

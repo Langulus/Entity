@@ -116,18 +116,18 @@ namespace Langulus::Entity
       Trait output;
       for (auto& unit : mUnitsList) {
          auto t = unit->GetMember(id.GetTrait(), index);
-         if (!t.IsEmpty()) {
+         if (t) {
             output = Trait::From(id.GetTrait(), t);
             break;
          }
       }
 
-      if (!output.IsEmpty())
+      if (output)
          return Abandon(output);
 
       // Finally, check this entity's static traits                     
       auto t = GetMember(id.GetTrait(), index);
-      if (!t.IsEmpty())
+      if (t)
          return Trait::From(id.GetTrait(), t);
 
       // Nothing was found                                              

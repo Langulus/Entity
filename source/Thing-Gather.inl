@@ -107,7 +107,7 @@ namespace Langulus::Entity
          for (auto& unit : mUnitsList) {
             Offset index {};
             auto t = unit->GetMember(trait, index);
-            while (!t.IsEmpty()) {
+            while (t) {
                results <<= Trait::From(trait, t);
                t = unit->GetMember(trait, ++index);
             }
@@ -164,7 +164,7 @@ namespace Langulus::Entity
          for (auto& unit : mUnitsList) {
             Offset index {};
             auto t = unit->GetMember(nullptr, index);
-            while (!t.IsEmpty()) {
+            while (t) {
                try { results << t.template AsCast<D>(); }
                catch (...) {}
 
@@ -175,7 +175,7 @@ namespace Langulus::Entity
          // Then check the Thing's members                              
          Offset index {};
          auto t = GetMember(nullptr, index);
-         while (!t.IsEmpty()) {
+         while (t) {
             try { results << t.template AsCast<D>(); }
             catch (...) {}
 

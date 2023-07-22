@@ -28,7 +28,7 @@ namespace Langulus::Entity
    ///   @param descriptor - instructions for creating the entity             
    Thing::Thing(const Descriptor& descriptor)
       : Resolvable {MetaOf<Thing>()} {
-      if (!descriptor.IsEmpty()) {
+      if (descriptor) {
          Verbs::Create creator {descriptor};
          Create(creator);
       }
@@ -47,7 +47,7 @@ namespace Langulus::Entity
          mFlow = parent->GetFlow();
       }
 
-      if (!descriptor.IsEmpty()) {
+      if (descriptor) {
          // Create any subthings/traits/unit in this thing              
          Verbs::Create creator {descriptor};
          Create(creator);
@@ -126,7 +126,7 @@ namespace Langulus::Entity
    /// Convert to text, by writing a short name or address                    
    Thing::operator Debug() const {
       const auto name = GetName();
-      if (!name.IsEmpty()) {
+      if (name) {
          Debug result;
          result += '#';
          result += name;
@@ -140,7 +140,7 @@ namespace Langulus::Entity
    void Thing::DumpHierarchy() const {
       const auto tab = Logger::Verbose("** ", *this, Logger::Tabs {});
 
-      if (!mTraits.IsEmpty()) {
+      if (mTraits) {
          Logger::Verbose(".. contains ", mTraits.GetCount(), " traits:");
          for (auto traitpair : mTraits) {
             for (auto& trait : traitpair.mValue)
@@ -148,13 +148,13 @@ namespace Langulus::Entity
          }
       }
 
-      if (!mUnitsList.IsEmpty()) {
+      if (mUnitsList) {
          Logger::Verbose("++ contains ", mUnitsList.GetCount(), " units:");
          for (auto& unit : mUnitsList)
             Logger::Verbose("+ ", *unit);
       }
 
-      if (!mChildren.IsEmpty()) {
+      if (mChildren) {
          Logger::Verbose("** contains ", mChildren.GetCount(), " child entities:");
          for (auto& child : mChildren)
             child->DumpHierarchy();
@@ -253,7 +253,7 @@ namespace Langulus::Entity
          const auto found = mUnitsAmbiguous.Find(meta);
          if (found) {
             const auto& bucket = mUnitsAmbiguous.GetValue(found);
-            if (what.GetArgument().IsEmpty())
+            if (!what.GetArgument())
                return bucket[index];
 
             // Check all units in that bucket for required properties   

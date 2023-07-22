@@ -120,7 +120,7 @@ namespace Langulus::Entity
    ///              different runtimes should be explicitly disallowed        
    ///   @return a pointer to the runtime, if available                       
    Runtime* Unit::GetRuntime() const noexcept {
-      if (mOwners.IsEmpty())
+      if (!mOwners)
          return nullptr;
       return mOwners[0]->GetRuntime();
    }

@@ -18,10 +18,10 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(root.mFlow.Get() == nullptr);
          REQUIRE(root.mFlow.IsPinned() == false);
          REQUIRE(root.mRefreshRequired == false);
-         REQUIRE(root.mChildren.IsEmpty());
-         REQUIRE(root.mUnitsList.IsEmpty());
-         REQUIRE(root.mUnitsAmbiguous.IsEmpty());
-         REQUIRE(root.mTraits.IsEmpty());
+         REQUIRE(!root.mChildren);
+         REQUIRE(!root.mUnitsList);
+         REQUIRE(!root.mUnitsAmbiguous);
+         REQUIRE(!root.mTraits);
          REQUIRE(root.GetReferences() == 1);
       }
    }
@@ -39,9 +39,9 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(root.mRefreshRequired == false);
          REQUIRE(root.mChildren.GetCount() == 1);
          REQUIRE(root.mChildren[0] == &child);
-         REQUIRE(root.mUnitsList.IsEmpty());
-         REQUIRE(root.mUnitsAmbiguous.IsEmpty());
-         REQUIRE(root.mTraits.IsEmpty());
+         REQUIRE(!root.mUnitsList);
+         REQUIRE(!root.mUnitsAmbiguous);
+         REQUIRE(!root.mTraits);
          REQUIRE(root.GetReferences() == 2);
 
          REQUIRE(child.mOwner == &root);
@@ -50,10 +50,10 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(child.mFlow.Get() == nullptr);
          REQUIRE(child.mFlow.IsPinned() == false);
          REQUIRE(child.mRefreshRequired == false);
-         REQUIRE(child.mChildren.IsEmpty());
-         REQUIRE(child.mUnitsList.IsEmpty());
-         REQUIRE(child.mUnitsAmbiguous.IsEmpty());
-         REQUIRE(child.mTraits.IsEmpty());
+         REQUIRE(!child.mChildren);
+         REQUIRE(!child.mUnitsList);
+         REQUIRE(!child.mUnitsAmbiguous);
+         REQUIRE(!child.mTraits);
          REQUIRE(child.GetReferences() == 2);
       }
    }
@@ -90,8 +90,8 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.mFlow.IsPinned() == false);
             REQUIRE(root.mRefreshRequired == false);
             REQUIRE(root.mChildren.GetCount() == 1);
-            REQUIRE(root.mUnitsList.IsEmpty());
-            REQUIRE(root.mTraits.IsEmpty());
+            REQUIRE(!root.mUnitsList);
+            REQUIRE(!root.mTraits);
             REQUIRE(root.GetReferences() == 2);
 
             auto child1 = root.mChildren[0];
@@ -102,9 +102,9 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(child1->mFlow.Get() == root.mFlow);
             REQUIRE(child1->mFlow.IsPinned() == false);
             REQUIRE(child1->mRefreshRequired == false);
-            REQUIRE(child1->mChildren.IsEmpty());
-            REQUIRE(child1->mUnitsList.IsEmpty());
-            REQUIRE(child1->mTraits.IsEmpty());
+            REQUIRE(!child1->mChildren);
+            REQUIRE(!child1->mUnitsList);
+            REQUIRE(!child1->mTraits);
             REQUIRE(child1->GetReferences() == 3);
          }
       }
@@ -173,9 +173,9 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.mFlow.Get() == nullptr);
             REQUIRE(root.mFlow.IsPinned() == false);
             REQUIRE(root.mRefreshRequired == true);
-            REQUIRE(root.mChildren.IsEmpty());
-            REQUIRE(root.mUnitsList.IsEmpty());
-            REQUIRE(root.mUnitsAmbiguous.IsEmpty());
+            REQUIRE(!root.mChildren);
+            REQUIRE(!root.mUnitsList);
+            REQUIRE(!root.mUnitsAmbiguous);
             REQUIRE(root.mTraits.GetCount() == 1);
             REQUIRE(root.GetReferences() == 1);
 
@@ -199,9 +199,9 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.mFlow.Get() == nullptr);
             REQUIRE(root.mFlow.IsPinned() == false);
             REQUIRE(root.mRefreshRequired == true);
-            REQUIRE(root.mChildren.IsEmpty());
-            REQUIRE(root.mUnitsList.IsEmpty());
-            REQUIRE(root.mUnitsAmbiguous.IsEmpty());
+            REQUIRE(!root.mChildren);
+            REQUIRE(!root.mUnitsList);
+            REQUIRE(!root.mUnitsAmbiguous);
             REQUIRE(root.mTraits.GetCount() == 1);
             REQUIRE(root.GetName() == "Dimo");
             REQUIRE(root.GetReferences() == 1);
@@ -274,8 +274,8 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(child2->mFlow.Get() == root.mFlow);
          REQUIRE(child2->mFlow.IsPinned() == false);
          REQUIRE(child2->mRefreshRequired == true);
-         REQUIRE(child2->mChildren.IsEmpty());
-         REQUIRE(child2->mUnitsList.IsEmpty());
+         REQUIRE(!child2->mChildren);
+         REQUIRE(!child2->mUnitsList);
          REQUIRE(child2->mTraits.GetCount() == 1);
          REQUIRE(child2->GetName() == "Child2");
          REQUIRE(child2->GetReferences() == 2);
@@ -287,8 +287,8 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(grandchild1->mFlow.Get() == root.mFlow);
          REQUIRE(grandchild1->mFlow.IsPinned() == false);
          REQUIRE(grandchild1->mRefreshRequired == true);
-         REQUIRE(grandchild1->mChildren.IsEmpty());
-         REQUIRE(grandchild1->mUnitsList.IsEmpty());
+         REQUIRE(!grandchild1->mChildren);
+         REQUIRE(!grandchild1->mUnitsList);
          REQUIRE(grandchild1->mTraits.GetCount() == 1);
          REQUIRE(grandchild1->GetName() == "GrandChild1");
          REQUIRE(grandchild1->GetReferences() == 2);
@@ -300,8 +300,8 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(grandchild2->mFlow.Get() == root.mFlow);
          REQUIRE(grandchild2->mFlow.IsPinned() == false);
          REQUIRE(grandchild2->mRefreshRequired == true);
-         REQUIRE(grandchild2->mChildren.IsEmpty());
-         REQUIRE(grandchild2->mUnitsList.IsEmpty());
+         REQUIRE(!grandchild2->mChildren);
+         REQUIRE(!grandchild2->mUnitsList);
          REQUIRE(grandchild2->mTraits.GetCount() == 1);
          REQUIRE(grandchild2->GetName() == "GrandChild2");
          REQUIRE(grandchild2->GetReferences() == 2);
@@ -416,7 +416,7 @@ SCENARIO("Testing Thing", "[thing]") {
 
          THEN("Properties should match") {
             REQUIRE(removed == 2);
-            REQUIRE(root.mUnitsList.IsEmpty());
+            REQUIRE(!root.mUnitsList);
             REQUIRE(nullptr == Fractalloc.Find(MetaOf<TestUnit1>(), unitmemory1));
             REQUIRE(nullptr == Fractalloc.Find(MetaOf<TestUnit2>(), unitmemory2));
          }

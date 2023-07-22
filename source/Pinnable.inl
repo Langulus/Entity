@@ -24,8 +24,8 @@ namespace Langulus::Entity
    ///   @param desc - the descriptor to use                                  
    TEMPLATE() LANGULUS(INLINED)
    PINNED()::Pinnable(const Descriptor& desc) requires (!CT::DescriptorMakable<T>)
-      : T {desc.Is<T>() && !desc.IsEmpty() ? desc.Get<T>() : T{}} {
-      if (!desc.Is<T>() || desc.IsEmpty())
+      : T {desc.Is<T>() && desc ? desc.Get<T>() : T{}} {
+      if (!desc.Is<T>() || !desc)
          LANGULUS_THROW(Construct, "Can't construct pinnable");
    }
 

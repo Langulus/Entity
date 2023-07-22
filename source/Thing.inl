@@ -134,7 +134,7 @@ namespace Langulus::Entity
       const auto found = mUnitsAmbiguous.Find(type);
       if (found) {
          auto& set = mUnitsAmbiguous.GetValue(found);
-         if (set.Remove(unit) && set.IsEmpty())
+         if (set.Remove(unit) && !set)
             mUnitsAmbiguous.RemoveIndex(found);
       }
 
@@ -409,7 +409,7 @@ namespace Langulus::Entity
          if (producer->template CastsTo<Unit>()) {
             // Data is producible from a unit                           
             auto producers = GatherUnits<SEEK>(producer);
-            if (producers.IsEmpty()) {
+            if (!producers) {
                LANGULUS_THROW(Construct,
                   "No viable unit producers available");
             }
@@ -424,7 +424,7 @@ namespace Langulus::Entity
          else if (producer->template CastsTo<Module>()) {
             // Data is producible from a module                         
             auto producers = GetRuntime()->GetModules(producer);
-            if (producers.IsEmpty()) {
+            if (!producers) {
                LANGULUS_THROW(Construct,
                   "No viable module producers available");
             }
@@ -446,7 +446,7 @@ namespace Langulus::Entity
          // so we know that only a module/unit can concretize it        
          // Gather all units in the desired part of the hierarchy       
          auto producers = GatherUnits<Unit, SEEK>();
-         if (!producers.IsEmpty()) {
+         if (producers) {
             // Potential unit producers found, attempt creation there   
             Verbs::Create creator {&descriptor};
             if (Flow::DispatchFlat(producers, creator))
@@ -480,7 +480,7 @@ namespace Langulus::Entity
    ///   @return true if succesfully executed                                 
    template<Seek SEEK>
    bool Unit::DoInHierarchy(Verb& verb) {
-      if (mOwners.IsEmpty()) {
+      if (!mOwners) {
          Logger::Warning("No owners available for executing ", verb);
          return false;
       }

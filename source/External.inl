@@ -291,7 +291,7 @@ namespace Langulus::A
    ///   @param where - line indices                                          
    ///   @return the (eventually indirected) line indices                     
    inline Math::Vec2u Geometry::InnerGetIndices(const Data* indices, const Math::Vec2u& where) const {
-      if (!indices || indices->IsEmpty())
+      if (!indices || !*indices)
          return where;
 
       if (indices->IsExact<std::uint8_t>()) {
@@ -325,7 +325,7 @@ namespace Langulus::A
    ///   @param where - triangle indices                                      
    ///   @return the (eventually indirected) triangle indices                 
    inline Math::Vec3u Geometry::InnerGetIndices(const Data* indices, const Math::Vec3u& where) const {
-      if (!indices || indices->IsEmpty())
+      if (!indices || !*indices)
          return where;
 
       if (indices->IsExact<std::uint8_t>()) {
@@ -490,7 +490,7 @@ namespace Langulus::A
    Anyness::Any Geometry::GetLineTrait(Offset lineIndex) const {
       const auto indices = GetLineIndices(lineIndex);
       const auto soughtt = GetData<T>(0);
-      if (!soughtt || soughtt->IsEmpty())
+      if (!soughtt || !*soughtt)
          return {};
 
       Anyness::Block soughtDecayed;
@@ -580,7 +580,7 @@ namespace Langulus::A
    Anyness::Any Geometry::GetTriangleTrait(Offset triangleIndex) const {
       const auto indices = GetTriangleIndices(triangleIndex);
       const auto soughtt = GetData<T>(0);
-      if (!soughtt || soughtt->IsEmpty())
+      if (!soughtt || !*soughtt)
          return {};
 
       Anyness::Block soughtDecayed;
