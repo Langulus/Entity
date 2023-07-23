@@ -10,7 +10,6 @@
 #include <Anyness/TMap.hpp>
 #include <Anyness/TAny.hpp>
 
-
 namespace Langulus::Entity
 {
 
@@ -118,6 +117,11 @@ namespace Langulus::Entity
       NOD() LANGULUS_API(ENTITY)
       const ModuleList& GetModules(DMeta) const noexcept;
 
+      template<CT::Module M>
+      NOD() const ModuleList& GetModules() const noexcept {
+         return GetModules(RTTI::MetaData::Of<M>());
+      }
+
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
          NOD() LANGULUS_API(ENTITY)
          SharedLibrary GetDependency(const Token&) const noexcept;
@@ -128,9 +132,12 @@ namespace Langulus::Entity
 
       NOD() LANGULUS_API(ENTITY)
       A::File* GetFile(const Path&);
-
       NOD() LANGULUS_API(ENTITY)
       A::Folder* GetFolder(const Path&);
+      NOD() LANGULUS_API(ENTITY)
+      const Path& GetWorkingPath() const;
+      NOD() LANGULUS_API(ENTITY)
+      const Path& GetDataPath() const;
 
       LANGULUS_API(ENTITY)
       void Update(Time);

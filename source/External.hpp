@@ -269,11 +269,24 @@ namespace Langulus::A
    ///   Abstract file system module                                          
    ///                                                                        
    struct FileSystem : Entity::Module {
+   protected:
+      // Working directory path                                         
+      // This is the only full path that is exposed to the system,      
+      // unless LANGULUS(PARANOID) is enabled                           
+      Anyness::Path mWorkingPath;
+      // Main data directory, for both reading and writing              
+      // Relative to mWorkingPath                                       
+      Anyness::Path mMainDataPath;
+
+   public:
       LANGULUS_BASES(Entity::Module);
       using Entity::Module::Module;
 
       NOD() virtual const File* GetFile(const Anyness::Path&) const = 0;
       NOD() virtual const Folder* GetFolder(const Anyness::Path&) const = 0;
+
+      NOD() const Anyness::Path& GetWorkingPath() const noexcept;
+      NOD() const Anyness::Path& GetDataPath() const noexcept;
    };
 
    ///                                                                        
@@ -343,6 +356,7 @@ namespace Langulus::A
    protected:
       Anyness::Path mFolderPath;
       bool mExists {};
+      bool mIsReadOnly {};
 
    public:
       LANGULUS(PRODUCER) FileSystem;
@@ -350,6 +364,7 @@ namespace Langulus::A
       using Entity::Unit::Unit;
 
       NOD() bool Exists() const noexcept;
+      NOD() bool IsReadOnly() const noexcept;
       NOD() const Anyness::Path& GetFolderPath() const noexcept;
 
       NOD() virtual const File* GetFile(const Anyness::Path&) const = 0;

@@ -7,7 +7,7 @@
 ///                                                                           
 #include "Thing.hpp"
 #include "Runtime.hpp"
-#include "External.hpp"
+#include "External.inl"
 #include <Anyness/Path.hpp>
 
 #if LANGULUS_OS(WINDOWS)
@@ -445,36 +445,42 @@ namespace Langulus::Entity
    ///   @param path - the path for the file                                  
    ///   @return the file interface, or nullptr if file doesn't exist         
    A::File* Runtime::GetFile(const Path& path) {
-      const auto& fileSystems = GetModules(MetaOf<A::FileSystem>());
-      for (auto module : fileSystems) {
-         const auto fs = dynamic_cast<A::FileSystem*>(module);
-         if (!fs)
-            continue;
-
-         const auto file = fs->GetFile(path);
-         if (file)
-            return const_cast<A::File*>(file);
-      }
-
-      return nullptr;
+      auto& fileSystems = GetModules<A::FileSystem>();
+      LANGULUS_ASSERT(fileSystems, Module,
+         "Can't retrieve a file", ", no file system module available");
+      return const_cast<A::File*>(
+         fileSystems.template As<A::FileSystem*>()->GetFile(path)
+      );
    }
    
    /// Get a folder interface, relying on external modules to find it         
    ///   @param path - the path for the folder                                
    ///   @return the folder interface, or nullptr if folder doesn't exist     
    A::Folder* Runtime::GetFolder(const Path& path) {
-      const auto& fileSystems = GetModules(MetaOf<A::FileSystem>());
-      for (auto module : fileSystems) {
-         const auto fs = dynamic_cast<A::FileSystem*>(module);
-         if (!fs)
-            continue;
+      auto& fileSystems = GetModules<A::FileSystem>();
+      LANGULUS_ASSERT(fileSystems, Module,
+         "Can't retrieve a file", ", no file system module available");
+      return const_cast<A::Folder*>(
+         fileSystems.template As<A::FileSystem*>()->GetFolder(path)
+      );
+   }
 
-         const auto file = fs->GetFolder(path);
-         if (file)
-            return const_cast<A::Folder*>(file);
-      }
+   /// Get the current working path (where the main exe was executed)         
+   ///   @return the path                                                     
+   const Path& Runtime::GetWorkingPath() const {
+      auto& fileSystems = GetModules<A::FileSystem>();
+      LANGULUS_ASSERT(fileSystems, Module,
+         "Can't retrieve working path", ", no file system module available");
+      return fileSystems.template As<A::FileSystem*>()->GetWorkingPath();
+   }
 
-      return nullptr;
+   /// Get the current data path, like GetWorkingPath() / "data"              
+   ///   @return the path                                                     
+   const Path& Runtime::GetDataPath() const {
+      auto& fileSystems = GetModules<A::FileSystem>();
+      LANGULUS_ASSERT(fileSystems, Module,
+         "Can't retrieve data path", ", no file system module available");
+      return fileSystems.template As<A::FileSystem*>()->GetDataPath();
    }
 
    /// Update the runtime, by updating all module instantiations by order of  

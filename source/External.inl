@@ -122,6 +122,25 @@ namespace Langulus::A
 {
 
    ///                                                                        
+   ///   Abstract file system interface                                       
+   ///                                                                        
+
+   /// Get the current working path (where the main exe was executed)         
+   ///   @return the path                                                     
+   LANGULUS(INLINED)
+   const Anyness::Path& FileSystem::GetWorkingPath() const noexcept {
+      return mWorkingPath;
+   }
+
+   /// Get the current data path, like GetWorkingPath() / "data"              
+   ///   @return the path                                                     
+   LANGULUS(INLINED)
+   const Anyness::Path& FileSystem::GetDataPath() const noexcept {
+      return mMainDataPath;
+   }
+
+
+   ///                                                                        
    ///   Abstract file interface                                              
    ///                                                                        
    
@@ -175,19 +194,26 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract folder interface                                            
    ///                                                                        
-   
-   /// Get the full path of the folder                                        
-   ///   @return a reference to the path                                      
-   LANGULUS(INLINED)
-   const Anyness::Path& Folder::GetFolderPath() const noexcept {
-      return mFolderPath;
-   }
-
+  
    /// Check if folder physically exists                                      
    ///   @return true if folder exists                                        
    LANGULUS(INLINED)
    bool Folder::Exists() const noexcept {
       return mExists;
+   }
+
+   /// Check if file is read-only                                             
+   ///   @return true if file exists and is read-only                         
+   LANGULUS(INLINED)
+   bool Folder::IsReadOnly() const noexcept {
+      return mIsReadOnly;
+   }
+
+   /// Get the full path of the folder                                        
+   ///   @return a reference to the path                                      
+   LANGULUS(INLINED)
+   const Anyness::Path& Folder::GetFolderPath() const noexcept {
+      return mFolderPath;
    }
 
 
