@@ -444,25 +444,21 @@ namespace Langulus::Entity
    /// Get a file interface, relying on external modules to find it           
    ///   @param path - the path for the file                                  
    ///   @return the file interface, or nullptr if file doesn't exist         
-   A::File* Runtime::GetFile(const Path& path) {
+   Ptr<A::File> Runtime::GetFile(const Path& path) {
       auto& fileSystems = GetModules<A::FileSystem>();
       LANGULUS_ASSERT(fileSystems, Module,
          "Can't retrieve a file", ", no file system module available");
-      return const_cast<A::File*>(
-         fileSystems.template As<A::FileSystem*>()->GetFile(path)
-      );
+      return fileSystems.template As<A::FileSystem*>()->GetFile(path);
    }
    
    /// Get a folder interface, relying on external modules to find it         
    ///   @param path - the path for the folder                                
    ///   @return the folder interface, or nullptr if folder doesn't exist     
-   A::Folder* Runtime::GetFolder(const Path& path) {
+   Ptr<A::Folder> Runtime::GetFolder(const Path& path) {
       auto& fileSystems = GetModules<A::FileSystem>();
       LANGULUS_ASSERT(fileSystems, Module,
          "Can't retrieve a file", ", no file system module available");
-      return const_cast<A::Folder*>(
-         fileSystems.template As<A::FileSystem*>()->GetFolder(path)
-      );
+      return fileSystems.template As<A::FileSystem*>()->GetFolder(path);
    }
 
    /// Get the current working path (where the main exe was executed)         
