@@ -24,7 +24,7 @@ namespace Langulus::Entity
       LANGULUS(UNINSERTABLE) false;
       LANGULUS_BASES(Resolvable);
 
-   protected: TESTING(public:)
+   protected: IF_LANGULUS_TESTING(public:)
       friend class Thing;
 
       // Things that are coupled with this unit                         

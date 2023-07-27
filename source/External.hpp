@@ -282,8 +282,8 @@ namespace Langulus::A
       LANGULUS_BASES(Entity::Module);
       using Entity::Module::Module;
 
-      NOD() virtual Anyness::Ptr<File> GetFile(const Anyness::Path&) = 0;
-      NOD() virtual Anyness::Ptr<Folder> GetFolder(const Anyness::Path&) = 0;
+      NOD() virtual Anyness::Ref<File> GetFile(const Anyness::Path&) = 0;
+      NOD() virtual Anyness::Ref<Folder> GetFolder(const Anyness::Path&) = 0;
 
       NOD() const Anyness::Path& GetWorkingPath() const noexcept;
       NOD() const Anyness::Path& GetDataPath() const noexcept;

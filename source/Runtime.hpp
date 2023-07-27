@@ -67,28 +67,26 @@ namespace Langulus::Entity
          }
       };
 
+      // @attention, any member that requires dynamic allocation must   
+      // have its member type reflected prior to loading any shared     
+      // objects. See Runtime::LoadSharedLibrary.                       
+      
       // The owner of the runtime                                       
       Thing* mOwner {};
-
-      // Number of modules that are waiting to be destroyed             
-      Count mMarkedForDeletion {};
-      // Number of libraries that are waiting to be unloaded            
-      Count mMarkedForUnload {};
-
       // Loaded shared libraries, indexed by filename                   
       // This is a static registry - all Runtimes use the same shared   
       // library objects, but manage their own module instantiations    
       static TUnorderedMap<Token, SharedLibrary> mLibraries;
-
       // Shared library dependencies for all externally registered types
       static TUnorderedMap<const RTTI::Meta*, SharedLibrary> mDependencies;
-
       // Instantiated modules, sorted by priority                       
       TMap<Real, ModuleList> mModules;
-
       // Instantiated modules, indexed by type                          
       TUnorderedMap<DMeta, ModuleList> mModulesByType;
 
+   protected:
+      NOD() LANGULUS_API(ENTITY)
+      SharedLibrary LoadSharedLibrary(const Token&);
       NOD() bool UnloadSharedLibrary(const SharedLibrary&);
 
    public:
@@ -97,13 +95,12 @@ namespace Langulus::Entity
       Runtime() = delete;
       Runtime(Runtime&&) noexcept = default;
 
-      LANGULUS_API(ENTITY) Runtime(Thing*) noexcept;
-      LANGULUS_API(ENTITY) ~Runtime();
+      LANGULUS_API(ENTITY)
+      Runtime(Thing*) noexcept;
+      LANGULUS_API(ENTITY)
+      ~Runtime();
 
       NOD() auto GetOwner() const noexcept { return mOwner; }
-
-      NOD() LANGULUS_API(ENTITY)
-      SharedLibrary LoadSharedLibrary(const Token&);
 
       NOD() LANGULUS_API(ENTITY)
       Module* InstantiateModule(const Token&, const Descriptor& = {});

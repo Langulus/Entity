@@ -46,7 +46,7 @@ namespace Langulus::Entity
       LANGULUS_BASES(Resolvable);
       LANGULUS_VERBS(Verbs::Create, Verbs::Select);
 
-   protected: TESTING(public:)
+   protected: IF_LANGULUS_TESTING(public:)
       LANGULUS_API(ENTITY) void ResetRuntime(Runtime*);
       LANGULUS_API(ENTITY) void ResetFlow(Temporal*);
 

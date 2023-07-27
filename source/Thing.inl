@@ -29,7 +29,7 @@
 namespace Langulus::Entity
 {
    
-   /// Remove a child                                                         
+   /// Add a child                                                            
    ///   @attention assumes entity is a valid pointer                         
    ///   @tparam TWOSIDED - true to also set the entity's owner;              
    ///                      used mainly internally to avoid endless loops     
@@ -37,7 +37,7 @@ namespace Langulus::Entity
    ///   @return the number of added children                                 
    template<bool TWOSIDED>
    Count Thing::AddChild(Thing* entity) {
-      LANGULUS_ASSUME(UserAssumes, nullptr != entity, "Bad entity pointer");
+      LANGULUS_ASSUME(UserAssumes, entity, "Bad entity pointer");
 
       const auto added = mChildren.Merge(entity);
       if constexpr (TWOSIDED) {
@@ -66,7 +66,7 @@ namespace Langulus::Entity
    ///   @return the number of removed children                               
    template<bool TWOSIDED>
    Count Thing::RemoveChild(Thing* entity) {
-      LANGULUS_ASSUME(UserAssumes, nullptr != entity, "Bad entity pointer");
+      LANGULUS_ASSUME(UserAssumes, entity, "Bad entity pointer");
       
       const auto removed = mChildren.Remove(entity);
       if constexpr (TWOSIDED) {

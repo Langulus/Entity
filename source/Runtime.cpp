@@ -89,7 +89,13 @@ namespace Langulus::Entity
             Logger::Append(library->mKey, " ");
          Logger::Error(this, ": This likely involves a memory leak, "
             "that withholds managed data, reflected by the given modules");
-         LANGULUS_THROW(Destruct, "Can't unload last module (s)");
+
+         #if LANGULUS_FEATURE(MEMORY_STATISTICS)
+            Fractalloc.CollectGarbage();
+            Fractalloc.DumpPools();
+         #endif
+
+         LANGULUS_THROW(Destruct, "Can't unload last module(s)");
       }
    }
 
@@ -298,13 +304,15 @@ namespace Langulus::Entity
       // It might throw if out of memory or on meta collision, while    
       // registering new types on the other side                        
       try {
-         // Make sure that const RTTI::Meta* type is registered here,   
-         // and not inside the library (nasty bugs otherwise)           
-         //TODO find a more elegant solution to this, preferably one that doesn't involve prebuild steps with cppast
+         // Make sure that all types used by the Runtime are reflected  
+         // here, and not inside any library (nasty bugs otherwise)     
+         (void)MetaOf<Real>();
          (void)MetaOf<Runtime>();
          (void)MetaOf<DMeta>();
          (void)MetaOf<Module>();
          (void)MetaOf<Unit>();
+         (void)MetaOf<ModuleList>();
+         (void)MetaOf<SharedLibrary>();
 
          library.mEntry(library.mModuleType, library.mTypes);
 
@@ -375,7 +383,6 @@ namespace Langulus::Entity
                "Unload has been postponed to the next library unload."
             );
             const_cast<SharedLibrary&>(library).mMarkedForUnload = true;
-            ++mMarkedForUnload;
          }
 
          return false;
@@ -395,11 +402,6 @@ namespace Langulus::Entity
       #else 
          #error Unsupported OS
       #endif
-
-      // Done, account for it, if it was marked for deletion            
-      if (wasMarked)
-         --mMarkedForUnload;
-
       return true;
    }
 
