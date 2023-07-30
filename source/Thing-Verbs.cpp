@@ -43,7 +43,7 @@ namespace Langulus::Entity
          Construct::From<Lingua>(static_cast<const Text&>(text))
       );
 
-      Verbs::InterpretTo<Flow::Scope> interpreter;
+      Verbs::InterpretAs<Flow::Scope> interpreter;
       if (!Flow::DispatchFlat(messages, interpreter)) {  
          Logger::Error("Messages failed to interpret to scope: ", messages);
          return {};
@@ -51,7 +51,7 @@ namespace Langulus::Entity
 
       // Execute the resulting scopes                                   
       Any results;
-      interpreter.GetOutput().ForEach([&](const Flow::Scope& scope) {
+      interpreter->ForEach([&](const Flow::Scope& scope) {
          results << Resolvable::Run(scope);
       });
 

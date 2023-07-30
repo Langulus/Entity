@@ -161,49 +161,60 @@ namespace Langulus::Entity
       }
    }
 
-   /// Update all children's Runtime(s) and Temporal(s)                       
-   /// This is used for the purpose of a main loop, but also supports sub     
-   /// systems and multiple runtimes with different environments              
-   ///   @param dt - delta time that has passed between updates               
-   void Thing::Update(Time) {
-      // Keep a flow inside the runtime?
-      /*
-      auto thisBlock = GetBlock();
-      for (auto unit : mUnits) {
-         if (unit->IsClassIrrelevant())
-            continue;
+   /// Simulate the hierarchy of things for a given period of time, by        
+   /// updating all runtimes and flows at and under this Thing                
+   /// Also synchronizes changes between all units, if mRefreshRequired       
+   ///   @param deltaTime - how much time passes for the simulation           
+   void Thing::Update(Time deltaTime) {
+      // Refresh the hierarchy on any changes, before updating anything 
+      Refresh();
 
-         if (unit->ClassIs<CFlow>()) {
-            // Update every flow                                          
-            // This will execute all verbs up to current   time, as well   
-            // as verbs with specific time and frequency                  
-            static_cast<CFlow*>(unit)->Update(thisBlock, dt);
-         }
-         else if (unit->ClassIs<CRuntime>()) {
-            // Update every system                                       
-            // This will also update all modules that   are instantiated   
-            // by the system component                                    
-            static_cast<CRuntime*>(unit)->Update(dt);
-         }
+      if (mFlow.IsPinned()) {
+         // This thing owns its flow, so we need to update it here      
+         // This will execute any temporally based verbs and scripts    
+         // Game logic basically happens in this flow                   
+         mFlow->Update(deltaTime);
       }
 
-      // Refresh all units if requested                                 
-      if (mRefreshRequired) {
-         mRefreshRequired = false;
-         for (auto unit : mUnits)
-            unit->Refresh();
+      if (mRuntime.IsPinned()) {
+         // This thing owns its runtime, so we need to update it here   
+         // This is where modules are updated in parallel, physical     
+         // simulations happen, images get rendered, etc.               
+         mRuntime->Update(deltaTime);
       }
 
-      // Nest update inside all children                                 
-      for (auto child : mChildren) {
-         if (child->IsClassIrrelevant())
-            continue;
-         child->Update(dt);
-      }*/
+      // Cascade the update down the hierarchy                          
+      for (auto& child : mChildren)
+         child->Update(deltaTime);
+   }
+
+   /// Refresh all units and children down the hierarchy                      
+   ///   @param force - force refresh                                         
+   void Thing::Refresh(bool force) {
+      if (!force && !mRefreshRequired)
+         return;
+
+      mRefreshRequired = false;
+
+      // Refresh all units                                              
+      for (auto& unit : mUnitsList)
+         unit->Refresh();
+
+      // And cascade down the hierarchy                                 
+      for (auto& child : mChildren)
+         child->Refresh(true);
    }
 
    /// Reset the entity, clearing all children, units, traits                 
    void Thing::Reset() {
+      // Decouple all children from this parent                         
+      for (auto& child : mChildren)
+         child->mOwner.Reset();
+
+      // Decouple all units from this owner                             
+      for (auto& unit : mUnitsList)
+         unit->mOwners.Remove(this);
+
       mChildren.Reset();
       mUnitsList.Reset();
       mUnitsAmbiguous.Reset();

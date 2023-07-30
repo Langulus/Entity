@@ -96,11 +96,12 @@ namespace Langulus::Entity
       LANGULUS_API(ENTITY) void Create(Verb&);
 
       template<Seek = Seek::HereAndAbove>
-      bool DoInHierarchy(Verb&);
+      Any RunIn(Verb&);
 
       LANGULUS_API(ENTITY) Any Run(const Lingua&);
 
       LANGULUS_API(ENTITY) void Update(Time);
+      LANGULUS_API(ENTITY) void Refresh(bool force = false);
       LANGULUS_API(ENTITY) void Reset();
 
       NOD() LANGULUS_API(ENTITY)

@@ -25,7 +25,6 @@ namespace Langulus::Entity
    using Flow::Seek;
    using Flow::Resolvable;
    using Flow::Temporal;
-   using Flow::Time;
    using Flow::Scope;
    using Flow::Code;
 
@@ -65,11 +64,11 @@ namespace Langulus::A
    struct Renderable;
    struct Light;
 
-   struct ContentModule;
-   struct Content;
-   struct Geometry;
+   struct AssetModule;
+   struct Asset;
+   struct Mesh;
    struct Material;
-   struct Texture;
+   struct Image;
 
 } // namespace Langulus::A
 

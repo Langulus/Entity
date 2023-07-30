@@ -56,12 +56,15 @@ namespace Langulus::Entity
       NOD() LANGULUS_API(ENTITY)
       const Hierarchy& GetOwners() const noexcept;
 
-      template<Seek = Seek::HereAndAbove>
-      bool DoInHierarchy(Verb&);
-
       NOD() LANGULUS_API(ENTITY)
       bool CompareDescriptor(const Block&) const;
       
+      ///                                                                     
+      ///   Flow                                                              
+      ///                                                                     
+      template<Seek = Seek::HereAndAbove>
+      Any RunIn(Verb&);
+
       ///                                                                     
       ///   Seek                                                              
       ///                                                                     

@@ -22,7 +22,7 @@ namespace Langulus
    ///   @param rhs - the geometry view to compare against                    
    ///   @return true if both views are the same                              
    LANGULUS(INLINED)
-   bool GeometryView::operator == (const GeometryView& rhs) const noexcept {
+   bool MeshView::operator == (const MeshView& rhs) const noexcept {
       return mPrimitiveCount == rhs.mPrimitiveCount &&
              mPrimitiveStart == rhs.mPrimitiveStart &&
              mIndexCount == rhs.mIndexCount &&
@@ -35,12 +35,12 @@ namespace Langulus
    /// Decay the geometry view to a list of points                            
    ///   @return the decayed view                                             
    LANGULUS(INLINED)
-   GeometryView GeometryView::Decay() const {
+   MeshView MeshView::Decay() const {
       LANGULUS_ASSERT(mPrimitiveCount && mTopology, Convert, "Bad vertex view");
       if (mTopology->template Is<A::Point>())
          return *this;
 
-      GeometryView result {*this};
+      MeshView result {*this};
       result.mTopology = MetaOf<A::Point>();
 
       // mPrimitiveCount corresponds to the number of points in these   
@@ -62,6 +62,16 @@ namespace Langulus
 
       return result;
    }
+   
+   /// Get the hash of a normalized descriptor (cached)                       
+   ///   @return the hash                                                     
+   LANGULUS(INLINED)
+   Hash MeshView::GetHash() const noexcept {
+      return HashOf(
+         mPrimitiveCount, mPrimitiveStart, mIndexCount, mIndexStart,
+         mTopology, mBilateral, mTextureMapping
+      );
+   }
 
 
    ///                                                                        
@@ -72,7 +82,7 @@ namespace Langulus
    ///   @param rhs - the texture view to compare against                     
    ///   @return true if both views are the same                              
    LANGULUS(INLINED)
-   bool TextureView::operator == (const TextureView& rhs) const noexcept {
+   bool ImageView::operator == (const ImageView& rhs) const noexcept {
       return mWidth == rhs.mWidth &&
              mHeight == rhs.mHeight &&
              mDepth == rhs.mDepth &&
@@ -84,36 +94,46 @@ namespace Langulus
    /// Get the number of pixels in the texture                                
    ///   @return the number of pixels                                         
    LANGULUS(INLINED)
-   constexpr uint32_t TextureView::GetPixelCount() const noexcept {
+   constexpr uint32_t ImageView::GetPixelCount() const noexcept {
       return mWidth * mHeight * mDepth * mFrames;
    }
 
    /// Get number of dimensions used for the image                            
    ///   @return return up to 4 dimensions                                    
    LANGULUS(INLINED)
-   constexpr uint32_t TextureView::GetDimensionCount() const noexcept {
+   constexpr uint32_t ImageView::GetDimensionCount() const noexcept {
       return (mWidth > 1) + (mHeight > 1) + (mDepth > 1) + (mFrames > 1);
    }
 
    /// Get the size in bytes for a single pixel                               
    ///   @return the size in bytes                                            
    LANGULUS(INLINED)
-   Size TextureView::GetPixelBytesize() const noexcept {
+   Size ImageView::GetPixelBytesize() const noexcept {
       return mFormat ? mFormat->mSize : 0;
    }
 
    /// Get the bytesize of the entire image across all dimensions             
    ///   @return the bytesize of the entire image                             
    LANGULUS(INLINED)
-   Size TextureView::GetBytesize() const noexcept {
+   Size ImageView::GetBytesize() const noexcept {
       return GetPixelCount() * GetPixelBytesize();
    }
 
    /// Get the number of channels inside the color format                     
    ///   @return the number of channels                                       
    LANGULUS(INLINED)
-   uint32_t TextureView::GetChannelCount() const noexcept {
+   uint32_t ImageView::GetChannelCount() const noexcept {
       return static_cast<uint32_t>(mFormat->GetMemberCount());
+   }
+   
+   /// Get the hash of a normalized descriptor (cached)                       
+   ///   @return the hash                                                     
+   LANGULUS(INLINED)
+   Hash ImageView::GetHash() const noexcept {
+      return HashOf(
+         mWidth, mHeight, mDepth, mFrames,
+         mFormat, mReverseFormat
+      );
    }
 
 } // namespace Langulus
@@ -299,7 +319,7 @@ namespace Langulus::A
    /// Get the topology of the geometry                                       
    ///   @return the topology type                                            
    LANGULUS(INLINED)
-   Anyness::DMeta Geometry::GetTopology() const noexcept {
+   Anyness::DMeta Mesh::GetTopology() const noexcept {
       return mView.mTopology;
    }
 
@@ -308,7 +328,7 @@ namespace Langulus::A
    ///   @return true if T matches topology                                   
    template<CT::Topology T>
    LANGULUS(INLINED)
-   bool Geometry::CheckTopology() const {
+   bool Mesh::CheckTopology() const {
       return mView.mTopology && mView.mTopology->template Is<T>();
    }
 
@@ -316,7 +336,7 @@ namespace Langulus::A
    ///   @param indices - index buffer                                        
    ///   @param where - line indices                                          
    ///   @return the (eventually indirected) line indices                     
-   inline Math::Vec2u Geometry::InnerGetIndices(const Data* indices, const Math::Vec2u& where) const {
+   inline Math::Vec2u Mesh::InnerGetIndices(const Data* indices, const Math::Vec2u& where) const {
       if (!indices || !*indices)
          return where;
 
@@ -350,7 +370,7 @@ namespace Langulus::A
    ///   @param indices - index buffer                                        
    ///   @param where - triangle indices                                      
    ///   @return the (eventually indirected) triangle indices                 
-   inline Math::Vec3u Geometry::InnerGetIndices(const Data* indices, const Math::Vec3u& where) const {
+   inline Math::Vec3u Mesh::InnerGetIndices(const Data* indices, const Math::Vec3u& where) const {
       if (!indices || !*indices)
          return where;
 
@@ -384,32 +404,32 @@ namespace Langulus::A
    /// Is topology a point list?                                              
    ///   @return true if geometry is made of points                           
    LANGULUS(INLINED)
-   bool Geometry::MadeOfPoints() const noexcept {
+   bool Mesh::MadeOfPoints() const noexcept {
       return CheckTopology<A::Point>();
    }
 
    /// Get the number of points inside the geometry                           
    ///   @return the number of points                                         
    LANGULUS(INLINED)
-   Count Geometry::GetPointCount() const {
+   Count Mesh::GetPointCount() const {
       TODO();
    }
 
    template<CT::Trait T>
-   Anyness::Any Geometry::GetPointTrait(Offset) const {
+   Anyness::Any Mesh::GetPointTrait(Offset) const {
       TODO();
    }
 
    /// Is topology line list/strip/loop?                                      
    ///   @return true if geometry is made of lines                            
    LANGULUS(INLINED)
-   bool Geometry::MadeOfLines() const noexcept {
+   bool Mesh::MadeOfLines() const noexcept {
       return CheckTopology<A::Line>();
    }
 
    /// Get the number of lines inside the geometry                            
    ///   @return the number of points                                         
-   inline Count Geometry::GetLineCount() const {
+   inline Count Mesh::GetLineCount() const {
       if (MadeOfPoints())
          return 0;
       
@@ -461,7 +481,7 @@ namespace Langulus::A
    /// Get the point indices of a given line                                  
    ///   @param index - line index                                            
    ///   @return the point indices as a 32bit unsigned 2D vector              
-   inline Math::Vec2u Geometry::GetLineIndices(Offset index) const {
+   inline Math::Vec2u Mesh::GetLineIndices(Offset index) const {
       const auto indices = GetData<Traits::Index>();
 
       if (CheckTopology<A::Line>()) {
@@ -513,7 +533,7 @@ namespace Langulus::A
    ///   @param lineIndex - the line index                                    
    ///   @return data for the specific line                                   
    template<CT::Trait T>
-   Anyness::Any Geometry::GetLineTrait(Offset lineIndex) const {
+   Anyness::Any Mesh::GetLineTrait(Offset lineIndex) const {
       const auto indices = GetLineIndices(lineIndex);
       const auto soughtt = GetData<T>(0);
       if (!soughtt || !*soughtt)
@@ -538,13 +558,13 @@ namespace Langulus::A
    /// Is geometry made up of triangles list/strip/fan?                       
    ///   @return true if geometry is made of triangles                        
    LANGULUS(INLINED)
-   bool Geometry::MadeOfTriangles() const noexcept {
+   bool Mesh::MadeOfTriangles() const noexcept {
       return CheckTopology<A::Triangle>();
    }
    
    /// Get the number of triangles inside the geometry                        
    ///   @return the number of points                                         
-   inline Count Geometry::GetTriangleCount() const {
+   inline Count Mesh::GetTriangleCount() const {
       if (MadeOfPoints() || MadeOfLines())
          return 0;
 
@@ -570,7 +590,7 @@ namespace Langulus::A
    /// Get the indices of a given triangle                                    
    ///   @param index - triangle index                                        
    ///   @return the indices as a 32bit unsigned 3D vector                    
-   inline Math::Vec3u Geometry::GetTriangleIndices(Offset index) const {
+   inline Math::Vec3u Mesh::GetTriangleIndices(Offset index) const {
       const auto indices = GetData<Traits::Index>(0);
 
       if (CheckTopology<A::Triangle>()) {
@@ -603,7 +623,7 @@ namespace Langulus::A
    ///   @param triangleIndex - the triangle index                            
    ///   @return data for the specific triangle                               
    template<CT::Trait T>
-   Anyness::Any Geometry::GetTriangleTrait(Offset triangleIndex) const {
+   Anyness::Any Mesh::GetTriangleTrait(Offset triangleIndex) const {
       const auto indices = GetTriangleIndices(triangleIndex);
       const auto soughtt = GetData<T>(0);
       if (!soughtt || !*soughtt)
@@ -627,21 +647,21 @@ namespace Langulus::A
    /// Get texture mapping mode                                               
    ///   @return the texturing mode                                           
    LANGULUS(INLINED)
-   Math::MapMode Geometry::GetTextureMapper() const noexcept {
+   Math::MapMode Mesh::GetTextureMapper() const noexcept {
       return mView.mTextureMapping;
    }
 
    /// Get the geometry view (const)                                          
    ///   @return the geometry view                                            
    LANGULUS(INLINED)
-   const GeometryView& Geometry::GetView() const noexcept {
+   const MeshView& Mesh::GetView() const noexcept {
       return mView;
    }
 
    /// Get the geometry view                                                  
    ///   @return the geometry view                                            
    LANGULUS(INLINED)
-   GeometryView& Geometry::GetView() noexcept {
+      MeshView& Mesh::GetView() noexcept {
       return mView;
    }
 
@@ -722,21 +742,21 @@ namespace Langulus::A
    /// Get the pixel format of the texture                                    
    ///   @return the pixel format type                                        
    LANGULUS(INLINED)
-   Anyness::DMeta Texture::GetFormat() const noexcept {
+   Anyness::DMeta Image::GetFormat() const noexcept {
       return mView.mFormat;
    }
 
    /// Get the texture view (const)                                           
    ///   @return the texture view                                             
    LANGULUS(INLINED)
-   const TextureView& Texture::GetView() const noexcept {
+   const ImageView& Image::GetView() const noexcept {
       return mView;
    }
    
    /// Get the texture view                                                   
    ///   @return the texture view                                             
    LANGULUS(INLINED)
-   TextureView& Texture::GetView() noexcept {
+      ImageView& Image::GetView() noexcept {
       return mView;
    }
 

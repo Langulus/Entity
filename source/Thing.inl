@@ -84,34 +84,42 @@ namespace Langulus::Entity
       return removed;
    }
 
-   /// Execute verb in the hierarchy                                          
-   ///   @tparam SEEK - where in the hierarchy to execute                     
+   /// Execute verb in the hierarchy, searching for valid context in the      
+   /// given direction                                                        
+   ///   @tparam SEEK - the direction in which to seek a valid context        
    ///   @param verb - the verb to execute                                    
-   ///   @return true if succesfully executed                                 
+   ///   @return verb output                                                  
    template<Seek SEEK>
-   bool Thing::DoInHierarchy(Verb& verb) {
-      // Execute in owners directly                                     
+   Any Thing::RunIn(Verb& verb) {
       if constexpr (SEEK & Seek::Here) {
+         // Execute here                                                
          Do(verb);
          if (verb.IsDone())
-            return true;
+            return verb.GetOutput();
       }
 
-      // Execute in parents up to root, if requested                    
       if constexpr (SEEK & Seek::Above) {
-         if (mOwner && mOwner->DoInHierarchy<Seek::HereAndAbove>(verb))
-            return true;
-      }
-
-      // Execute in children, if requested                              
-      if constexpr (SEEK & Seek::Below) {
-         for (auto child : mChildren) {
-            if (child->DoInHierarchy<Seek::HereAndBelow>(verb))
-               return true;
+         // Execute in parents up to root, if requested                 
+         if (mOwner) {
+            mOwner->template RunIn<Seek::HereAndAbove>(verb);
+            if (verb.IsDone())
+               return verb.GetOutput();
          }
       }
 
-      return false;
+      if constexpr (SEEK & Seek::Below) {
+         // Execute in children, if requested                              
+         for (auto& child : mChildren) {
+            Verb local {verb};
+            local.ShortCircuit(false);
+            verb << Abandon(child->template RunIn<Seek::HereAndBelow>(local));
+         }
+
+         if (verb.IsDone())
+            return verb.GetOutput();
+      }
+
+      return {};
    }
    
    /// Register unit by all its bases in mUnitsAmbiguous                      
@@ -474,21 +482,26 @@ namespace Langulus::Entity
       return {};
    }
 
-   /// Execute verb in all owners                                             
-   ///   @tparam SEEK - where in hierarchy to execute                         
+   /// Execute verb in all owners, seeking valid context in the specified     
+   /// seek direction                                                         
+   ///   @tparam SEEK - direction to seek valid execution context in          
    ///   @param verb - the verb to execute                                    
-   ///   @return true if succesfully executed                                 
+   ///   @return the verb output                                              
    template<Seek SEEK>
-   bool Unit::DoInHierarchy(Verb& verb) {
+   Any Unit::RunIn(Verb& verb) {
       if (!mOwners) {
-         Logger::Warning("No owners available for executing ", verb);
+         Logger::Warning(Self(), "No owners available for executing: ", verb);
          return false;
       }
 
-      bool success {};
-      for (auto owner : mOwners)
-         success |= owner->template DoInHierarchy<SEEK>(verb);
-      return success;
+      // Dispatch to all owner, accumulate outputs                      
+      for (auto& owner : mOwners) {
+         Verb local {verb};
+         local.ShortCircuit(false);
+         verb << Abandon(owner->template RunIn<SEEK>(local));
+      }
+
+      return verb.GetOutput();
    }
 
 } // namespace Langulus::Entity

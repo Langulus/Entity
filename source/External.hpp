@@ -32,7 +32,7 @@ namespace Langulus
    ///                                                                        
    ///   Vertex/index buffer view                                             
    ///                                                                        
-   struct GeometryView {
+   struct MeshView {
       // Number of primitives                                           
       uint32_t mPrimitiveCount {};
       // Starting primitive                                             
@@ -48,16 +48,17 @@ namespace Langulus
       // Texture mapping mode                                           
       Math::MapMode mTextureMapping {};
 
-      bool operator == (const GeometryView&) const noexcept;
+      bool operator == (const MeshView&) const noexcept;
 
-      NOD() GeometryView Decay() const;
+      NOD() MeshView Decay() const;
+      NOD() Hash GetHash() const noexcept;
    };
 
 
    ///                                                                        
    ///   Universal pixel buffer view                                          
    ///                                                                        
-   struct TextureView {
+   struct ImageView {
       uint32_t mWidth {1};
       uint32_t mHeight {1};
       uint32_t mDepth {1};
@@ -67,13 +68,14 @@ namespace Langulus
       // This is not a scalable solution and would eventually fail      
       bool mReverseFormat {};
 
-      bool operator == (const TextureView&) const noexcept;
+      bool operator == (const ImageView&) const noexcept;
 
       NOD() constexpr uint32_t GetPixelCount() const noexcept;
       NOD() constexpr uint32_t GetDimensionCount() const noexcept;
       NOD() Size GetPixelBytesize() const noexcept;
       NOD() Size GetBytesize() const noexcept;
       NOD() uint32_t GetChannelCount() const noexcept;
+      NOD() Hash GetHash() const noexcept;
    };
    
    ///                                                                        
@@ -474,12 +476,12 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract geometry content                                            
    ///                                                                        
-   struct Geometry : Asset {
+   struct Mesh : Asset {
       LANGULUS_BASES(Asset);
       using Asset::Asset;
 
    protected:
-      GeometryView mView;
+      MeshView mView;
 
    public:
       template<CT::Topology T>
@@ -488,10 +490,10 @@ namespace Langulus::A
 
       NOD() Math::MapMode GetTextureMapper() const noexcept;
 
-      NOD() const GeometryView& GetView() const noexcept;
-      NOD() GeometryView& GetView() noexcept;
+      NOD() const MeshView& GetView() const noexcept;
+      NOD() MeshView& GetView() noexcept;
 
-      NOD() virtual const Geometry* GetLOD(const Math::LOD&) const = 0;
+      NOD() virtual Anyness::Ref<Mesh> GetLOD(const Math::LOD&) const = 0;
 
       NOD() Math::Vec2u InnerGetIndices(const Data*, const Math::Vec2u&) const;
       NOD() Math::Vec3u InnerGetIndices(const Data*, const Math::Vec3u&) const;
@@ -524,7 +526,7 @@ namespace Langulus::A
       LANGULUS_BASES(Asset);
       using Asset::Asset;
 
-      NOD() virtual const Material* GetLOD(const Math::LOD&) const = 0;
+      NOD() virtual Anyness::Ref<Material> GetLOD(const Math::LOD&) const = 0;
 
       NOD() const Entity::TraitList& GetInputs(Flow::Rate) const;
       NOD() const Entity::TraitList& GetInputs(Offset) const;
@@ -536,20 +538,22 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract texture content                                             
    ///                                                                        
-   struct Texture : Asset {
+   struct Image : Asset {
       LANGULUS_BASES(Asset);
       using Asset::Asset;
 
    protected:
-      TextureView mView;
+      ImageView mView;
 
    public:
-      NOD() Anyness::DMeta GetFormat() const noexcept;
-      NOD() const TextureView& GetView() const noexcept;
-      NOD() TextureView& GetView() noexcept;
-
-      NOD() virtual const Texture* GetLOD(const Math::LOD&) const = 0;
+      virtual void Upload(const Anyness::Any&) = 0;
+      virtual void Upload(Anyness::Any&&) = 0;
+      NOD() virtual Anyness::Ref<Image> GetLOD(const Math::LOD&) const = 0;
       NOD() virtual void* GetGPUHandle() const noexcept = 0;
+
+      NOD() Anyness::DMeta GetFormat() const noexcept;
+      NOD() const ImageView& GetView() const noexcept;
+      NOD() ImageView& GetView() noexcept;
    };
 
 } // namespace Langulus::A
@@ -571,11 +575,11 @@ namespace Langulus::CT
 
    /// A concept for any kind of image content unit                           
    template<class T>
-   concept Texture = DerivedFrom<T, A::Texture>;
+   concept Image = DerivedFrom<T, A::Image>;
 
    /// A concept for any kind of geometric content unit                       
    template<class T>
-   concept Geometry = DerivedFrom<T, A::Geometry>;
+   concept Mesh = DerivedFrom<T, A::Mesh>;
 
 } // namespace Langulus::CT
 
@@ -584,10 +588,10 @@ LANGULUS_DEFINE_TRAIT(Shader,
    "Shader unit");
 LANGULUS_DEFINE_TRAIT(Material,
    "Material unit");
-LANGULUS_DEFINE_TRAIT(Texture,
-   "Texture unit");
-LANGULUS_DEFINE_TRAIT(Geometry,
-   "Geometry unit");
+LANGULUS_DEFINE_TRAIT(Image,
+   "Image unit");
+LANGULUS_DEFINE_TRAIT(Mesh,
+   "Mesh unit");
 LANGULUS_DEFINE_TRAIT(FOV,
    "Horizontal field of view angle, usually a real number");
 LANGULUS_DEFINE_TRAIT(AspectRatio,
