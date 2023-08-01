@@ -311,7 +311,7 @@ namespace Langulus::A
       NOD() bool IsReadOnly() const noexcept;
       NOD() const Anyness::Path& GetFilePath() const noexcept;
       NOD() Anyness::DMeta GetFormat() const noexcept;
-      NOD() Size GetByteSize() const noexcept;
+      NOD() Size GetBytesize() const noexcept;
 
       NOD() virtual Anyness::Any ReadAs(Anyness::DMeta) const = 0;
       
@@ -554,6 +554,9 @@ namespace Langulus::A
       NOD() Anyness::DMeta GetFormat() const noexcept;
       NOD() const ImageView& GetView() const noexcept;
       NOD() ImageView& GetView() noexcept;
+
+      template<class F>
+      auto ForEachPixel(F&&) const;
    };
 
 } // namespace Langulus::A

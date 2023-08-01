@@ -10,6 +10,7 @@
 #include <Math/Primitives/TTriangle.hpp>
 #include <Math/Primitives/TLine.hpp>
 #include <Math/Primitives/TPoint.hpp>
+#include <Math/Colors.hpp>
 
 namespace Langulus
 {
@@ -189,7 +190,7 @@ namespace Langulus::A
    /// Get the size of the file in bytes (if file exists)                     
    ///   @return the size of the file in bytes, or 0 if it doesn't exist      
    LANGULUS(INLINED)
-   Size File::GetByteSize() const noexcept {
+   Size File::GetBytesize() const noexcept {
       return mByteCount;
    }
 
@@ -756,8 +757,52 @@ namespace Langulus::A
    /// Get the texture view                                                   
    ///   @return the texture view                                             
    LANGULUS(INLINED)
-      ImageView& Image::GetView() noexcept {
+   ImageView& Image::GetView() noexcept {
       return mView;
    }
+
+   /// Execute a function for each pixel, represented by a desired type       
+   ///   @tparam F - the function signature (deducible)                       
+   ///   @param call - the function to execute for each pixel                 
+   ///   @return the number of pixels that were iterated                      
+   template<class F>
+   auto Image::ForEachPixel(F&& call) const {
+      auto pixels = GetData<Traits::Color>();
+
+      LANGULUS_ASSUME(DevAssumes, pixels && *pixels,
+         "No color data in image");
+      LANGULUS_ASSUME(DevAssumes, pixels->IsDense(),
+         "Image data isn't dense");
+      LANGULUS_ASSUME(DevAssumes, pixels->CastsTo<Byte>() || pixels->CastsTo<A::Color>(),
+         "Image doesn't contain pixel data");
+
+      using A = ArgumentOf<F>;
+      using R = ReturnOf<F>;
+
+      static_assert(CT::Constant<A>, "Color iterator must be constant");
+      static_assert(CT::Dense<A>, "Color iterator must be dense");
+
+      LANGULUS_ASSUME(DevAssumes, mView.mFormat->IsExact<A>(),
+         "Iterator type is not compatible with contained color data");
+
+      // Iterate using the desired color type                           
+      UNUSED() Count counter = 0;
+      auto data = pixels->GetRaw();
+      const auto dataEnd = data + mView.GetBytesize();
+      while (data != dataEnd) {
+         if constexpr (CT::Bool<R>) {
+            ++counter;
+            if (!call(*reinterpret_cast<const Deref<A>*>(data)))
+               return counter;
+         }
+         else call(*reinterpret_cast<const Deref<A>*>(data));
+
+         data += mView.mFormat->mSize;
+      }
+
+      if constexpr (CT::Bool<R>)
+         return counter;
+   }
+
 
 } // namespace Langulus::A
