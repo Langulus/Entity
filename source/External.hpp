@@ -25,6 +25,22 @@ LANGULUS_DEFINE_TRAIT(MouseScroll,
    "Mouse scroll for window");
 LANGULUS_DEFINE_TRAIT(NativeWindowHandle,
    "Native window handle");
+LANGULUS_DEFINE_TRAIT(Shader,
+   "Shader unit");
+LANGULUS_DEFINE_TRAIT(Material,
+   "Material unit");
+LANGULUS_DEFINE_TRAIT(Image,
+   "Image unit");
+LANGULUS_DEFINE_TRAIT(Mesh,
+   "Mesh unit");
+LANGULUS_DEFINE_TRAIT(FOV,
+   "Horizontal field of view angle, usually a real number");
+LANGULUS_DEFINE_TRAIT(AspectRatio,
+   "Aspect ratio trait (width / height), usually a real number");
+LANGULUS_DEFINE_TRAIT(Viewport,
+   "Viewport and depth clipping, usually a Range4");
+
+LANGULUS_EXCEPTION(Image);
 
 namespace Langulus
 {
@@ -546,8 +562,6 @@ namespace Langulus::A
       ImageView mView;
 
    public:
-      virtual void Upload(const Anyness::Any&) = 0;
-      virtual void Upload(Anyness::Any&&) = 0;
       NOD() virtual Anyness::Ref<Image> GetLOD(const Math::LOD&) const = 0;
       NOD() virtual void* GetGPUHandle() const noexcept = 0;
 
@@ -557,6 +571,8 @@ namespace Langulus::A
 
       template<class F>
       auto ForEachPixel(F&&) const;
+
+      void Upload(CT::Semantic auto&&);
    };
 
 } // namespace Langulus::A
@@ -585,19 +601,3 @@ namespace Langulus::CT
    concept Mesh = DerivedFrom<T, A::Mesh>;
 
 } // namespace Langulus::CT
-
-
-LANGULUS_DEFINE_TRAIT(Shader,
-   "Shader unit");
-LANGULUS_DEFINE_TRAIT(Material,
-   "Material unit");
-LANGULUS_DEFINE_TRAIT(Image,
-   "Image unit");
-LANGULUS_DEFINE_TRAIT(Mesh,
-   "Mesh unit");
-LANGULUS_DEFINE_TRAIT(FOV,
-   "Horizontal field of view angle, usually a real number");
-LANGULUS_DEFINE_TRAIT(AspectRatio,
-   "Aspect ratio trait (width / height), usually a real number");
-LANGULUS_DEFINE_TRAIT(Viewport,
-   "Viewport and depth clipping, usually a Range4");

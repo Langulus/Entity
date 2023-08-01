@@ -308,7 +308,8 @@ namespace Langulus::A
    template<CT::Trait T, CT::Semantic S>
    LANGULUS(INLINED)
    void Asset::Commit(S&& content) {
-      static_assert(CT::Deep<TypeOf<S>>, "Content should be CT::Deep");
+      static_assert(CT::Block<TypeOf<S>>,
+         "Content should be provided in a Block");
       mDataListMap[T::GetTrait()] << content.Forward();
    }
 
@@ -770,11 +771,14 @@ namespace Langulus::A
       auto pixels = GetData<Traits::Color>();
 
       LANGULUS_ASSUME(DevAssumes, pixels && *pixels,
-         "No color data in image");
+         "No color data", " in ", Self());
       LANGULUS_ASSUME(DevAssumes, pixels->IsDense(),
-         "Image data isn't dense");
-      LANGULUS_ASSUME(DevAssumes, pixels->CastsTo<Byte>() || pixels->CastsTo<A::Color>(),
-         "Image doesn't contain pixel data");
+         "Image data is not dense", " for ", Self());
+      LANGULUS_ASSUME(DevAssumes,
+         pixels->CastsTo<Anyness::Bytes>() || pixels->CastsTo<A::Color>(),
+         "Image doesn't contain pixel data", 
+         " - contains ", pixels->GetType(), " instead"
+      );
 
       using A = ArgumentOf<F>;
       using R = ReturnOf<F>;
@@ -787,7 +791,9 @@ namespace Langulus::A
 
       // Iterate using the desired color type                           
       UNUSED() Count counter = 0;
-      auto data = pixels->GetRaw();
+      auto data = pixels->CastsTo<Anyness::Bytes>()
+         ? pixels->Get<Anyness::Bytes>().GetRaw()
+         : pixels->GetRaw();
       const auto dataEnd = data + mView.GetBytesize();
       while (data != dataEnd) {
          if constexpr (CT::Bool<R>) {
@@ -804,5 +810,22 @@ namespace Langulus::A
          return counter;
    }
 
+   /// Upload raw data to the image by a semantic                                
+   ///   @attention deletes any data previously commited                         
+   ///   @param data - the block of data                                         
+   LANGULUS(INLINED)
+   void Image::Upload(CT::Semantic auto&& data) {
+      using S = Decay<decltype(data)>;
+      using T = TypeOf<S>;
+      static_assert(CT::Block<T>, "Data must be inside a Block");
+
+      // Check if provided data matches the view requirements              
+      LANGULUS_ASSERT(mView.GetBytesize() == data->GetBytesize(), Image,
+         "Data is of the wrong size");
+
+      // Reset data and commit the new one                                 
+      mDataListMap.Reset();
+      Commit<Traits::Color>(data.Forward());
+   }
 
 } // namespace Langulus::A
