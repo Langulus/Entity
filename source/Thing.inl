@@ -401,15 +401,15 @@ namespace Langulus::Entity
    template<Seek SEEK>
    Any Thing::CreateData(const Construct& construct) {
       const auto type = construct.GetType();
-      if (!type)
-         LANGULUS_THROW(Construct, "Invalid construct");
-
+      LANGULUS_ASSERT(type, Construct, "Invalid construct");
       const auto producer = type->mProducer;
-
-      // Always implicitly attach a parent trait to descriptor, it      
-      // will be stripped, when normalizing the descriptor              
       Construct descriptor {construct};
-      descriptor << Traits::Parent {this};
+
+      // Implicitly add a parent trait to descriptor, if one isn't      
+      // already added - it will be stripped later, when normalizing    
+      // the descriptor when producing the item from a factory          
+      if (!descriptor.Get<Traits::Parent>())
+         descriptor << Traits::Parent {this};
 
       if (producer) {
          // Data has a specific producer, we can narrow the required    
