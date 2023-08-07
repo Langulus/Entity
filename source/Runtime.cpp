@@ -449,7 +449,7 @@ namespace Langulus::Entity
    Ptr<A::File> Runtime::GetFile(const Path& path) {
       auto& fileSystems = GetModules<A::FileSystem>();
       LANGULUS_ASSERT(fileSystems, Module,
-         "Can't retrieve a file", ", no file system module available");
+         "Can't retrieve file `", path, "` - no file system module available");
       return fileSystems.template As<A::FileSystem*>()->GetFile(path);
    }
    
@@ -459,7 +459,7 @@ namespace Langulus::Entity
    Ptr<A::Folder> Runtime::GetFolder(const Path& path) {
       auto& fileSystems = GetModules<A::FileSystem>();
       LANGULUS_ASSERT(fileSystems, Module,
-         "Can't retrieve a file", ", no file system module available");
+         "Can't retrieve folder `", path, "` - no file system module available");
       return fileSystems.template As<A::FileSystem*>()->GetFolder(path);
    }
 
@@ -468,7 +468,7 @@ namespace Langulus::Entity
    const Path& Runtime::GetWorkingPath() const {
       auto& fileSystems = GetModules<A::FileSystem>();
       LANGULUS_ASSERT(fileSystems, Module,
-         "Can't retrieve working path", ", no file system module available");
+         "Can't retrieve working path", " - no file system module available");
       return fileSystems.template As<A::FileSystem*>()->GetWorkingPath();
    }
 
@@ -477,7 +477,7 @@ namespace Langulus::Entity
    const Path& Runtime::GetDataPath() const {
       auto& fileSystems = GetModules<A::FileSystem>();
       LANGULUS_ASSERT(fileSystems, Module,
-         "Can't retrieve data path", ", no file system module available");
+         "Can't retrieve data path", " - no file system module available");
       return fileSystems.template As<A::FileSystem*>()->GetDataPath();
    }
 

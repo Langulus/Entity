@@ -41,6 +41,7 @@ LANGULUS_DEFINE_TRAIT(Viewport,
    "Viewport and depth clipping, usually a Range4");
 
 LANGULUS_EXCEPTION(Image);
+LANGULUS_EXCEPTION(Mesh);
 
 namespace Langulus
 {
@@ -94,6 +95,7 @@ namespace Langulus
       NOD() Hash GetHash() const noexcept;
    };
    
+
    ///                                                                        
    ///   Shader stages                                                        
    ///                                                                        
@@ -120,6 +122,7 @@ namespace Langulus
          "compute"
       };
    }
+
 
    ///                                                                        
    ///   Shader layout tokens                                                 
@@ -573,6 +576,14 @@ namespace Langulus::A
       auto ForEachPixel(F&&) const;
 
       void Upload(CT::Semantic auto&&);
+   };
+   
+   ///                                                                        
+   ///   Abstract font content                                                
+   ///                                                                        
+   struct Font : Image {
+      LANGULUS_BASES(Image);
+      using Image::Image;
    };
 
 } // namespace Langulus::A

@@ -395,13 +395,15 @@ namespace Langulus::Entity
    }
 
    /// Produce any data (including units) from the hierarchy                  
+   ///   @attention assumes construct has a valid type                        
    ///   @tparam SEEK - what part of the hierarchy to use for the creation    
    ///   @param construct - instructions for the creation of the data         
    ///   @return created data                                                 
    template<Seek SEEK>
    Any Thing::CreateData(const Construct& construct) {
+      LANGULUS_ASSUME(UserAssumes, construct.GetType(),
+         "Invalid construct type");
       const auto type = construct.GetType();
-      LANGULUS_ASSERT(type, Construct, "Invalid construct");
       const auto producer = type->mProducer;
       Construct descriptor {construct};
 
@@ -417,10 +419,10 @@ namespace Langulus::Entity
          if (producer->template CastsTo<Unit>()) {
             // Data is producible from a unit                           
             auto producers = GatherUnits<SEEK>(producer);
-            if (!producers) {
-               LANGULUS_THROW(Construct,
-                  "No viable unit producers available");
-            }
+            LANGULUS_ASSERT(producers, Construct, 
+               "No producers", " (of unit type `", producer, "`) available "
+               "in hierarchy for construct: ", construct
+            );
 
             // Potential unit producers found, attempt creation         
             Verbs::Create creator {&descriptor};
@@ -432,10 +434,10 @@ namespace Langulus::Entity
          else if (producer->template CastsTo<Module>()) {
             // Data is producible from a module                         
             auto producers = GetRuntime()->GetModules(producer);
-            if (!producers) {
-               LANGULUS_THROW(Construct,
-                  "No viable module producers available");
-            }
+            LANGULUS_ASSERT(producers, Construct,
+               "No producers", " (of module type `", producer, "`) available "
+               "in hierarchy for construct: ", construct
+            );
 
             // Potential module producers found, attempt creation       
             Verbs::Create creator {&descriptor};
