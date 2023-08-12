@@ -252,6 +252,7 @@ namespace Langulus::A
       , ProducedFrom<AssetModule> {producer, desc} {}
 
    /// Get the entire content data map                                        
+   ///   @attention this doesn't generate any data                            
    ///   @return a reference to the contents                                  
    LANGULUS(INLINED)
    const Asset::DataListMap& Asset::GetDataListMap() const noexcept {
@@ -274,6 +275,9 @@ namespace Langulus::A
    ///   @return a pointer to the data entry, or nullptr if none exists       
    LANGULUS(INLINED)
    const Asset::Data* Asset::GetData(Anyness::TMeta trait, Offset index) const noexcept {
+      if (not const_cast<Asset*>(this)->Generate(trait, index))
+         return nullptr;
+
       const auto datalist = GetDataList(trait);
       return datalist && datalist->GetCount() > index
          ? &(*datalist)[index]
@@ -294,6 +298,9 @@ namespace Langulus::A
    ///   @return a pointer to the data list, or nullptr if none exists        
    LANGULUS(INLINED)
    const Asset::DataList* Asset::GetDataList(Anyness::TMeta trait) const noexcept {
+      if (not const_cast<Asset*>(this)->Generate(trait))
+         return nullptr;
+
       const auto found = mDataListMap.Find(trait);
       if (found)
          return &mDataListMap.GetValue(found);

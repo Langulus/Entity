@@ -475,10 +475,16 @@ namespace Langulus::A
       using DataListMap = Anyness::TUnorderedMap<Anyness::TMeta, DataList>;
 
    protected:
+      NOD() const DataListMap& GetDataListMap() const noexcept;
+
+      // Map of lists of generated data                                 
       DataListMap mDataListMap;
 
    public:
-      NOD() const DataListMap& GetDataListMap() const noexcept;
+      virtual bool Generate(Anyness::TMeta, Offset = 0) = 0;
+
+      template<CT::Trait T, CT::Semantic S>
+      void Commit(S&&);
 
       template<CT::Trait T>
       NOD() const Data* GetData(Offset = 0) const noexcept;
@@ -487,9 +493,6 @@ namespace Langulus::A
       template<CT::Trait T>
       NOD() const DataList* GetDataList() const noexcept;
       NOD() const DataList* GetDataList(Anyness::TMeta) const noexcept;
-
-      template<CT::Trait T, CT::Semantic S>
-      void Commit(S&&);
    };
 
    ///                                                                        
