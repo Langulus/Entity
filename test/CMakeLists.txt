@@ -1,5 +1,3 @@
-project(LangulusEntityTest)
-
 add_executable(LangulusEntityTest 
 	Main.cpp
 	TestComposition.cpp

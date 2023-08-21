@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.24)
-project(LangulusEntity)
+project(LangulusEntity
+    VERSION         1.0.0
+    DESCRIPTION     "Langulus entity component system library"
+    HOMEPAGE_URL    https://langulus.com
+    LANGUAGES       CXX
+)
+
 
 # Check if this project is built as standalone, or a part of something else 
 if(PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
@@ -16,6 +22,9 @@ if(PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
 	fetch_langulus_module(Core)
 	fetch_langulus_module(Logger)
 	fetch_langulus_module(RTTI)
+    if(LANGULUS_FEATURE_MANAGED_MEMORY)
+        fetch_langulus_module(Fractalloc)
+    endif()
 	fetch_langulus_module(SIMD)
 	fetch_langulus_module(Anyness)
 	fetch_langulus_module(Flow)
@@ -26,6 +35,7 @@ endif()
 add_library(LangulusEntity ${LANGULUS_LIBRARY_TYPE}
     $<TARGET_OBJECTS:LangulusLogger>
     $<TARGET_OBJECTS:LangulusRTTI>
+    $<$<BOOL:${LANGULUS_FEATURE_MANAGED_MEMORY}>:$<TARGET_OBJECTS:LangulusFractalloc>>
     $<TARGET_OBJECTS:LangulusAnyness>
     $<TARGET_OBJECTS:LangulusFlow>
     source/Thing.cpp
@@ -39,6 +49,7 @@ target_include_directories(LangulusEntity
     PUBLIC      include
                 $<TARGET_PROPERTY:LangulusLogger,INTERFACE_INCLUDE_DIRECTORIES>
                 $<TARGET_PROPERTY:LangulusRTTI,INTERFACE_INCLUDE_DIRECTORIES>
+                $<$<BOOL:${LANGULUS_FEATURE_MANAGED_MEMORY}>:$<TARGET_PROPERTY:LangulusFractalloc,INTERFACE_INCLUDE_DIRECTORIES>>
                 $<TARGET_PROPERTY:LangulusAnyness,INTERFACE_INCLUDE_DIRECTORIES>
                 $<TARGET_PROPERTY:LangulusFlow,INTERFACE_INCLUDE_DIRECTORIES>
                 $<TARGET_PROPERTY:LangulusMath,INTERFACE_INCLUDE_DIRECTORIES>

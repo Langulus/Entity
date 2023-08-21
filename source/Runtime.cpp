@@ -91,8 +91,8 @@ namespace Langulus::Entity
             "that withholds managed data, reflected by the given modules");
 
          #if LANGULUS_FEATURE(MEMORY_STATISTICS)
-            Fractalloc.CollectGarbage();
-            Fractalloc.DumpPools();
+            Allocator::CollectGarbage();
+            Allocator::DumpPools();
          #endif
 
          LANGULUS_THROW(Destruct, "Can't unload last module(s)");
@@ -369,8 +369,8 @@ namespace Langulus::Entity
       const auto wasMarked = library.mMarkedForUnload;
       const auto boundary = library.mInfo()->mName;
 
-      Anyness::Fractalloc.CollectGarbage();
-      const auto poolsInUse = Anyness::Fractalloc.CheckBoundary(boundary);
+      Allocator::CollectGarbage();
+      const auto poolsInUse = Allocator::CheckBoundary(boundary);
       if (poolsInUse) {
          // We can't allow the shared object to be unloaded!            
          // It will be attempted on next unload, so that dependent      

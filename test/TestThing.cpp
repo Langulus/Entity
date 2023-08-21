@@ -405,7 +405,7 @@ SCENARIO("Testing Thing", "[thing]") {
          THEN("Properties should match") {
             REQUIRE(removed == 1);
             REQUIRE(root.mUnitsList.GetCount() == 1);
-            REQUIRE(nullptr == Fractalloc.Find(MetaOf<TestUnit1>(), unitmemory));
+            REQUIRE(nullptr == Allocator::Find(MetaOf<TestUnit1>(), unitmemory));
          }
       }
 
@@ -417,8 +417,8 @@ SCENARIO("Testing Thing", "[thing]") {
          THEN("Properties should match") {
             REQUIRE(removed == 2);
             REQUIRE(!root.mUnitsList);
-            REQUIRE(nullptr == Fractalloc.Find(MetaOf<TestUnit1>(), unitmemory1));
-            REQUIRE(nullptr == Fractalloc.Find(MetaOf<TestUnit2>(), unitmemory2));
+            REQUIRE(nullptr == Allocator::Find(MetaOf<TestUnit1>(), unitmemory1));
+            REQUIRE(nullptr == Allocator::Find(MetaOf<TestUnit2>(), unitmemory2));
          }
       }
 
