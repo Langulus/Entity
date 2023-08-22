@@ -389,7 +389,7 @@ namespace Langulus::Entity
       #endif
 
       // Unregister external types, if no longer used                   
-      RTTI::Database.UnloadLibrary(boundary);
+      IF_LANGULUS_MANAGED_REFLECTION(RTTI::UnloadLibrary(boundary));
       Logger::Info("Module `", boundary, "` unloaded ", (wasMarked ? "(scheduled)" : ""));
 
       // Unload the shared object                                       
@@ -431,15 +431,15 @@ namespace Langulus::Entity
    /// Get the dependency module of a given type by token                     
    ///   @param token - type token                                            
    ///   @return the shared library handle, you should check if it's valid    
-   Runtime::SharedLibrary Runtime::GetDependency(const Token& token) const noexcept {
-      return GetDependency(RTTI::Database.GetMetaData(token));
+   Runtime::SharedLibrary Runtime::GetDependencyToken(const Token& token) const noexcept {
+      return GetDependency(RTTI::GetMetaData(token));
    }
 
    /// Get a module instance by type token                                    
    ///   @param token - type token                                            
    ///   @return the module instance, or nullptr if not found                 
-   const ModuleList& Runtime::GetModules(const Token& token) const noexcept {
-      return GetModules(RTTI::Database.GetMetaData(token));
+   const ModuleList& Runtime::GetModulesToken(const Token& token) const noexcept {
+      return GetModules(RTTI::GetMetaData(token));
    }
 #endif
 

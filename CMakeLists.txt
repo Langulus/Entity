@@ -3,7 +3,6 @@ project(LangulusEntity
     VERSION         1.0.0
     DESCRIPTION     "Langulus entity component system library"
     HOMEPAGE_URL    https://langulus.com
-    LANGUAGES       CXX
 )
 
 

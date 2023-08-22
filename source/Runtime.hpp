@@ -121,10 +121,10 @@ namespace Langulus::Entity
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
          NOD() LANGULUS_API(ENTITY)
-         SharedLibrary GetDependency(const Token&) const noexcept;
+         SharedLibrary GetDependencyToken(const Token&) const noexcept;
 
          NOD() LANGULUS_API(ENTITY)
-         const ModuleList& GetModules(const Token&) const noexcept;
+         const ModuleList& GetModulesToken(const Token&) const noexcept;
       #endif
 
       NOD() LANGULUS_API(ENTITY)
