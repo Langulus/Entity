@@ -90,11 +90,8 @@ namespace Langulus::Entity
          Logger::Error(this, ": This likely involves a memory leak, "
             "that withholds managed data, reflected by the given modules");
 
-         #if LANGULUS_FEATURE(MEMORY_STATISTICS)
-            Allocator::CollectGarbage();
-            Allocator::DumpPools();
-         #endif
-
+         IF_LANGULUS_MANAGED_MEMORY(Allocator::CollectGarbage());
+         IF_LANGULUS_MEMORY_STATISTICS(Allocator::DumpPools());
          LANGULUS_THROW(Destruct, "Can't unload last module(s)");
       }
    }
@@ -369,24 +366,27 @@ namespace Langulus::Entity
       const auto wasMarked = library.mMarkedForUnload;
       const auto boundary = library.mInfo()->mName;
 
-      Allocator::CollectGarbage();
-      const auto poolsInUse = Allocator::CheckBoundary(boundary);
-      if (poolsInUse) {
-         // We can't allow the shared object to be unloaded!            
-         // It will be attempted on next unload, so that dependent      
-         // libraries have a chance of being unloaded first, releasing  
-         // required resources.                                         
-         if (!wasMarked) {
-            Logger::Warning(
-               "Module `", boundary, "` can't be unloaded yet, because "
-               "exposed data is still in use in ", poolsInUse, " memory pools. "
-               "Unload has been postponed to the next library unload."
-            );
-            const_cast<SharedLibrary&>(library).mMarkedForUnload = true;
-         }
+      IF_LANGULUS_MANAGED_MEMORY(Allocator::CollectGarbage());
 
-         return false;
-      }
+      #if LANGULUS_FEATURE(MANAGED_REFLECTION) and LANGULUS_FEATURE(MANAGED_MEMORY)
+         const auto poolsInUse = Allocator::CheckBoundary(boundary);
+         if (poolsInUse) {
+            // We can't allow the shared object to be unloaded!         
+            // It will be attempted on next unload, so that dependent   
+            // libraries have a chance of being unloaded first,         
+            // releasing required resources.                            
+            if (!wasMarked) {
+               Logger::Warning(
+                  "Module `", boundary, "` can't be unloaded yet, because "
+                  "exposed data is still in use in ", poolsInUse, " memory pools. "
+                  "Unload has been postponed to the next library unload."
+               );
+               const_cast<SharedLibrary&>(library).mMarkedForUnload = true;
+            }
+
+            return false;
+         }
+      #endif
 
       // Unregister external types, if no longer used                   
       RTTI::Database.UnloadLibrary(boundary);
