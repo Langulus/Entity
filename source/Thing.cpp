@@ -310,7 +310,7 @@ namespace Langulus::Entity
    ///   @return the unit if found, or nullptr if not                         
    Unit* Thing::GetUnitMeta(const Token& token, Index offset) {
       const auto meta = dynamic_cast<DMeta>(
-         RTTI::Database.DisambiguateMeta(token)
+         RTTI::DisambiguateMeta(token)
       );
       return GetUnitMeta(meta, offset);
    }

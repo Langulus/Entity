@@ -143,49 +143,49 @@ namespace Langulus::Entity
       template<Seek SEEK = Seek::HereAndAbove> \
       NOD() LANGULUS(INLINED) \
       Unit* SeekUnit(const Token& token, Index offset = IndexFirst) { \
-         return SeekUnit<SEEK>(RTTI::Database.GetMetaData(token), offset); \
+         return SeekUnit<SEEK>(RTTI::GetMetaData(token), offset); \
       } \
       template<Seek SEEK = Seek::HereAndAbove> \
       NOD() LANGULUS(INLINED) \
       const Unit* SeekUnit(const Token& token, Index offset = IndexFirst) const { \
-         return SeekUnit<SEEK>(RTTI::Database.GetMetaData(token), offset); \
+         return SeekUnit<SEEK>(RTTI::GetMetaData(token), offset); \
       } \
       template<Seek SEEK = Seek::HereAndAbove> \
       NOD() LANGULUS(INLINED) \
       Unit* SeekUnitAux(const Any& aux, const Token& token, Index offset = IndexFirst) { \
-         return SeekUnitAux<SEEK>(aux, RTTI::Database.GetMetaData(token), offset); \
+         return SeekUnitAux<SEEK>(aux, RTTI::GetMetaData(token), offset); \
       } \
       template<Seek SEEK = Seek::HereAndAbove> \
       NOD() LANGULUS(INLINED) \
       const Unit* SeekUnitAux(const Any& aux, const Token& token, Index offset = IndexFirst) const { \
-         return SeekUnitAux<SEEK>(aux, RTTI::Database.GetMetaData(token), offset); \
+         return SeekUnitAux<SEEK>(aux, RTTI::GetMetaData(token), offset); \
       } \
       \
       template<Seek SEEK = Seek::HereAndAbove> \
       NOD() LANGULUS(INLINED) \
       Trait SeekTrait(const Token& token, Index offset = IndexFirst) { \
-         return SeekTrait<SEEK>(RTTI::Database.GetMetaTrait(token), offset); \
+         return SeekTrait<SEEK>(RTTI::GetMetaTrait(token), offset); \
       } \
       template<Seek SEEK = Seek::HereAndAbove> \
       NOD() LANGULUS(INLINED) \
       Trait SeekTrait(const Token& token, Index offset = IndexFirst) const { \
-         return SeekTrait<SEEK>(RTTI::Database.GetMetaTrait(token), offset); \
+         return SeekTrait<SEEK>(RTTI::GetMetaTrait(token), offset); \
       } \
       template<Seek SEEK = Seek::HereAndAbove, CT::Data D> \
       LANGULUS(INLINED) \
       bool SeekTrait(const Token& token, D& output, Index offset = IndexFirst) const { \
-         return SeekTrait<SEEK>(RTTI::Database.GetMetaTrait(token), output, offset); \
+         return SeekTrait<SEEK>(RTTI::GetMetaTrait(token), output, offset); \
       } \
       \
       template<Seek SEEK = Seek::HereAndAbove> \
       NOD() LANGULUS(INLINED) \
       Trait SeekTraitAux(const Any& aux, const Token& token, Index offset = IndexFirst) const { \
-         return SeekTraitAux<SEEK>(aux, RTTI::Database.GetMetaTrait(token), offset); \
+         return SeekTraitAux<SEEK>(aux, RTTI::GetMetaTrait(token), offset); \
       } \
       template<Seek SEEK = Seek::HereAndAbove, CT::Data D> \
       LANGULUS(INLINED) \
       bool SeekTraitAux(const Any& aux, const Token& token, D& output, Index offset = IndexFirst) const { \
-         return SeekTraitAux<SEEK>(aux, RTTI::Database.GetMetaTrait(token), output, offset); \
+         return SeekTraitAux<SEEK>(aux, RTTI::GetMetaTrait(token), output, offset); \
       }
 #else
    #define LANGULUS_SEEK_TOKEN_INTERFACE()
@@ -236,23 +236,23 @@ namespace Langulus::Entity
       template<Seek SEEK = Seek::HereAndAbove> \
       NOD() LANGULUS(INLINED) \
       TAny<Unit*> GatherUnits(const Token& token) { \
-         return GatherUnits<SEEK>(RTTI::Database.GetMetaData(token)); \
+         return GatherUnits<SEEK>(RTTI::GetMetaData(token)); \
       } \
       template<Seek SEEK = Seek::HereAndAbove> \
       NOD() LANGULUS(INLINED) \
       TAny<const Unit*> GatherUnits(const Token& token) const { \
-         return GatherUnits<SEEK>(RTTI::Database.GetMetaData(token)); \
+         return GatherUnits<SEEK>(RTTI::GetMetaData(token)); \
       } \
       \
       template<Seek SEEK = Seek::HereAndAbove> \
       NOD() LANGULUS(INLINED) \
       TraitList GatherTraits(const Token& token) { \
-         return GatherTraits<SEEK>(RTTI::Database.GetMetaTrait(token)); \
+         return GatherTraits<SEEK>(RTTI::GetMetaTrait(token)); \
       } \
       template<Seek SEEK = Seek::HereAndAbove> \
       NOD() LANGULUS(INLINED) \
       TraitList GatherTraits(const Token& token) const { \
-         return GatherTraits<SEEK>(RTTI::Database.GetMetaTrait(token)); \
+         return GatherTraits<SEEK>(RTTI::GetMetaTrait(token)); \
       }
 #else
    #define LANGULUS_GATHER_TOKEN_INTERFACE()
