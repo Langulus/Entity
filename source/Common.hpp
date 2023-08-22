@@ -20,8 +20,6 @@ namespace Langulus::Entity
    using namespace ::Langulus::Anyness;
 
    using Flow::Verb;
-   using Flow::Construct;
-   using Flow::Charge;
    using Flow::Seek;
    using Flow::Resolvable;
    using Flow::Temporal;
