@@ -39,7 +39,7 @@ namespace Langulus::Entity
       Unit& operator = (const Unit&) = delete;
 
       /// A unit can only be moved or created with type and owner             
-      LANGULUS_API(ENTITY) Unit(DMeta, const Any&) noexcept;
+      LANGULUS_API(ENTITY) Unit(DMeta, const Neat& = {}) noexcept;
       LANGULUS_API(ENTITY) Unit(Unit&&) noexcept;
       LANGULUS_API(ENTITY) virtual ~Unit();
 
@@ -57,7 +57,7 @@ namespace Langulus::Entity
       const Hierarchy& GetOwners() const noexcept;
 
       NOD() LANGULUS_API(ENTITY)
-      bool CompareDescriptor(const Block&) const;
+      bool CompareDescriptor(const Neat&) const;
       
       ///                                                                     
       ///   Flow                                                              

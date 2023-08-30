@@ -31,27 +31,27 @@ namespace Langulus::Entity
    ///   @param text - text to execute                                        
    ///   @return the results of the execution                                 
    Any Thing::Run(const Lingua& text) {
-      if (!text)
+      if (not text)
          return {};
 
       // Message is still contextless, we don't know where exactly to   
       // interpret it, so create message objects from the hierarchy,    
-      // and try interpreting those to executable scopes                
+      // and try interpreting those to executable temporals             
       // Each trained AI in the hierarchy will produce its own          
       // interpretation                                                 
       auto messages = CreateData(
          Construct::From<Lingua>(static_cast<const Text&>(text))
       );
 
-      Verbs::InterpretAs<Flow::Scope> interpreter;
-      if (!Flow::DispatchFlat(messages, interpreter)) {  
-         Logger::Error("Messages failed to interpret to scope: ", messages);
+      Verbs::InterpretAs<Flow::Temporal> interpreter;
+      if (not Flow::DispatchFlat(messages, interpreter)) {  
+         Logger::Error("Messages failed to interpret to temporal: ", messages);
          return {};
       }
 
       // Execute the resulting scopes                                   
       Any results;
-      interpreter->ForEach([&](const Flow::Scope& scope) {
+      interpreter->ForEach([&](const Flow::Temporal& scope) {
          results << Resolvable::Run(scope);
       });
 
@@ -81,7 +81,7 @@ namespace Langulus::Entity
    /// Create/Destroy stuff inside entity's context                           
    ///   @param verb - creation verb                                          
    void Thing::Create(Verb& verb) {
-      if (!verb)
+      if (not verb)
          return;
 
       // Scan the request                                               
@@ -121,8 +121,7 @@ namespace Langulus::Entity
 
          if (construct.template Is<Thing>()) {
             // Instantiate a child Thing                                
-            Descriptor d {construct.GetArgument()};
-            verb << CreateChild(d);
+            verb << CreateChild(construct.GetArgument());
          }
          else if (construct.template Is<Runtime>()) {
             // Instantiate a runtime                                    
@@ -136,8 +135,7 @@ namespace Langulus::Entity
             // Instantiate a module from the runtime                    
             auto runtime = GetRuntime();
             auto dependency = runtime->GetDependency(construct.GetType());
-            Descriptor d {construct.GetArgument()};
-            verb << runtime->InstantiateModule(dependency, d);
+            verb << runtime->InstantiateModule(dependency, construct.GetArgument());
          }
          else {
             // Instantiate anything else                                
@@ -159,7 +157,7 @@ namespace Langulus::Entity
 
       const auto selectTrait = [&](const MetaTrait* trait) {
          auto found = GetTrait(trait);
-         if (!found) {
+         if (not found) {
             mismatch = true;
             return Flow::Break;
          }
@@ -173,7 +171,7 @@ namespace Langulus::Entity
             return Flow::Continue;
 
          auto found = GetUnitMeta(type);
-         if (!found) {
+         if (not found) {
             mismatch = true;
             return Flow::Break;
          }
@@ -195,7 +193,7 @@ namespace Langulus::Entity
          }
          else if (construct.CastsTo<Unit>()) {
             // Find a unit containing construct arguments               
-            if (!selectUnit(construct.GetType()))
+            if (not selectUnit(construct.GetType()))
                return Flow::Break;
 
             // selectedComponents has been populated with results       
@@ -204,11 +202,11 @@ namespace Langulus::Entity
             for (auto& unit : selectedUnits) {
                bool localMismatch = false;
                auto unitBlock = unit->GetBlock();
-               construct.ForEachDeep([&](const Block& part) {
+               construct.ForEach([&](const Block& part) {
                   for (Offset i = 0; i < part.GetCount(); ++i) {
                      auto element = part.GetElementResolved(i);
                      Verbs::Select selector {element};
-                     if (!Flow::DispatchFlat(unitBlock, selector)) {
+                     if (not Flow::DispatchFlat(unitBlock, selector)) {
                         // Abort on first failure                       
                         localMismatch = true;
                         return Flow::Break;
@@ -218,7 +216,7 @@ namespace Langulus::Entity
                   return Flow::Continue;
                });
 
-               if (!localMismatch) {
+               if (not localMismatch) {
                   // The unit passes the test                           
                   filteredSelectedComponents << unit;
                }
@@ -247,10 +245,10 @@ namespace Langulus::Entity
             }
          );
 
-         return !mismatch;
+         return not mismatch;
       });
 
-      if (!mismatch) {
+      if (not mismatch) {
          // We're not seeking an entity, but components/traits          
          if (selectedTraits) {
             ENTITY_SELECTION_VERBOSE_SELF(Logger::Green,
@@ -272,7 +270,7 @@ namespace Langulus::Entity
       }
 
       // Climb the hierarchy                                            
-      if (!verb.IsDone() && mOwner)
+      if (not verb.IsDone() and mOwner)
          mOwner->Select(verb);
    }
       

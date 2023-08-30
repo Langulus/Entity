@@ -13,21 +13,13 @@ namespace Langulus::Entity
    /// Manual construction                                                    
    ///   @param classid - type of the unit                                    
    ///   @param descriptor - the unit descriptor, used to extract unit owner  
-   Unit::Unit(DMeta classid, const Any& descriptor) noexcept
+   Unit::Unit(DMeta classid, const Neat& descriptor) noexcept
       : Resolvable {classid} {
       // Couple any Thing provided in the descriptor                    
-      descriptor.ForEachDeep(
-         [this](const Trait& trait) {
-            if (trait.TraitIs<Traits::Parent>()) {
-               trait.ForEach([this](const Thing* owner) {
-                  Couple(owner);
-               });
-            }
-         },
-         [this](const Thing* owner) {
-            Couple(owner);
-         }
-      );
+      const Thing* owner = nullptr;
+      if (not descriptor.ExtractTrait<Traits::Parent>(owner))
+         descriptor.ExtractData(owner);
+      Couple(owner);
    }
 
    /// Move unit                                                              
@@ -76,37 +68,36 @@ namespace Langulus::Entity
    }
    
    /// Check if this unit has a given set of properties                       
-   ///   @param messyDescriptor - descriptor with required properties         
+   ///   @param descriptor - descriptor with required properties              
    ///   @return true if the unit has the given properties                    
-   bool Unit::CompareDescriptor(const Block& messyDescriptor) const {
+   bool Unit::CompareDescriptor(const Neat& descriptor) const {
+      // First we compare traits only, all of them must be present      
       bool mismatch {};
       Offset memberOffset {};
-      messyDescriptor.ForEachDeep(
-         [&](const Trait& trait) {
-            if (!GetMember(trait.GetTrait(), memberOffset).Compare(trait)) {
-               mismatch = true;
-               return Flow::Break;
-            }
-
-            ++memberOffset;
-            return Flow::Continue;
+      descriptor.ForEach([&](const Trait& trait) {
+         if (not GetMember(trait.GetTrait(), memberOffset).Compare(trait)) {
+            mismatch = true;
+            return Flow::Break;
          }
-      );
 
+         ++memberOffset;
+         return Flow::Continue;
+      });
+
+      // Then we run another check, based on data types, again, all     
+      // of them must be present, either in trait, or in other form     
       memberOffset = {};
-      messyDescriptor.ForEachDeep(
-         [&](const Block& anythingElse) {
-            if (!GetMember(nullptr, memberOffset).Compare(anythingElse)) {
-               mismatch = true;
-               return Flow::Break;
-            }
-
-            ++memberOffset;
-            return Flow::Continue;
+      descriptor.ForEachTail([&](const Block& anythingElse) {
+         if (not GetMember(nullptr, memberOffset).Compare(anythingElse)) {
+            mismatch = true;
+            return Flow::Break;
          }
-      );
 
-      return !mismatch;
+         ++memberOffset;
+         return Flow::Continue;
+      });
+
+      return not mismatch;
    }
    
    /// Get the list of unit owners                                            
@@ -120,7 +111,7 @@ namespace Langulus::Entity
    ///              different runtimes should be explicitly disallowed        
    ///   @return a pointer to the runtime, if available                       
    Runtime* Unit::GetRuntime() const noexcept {
-      if (!mOwners)
+      if (not mOwners)
          return nullptr;
       return mOwners[0]->GetRuntime();
    }
@@ -129,7 +120,7 @@ namespace Langulus::Entity
    /// This will call refresh to all units in that entity on next tick        
    ///   @param entity - the entity to couple with                            
    void Unit::Couple(const Thing* entity) {
-      if (!entity)
+      if (not entity)
          return;
 
       if (mOwners.Merge(const_cast<Thing*>(entity)))
@@ -140,7 +131,7 @@ namespace Langulus::Entity
    /// This will call refresh to all units in that entity on next frame       
    ///   @param entity - the entity to decouple with                          
    void Unit::Decouple(const Thing* entity) {
-      if (!entity)
+      if (not entity)
          return;
       
       if (mOwners.Remove(entity))

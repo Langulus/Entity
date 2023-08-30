@@ -26,10 +26,10 @@ namespace Langulus::Entity
 
    /// Construct as a root                                                    
    ///   @param descriptor - instructions for creating the entity             
-   Thing::Thing(const Descriptor& descriptor)
+   Thing::Thing(const Neat& descriptor)
       : Resolvable {MetaOf<Thing>()} {
       if (descriptor) {
-         Verbs::Create creator {descriptor};
+         Verbs::Create creator {&descriptor};
          Create(creator);
       }
       ENTITY_VERBOSE_SELF("Created (root, ", GetReferences(), " references)");
@@ -38,7 +38,7 @@ namespace Langulus::Entity
    /// Construct as a child of another thing                                  
    ///   @param parent - the owner of the thing                               
    ///   @param descriptor - instructions for creating the thing              
-   Thing::Thing(Thing* parent, const Descriptor& descriptor)
+   Thing::Thing(Thing* parent, const Neat& descriptor)
       : Resolvable {MetaOf<Thing>()}
       , mOwner {parent} {
       if (parent) {
@@ -49,7 +49,7 @@ namespace Langulus::Entity
 
       if (descriptor) {
          // Create any subthings/traits/unit in this thing              
-         Verbs::Create creator {descriptor};
+         Verbs::Create creator {&descriptor};
          Create(creator);
       }
 
@@ -101,7 +101,7 @@ namespace Langulus::Entity
 
       // The thing might be on the stack, make sure we decouple it from 
       // its owner, if that's the case                                  
-      if (mOwner && GetReferences() > 1)
+      if (mOwner and GetReferences() > 1)
          mOwner->RemoveChild<false>(this);
 
       // Decouple all children from their parent                        
@@ -119,8 +119,8 @@ namespace Langulus::Entity
    ///           the exact same behavior (actual state is ignored)            
    bool Thing::operator == (const Thing& other) const {
       return mChildren == other.mChildren
-          && mUnitsList == other.mUnitsList
-          && mTraits == other.mTraits;
+         and mUnitsList == other.mUnitsList
+         and mTraits == other.mTraits;
    }
 
    /// Convert to text, by writing a short name or address                    
@@ -191,7 +191,7 @@ namespace Langulus::Entity
    /// Refresh all units and children down the hierarchy                      
    ///   @param force - force refresh                                         
    void Thing::Refresh(bool force) {
-      if (!force && !mRefreshRequired)
+      if (not force and not mRefreshRequired)
          return;
 
       mRefreshRequired = false;
@@ -264,7 +264,7 @@ namespace Langulus::Entity
          const auto found = mUnitsAmbiguous.Find(meta);
          if (found) {
             const auto& bucket = mUnitsAmbiguous.GetValue(found);
-            if (!what.GetArgument())
+            if (not what)
                return bucket[index];
 
             // Check all units in that bucket for required properties   
@@ -439,7 +439,7 @@ namespace Langulus::Entity
    /// Create a child thing                                                   
    ///   @param descriptor - instructions for the entity's creation           
    ///   @return the new child instance                                       
-   Ref<Thing> Thing::CreateChild(const Descriptor& descriptor) {
+   Ref<Thing> Thing::CreateChild(const Neat& descriptor) {
       ENTITY_VERBOSE_SELF_TAB("Producing child: ");
       Ref<Thing> newThing;
       newThing.New(this, descriptor);
@@ -452,9 +452,9 @@ namespace Langulus::Entity
    ///   @param module - name of the module                                   
    ///   @param descriptor - instructions for module setup                    
    ///   @return the instantiated module interface                            
-   Module* Thing::LoadMod(const Token& module, const Descriptor& descriptor) {
+   Module* Thing::LoadMod(const Token& module, const Neat& descriptor) {
       const auto runtime = GetRuntime();
-      LANGULUS_ASSUME(UserAssumes, runtime != nullptr,
+      LANGULUS_ASSUME(UserAssumes, runtime,
          "No runtime available for loading a module");
       const auto instance = runtime->InstantiateModule(module, descriptor);
       LANGULUS_ASSERT(instance, Module, "Missing module");

@@ -201,7 +201,7 @@ namespace Langulus::Entity
    ///   @return the number of matching traits                                
    Count Thing::HasTraits(const Trait& prototype) const {
       const auto found = mTraits.Find(prototype.GetTrait());
-      if (!found)
+      if (not found)
          return 0;
 
       Count counter {};
@@ -217,7 +217,7 @@ namespace Langulus::Entity
    ///   @param name - the name to set                                        
    void Thing::SetName(const Text& name) {
       auto found = GetLocalTrait<Traits::Name>();
-      if (!found)
+      if (not found)
          AddTrait(Traits::Name {name});
       else
          *found = name;
@@ -228,7 +228,7 @@ namespace Langulus::Entity
    ///   @return the name, or empty string if no such trait was found here    
    Text Thing::GetName() const {
       Text name;
-      if (!SeekTrait<Traits::Name, Seek::Here>(name))
+      if (not SeekTrait<Traits::Name, Seek::Here>(name))
          return {};
       return name;
    }

@@ -188,7 +188,7 @@ SCENARIO("Testing Thing", "[thing]") {
       }
 
       WHEN("Set a name trait") {
-         auto trait = root.AddTrait(Traits::Name {"Dimo"_text});
+         auto trait = root.AddTrait(Traits::Name {"Dimo"});
 
          THEN("Properties should match") {
             REQUIRE(trait != nullptr);
@@ -209,7 +209,7 @@ SCENARIO("Testing Thing", "[thing]") {
             auto it = root.mTraits.begin();
             REQUIRE(it->mKey == MetaOf<Traits::Name>());
             REQUIRE(it->mValue.GetCount() == 1);
-            REQUIRE(it->mValue[0] == Traits::Name {"Dimo"_text});
+            REQUIRE(it->mValue[0] == Traits::Name {"Dimo"});
             REQUIRE(&it->mValue[0] == trait);
          }
       }
@@ -217,25 +217,25 @@ SCENARIO("Testing Thing", "[thing]") {
 
    WHEN("Creating a Thing by descriptor") {
       Logger::Special("Start: Creating a Thing by descriptor");
-      Descriptor descriptor {
-         Traits::Name {"Root"_text},
+      Neat descriptor {
+         Traits::Name {"Root"},
          Construct::From<Runtime>(),
          Construct::From<Temporal>(),
          Construct::From<TestUnit1>(),
          Construct::From<TestUnit2>(),
          Construct::From<Thing>(
-            Traits::Name {"Child1"_text},
+            Traits::Name {"Child1"},
             Construct::From<TestUnit1>(),
             Construct::From<TestUnit2>(),
             Construct::From<Thing>(
-               Traits::Name {"GrandChild1"_text}
+               Traits::Name {"GrandChild1"}
             ),
             Construct::From<Thing>(
-               Traits::Name {"GrandChild2"_text}
+               Traits::Name {"GrandChild2"}
             )
          ),
          Construct::From<Thing>(
-            Traits::Name {"Child2"_text}
+            Traits::Name {"Child2"}
          )
       };
 
@@ -310,28 +310,28 @@ SCENARIO("Testing Thing", "[thing]") {
    }
 
    GIVEN("A complex hierarchy with runtime, flow, units, and traits") {
-      Descriptor descriptor {
-         Traits::Name {"Root"_text},
+      Neat descriptor {
+         Traits::Name {"Root"},
          Construct::From<Runtime>(),
          Construct::From<Temporal>(),
          Construct::From<TestUnit1>(),
          Construct::From<TestUnit2>(),
          Construct::From<Thing>(
-            Traits::Name {"Child1"_text},
+            Traits::Name {"Child1"},
             Construct::From<TestUnit1>(),
             Construct::From<TestUnit2>(),
             Construct::From<Thing>(
-               Traits::Name {"GrandChild1"_text}
+               Traits::Name {"GrandChild1"}
             ),
             Construct::From<Thing>(
-               Traits::Name {"GrandChild2"_text}
+               Traits::Name {"GrandChild2"}
             )
          ),
          Construct::From<Thing>(
-            Traits::Name {"Child2"_text}
+            Traits::Name {"Child2"}
          ),
          Construct::From<Thing>(
-            Traits::Name {"Child2"_text}
+            Traits::Name {"Child2"}
          )
       };
 

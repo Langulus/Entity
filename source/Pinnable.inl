@@ -17,17 +17,17 @@ namespace Langulus::Entity
    /// Descriptor-constructor for base type                                   
    ///   @param desc - the descriptor to use                                  
    TEMPLATE() LANGULUS(INLINED)
-   PINNED()::Pinnable(const Descriptor& desc) requires (CT::DescriptorMakable<T>)
-      : T {desc} {}
+   PINNED()::Pinnable(const Neat& neat) requires (CT::DescriptorMakable<T>)
+      : T {neat} {}
    
    /// Descriptor-constructor for base type, in case it lacks it              
    ///   @param desc - the descriptor to use                                  
-   TEMPLATE() LANGULUS(INLINED)
-   PINNED()::Pinnable(const Descriptor& desc) requires (!CT::DescriptorMakable<T>)
-      : T {desc.Is<T>() && desc ? desc.Get<T>() : T{}} {
-      if (!desc.Is<T>() || !desc)
+   /*TEMPLATE() LANGULUS(INLINED)
+   PINNED()::Pinnable(const Neat& neat) requires (not CT::DescriptorMakable<T>)
+      : T {neat.Is<T>() && neat ? neat.Get<T>() : T{}} {
+      if (not neat.Is<T>() or not neat)
          LANGULUS_THROW(Construct, "Can't construct pinnable");
-   }
+   }*/
 
    /// Check if the value is pinned                                           
    ///   @return true if value is pinned                                      

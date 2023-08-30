@@ -100,7 +100,7 @@ namespace Langulus::Entity
    ///   @param name - module name                                            
    ///   @param descriptor - module initialization descriptor                 
    ///   @return the new module instance                                      
-   Module* Runtime::InstantiateModule(const Token& name, const Descriptor& descriptor) {
+   Module* Runtime::InstantiateModule(const Token& name, const Neat& descriptor) {
       // Load the library if not loaded yet                             
       const auto library = LoadSharedLibrary(name);
 
@@ -154,24 +154,22 @@ namespace Langulus::Entity
    ///   @param library - the library handle                                  
    ///   @param descriptor - module initialization descriptor                 
    ///   @return the new module instance                                      
-   Module* Runtime::InstantiateModule(const SharedLibrary& library, const Descriptor& descriptor) {
-      if (!library.IsValid())
+   Module* Runtime::InstantiateModule(const SharedLibrary& library, const Neat& descriptor) {
+      if (not library.IsValid())
          return nullptr;
 
       // Use the creation point of the library to instantiate module    
       const auto info = library.mInfo();
       Module* module {};
 
-      try {
-         module = library.mCreator(this, descriptor);
-      }
+      try { module = library.mCreator(this, descriptor); }
       catch (...) {
          Logger::Error("Module `", info->mName,
             "` creator has thrown an exception");
          return nullptr;
       }
 
-      if (!module) {
+      if (not module) {
          Logger::Error("Module `", info->mName,
             "` creator didn't provide a module");
          return nullptr;
@@ -187,7 +185,7 @@ namespace Langulus::Entity
 
          // Make sure we end up in an invariant state                   
          mModules[info->mPriority].Remove(module);
-         if (!mModules[info->mPriority])
+         if (not mModules[info->mPriority])
             mModules.RemoveKey(info->mPriority);
 
          UnregisterAllBases(mModulesByType, module, module->GetType());
@@ -245,7 +243,7 @@ namespace Langulus::Entity
          #error Unsupported OS
       #endif
 
-      if (!dll) {
+      if (not dll) {
          Logger::Error("Failed to load module `", path, "` - file is missing or corrupted; Error code: ");
          #if LANGULUS_OS(WINDOWS)
             Logger::Append(::GetLastError());
@@ -276,21 +274,21 @@ namespace Langulus::Entity
          #error Unsupported OS
       #endif   
 
-      if (!library.mEntry) {
+      if (not library.mEntry) {
          Logger::Error("Module `", path, "` has no valid entry point - ",
             "the function " LANGULUS_MODULE_ENTRY_TOKEN() " is missing");
          (void)UnloadSharedLibrary(library);
          return {};
       }
 
-      if (!library.mCreator) {
+      if (not library.mCreator) {
          Logger::Error("Module `", path, "` has no valid instantiation point - ",
             "the function " LANGULUS_MODULE_CREATE_TOKEN() " is missing");
          (void)UnloadSharedLibrary(library);
          return {};
       }
 
-      if (!library.mInfo) {
+      if (not library.mInfo) {
          Logger::Error("Module `", path, "` has no valid information point - ",
             "the function " LANGULUS_MODULE_INFO_TOKEN() " is missing");
          (void)UnloadSharedLibrary(library);
@@ -375,7 +373,7 @@ namespace Langulus::Entity
             // It will be attempted on next unload, so that dependent   
             // libraries have a chance of being unloaded first,         
             // releasing required resources.                            
-            if (!wasMarked) {
+            if (not wasMarked) {
                Logger::Warning(
                   "Module `", boundary, "` can't be unloaded yet, because "
                   "exposed data is still in use in ", poolsInUse, " memory pools. "

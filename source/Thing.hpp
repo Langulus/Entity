@@ -76,8 +76,8 @@ namespace Langulus::Entity
       void CreateInner(Verb&, const Construct&);
 
    public:
-      LANGULUS_API(ENTITY) Thing(const Descriptor& = {});
-      LANGULUS_API(ENTITY) Thing(Thing*, const Descriptor& = {});
+      LANGULUS_API(ENTITY) Thing(const Neat& = {});
+      LANGULUS_API(ENTITY) Thing(Thing*, const Neat& = {});
       LANGULUS_API(ENTITY) Thing(Thing&&) noexcept;
       LANGULUS_API(ENTITY) ~Thing() SAFETY_NOEXCEPT();
 
@@ -121,7 +121,7 @@ namespace Langulus::Entity
       Temporal* CreateFlow();
 
       LANGULUS_API(ENTITY)
-      Ref<Thing> CreateChild(const Descriptor& = {});
+      Ref<Thing> CreateChild(const Neat& = {});
 
       template<bool TWOSIDED = true>
       Count AddChild(Thing*);
@@ -129,7 +129,7 @@ namespace Langulus::Entity
       Count RemoveChild(Thing*);
 
       LANGULUS_API(ENTITY)
-      Module* LoadMod(const Token&, const Descriptor& = {});
+      Module* LoadMod(const Token&, const Neat& = {});
 
       NOD() LANGULUS_API(ENTITY)
       const Hierarchy& GetChildren() const noexcept;

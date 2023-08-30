@@ -23,7 +23,6 @@ namespace Langulus::Entity
    using Flow::Seek;
    using Flow::Resolvable;
    using Flow::Temporal;
-   using Flow::Scope;
    using Flow::Code;
 
    //                                                                   

@@ -468,7 +468,7 @@ namespace Langulus::A
       LANGULUS(PRODUCER) AssetModule;
       LANGULUS_BASES(Entity::Unit);
       
-      Asset(RTTI::DMeta, AssetModule*, const Anyness::Descriptor&);
+      Asset(RTTI::DMeta, AssetModule*, const Anyness::Neat&);
 
       using Data = Anyness::Any;
       using DataList = Anyness::TAny<Data>;

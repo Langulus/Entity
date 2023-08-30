@@ -247,7 +247,7 @@ namespace Langulus::A
    ///   @param producer - the asset library and producer                     
    ///   @param desc - messy descriptor for the content                       
    LANGULUS(INLINED)
-   Asset::Asset(RTTI::DMeta type, AssetModule* producer, const Anyness::Descriptor& desc)
+   Asset::Asset(RTTI::DMeta type, AssetModule* producer, const Anyness::Neat& desc)
       : Unit {type, desc}
       , ProducedFrom<AssetModule> {producer, desc} {}
 

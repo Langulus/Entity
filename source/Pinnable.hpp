@@ -22,7 +22,7 @@ namespace Langulus
    namespace CT
    {
       template<class... T>
-      concept Pinnable = (DerivedFrom<T, A::Pinnable> && ...);
+      concept Pinnable = (DerivedFrom<T, A::Pinnable> and ...);
    }
 
 } // namespace Langulus::A
@@ -39,7 +39,7 @@ namespace Langulus::Entity
    template<class T>
    struct Pinnable : T, A::Pinnable {
    protected:
-      static_assert(!CT::Pinnable<T>, "Can't nest Pinnable types");
+      static_assert(not CT::Pinnable<T>, "Can't nest Pinnable types");
 
       // Hierarchies are allowed to pin pinnables                       
       friend struct Hierarchy;
@@ -62,8 +62,8 @@ namespace Langulus::Entity
       Pinnable(Pinnable&&) noexcept = default;
       using T::T;
 
-      Pinnable(const Descriptor&) requires (CT::DescriptorMakable<T>);
-      Pinnable(const Descriptor&) requires (!CT::DescriptorMakable<T>);
+      Pinnable(const Neat&) requires (CT::DescriptorMakable<T>);
+      //Pinnable(const Neat&) requires (not CT::DescriptorMakable<T>);
 
       Pinnable& operator = (const Pinnable&) = default;
       Pinnable& operator = (Pinnable&&) noexcept = default;
