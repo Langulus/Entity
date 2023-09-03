@@ -73,7 +73,8 @@ namespace Langulus::Entity
       template<Seek = Seek::HereAndAbove>
       NOD() Any CreateData(const Construct&);
 
-      void CreateInner(Verb&, const Construct&);
+      template<class T>
+      void CreateInner(Verb&, const T&);
 
    public:
       LANGULUS_API(ENTITY) Thing(const Neat& = {});

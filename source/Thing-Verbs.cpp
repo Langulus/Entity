@@ -83,65 +83,7 @@ namespace Langulus::Entity
    void Thing::Create(Verb& verb) {
       if (not verb)
          return;
-
-      // Scan the request                                               
-      verb.ForEachDeep([&](const Block& group) {
-         group.ForEach(
-            [&](const Trait& trait) {
-               ENTITY_CREATION_VERBOSE_SELF(
-                  "Creating: ", Logger::Yellow, trait);
-               verb << AddTrait(trait);
-            },
-            [&](const Construct& construct) {
-               if (construct.GetCharge().mMass > 0) {
-                  ENTITY_CREATION_VERBOSE_SELF(
-                     "Creating: ", Logger::Yellow, construct);
-                  CreateInner(verb, construct);
-               }
-            },
-            [&](const MetaData* type) {
-               ENTITY_CREATION_VERBOSE_SELF(
-                  "Creating: ", Logger::Yellow, type->mToken);
-               CreateInner(verb, Construct {type});
-            }
-         );
-      });
-   }
-
-   /// Inner creation routine                                                 
-   ///   @param verb - original create verb to output to                      
-   ///   @param construct - the construct to create                           
-   void Thing::CreateInner(Verb& verb, const Construct& construct) {
-      const auto count = static_cast<Count>(construct.GetCharge().mMass);
-      for (Offset i = 0; i < count; ++i) {
-         if (count != 1) {
-            ENTITY_CREATION_VERBOSE_SELF(Logger::Yellow,
-               "Charged creation - creating ", i + 1, " of ", count);
-         }
-
-         if (construct.template Is<Thing>()) {
-            // Instantiate a child Thing                                
-            verb << CreateChild(construct.GetArgument());
-         }
-         else if (construct.template Is<Runtime>()) {
-            // Instantiate a runtime                                    
-            verb << CreateRuntime();
-         }
-         else if (construct.template Is<Temporal>()) {
-            // Instantiate a temporal flow                              
-            verb << CreateFlow();
-         }
-         else if (construct.template CastsTo<Module>()) {
-            // Instantiate a module from the runtime                    
-            auto runtime = GetRuntime();
-            auto dependency = runtime->GetDependency(construct.GetType());
-            verb << runtime->InstantiateModule(dependency, construct.GetArgument());
-         }
-         else {
-            // Instantiate anything else                                
-            verb << CreateData(construct);
-         }
-      }
+      CreateInner(verb, verb.GetArgument());
    }
 
    /// Pick something from the entity - children, traits, units, modules      
@@ -229,24 +171,20 @@ namespace Langulus::Entity
          return Flow::Break;
       };
 
-      verb.ForEachDeep([&](const Block& part) {
-         part.ForEach(
-            [&](const Construct& construct) {
-               return selectConstruct(construct);
-            },
-            [&](const Trait& trait) {
-               return selectTrait(trait.GetTrait());
-            },
-            [&](const MetaTrait* trait) {
-               return selectTrait(trait);
-            },
-            [&](const MetaData* type) {
-               return selectUnit(type);
-            }
-         );
-
-         return not mismatch;
-      });
+      verb.ForEachDeep(
+         [&](const Construct& construct) {
+            return selectConstruct(construct);
+         },
+         [&](const Trait& trait) {
+            return selectTrait(trait.GetTrait());
+         },
+         [&](const MetaTrait* trait) {
+            return selectTrait(trait);
+         },
+         [&](const MetaData* type) {
+            return selectUnit(type);
+         }
+      );
 
       if (not mismatch) {
          // We're not seeking an entity, but components/traits          

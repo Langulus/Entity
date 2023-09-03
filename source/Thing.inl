@@ -29,6 +29,90 @@
 namespace Langulus::Entity
 {
    
+   /// Inner creation routine                                                 
+   ///   @tparam T - type of instructions for creation                        
+   ///   @param verb - original create verb to output to                      
+   ///   @param stuff - creation instructions                                 
+   template<class T>
+   void Thing::CreateInner(Verb& verb, const T& stuff) {
+      if constexpr (CT::Deep<T> or CT::Neat<T>) {
+         // Nest if deep/neat                                           
+         stuff.ForEachDeep(
+            [this, &verb](const Trait& trait) {
+               verb << AddTrait(trait);
+            },
+            [this, &verb](const Construct& construct) {
+               CreateInner(verb, construct);
+            },
+            [this, &verb](const Neat& neat) {
+               CreateInner(verb, neat);
+            },
+            [this, &verb](const MetaData* type) {
+               CreateInner(verb, type);
+            }
+         );
+      }
+      else if constexpr (CT::Exact<T, DMeta>) {
+         // Instantiate a type without any arguments                    
+         if (stuff->template Is<Thing>()) {
+            // Instantiate a child Thing                                
+            verb << CreateChild();
+         }
+         else if (stuff->template Is<Runtime>()) {
+            // Instantiate a runtime                                    
+            verb << CreateRuntime();
+         }
+         else if (stuff->template Is<Temporal>()) {
+            // Instantiate a temporal flow                              
+            verb << CreateFlow();
+         }
+         else if (stuff->template CastsTo<Module>()) {
+            // Instantiate a module from the runtime                    
+            auto runtime = GetRuntime();
+            auto dependency = runtime->GetDependency(stuff);
+            verb << runtime->InstantiateModule(dependency);
+         }
+         else {
+            // Instantiate anything else                                
+            verb << CreateData(Construct {stuff});
+         }
+      }
+      else if constexpr (CT::Construct<T>) {
+         // Instantiate a type, with charge and arguments               
+         const auto count = static_cast<int>(std::ceil(stuff.GetCharge().mMass));
+         for (int i = 0; i < count; ++i) {
+            if (count != 1) {
+               ENTITY_CREATION_VERBOSE_SELF(Logger::Yellow,
+                  "Charged creation - creating ", i + 1, " of ", count);
+            }
+
+            if (stuff.template Is<Thing>()) {
+               // Instantiate a child Thing                             
+               verb << CreateChild(stuff.GetArgument());
+            }
+            else if (stuff.template Is<Runtime>()) {
+               // Instantiate a runtime                                 
+               verb << CreateRuntime();
+            }
+            else if (stuff.template Is<Temporal>()) {
+               // Instantiate a temporal flow                           
+               verb << CreateFlow();
+            }
+            else if (stuff.template CastsTo<Module>()) {
+               // Instantiate a module from the runtime                 
+               auto runtime = GetRuntime();
+               auto dependency = runtime->GetDependency(stuff.GetType());
+               verb << runtime->InstantiateModule(dependency, stuff.GetArgument());
+            }
+            else {
+               // Instantiate anything else                             
+               verb << CreateData(stuff);
+            }
+         }
+      }
+      else LANGULUS_ERROR("Unsupported descriptor");
+   }
+
    /// Add a child                                                            
    ///   @attention assumes entity is a valid pointer                         
    ///   @tparam TWOSIDED - true to also set the entity's owner;              
@@ -394,7 +478,7 @@ namespace Langulus::Entity
       return const_cast<Thing&>(*this).template GetLocalTrait<T>(offset);
    }
 
-   /// Produce any data (including units) from the hierarchy                  
+   /// Produce constructs (including units) from the hierarchy                
    ///   @attention assumes construct has a valid type                        
    ///   @tparam SEEK - what part of the hierarchy to use for the creation    
    ///   @param construct - instructions for the creation of the data         
@@ -410,7 +494,7 @@ namespace Langulus::Entity
       // Implicitly add a parent trait to descriptor, if one isn't      
       // already added - it will be stripped later, when normalizing    
       // the descriptor when producing the item from a factory          
-      if (!descriptor.Get<Traits::Parent>())
+      if (not descriptor.Get<Traits::Parent>())
          descriptor << Traits::Parent {this};
 
       if (producer) {
@@ -451,7 +535,7 @@ namespace Langulus::Entity
             TODO();
          }
       }
-      else if (type->mIsAbstract && !type->mConcrete) {
+      else if (type->mIsAbstract and not type->mConcrete) {
          // Data doesn't have a specific producer, but it is abstract   
          // so we know that only a module/unit can concretize it        
          // Gather all units in the desired part of the hierarchy       

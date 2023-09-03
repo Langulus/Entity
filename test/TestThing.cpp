@@ -379,12 +379,17 @@ SCENARIO("Testing Thing", "[thing]") {
       }*/
 
       WHEN("Get a local unit by index") {
-         auto unit = root.GetUnit(0);
+         // Hash algorithm changes might swap the order of these two    
+         auto unit0 = root.GetUnit(1);
+         auto unit1 = root.GetUnit(0);
 
          THEN("Properties should match") { 
-            REQUIRE(unit);
-            REQUIRE(unit->Is<TestUnit1>());
-            REQUIRE(unit == root.mUnitsAmbiguous[MetaOf<TestUnit1>()][0]);
+            REQUIRE(unit0);
+            REQUIRE(unit0->Is<TestUnit1>());
+            REQUIRE(unit0 == root.mUnitsAmbiguous[MetaOf<TestUnit1>()][0]);
+            REQUIRE(unit1);
+            REQUIRE(unit1->Is<TestUnit2>());
+            REQUIRE(unit1 == root.mUnitsAmbiguous[MetaOf<TestUnit2>()][0]);
          }
       }
 
