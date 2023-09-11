@@ -419,8 +419,15 @@ namespace Langulus::Entity
    Runtime* Thing::CreateRuntime() {
       if (mRuntime.IsPinned())
          return mRuntime.Get();
+
       mRuntime.New(this);
       mRuntime.Pin();
+
+      // Dispatch the change to all children                            
+      for (auto& child : mChildren) {
+
+      }
+
       ENTITY_VERBOSE_SELF("New runtime: ", mRuntime);
       return mRuntime.Get();
    }
@@ -430,6 +437,7 @@ namespace Langulus::Entity
    Temporal* Thing::CreateFlow() {
       if (mFlow.IsPinned())
          return mFlow.Get();
+
       mFlow.New(this);
       mFlow.Pin();
       ENTITY_VERBOSE_SELF("New flow: ", mFlow);

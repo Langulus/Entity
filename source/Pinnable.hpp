@@ -63,7 +63,6 @@ namespace Langulus::Entity
       using T::T;
 
       Pinnable(const Neat&) requires (CT::DescriptorMakable<T>);
-      //Pinnable(const Neat&) requires (not CT::DescriptorMakable<T>);
 
       Pinnable& operator = (const Pinnable&) = default;
       Pinnable& operator = (Pinnable&&) noexcept = default;
