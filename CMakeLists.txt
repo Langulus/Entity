@@ -8,16 +8,9 @@ project(LangulusEntity
 
 # Check if this project is built as standalone, or a part of something else 
 if(PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
-    # Populate the cmake directory											
     include(LangulusUtilities.cmake)
-    langulus_fetch_cmake()
 
-    # Handle feature flags and global definitions/requirements				
-    include(HandleLangulusFeatures)
-    handle_langulus_features()
-
-    # Add Langulus::Core library                                            
-    include(FetchLangulusModule)
+    # Add all Langulus libraries                                            
 	fetch_langulus_module(Core)
 	fetch_langulus_module(Logger)
 	fetch_langulus_module(RTTI)
@@ -67,7 +60,7 @@ target_compile_definitions(LangulusEntity
     PRIVATE     LANGULUS_EXPORT_ALL
 )
 
-if(LANGULUS_ENABLE_TESTING)
+if(LANGULUS_TESTING)
     enable_testing()
 	add_subdirectory(test)
 endif()
