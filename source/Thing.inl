@@ -562,7 +562,7 @@ namespace Langulus::Entity
             return Abandon(creator.GetOutput());
          
          LANGULUS_THROW(Construct, 
-            "Requested data is not default- nor descriptor-constructible");
+            "Requested data is not default/descriptor-constructible");
       }
 
       Logger::Error("Unable to create data: ", construct);
