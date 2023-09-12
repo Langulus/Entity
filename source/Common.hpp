@@ -9,7 +9,7 @@
 #pragma once
 #include <Flow/Verb.hpp>
 
-#if defined(LANGULUS_EXPORT_ALL) || defined(LANGULUS_EXPORT_ENTITY)
+#if defined(LANGULUS_EXPORT_ALL) or defined(LANGULUS_EXPORT_ENTITY)
    #define LANGULUS_API_ENTITY() LANGULUS_EXPORT()
 #else
    #define LANGULUS_API_ENTITY() LANGULUS_IMPORT()

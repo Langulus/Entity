@@ -146,7 +146,7 @@ namespace Langulus::Entity
    void Unit::ReplaceOwner(const Thing* replaceThis, const Thing* withThis) {
       LANGULUS_ASSUME(DevAssumes, replaceThis != withThis,
          "Pointers are the same");
-      LANGULUS_ASSUME(DevAssumes, replaceThis && withThis,
+      LANGULUS_ASSUME(DevAssumes, replaceThis and withThis,
          "Nullptr not allowed");
 
       const auto found = mOwners.Find(replaceThis);

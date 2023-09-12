@@ -25,20 +25,20 @@ namespace Langulus
    ///   @return true if both views are the same                              
    LANGULUS(INLINED)
    bool MeshView::operator == (const MeshView& rhs) const noexcept {
-      return mPrimitiveCount == rhs.mPrimitiveCount &&
-             mPrimitiveStart == rhs.mPrimitiveStart &&
-             mIndexCount == rhs.mIndexCount &&
-             mIndexStart == rhs.mIndexStart &&
-             (mTopology == rhs.mTopology
-                || (mTopology && mTopology->IsExact(rhs.mTopology))) &&
-             mBilateral == rhs.mBilateral;
+      return mPrimitiveCount == rhs.mPrimitiveCount
+         and mPrimitiveStart == rhs.mPrimitiveStart
+         and mIndexCount == rhs.mIndexCount
+         and mIndexStart == rhs.mIndexStart
+         and (mTopology == rhs.mTopology
+            or (mTopology and mTopology->IsExact(rhs.mTopology)))
+         and mBilateral == rhs.mBilateral;
    }
 
    /// Decay the geometry view to a list of points                            
    ///   @return the decayed view                                             
    LANGULUS(INLINED)
    MeshView MeshView::Decay() const {
-      LANGULUS_ASSERT(mPrimitiveCount && mTopology, Convert, "Bad vertex view");
+      LANGULUS_ASSERT(mPrimitiveCount and mTopology, Convert, "Bad vertex view");
       if (mTopology->template Is<A::Point>())
          return *this;
 
@@ -48,19 +48,20 @@ namespace Langulus
       // mPrimitiveCount corresponds to the number of points in these   
       // cases:                                                         
       if (  mTopology->template Is<A::TriangleStrip>()
-         || mTopology->template Is<A::TriangleFan>()
-         || mTopology->template Is<A::LineStrip>()
-         || mTopology->template Is<A::LineLoop>())
+         or mTopology->template Is<A::TriangleFan>()
+         or mTopology->template Is<A::LineStrip>()
+         or mTopology->template Is<A::LineLoop>())
          return result;
 
-      if (mTopology->template Is<A::Triangle>())
+      if (mTopology->template Is<A::Triangle>()) {
          // Decay triangles to points                                   
          result.mPrimitiveCount *= 3;
-      if (mTopology->template Is<A::Line>())
+      }
+      if (mTopology->template Is<A::Line>()) {
          // Decay lines to points                                       
          result.mPrimitiveCount *= 2;
-      else
-         LANGULUS_THROW(Convert, "Bad primitive type");
+      }
+      else LANGULUS_THROW(Convert, "Bad primitive type");
 
       return result;
    }
@@ -85,12 +86,12 @@ namespace Langulus
    ///   @return true if both views are the same                              
    LANGULUS(INLINED)
    bool ImageView::operator == (const ImageView& rhs) const noexcept {
-      return mWidth == rhs.mWidth &&
-             mHeight == rhs.mHeight &&
-             mDepth == rhs.mDepth &&
-             mFrames == rhs.mFrames &&
-             (mFormat == rhs.mFormat
-                || (mFormat && mFormat->IsExact(rhs.mFormat)));
+      return mWidth == rhs.mWidth
+         and mHeight == rhs.mHeight
+         and mDepth == rhs.mDepth
+         and mFrames == rhs.mFrames
+         and (mFormat == rhs.mFormat
+            or (mFormat and mFormat->IsExact(rhs.mFormat)));
    }
 
    /// Get the number of pixels in the texture                                
@@ -339,7 +340,7 @@ namespace Langulus::A
    template<CT::Topology T>
    LANGULUS(INLINED)
    bool Mesh::CheckTopology() const {
-      return mView.mTopology && mView.mTopology->template Is<T>();
+      return mView.mTopology and mView.mTopology->template Is<T>();
    }
 
    /// Helper that indirects in case there is an index buffer                 
@@ -347,7 +348,7 @@ namespace Langulus::A
    ///   @param where - line indices                                          
    ///   @return the (eventually indirected) line indices                     
    inline Math::Vec2u Mesh::InnerGetIndices(const Data* indices, const Math::Vec2u& where) const {
-      if (!indices || !*indices)
+      if (not indices or not *indices)
          return where;
 
       if (indices->IsExact<std::uint8_t>()) {
@@ -381,7 +382,7 @@ namespace Langulus::A
    ///   @param where - triangle indices                                      
    ///   @return the (eventually indirected) triangle indices                 
    inline Math::Vec3u Mesh::InnerGetIndices(const Data* indices, const Math::Vec3u& where) const {
-      if (!indices || !*indices)
+      if (not indices or not *indices)
          return where;
 
       if (indices->IsExact<std::uint8_t>()) {
@@ -477,7 +478,7 @@ namespace Langulus::A
          }
          return 0;
       }
-      else if (CheckTopology<A::TriangleStrip>() || CheckTopology<A::TriangleFan>()) {
+      else if (CheckTopology<A::TriangleStrip>() or CheckTopology<A::TriangleFan>()) {
          if (mView.mIndexCount > 2)
             return 1 + (mView.mIndexCount - 2) * 2;
          else if (mView.mPrimitiveCount > 2)
@@ -546,7 +547,7 @@ namespace Langulus::A
    Anyness::Any Mesh::GetLineTrait(Offset lineIndex) const {
       const auto indices = GetLineIndices(lineIndex);
       const auto soughtt = GetData<T>(0);
-      if (!soughtt || !*soughtt)
+      if (not soughtt or not *soughtt)
          return {};
 
       Anyness::Block soughtDecayed;
@@ -575,7 +576,7 @@ namespace Langulus::A
    /// Get the number of triangles inside the geometry                        
    ///   @return the number of points                                         
    inline Count Mesh::GetTriangleCount() const {
-      if (MadeOfPoints() || MadeOfLines())
+      if (MadeOfPoints() or MadeOfLines())
          return 0;
 
       if (CheckTopology<A::Triangle>()) {
@@ -586,7 +587,7 @@ namespace Langulus::A
          LANGULUS_ASSERT(decayed.mPrimitiveCount % 3, Access, "Bad topology");
          return decayed.mPrimitiveCount / 3;
       }
-      else if (CheckTopology<A::TriangleStrip>() || CheckTopology<A::TriangleFan>()) {
+      else if (CheckTopology<A::TriangleStrip>() or CheckTopology<A::TriangleFan>()) {
          if (mView.mIndexCount > 2)
             return mView.mIndexCount - 2;
 
@@ -636,7 +637,7 @@ namespace Langulus::A
    Anyness::Any Mesh::GetTriangleTrait(Offset triangleIndex) const {
       const auto indices = GetTriangleIndices(triangleIndex);
       const auto soughtt = GetData<T>(0);
-      if (!soughtt || !*soughtt)
+      if (not soughtt or not *soughtt)
          return {};
 
       Anyness::Block soughtDecayed;
@@ -778,12 +779,12 @@ namespace Langulus::A
    auto Image::ForEachPixel(F&& call) const {
       auto pixels = GetData<Traits::Color>();
 
-      LANGULUS_ASSUME(DevAssumes, pixels && *pixels,
+      LANGULUS_ASSUME(DevAssumes, pixels and *pixels,
          "No color data", " in ", Self());
       LANGULUS_ASSUME(DevAssumes, pixels->IsDense(),
          "Image data is not dense", " for ", Self());
       LANGULUS_ASSUME(DevAssumes,
-         pixels->CastsTo<Anyness::Bytes>() || pixels->CastsTo<A::Color>(),
+         pixels->CastsTo<Anyness::Bytes>() or pixels->CastsTo<A::Color>(),
          "Image doesn't contain pixel data", 
          " - contains ", pixels->GetType(), " instead"
       );
@@ -806,7 +807,7 @@ namespace Langulus::A
       while (data != dataEnd) {
          if constexpr (CT::Bool<R>) {
             ++counter;
-            if (!call(*reinterpret_cast<const Deref<A>*>(data)))
+            if (not call(*reinterpret_cast<const Deref<A>*>(data)))
                return counter;
          }
          else call(*reinterpret_cast<const Deref<A>*>(data));

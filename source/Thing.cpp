@@ -425,9 +425,8 @@ namespace Langulus::Entity
       mRuntime.Pin();
 
       // Dispatch the change to all children                            
-      for (auto& child : mChildren) {
-
-      }
+      for (auto& child : mChildren)
+         child->ResetRuntime(mRuntime);
 
       ENTITY_VERBOSE_SELF("New runtime: ", mRuntime);
       return mRuntime.Get();
@@ -441,6 +440,11 @@ namespace Langulus::Entity
 
       mFlow.New(this);
       mFlow.Pin();
+
+      // Dispatch the change to all children                            
+      for (auto& child : mChildren)
+         child->ResetFlow(mFlow);
+
       ENTITY_VERBOSE_SELF("New flow: ", mFlow);
       return mFlow.Get();
    }

@@ -293,7 +293,7 @@ namespace Langulus::Entity
                // Didn't throw, but we're done only if offset matches   
                done = offset == 0;
                --offset;
-               return !done;
+               return not done;
             }
             catch (...) { }
          }
@@ -374,7 +374,7 @@ namespace Langulus::Entity
             // Didn't throw, but we're done only if offset matches      
             done = offset == 0;
             --offset;
-            return !done;
+            return not done;
          }
          catch(...) { }
 

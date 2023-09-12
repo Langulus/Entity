@@ -251,7 +251,7 @@ namespace Langulus::Entity
       // Check if the unit instance is already registered here          
       const auto meta = unit->GetType();
       const auto found = mUnitsAmbiguous.Find(meta);
-      if (found && mUnitsAmbiguous.GetValue(found).Find(unit))
+      if (found and mUnitsAmbiguous.GetValue(found).Find(unit))
          return 0;
 
       // We must guarantee, that no unit is coupled to entities with    
@@ -289,7 +289,7 @@ namespace Langulus::Entity
    Count Thing::RemoveUnit(Unit* unit) {
       const auto meta = unit->GetType();
       const auto foundType = mUnitsAmbiguous.Find(meta);
-      if (!foundType)
+      if (not foundType)
          return 0;
 
       auto& unitSet = mUnitsAmbiguous.GetValue(foundType);
@@ -339,7 +339,7 @@ namespace Langulus::Entity
          // Remove units of a specific type                             
          const auto meta = MetaOf<Decay<T>>();
          const auto found = mUnitsAmbiguous.Find(meta);
-         if (!found)
+         if (not found)
             return 0;
 
          // List intentionally shallow-copied, its memory will diverge  
@@ -398,7 +398,7 @@ namespace Langulus::Entity
    template<CT::Unit T>
    LANGULUS(INLINED)
    Decay<T>* Thing::GetUnit(Index offset) {
-      if constexpr (!CT::Same<T, Unit>) {
+      if constexpr (not CT::Same<T, Unit>) {
          return static_cast<Decay<T>*>(
             GetUnitMeta(MetaOf<Decay<T>>(), offset)
          );
@@ -417,7 +417,7 @@ namespace Langulus::Entity
    template<CT::Unit T>
    LANGULUS(INLINED)
    const Decay<T>* Thing::GetUnit(Index offset) const {
-      if constexpr (!CT::Same<T, Unit>) {
+      if constexpr (not CT::Same<T, Unit>) {
          return static_cast<const Decay<T>*>(
             GetUnitMeta(MetaOf<Decay<T>>(), offset)
          );
@@ -576,7 +576,7 @@ namespace Langulus::Entity
    ///   @return the verb output                                              
    template<Seek SEEK>
    Any Unit::RunIn(Verb& verb) {
-      if (!mOwners) {
+      if (not mOwners) {
          Logger::Warning(Self(), "No owners available for executing: ", verb);
          return false;
       }
