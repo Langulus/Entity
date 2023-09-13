@@ -81,7 +81,7 @@ namespace Langulus::Entity
       LANGULUS_API(ENTITY) Thing(const Neat& = {});
       LANGULUS_API(ENTITY) Thing(Thing*, const Neat& = {});
       LANGULUS_API(ENTITY) Thing(Thing&&) noexcept;
-      LANGULUS_API(ENTITY) ~Thing() SAFETY_NOEXCEPT();
+      LANGULUS_API(ENTITY) ~Thing() IF_UNSAFE(noexcept);
 
       // Shallow copy is disabled, you should be able only to clone,    
       // move, or abandon                                               

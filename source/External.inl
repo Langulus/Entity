@@ -8,10 +8,11 @@
 ///                                                                           
 #pragma once
 #include "External.hpp"
-#include <Math/Primitives/TTriangle.hpp>
-#include <Math/Primitives/TLine.hpp>
-#include <Math/Primitives/TPoint.hpp>
-#include <Math/Colors.hpp>
+#include <Math/Primitives/Triangle.hpp>
+#include <Math/Primitives/Line.hpp>
+#include <Math/Primitives/Point.hpp>
+#include <Math/Color.hpp>
+
 
 namespace Langulus
 {

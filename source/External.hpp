@@ -15,6 +15,7 @@
 #include <Flow/Rate.hpp>
 #include <Math/LOD.hpp>
 #include <Math/Mapping.hpp>
+#include <Math/Scale.hpp>
 
 LANGULUS_DEFINE_TRAIT(Cursor,
    "Enables or disables cursor for window");

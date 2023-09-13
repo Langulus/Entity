@@ -97,7 +97,7 @@ namespace Langulus::Entity
    }
 
    /// Thing destructor                                                       
-   Thing::~Thing() SAFETY_NOEXCEPT() {
+   Thing::~Thing() IF_UNSAFE(noexcept) {
       ENTITY_VERBOSE_SELF_TAB("Destroying (", GetReferences(), " uses)");
 
       // The thing might be on the stack, make sure we decouple it from 

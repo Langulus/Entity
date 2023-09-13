@@ -59,7 +59,7 @@ namespace Langulus::Entity
       Runtime* mRuntime;
 
    public:
-      Module(DMeta classid, Runtime* runtime) SAFETY_NOEXCEPT()
+      Module(DMeta classid, Runtime* runtime) IF_UNSAFE(noexcept)
          : Resolvable {classid}
          , mRuntime {runtime} {}
 
