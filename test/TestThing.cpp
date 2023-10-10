@@ -388,8 +388,8 @@ SCENARIO("Testing Thing", "[thing]") {
 
       WHEN("Get a local unit by index") {
          // Hash algorithm changes might swap the order of these two    
-         auto unit0 = root.GetUnit(1);
-         auto unit1 = root.GetUnit(0);
+         auto unit0 = root.GetUnit(0);
+         auto unit1 = root.GetUnit(1);
 
          THEN("Properties should match") { 
             REQUIRE(unit0);

@@ -224,11 +224,11 @@ namespace Langulus::Entity
    ///   @param unit - the unit instance to unregister                        
    ///   @param type - the type to unregister the unit as                     
    inline void Thing::RemoveUnitBases(Unit* unit, DMeta type) {
-      const auto found = mUnitsAmbiguous.Find(type);
+      const auto found = mUnitsAmbiguous.FindIt(type);
       if (found) {
-         auto& set = mUnitsAmbiguous.GetValue(found);
-         if (set.Remove(unit) && !set)
-            mUnitsAmbiguous.RemoveIndex(found);
+         auto& set = found->mValue;
+         if (set.Remove(unit) and not set)
+            mUnitsAmbiguous.RemoveIt(found);
       }
 
       for (auto& base : type->mBases) {

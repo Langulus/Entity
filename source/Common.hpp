@@ -8,6 +8,7 @@
 ///                                                                           
 #pragma once
 #include <Flow/Verb.hpp>
+#include <Flow/Resolvable.hpp>
 
 #if defined(LANGULUS_EXPORT_ALL) or defined(LANGULUS_EXPORT_ENTITY)
    #define LANGULUS_API_ENTITY() LANGULUS_EXPORT()

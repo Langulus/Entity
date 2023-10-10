@@ -73,9 +73,9 @@ namespace Langulus::Entity
       // that is no longer in use each time                             
       auto attempts = mLibraries.GetCount();
       while (attempts) {
-         for (auto library = mLibraries.begin(); library != mLibraries.end(); ++library) {
+         for (auto library : KeepIterator(mLibraries)) {
             if (UnloadSharedLibrary(library->mValue))
-               library = mLibraries.RemoveIndex(library);
+               library = mLibraries.RemoveIt(library);
          }
 
          --attempts;
@@ -141,12 +141,12 @@ namespace Langulus::Entity
          UnregisterAllBases(map, module, base.mType);
       }
 
-      const auto found = map.Find(type);
+      const auto found = map.FindIt(type);
       if (found) {
-         auto& list = map.GetValue(found);
-         if (list.Remove(module) && !list) {
+         auto& list = found->mValue;
+         if (list.Remove(module) and not list) {
             VERBOSE("Unregistering `", type, '`');
-            map.RemoveIndex(found);
+            map.RemoveIt(found);
          }
       }
    }
@@ -342,8 +342,8 @@ namespace Langulus::Entity
 
       Logger::Info("Unloading module `", library.mInfo()->mName, "`...");
 
-      for (auto list = mModules.begin(); list != mModules.end(); ++list) {
-         for (auto mod = list->mValue.begin(); mod != list->mValue.end(); ++mod) {
+      for (auto list : KeepIterator(mModules)) {
+         for (auto mod : KeepIterator(list->mValue)) {
             if (mod->Is(library.mModuleType)) {
                // Delete module instance                                
                const auto modType = mod->GetType();
@@ -353,8 +353,8 @@ namespace Langulus::Entity
             }
          }
 
-         if (!list->mValue)
-            list = mModules.RemoveIndex(list);
+         if (not list->mValue)
+            list = mModules.RemoveIt(list);
       }
 
       // Remove dependencies                                            
