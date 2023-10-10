@@ -8,8 +8,9 @@
 ///                                                                           
 #pragma once
 #include "Module.hpp"
-#include <Anyness/TMap.hpp>
+#include <Anyness/TOrderedMap.hpp>
 #include <Anyness/TAny.hpp>
+
 
 namespace Langulus::Entity
 {
@@ -64,7 +65,7 @@ namespace Langulus::Entity
 
          /// Hashing for to being able to contain it in a map                 
          NOD() constexpr Hash GetHash() const noexcept {
-            return HashNumber(mHandle);
+            return HashBytes(&mHandle, static_cast<int>(sizeof(mHandle)));
          }
       };
 
@@ -81,7 +82,7 @@ namespace Langulus::Entity
       // Shared library dependencies for all externally registered types
       static TUnorderedMap<const RTTI::Meta*, SharedLibrary> mDependencies;
       // Instantiated modules, sorted by priority                       
-      TMap<Real, ModuleList> mModules;
+      TOrderedMap<Real, ModuleList> mModules;
       // Instantiated modules, indexed by type                          
       TUnorderedMap<DMeta, ModuleList> mModulesByType;
 

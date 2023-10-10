@@ -54,7 +54,7 @@ namespace Langulus::Entity
       // Search trait by index                                          
       Trait* found {};
       if (index.IsArithmetic()) {
-         auto offset = index.GetOffset();
+         auto offset = index.GetOffsetUnsafe();
          mTraits.ForEachValue([&](TAny<Trait>& list) noexcept {
             if (offset < list.GetCount()) {
                found = &list[offset];
@@ -158,10 +158,10 @@ namespace Langulus::Entity
    ///   @param id - type of trait to remove                                  
    ///   @return the number of removed traits                                 
    Count Thing::RemoveTrait(TMeta id) {
-      const auto found = mTraits.Find(id);
+      const auto found = mTraits.FindIt(id);
       if (found) {
-         const auto removed = mTraits.GetValue(found).GetCount();
-         mTraits.RemoveIndex(found);
+         const auto removed = found->mValue.GetCount();
+         mTraits.RemoveIt(found);
          ENTITY_VERBOSE_SELF(id << " removed");
          mRefreshRequired = true;
          return removed;
