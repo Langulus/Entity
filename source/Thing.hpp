@@ -8,6 +8,7 @@
 ///                                                                           
 #pragma once
 #include "Unit.hpp"
+#include "Pin.hpp"
 #include <Anyness/Any.hpp>
 #include <Anyness/Ref.hpp>
 #include <Anyness/TUnorderedSet.hpp>
@@ -58,9 +59,9 @@ namespace Langulus::Entity
       // Runtime should be destroyed last, hence it is the first member 
 
       // Runtime                                                        
-      Pinnable<Ptr<Runtime>> mRuntime;
+      Pin<Ptr<Runtime>> mRuntime;
       // Temporal flow                                                  
-      Pinnable<Ptr<Temporal>> mFlow;
+      Pin<Ptr<Temporal>> mFlow;
       // Hierarchy                                                      
       Hierarchy mChildren;
       // Units indexed by all their relevant reflected bases            

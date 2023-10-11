@@ -8,7 +8,7 @@
 ///                                                                           
 #pragma once
 #include "Hierarchy.hpp"
-#include "Pinnable.hpp"
+
 
 namespace Langulus::Entity
 {
@@ -91,6 +91,6 @@ namespace Langulus::CT
 
    /// Any type that inherits Unit is considered a unit                       
    template<class T>
-   concept Unit = DerivedFrom<T, ::Langulus::Entity::Unit>;
+   concept Unit = DerivedFrom<T, Entity::Unit>;
 
 } // namespace Langulus::CT

@@ -170,14 +170,14 @@ namespace Langulus::Entity
       // Refresh the hierarchy on any changes, before updating anything 
       Refresh();
 
-      if (mFlow.IsPinned()) {
+      if (mFlow.IsLocked()) {
          // This thing owns its flow, so we need to update it here      
          // This will execute any temporally based verbs and scripts    
          // Game logic basically happens in this flow                   
          mFlow->Update(deltaTime);
       }
 
-      if (mRuntime.IsPinned()) {
+      if (mRuntime.IsLocked()) {
          // This thing owns its runtime, so we need to update it here   
          // This is where modules are updated in parallel, physical     
          // simulations happen, images get rendered, etc.               
@@ -366,7 +366,7 @@ namespace Langulus::Entity
    /// runtime, will incorporate the provided one                             
    ///   @param newrt - the new runtime to set                                
    void Thing::ResetRuntime(Runtime* newrt) {
-      if (mRuntime.IsPinned())
+      if (mRuntime.IsLocked())
          return;
 
       mRuntime = newrt;
@@ -378,7 +378,7 @@ namespace Langulus::Entity
    /// flow, will incorporate the provided one                                
    ///   @param newrt - the new flow to set                                   
    void Thing::ResetFlow(Temporal* newflow) {
-      if (mFlow.IsPinned())
+      if (mFlow.IsLocked())
          return;
 
       mFlow = newflow;
@@ -406,47 +406,47 @@ namespace Langulus::Entity
    /// Get the current runtime                                                
    ///   @return the pointer to the runtime                                   
    Runtime* Thing::GetRuntime() const noexcept {
-      return mRuntime.Get();
+      return *mRuntime;
    }
 
    /// Get the current temporal flow                                          
    ///   @return the pointer to the flow                                      
    Temporal* Thing::GetFlow() const noexcept {
-      return mFlow.Get();
+      return *mFlow;
    }
 
    /// Create a local runtime for this thing                                  
    ///   @return the new runtime instance, or the old one if already created  
    Runtime* Thing::CreateRuntime() {
-      if (mRuntime.IsPinned())
-         return mRuntime.Get();
+      if (mRuntime.IsLocked())
+         return *mRuntime;
 
-      mRuntime.New(this);
-      mRuntime.Pin();
+      mRuntime->New(this);
+      mRuntime.Lock();
 
       // Dispatch the change to all children                            
       for (auto& child : mChildren)
-         child->ResetRuntime(mRuntime);
+         child->ResetRuntime(*mRuntime);
 
       ENTITY_VERBOSE_SELF("New runtime: ", mRuntime);
-      return mRuntime.Get();
+      return *mRuntime;
    }
 
    /// Create a local flow for this thing                                     
    ///   @return the new flow instance, or the old one, if already created    
    Temporal* Thing::CreateFlow() {
-      if (mFlow.IsPinned())
-         return mFlow.Get();
+      if (mFlow.IsLocked())
+         return *mFlow;
 
-      mFlow.New(this);
-      mFlow.Pin();
+      mFlow->New(this);
+      mFlow.Lock();
 
       // Dispatch the change to all children                            
       for (auto& child : mChildren)
-         child->ResetFlow(mFlow);
+         child->ResetFlow(*mFlow);
 
       ENTITY_VERBOSE_SELF("New flow: ", mFlow);
-      return mFlow.Get();
+      return *mFlow;
    }
 
    /// Create a child thing                                                   
