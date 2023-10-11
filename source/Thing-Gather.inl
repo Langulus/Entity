@@ -92,11 +92,11 @@ namespace Langulus::Entity
          }
          else if (trait->template Is<Traits::Runtime>()) {
             // Get the nearest runtime                                  
-            results << Traits::Runtime {mRuntime.Get()};
+            results << Traits::Runtime {*mRuntime};
          }
          else if (trait->template Is<Traits::Parent>()) {
             // Get the parent                                           
-            results << Traits::Parent {mOwner.Get()};
+            results << Traits::Parent {*mOwner};
          }
 
          // Check dynamic traits in the entity                          
