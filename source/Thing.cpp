@@ -421,7 +421,7 @@ namespace Langulus::Entity
       if (mRuntime.IsLocked())
          return *mRuntime;
 
-      mRuntime->New(this);
+      (*mRuntime).New(this);
       mRuntime.Lock();
 
       // Dispatch the change to all children                            
@@ -438,7 +438,7 @@ namespace Langulus::Entity
       if (mFlow.IsLocked())
          return *mFlow;
 
-      mFlow->New(this);
+      (*mFlow).New(this);
       mFlow.Lock();
 
       // Dispatch the change to all children                            
