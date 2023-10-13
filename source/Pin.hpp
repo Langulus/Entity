@@ -64,21 +64,24 @@ namespace Langulus::Entity
       Pin(const Pin&) requires CT::Inner::CopyMakable<T>;
       Pin(Pin&&) requires CT::Inner::MoveMakable<T>;
 
-      Pin(const Neat&);
+      //Pin(const Neat&);
 
       Pin& operator = (const Pin&) requires CT::Inner::CopyAssignable<T>;
       Pin& operator = (Pin&&) requires CT::Inner::MoveAssignable<T>;
+      Pin& operator = (const T&) requires CT::Inner::CopyAssignable<T>;
+      Pin& operator = (T&&) requires CT::Inner::MoveAssignable<T>;
+
+      bool operator == (const Pin&) const requires CT::Inner::Comparable<T>;
 
       void Lock() noexcept;
       void Unlock() noexcept;
 
       NOD() bool IsLocked() const noexcept;
 
-      LANGULUS(INLINED)
-      const T& operator *  () const noexcept { return  mValue; }
-
-      LANGULUS(INLINED)
-      const T* operator -> () const noexcept { return &mValue; }
+      const T& operator *  () const noexcept;
+            T& operator *  ()       noexcept;
+      const T& operator -> () const noexcept;
+            T& operator -> ()       noexcept;
    };
 
 } // namespace Langulus::Entity
