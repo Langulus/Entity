@@ -122,7 +122,12 @@ namespace Langulus::Entity
    ///   @param type - the type to unregister the module as                   
    void RegisterAllBases(TUnorderedMap<DMeta, ModuleList>& map, Module* module, DMeta type) {
       VERBOSE("Registering `", type, '`');
-      map[type] << module;
+      auto found = map.FindIt(type);
+      if (found)
+         found->mValue << module;
+      else
+         map.Insert(type, module);
+
       for (auto& base : type->mBases) {
          if (base.mType->template Is<Resolvable>())
             break;
@@ -178,16 +183,24 @@ namespace Langulus::Entity
 
       // Register the module in the various maps, for fast retrieval    
       try {
-         mModules[info->mPriority] << module;
+         auto found = mModules.FindIt(info->mPriority);
+         if (found)
+            found->mValue << module;
+         else
+            mModules.Insert(info->mPriority, module);
+
          RegisterAllBases(mModulesByType, module, module->GetType());
       }
       catch (...) {
          Logger::Error("Registering module `", info->mName, "` failed");
 
          // Make sure we end up in an invariant state                   
-         mModules[info->mPriority].Remove(module);
-         if (not mModules[info->mPriority])
-            mModules.RemoveKey(info->mPriority);
+         auto found = mModules.FindIt(info->mPriority);
+         if (found) {
+            found->mValue.Remove(module);
+            if (not found->mValue)
+               mModules.RemoveIt(found);
+         }
 
          UnregisterAllBases(mModulesByType, module, module->GetType());
          delete module;
@@ -408,19 +421,17 @@ namespace Langulus::Entity
    ///   @param type - the type to search for                                 
    ///   @return the shared library handle, you should check if it's valid    
    Runtime::SharedLibrary Runtime::GetDependency(DMeta type) const noexcept {
-      auto found = mDependencies.Find(type);
-      if (found)
-         return mDependencies.GetValue(found);
-      return {};
+      auto found = mDependencies.FindIt(type);
+      return found ? found->mValue : SharedLibrary {};
    }
 
    /// Get a module instance by type                                          
    ///   @param type - the type to search for                                 
    ///   @return the module instance                                          
    const ModuleList& Runtime::GetModules(DMeta type) const noexcept {
-      auto found = mModulesByType.Find(type);
+      auto found = mModulesByType.FindIt(type);
       if (found)
-         return mModulesByType.GetValue(found);
+         return found->mValue;
 
       static const ModuleList emptyFallback {};
       return emptyFallback;

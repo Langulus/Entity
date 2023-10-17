@@ -82,7 +82,8 @@ namespace Langulus::Entity
       void CreateInner(Verb&, const T&);
 
    public:
-      LANGULUS_API(ENTITY) Thing(const Neat& = {});
+      LANGULUS_API(ENTITY) Thing();
+      LANGULUS_API(ENTITY) Thing(Describe&&);
       LANGULUS_API(ENTITY) Thing(Thing*, const Neat& = {});
       LANGULUS_API(ENTITY) Thing(Thing&&) noexcept;
       LANGULUS_API(ENTITY) ~Thing() IF_UNSAFE(noexcept);

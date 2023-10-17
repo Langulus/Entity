@@ -144,25 +144,31 @@ namespace Langulus::Entity
    }
 
    /// Add a new trait to the thing                                           
-   ///   @param initializer - trait to shallow copy                           
+   ///   @param trait - trait to shallow copy                                 
    ///   @return the new trait instance                                       
-   Trait* Thing::AddTrait(const Trait& initializer) {
-      auto& list = mTraits[initializer.GetTrait()];
-      list << initializer;
+   Trait* Thing::AddTrait(const Trait& trait) {
+      const auto tmeta = trait.GetTrait();
+      auto found = mTraits.FindIt(tmeta);
+      if (found) {
+         found->mValue << trait;
+         return &found->mValue.Last();
+      }
+
+      mTraits.Insert(tmeta, trait);
       mRefreshRequired = true;
-      ENTITY_VERBOSE(initializer << " added");
-      return &list.Last();
+      ENTITY_VERBOSE(trait << " added");
+      return &mTraits[tmeta].Last();
    }
 
    /// Remove a trait from the universal entity                               
-   ///   @param id - type of trait to remove                                  
+   ///   @param trait - type of trait to remove                               
    ///   @return the number of removed traits                                 
-   Count Thing::RemoveTrait(TMeta id) {
-      const auto found = mTraits.FindIt(id);
+   Count Thing::RemoveTrait(TMeta trait) {
+      const auto found = mTraits.FindIt(trait);
       if (found) {
          const auto removed = found->mValue.GetCount();
          mTraits.RemoveIt(found);
-         ENTITY_VERBOSE_SELF(id << " removed");
+         ENTITY_VERBOSE_SELF(trait << " removed");
          mRefreshRequired = true;
          return removed;
       }
@@ -171,14 +177,14 @@ namespace Langulus::Entity
    }
 
    /// Remove an exact-matching trait from this entity                        
-   ///   @param id - type and value to remove                                 
+   ///   @param trait - type and value to remove                              
    ///   @return the number of removed traits                                 
-   Count Thing::RemoveTrait(const Trait& prototype) {
-      const auto found = mTraits.Find(prototype.GetTrait());
+   Count Thing::RemoveTrait(const Trait& trait) {
+      const auto found = mTraits.FindIt(trait.GetTrait());
       if (found) {
-         const auto removed = mTraits.GetValue(found).Remove(prototype);
+         const auto removed = found->mValue.Remove(trait);
          if (removed) {
-            ENTITY_VERBOSE_SELF(prototype << " removed");
+            ENTITY_VERBOSE_SELF(trait << " removed");
             mRefreshRequired = true;
             return removed;
          }
@@ -188,27 +194,24 @@ namespace Langulus::Entity
    }
 
    /// A fast check whether traits of the given type are inside this entity   
-   ///   @param id - type of trait to check                                   
+   ///   @param trait - type of trait to check                                
    ///   @return the number of matching traits                                
-   Count Thing::HasTraits(TMeta id) const {
-      const auto found = mTraits.Find(id);
-      if (found)
-         return mTraits.GetValue(found).GetCount();
-      return 0;
+   Count Thing::HasTraits(TMeta trait) const {
+      const auto found = mTraits.FindIt(trait);
+      return found ? found->mValue.GetCount() : 0;
    }
 
    /// A fast check whether traits of the given type and value are inside     
-   ///   @param prototype - trait to search for                               
+   ///   @param trait - trait to search for                                   
    ///   @return the number of matching traits                                
-   Count Thing::HasTraits(const Trait& prototype) const {
-      const auto found = mTraits.Find(prototype.GetTrait());
+   Count Thing::HasTraits(const Trait& trait) const {
+      const auto found = mTraits.FindIt(trait.GetTrait());
       if (not found)
          return 0;
 
       Count counter {};
-      const auto& list = mTraits.GetValue(found);
-      for (auto& trait : list) {
-         if (trait == prototype)
+      for (auto& trait : found->mValue) {
+         if (trait == trait)
             ++counter;
       }
       return counter;

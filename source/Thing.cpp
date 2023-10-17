@@ -7,14 +7,18 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #include "Thing.inl"
+#include "Pin.inl"
 #include "Runtime.hpp"
 #include <Flow/Verbs/Interpret.hpp>
 
 #if 0
    #define ENTITY_VERBOSE_ENABLED() 1
-   #define ENTITY_VERBOSE_SELF(...)            Logger::Verbose(Self(), __VA_ARGS__)
-   #define ENTITY_VERBOSE_SELF_TAB(...)        const auto scoped = Logger::Verbose(Self(), __VA_ARGS__, Logger::Tabs {})
-   #define ENTITY_VERBOSE(...)                 Logger::Append(__VA_ARGS__)
+   #define ENTITY_VERBOSE_SELF(...) \
+      Logger::Verbose(Self(), __VA_ARGS__)
+   #define ENTITY_VERBOSE_SELF_TAB(...) \
+      const auto scoped = Logger::Verbose(Self(), __VA_ARGS__, Logger::Tabs {})
+   #define ENTITY_VERBOSE(...) \ 
+      Logger::Append(__VA_ARGS__)
 #else
    #define ENTITY_VERBOSE_ENABLED() 0
    #define ENTITY_VERBOSE_SELF(...)
@@ -22,22 +26,40 @@
    #define ENTITY_VERBOSE(...)
 #endif
 
+
 namespace Langulus::Entity
 {
 
-   /// Construct as a root                                                    
-   ///   @param descriptor - instructions for creating the entity             
-   Thing::Thing(const Neat& descriptor)
+   /// Default-constructor, always creates a parentless root thing            
+   Thing::Thing()
       : Resolvable {MetaOf<Thing>()} {
-      if (descriptor) {
-         Verbs::Create creator {&descriptor};
-         Create(creator);
-      }
       ENTITY_VERBOSE_SELF("Created (root, ", GetReferences(), " references)");
    }
    
+   /// Descriptor-constructor                                                 
+   ///   @param describe - instructions for creating the entity               
+   Thing::Thing(Describe&& describe)
+      : Resolvable {MetaOf<Thing>()} {
+      if (*describe) {
+         Verbs::Create creator {&(*describe)};
+         Create(creator);
+      }
+
+      if (mOwner) {
+         ENTITY_VERBOSE_SELF(
+            "Created as child to ", mOwner,
+            " (", GetReferences(), " references)"
+         );
+      }
+      else {
+         ENTITY_VERBOSE_SELF(
+            "Created (root, ", GetReferences(), " references)"
+         );
+      }
+   }
+   
    /// Construct as a child of another thing                                  
-   ///   @param parent - the owner of the thing                               
+   ///   @param parent - the thing that owns this thing                       
    ///   @param descriptor - instructions for creating the thing              
    Thing::Thing(Thing* parent, const Neat& descriptor)
       : Resolvable {MetaOf<Thing>()}
@@ -54,9 +76,9 @@ namespace Langulus::Entity
          Create(creator);
       }
 
-      if (parent) {
+      if (mOwner) {
          ENTITY_VERBOSE_SELF(
-            "Created as child to ", parent,
+            "Created as child to ", mOwner,
             " (", GetReferences(), " references)"
          );
       }

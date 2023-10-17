@@ -247,7 +247,7 @@ SCENARIO("Testing Thing", "[thing]") {
          )
       };
 
-      Thing root {descriptor};
+      Thing root {Describe(descriptor)};
 
       THEN("Properties should match") {
          REQUIRE(root.mOwner == nullptr);
@@ -343,7 +343,7 @@ SCENARIO("Testing Thing", "[thing]") {
          )
       };
 
-      Thing root {descriptor};
+      Thing root {Describe(descriptor)};
 
       WHEN("Getting a local child by index") {
          auto child = root.GetChild(0);
