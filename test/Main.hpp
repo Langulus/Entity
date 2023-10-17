@@ -19,8 +19,11 @@ public:
    LANGULUS(ABSTRACT) false;
    LANGULUS_BASES(Unit);
 
-   TestUnit1(const Neat& a = {})
-      : Unit {MetaOf<TestUnit1>(), a} {}
+   TestUnit1()
+      : Unit {MetaOf<TestUnit1>()} {}
+
+   TestUnit1(Describe&& describe)
+      : Unit {MetaOf<TestUnit1>(), *describe} {}
 
    void Refresh() final {}
 };
@@ -30,8 +33,11 @@ public:
    LANGULUS(ABSTRACT) false;
    LANGULUS_BASES(Unit);
 
-   TestUnit2(const Neat& a = {})
-      : Unit {MetaOf<TestUnit2>(), a} {}
+   TestUnit2()
+      : Unit {MetaOf<TestUnit2>()} {}
+
+   TestUnit2(Describe&& describe)
+      : Unit {MetaOf<TestUnit2>(), *describe} {}
 
    void Refresh() final {}
 };

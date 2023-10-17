@@ -11,3 +11,4 @@
 #include "../../source/Thing.inl"
 #include "../../source/Thing-Gather.inl"
 #include "../../source/Thing-Seek.inl"
+#include "../../source/Pin.inl"

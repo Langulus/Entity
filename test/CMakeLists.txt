@@ -1,9 +1,10 @@
-add_executable(LangulusEntityTest 
-	Main.cpp
-	TestComposition.cpp
-	TestRuntime.cpp
-	TestThing.cpp
+file(GLOB_RECURSE
+	LANGULUS_ENTITY_TEST_SOURCES 
+	LIST_DIRECTORIES FALSE CONFIGURE_DEPENDS
+	*.cpp *.hpp
 )
+
+add_executable(LangulusEntityTest ${LANGULUS_ENTITY_TEST_SOURCES})
 
 target_link_libraries(LangulusEntityTest
 	PRIVATE		LangulusEntity

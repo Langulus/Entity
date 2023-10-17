@@ -27,6 +27,7 @@
    #define ENTITY_SELECTION_VERBOSE_SELF(...)
 #endif
 
+
 namespace Langulus::Entity
 {
    
@@ -211,7 +212,11 @@ namespace Langulus::Entity
    ///   @param unit - the unit instance to register                          
    ///   @param type - the type to register the unit as                       
    inline void Thing::AddUnitBases(Unit* unit, DMeta type) {
-      mUnitsAmbiguous[type] << unit;
+      const auto found = mUnitsAmbiguous.FindIt(type);
+      if (found)
+         found->mValue << unit;
+      else
+         mUnitsAmbiguous.Insert(type, TUnorderedSet<Ref<Unit>> {unit});
 
       for (auto& base : type->mBases) {
          if (base.mType->template Is<Unit>())
@@ -250,8 +255,8 @@ namespace Langulus::Entity
    Count Thing::AddUnit(Unit* unit) {
       // Check if the unit instance is already registered here          
       const auto meta = unit->GetType();
-      const auto found = mUnitsAmbiguous.Find(meta);
-      if (found and mUnitsAmbiguous.GetValue(found).Find(unit))
+      const auto found = mUnitsAmbiguous.FindIt(meta);
+      if (found and found->mValue.Find(unit))
          return 0;
 
       // We must guarantee, that no unit is coupled to entities with    
@@ -288,12 +293,11 @@ namespace Langulus::Entity
    template<bool TWOSIDED>
    Count Thing::RemoveUnit(Unit* unit) {
       const auto meta = unit->GetType();
-      const auto foundType = mUnitsAmbiguous.Find(meta);
+      const auto foundType = mUnitsAmbiguous.FindIt(meta);
       if (not foundType)
          return 0;
 
-      auto& unitSet = mUnitsAmbiguous.GetValue(foundType);
-      const auto unitIndex = unitSet.Find(unit);
+      const auto unitIndex = foundType->mValue.Find(unit);
       if (unitIndex) {
          // Decouple before unit is destroyed                           
          if constexpr (TWOSIDED)
@@ -511,10 +515,8 @@ namespace Langulus::Entity
 
             // Potential unit producers found, attempt creation         
             Verbs::Create creator {&descriptor};
-            if (Flow::DispatchFlat(producers, creator)) {
-               // Great success                                         
+            if (Flow::DispatchFlat(producers, creator))
                return Abandon(creator.GetOutput());
-            }
          }
          else if (producer->template CastsTo<Module>()) {
             // Data is producible from a module                         
@@ -526,10 +528,8 @@ namespace Langulus::Entity
 
             // Potential module producers found, attempt creation       
             Verbs::Create creator {&descriptor};
-            if (Flow::DispatchFlat(producers, creator)) {
-               // Great success                                         
+            if (Flow::DispatchFlat(producers, creator))
                return Abandon(creator.GetOutput());
-            }
          }
          else if (producer->template CastsTo<Thing>()) {
             // Data is producible from a thing                          
