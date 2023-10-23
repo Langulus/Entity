@@ -53,6 +53,19 @@ namespace Langulus::Entity
          bool mMarkedForUnload {};
 
       public:
+         constexpr SharedLibrary() noexcept = default;
+
+         /// Explicit abandon construction, for optimized containment         
+         ///   @param other - the library to abandon                          
+         SharedLibrary(Abandoned<SharedLibrary>&& other) noexcept
+            : mHandle {other->mHandle}
+            , mEntry {other->mEntry}
+            , mCreator {other->mCreator}
+            , mInfo {other->mInfo}
+            , mModuleType {other->mModuleType}
+            , mTypes {Abandon(other->mTypes)}
+            , mMarkedForUnload {other->mMarkedForUnload} {}
+
          /// Check if the shared library handle is valid                      
          NOD() constexpr bool IsValid() const noexcept {
             return mHandle != 0;

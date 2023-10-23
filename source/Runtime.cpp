@@ -35,7 +35,8 @@
    //TODO
 #endif
 
-#define VERBOSE(...) //Logger::Verbose(this, ": ", ...)
+#define VERBOSE(...) //Logger::Verbose(__VA_ARGS__)
+
 
 namespace Langulus::Entity
 {
@@ -61,13 +62,13 @@ namespace Langulus::Entity
    ///   @param owner - the owner of the runtime                              
    Runtime::Runtime(Thing* owner) noexcept
       : mOwner {owner} {
-      VERBOSE("Initializing...");
-      VERBOSE("Initialized");
+      VERBOSE(this, ": Initializing...");
+      VERBOSE(this, ": Initialized");
    }
 
    /// Runtime destruction                                                    
    Runtime::~Runtime() {
-      VERBOSE("Shutting down...");
+      VERBOSE(this, ": Shutting down...");
 
       // Cycle through all libraries N^2 times, unloading anything      
       // that is no longer in use each time                             
@@ -111,7 +112,7 @@ namespace Langulus::Entity
          return foundModules[0];
 
       // A module instance doesn't exist yet, so instantiate it         
-      VERBOSE("Module `", name, "` is not instantiated yet"
+      VERBOSE(this, ": Module `", name, "` is not instantiated yet"
          ", so attempting to create it...");
       return InstantiateModule(library, descriptor);
    }
@@ -208,7 +209,7 @@ namespace Langulus::Entity
       }
 
       // Done, if reached                                               
-      VERBOSE("Module `", info->mName,
+      VERBOSE(this, ": Module `", info->mName,
          "` registered with priority ", info->mPriority);
       return module;
    }
@@ -220,19 +221,15 @@ namespace Langulus::Entity
    ///   @return the module handle (OS dependent)                             
    Runtime::SharedLibrary Runtime::LoadSharedLibrary(const Token& name) {
       // Check if this library is already loaded                        
-      const auto preloaded = mLibraries.Find(name);
-      if (preloaded) {
-         // Never even attempt to load libraries more than once         
-         return mLibraries.GetValue(preloaded);
-      }
+      const auto preloaded = mLibraries.FindIt(name);
+      if (preloaded)
+         return preloaded->mValue;
 
       // File prefix                                                    
       Path path;
-
       #if LANGULUS_OS(LINUX)
          path += "./lib";
       #endif
-
       path += "LangulusMod";
       path += name;
 
@@ -317,6 +314,8 @@ namespace Langulus::Entity
          // here, and not inside any library (nasty bugs otherwise)     
          (void)MetaOf<Real>();
          (void)MetaOf<Runtime>();
+         (void)MetaOf<RTTI::Meta*>();
+         (void)MetaOf<const RTTI::Meta*>();
          (void)MetaOf<DMeta>();
          (void)MetaOf<Module>();
          (void)MetaOf<Unit>();
@@ -371,8 +370,10 @@ namespace Langulus::Entity
       }
 
       // Remove dependencies                                            
-      for (auto externalType : library.mTypes)
+      for (auto externalType : library.mTypes) {
+         VERBOSE(this, ": Removing dependencies: ", externalType);
          mDependencies.RemoveKey(externalType);
+      }
 
       // Collect garbage, and check if library's boundary is still used 
       const auto wasMarked = library.mMarkedForUnload;

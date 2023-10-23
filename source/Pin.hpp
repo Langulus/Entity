@@ -64,25 +64,40 @@ namespace Langulus::Entity
       Pin() requires CT::Inner::Defaultable<T>;
       Pin(const Pin&) requires CT::Inner::CopyMakable<T>;
       Pin(Pin&&) requires CT::Inner::MoveMakable<T>;
+      template<template<class> class S>
+      Pin(S<Pin>&&) requires CT::Inner::SemanticMakable<S, T>;
+
+      Pin(const T&) requires CT::Inner::CopyMakable<T>;
+      Pin(T&&) requires CT::Inner::MoveMakable<T>;
+      template<template<class> class S>
+      Pin(S<T>&&) requires CT::Inner::SemanticMakable<S, T>;
+
       Pin(Describe&&) requires CT::Inner::DescriptorMakable<T>;
 
       Pin& operator = (const Pin&) requires CT::Inner::CopyAssignable<T>;
       Pin& operator = (Pin&&) requires CT::Inner::MoveAssignable<T>;
+      template<template<class> class S>
+      Pin& operator = (S<Pin>&&) requires CT::Inner::SemanticAssignable<S, T>;
+
       Pin& operator = (const T&) requires CT::Inner::CopyAssignable<T>;
       Pin& operator = (T&&) requires CT::Inner::MoveAssignable<T>;
+      template<template<class> class S>
+      Pin& operator = (S<T>&&) requires CT::Inner::SemanticAssignable<S, T>;
 
       bool operator == (const Pin&) const requires CT::Inner::Comparable<T>;
+      bool operator != (const Pin&) const requires CT::Inner::Comparable<T>;
       bool operator == (const T&) const requires CT::Inner::Comparable<T>;
+      bool operator != (const T&) const requires CT::Inner::Comparable<T>;
 
       void Lock() noexcept;
       void Unlock() noexcept;
 
       NOD() bool IsLocked() const noexcept;
 
-      const T& operator *  () const noexcept;
-            T& operator *  ()       noexcept;
-      const T& operator -> () const noexcept;
-            T& operator -> ()       noexcept;
+      const T& operator * () const noexcept;
+            T& operator * ()       noexcept;
+      auto operator -> () const noexcept;
+      auto operator -> ()       noexcept;
    };
 
 } // namespace Langulus::Entity

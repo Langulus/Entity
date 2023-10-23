@@ -282,7 +282,7 @@ namespace Langulus::A
          return nullptr;
 
       const auto datalist = GetDataList(trait);
-      return datalist && datalist->GetCount() > index
+      return datalist and datalist->GetCount() > index
          ? &(*datalist)[index]
          : nullptr;
    }
@@ -304,10 +304,8 @@ namespace Langulus::A
       if (not const_cast<Asset*>(this)->Generate(trait))
          return nullptr;
 
-      const auto found = mDataListMap.Find(trait);
-      if (found)
-         return &mDataListMap.GetValue(found);
-      return nullptr;
+      const auto found = mDataListMap.FindIt(trait);
+      return found ? &found->mValue : nullptr;
    }
 
    /// Commit data to an asset                                                
@@ -320,7 +318,11 @@ namespace Langulus::A
    void Asset::Commit(S&& content) {
       static_assert(CT::Block<TypeOf<S>>,
          "Content should be provided in a Block");
-      mDataListMap[T::GetTrait()] << content.Forward();
+      const auto found = mDataListMap.FindIt(T::GetTrait());
+      if (found)
+         found->mValue << Anyness::Any {content.Forward()};
+      else
+         mDataListMap.Insert(T::GetTrait(), Anyness::Any {content.Forward()});
    }
 
 
