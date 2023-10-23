@@ -19,6 +19,7 @@
    #define ENTITY_VERBOSE(...)
 #endif
 
+
 namespace Langulus::Entity
 {
 

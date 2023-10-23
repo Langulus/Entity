@@ -196,14 +196,14 @@ namespace Langulus::Entity
          // This thing owns its flow, so we need to update it here      
          // This will execute any temporally based verbs and scripts    
          // Game logic basically happens in this flow                   
-         mFlow->Update(deltaTime);
+         (*mFlow)->Update(deltaTime);
       }
 
       if (mRuntime.IsLocked()) {
          // This thing owns its runtime, so we need to update it here   
          // This is where modules are updated in parallel, physical     
          // simulations happen, images get rendered, etc.               
-         mRuntime->Update(deltaTime);
+         (*mRuntime)->Update(deltaTime);
       }
 
       // Cascade the update down the hierarchy                          
@@ -253,14 +253,12 @@ namespace Langulus::Entity
    Unit* Thing::GetUnitMeta(DMeta id, Index index) {
       if (id) {
          // Search a typed trait                                        
-         const auto found = mUnitsAmbiguous.Find(id);
-         if (found)
-            return mUnitsAmbiguous.GetValue(found)[index];
-         return nullptr;
+         const auto found = mUnitsAmbiguous.FindIt(id);
+         return found ? *found->mValue[index] : nullptr;
       }
 
       // Get unit by index only                                         
-      return mUnitsList[index];
+      return *mUnitsList[index];
    }
 
    /// Get a unit by type and offset (const)                                  
@@ -284,18 +282,18 @@ namespace Langulus::Entity
 
       if (meta) {
          // Search a typed unit                                         
-         const auto found = mUnitsAmbiguous.Find(meta);
+         const auto found = mUnitsAmbiguous.FindIt(meta);
          if (found) {
-            const auto& bucket = mUnitsAmbiguous.GetValue(found);
+            auto& bucket = found->mValue;
             if (not what)
-               return bucket[index];
+               return *bucket[index];
 
             // Check all units in that bucket for required properties   
             for (auto& unit : bucket) {
                if (unit->CompareDescriptor(what)) {
                   // Match found                                        
                   if (index == 0)
-                     return unit;
+                     return *unit;
                   else
                      --index;
                }
@@ -308,7 +306,7 @@ namespace Langulus::Entity
             if (unit->CompareDescriptor(what)) {
                // Match found                                           
                if (index == 0)
-                  return unit;
+                  return *unit;
                else
                   --index;
             }
@@ -349,7 +347,7 @@ namespace Langulus::Entity
    ///   @param id - the index to pick                                        
    ///   @return the child entity, or nullptr of none was found               
    Thing* Thing::GetChild(const Index& id) {
-      return mChildren[id];
+      return *mChildren[id];
    }
 
    /// Get child entity by offset                                             
@@ -368,7 +366,7 @@ namespace Langulus::Entity
       for (auto& child : mChildren) {
          if (child->GetName() == name) {
             if (matches == offset)
-               return child;
+               return *child;
             ++matches;
          }
       }
@@ -421,54 +419,54 @@ namespace Langulus::Entity
    ///   @param type - the type of units to search for                        
    ///   @return the number of matching units                                 
    Count Thing::HasUnits(DMeta type) const {
-      const auto found = mUnitsAmbiguous.Find(type);
-      return found ? mUnitsAmbiguous.GetValue(found).GetCount() : 0;
+      const auto found = mUnitsAmbiguous.FindIt(type);
+      return found ? found->mValue.GetCount() : 0;
    }
 
    /// Get the current runtime                                                
    ///   @return the pointer to the runtime                                   
    Runtime* Thing::GetRuntime() const noexcept {
-      return *mRuntime;
+      return const_cast<Runtime*>(**mRuntime);
    }
 
    /// Get the current temporal flow                                          
    ///   @return the pointer to the flow                                      
    Temporal* Thing::GetFlow() const noexcept {
-      return *mFlow;
+      return const_cast<Temporal*>(**mFlow);
    }
 
    /// Create a local runtime for this thing                                  
    ///   @return the new runtime instance, or the old one if already created  
    Runtime* Thing::CreateRuntime() {
       if (mRuntime.IsLocked())
-         return *mRuntime;
+         return **mRuntime;
 
       (*mRuntime).New(this);
       mRuntime.Lock();
 
       // Dispatch the change to all children                            
       for (auto& child : mChildren)
-         child->ResetRuntime(*mRuntime);
+         child->ResetRuntime(**mRuntime);
 
       ENTITY_VERBOSE_SELF("New runtime: ", mRuntime);
-      return *mRuntime;
+      return **mRuntime;
    }
 
    /// Create a local flow for this thing                                     
    ///   @return the new flow instance, or the old one, if already created    
    Temporal* Thing::CreateFlow() {
       if (mFlow.IsLocked())
-         return *mFlow;
+         return **mFlow;
 
       (*mFlow).New(this);
       mFlow.Lock();
 
       // Dispatch the change to all children                            
       for (auto& child : mChildren)
-         child->ResetFlow(*mFlow);
+         child->ResetFlow(**mFlow);
 
       ENTITY_VERBOSE_SELF("New flow: ", mFlow);
-      return *mFlow;
+      return **mFlow;
    }
 
    /// Create a child thing                                                   
