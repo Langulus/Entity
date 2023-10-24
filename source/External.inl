@@ -427,11 +427,13 @@ namespace Langulus::A
    LANGULUS(INLINED)
    Count Mesh::GetPointCount() const {
       TODO();
+      return {};
    }
 
    template<CT::Trait T>
    Anyness::Any Mesh::GetPointTrait(Offset) const {
       TODO();
+      return {};
    }
 
    /// Is topology line list/strip/loop?                                      

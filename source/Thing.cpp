@@ -439,34 +439,34 @@ namespace Langulus::Entity
    ///   @return the new runtime instance, or the old one if already created  
    Runtime* Thing::CreateRuntime() {
       if (mRuntime.IsLocked())
-         return **mRuntime;
+         return mRuntime->Get();
 
-      (*mRuntime).New(this);
+      mRuntime->New(this);
       mRuntime.Lock();
 
       // Dispatch the change to all children                            
       for (auto& child : mChildren)
-         child->ResetRuntime(**mRuntime);
+         child->ResetRuntime(mRuntime->Get());
 
       ENTITY_VERBOSE_SELF("New runtime: ", mRuntime);
-      return **mRuntime;
+      return mRuntime->Get();
    }
 
    /// Create a local flow for this thing                                     
    ///   @return the new flow instance, or the old one, if already created    
    Temporal* Thing::CreateFlow() {
       if (mFlow.IsLocked())
-         return **mFlow;
+         return mFlow->Get();
 
-      (*mFlow).New(this);
+      mFlow->New(this);
       mFlow.Lock();
 
       // Dispatch the change to all children                            
       for (auto& child : mChildren)
-         child->ResetFlow(**mFlow);
+         child->ResetFlow(mFlow->Get());
 
       ENTITY_VERBOSE_SELF("New flow: ", mFlow);
-      return **mFlow;
+      return mFlow->Get();
    }
 
    /// Create a child thing                                                   
