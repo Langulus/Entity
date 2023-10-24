@@ -46,9 +46,9 @@ namespace Langulus::Entity
    Trait* Thing::GetLocalTrait(TMeta id, const Index& index) {
       if (id) {
          // Search a typed trait                                        
-         const auto found = mTraits.Find(id);
+         const auto found = mTraits.FindIt(id);
          if (found)
-            return &mTraits.GetValue(found)[index];
+            return &found->mValue[index];
          return nullptr;
       }
 
@@ -115,7 +115,10 @@ namespace Langulus::Entity
          return *found;
 
       // Then check each unit's static traits                           
-      Trait output;
+      //TODO, hm, this feeds back onto units, so we should probably expose
+      //traits explicitly from the unit itself, in order for them to be reachable
+      //this way we also save on this whole loop with many indirections
+      /*Trait output;
       for (auto& unit : mUnitsList) {
          auto t = unit->GetMember(id.GetTrait(), index);
          if (t) {
@@ -125,12 +128,13 @@ namespace Langulus::Entity
       }
 
       if (output)
-         return Abandon(output);
+         return Abandon(output); */
 
       // Finally, check this entity's static traits                     
-      auto t = GetMember(id.GetTrait(), index);
+      //TODO shouldn't this be handled at the beginning of this func?
+      /*auto t = GetMember(id.GetTrait(), index);
       if (t)
-         return Trait::From(id.GetTrait(), t);
+         return Trait::From(id.GetTrait(), t);*/
 
       // Nothing was found                                              
       return {};

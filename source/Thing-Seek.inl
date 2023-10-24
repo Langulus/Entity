@@ -291,9 +291,9 @@ namespace Langulus::Entity
          // Seek here if requested                                      
          auto temp = GetTrait(meta, offset);
          try {
-            //if constexpr (CT::Pinnable<D>)
-            //   output = temp.template AsCast<TypeOf<D>>();
-            //else
+            if constexpr (CT::Pinnable<D>)
+               output = temp.template AsCast<TypeOf<D>>();
+            else
                output = temp.template AsCast<D>();
             return true;
          }
