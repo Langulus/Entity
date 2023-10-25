@@ -361,7 +361,7 @@ namespace Langulus::Entity
                const auto modType = mod->GetType();
                UnregisterAllBases(mModulesByType, *mod, modType);
                delete *mod;
-               mod = list->mValue.RemoveIndex(mod);
+               mod = list->mValue.RemoveIt(mod);
             }
          }
 
