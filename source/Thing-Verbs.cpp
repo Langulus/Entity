@@ -24,6 +24,7 @@
    #define ENTITY_SELECTION_VERBOSE_SELF(...)
 #endif
 
+
 namespace Langulus::Entity
 {
 

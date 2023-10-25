@@ -9,6 +9,7 @@
 #pragma once
 #include "IntegrateFramework.hpp"
 
+
 namespace Langulus::Entity
 {
 

@@ -8,6 +8,7 @@
 ///                                                                           
 #include "Thing.inl"
 
+
 namespace Langulus::Entity
 {
 

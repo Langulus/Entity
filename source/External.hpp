@@ -45,6 +45,7 @@ LANGULUS_DEFINE_TRAIT(Viewport,
 LANGULUS_EXCEPTION(Image);
 LANGULUS_EXCEPTION(Mesh);
 
+
 namespace Langulus
 {
 

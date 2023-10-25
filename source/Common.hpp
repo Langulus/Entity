@@ -16,6 +16,7 @@
    #define LANGULUS_API_ENTITY() LANGULUS_IMPORT()
 #endif
 
+
 namespace Langulus::Entity
 {
 
