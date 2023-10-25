@@ -13,6 +13,7 @@
 
 LANGULUS_EXCEPTION(Module);
 
+
 namespace Langulus
 {
    namespace Entity

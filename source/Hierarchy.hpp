@@ -12,6 +12,7 @@
 #include <Anyness/TAny.hpp>
 #include <Anyness/Trait.hpp>
 
+
 namespace Langulus::Entity
 {
    using TraitList = TAny<Trait>;

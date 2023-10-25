@@ -9,6 +9,7 @@
 #pragma once
 #include "Hierarchy.hpp"
 
+
 namespace Langulus::Entity
 {
       
