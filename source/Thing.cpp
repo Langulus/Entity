@@ -274,12 +274,11 @@ namespace Langulus::Entity
    /// Get a unit by type, properties, and offset                             
    /// If construct's type is nullptr searches only by offset and properties  
    /// If construct's type is not nullptr, gets the Nth matching unit, if any 
-   ///   @param what - the type and properties of the unit                    
+   ///   @param meta - the type of the unit                                   
+   ///   @param what - the desired properties of the unit                     
    ///   @param index - the unit index to seek                                
    ///   @return the unit if found, or nullptr if not                         
-   Unit* Thing::GetUnitExt(const Construct& what, Index index) {
-      const auto meta = what.GetType();
-
+   Unit* Thing::GetUnitExt(DMeta meta, const Neat& what, Index index) {
       if (meta) {
          // Search a typed unit                                         
          const auto found = mUnitsAmbiguous.FindIt(meta);
@@ -316,12 +315,8 @@ namespace Langulus::Entity
       return nullptr;
    }
 
-   /// Get a unit by type, properties, and offset (const)                     
-   ///   @param what - the type and properties of the unit                    
-   ///   @param index - the unit index to seek                                
-   ///   @return the unit if found, or nullptr if not                         
-   const Unit* Thing::GetUnitExt(const Construct& what, Index index) const {
-      return const_cast<Thing*>(this)->GetUnitExt(what, index);
+   const Unit* Thing::GetUnitExt(DMeta meta, const Neat& what, Index index) const {
+      return const_cast<Thing*>(this)->GetUnitExt(meta, what, index);
    }
 
 #if LANGULUS_FEATURE(MANAGED_REFLECTION)

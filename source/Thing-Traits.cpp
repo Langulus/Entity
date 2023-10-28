@@ -8,6 +8,7 @@
 ///                                                                           
 #include "Thing.inl"
 #include "Thing-Seek.inl"
+#include "Pin.inl"
 
 #if 0
    #define ENTITY_VERBOSE_ENABLED() 1
@@ -237,8 +238,7 @@ namespace Langulus::Entity
    ///   @return the name, or empty string if no such trait was found here    
    Text Thing::GetName() const {
       Text name;
-      if (not SeekTrait<Traits::Name, Seek::Here>(name))
-         return {};
+      SeekValue<Traits::Name, Seek::Here>(name);
       return name;
    }
    

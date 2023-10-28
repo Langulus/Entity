@@ -8,11 +8,12 @@
 ///                                                                           
 #pragma once
 #include "Thing.hpp"
+#include "Hierarchy-Gather.inl"
 
 #if 0
    #define ENTITY_VERBOSE_ENABLED() 1
-   #define ENTITY_VERBOSE_SELF(...)            Logger::Verbose(Self(), __VA_ARGS__)
-   #define ENTITY_VERBOSE(...)                 Logger::Append(__VA_ARGS__)
+   #define ENTITY_VERBOSE_SELF(...)    Logger::Verbose(Self(), __VA_ARGS__)
+   #define ENTITY_VERBOSE(...)         Logger::Append(__VA_ARGS__)
 #else
    #define ENTITY_VERBOSE_ENABLED() 0
    #define ENTITY_VERBOSE_SELF(...)
@@ -59,16 +60,6 @@ namespace Langulus::Entity
       }
 
       return result;
-   }
-
-   /// Collects all units of the given type inside the hierarchy              
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
-   ///   @param meta - the units to seek for                                  
-   ///   @return the gathered units that match the type                       
-   template<Seek SEEK>
-   LANGULUS(INLINED)
-   TAny<const Unit*> Thing::GatherUnits(DMeta meta) const {
-      return const_cast<Thing*>(this)->template GatherUnits<SEEK>(meta);
    }
       
    /// Collects all traits of the given type inside the hierarchy             
@@ -135,21 +126,11 @@ namespace Langulus::Entity
       return Abandon(results);
    }
 
-   /// Collects all traits/members of the given type inside the hierarchy     
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
-   ///   @param trait - the trait to seek for                                 
-   ///   @return the gathered traits that match the trait                     
-   template<Seek SEEK>
-   LANGULUS(INLINED)
-   TAny<Trait> Thing::GatherTraits(TMeta trait) const {
-      return const_cast<Thing*>(this)->template GatherTraits<SEEK>(trait);
-   }
-
    /// Gather all traits/members convertible to a type                        
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @tparam D - type to convert to                                       
+   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @return the gathered values                                          
-   template<Seek SEEK, CT::Data D>
+   template<CT::Data D, Seek SEEK>
    TAny<D> Thing::GatherValues() const {
       TAny<D> results;
 

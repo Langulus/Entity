@@ -21,7 +21,7 @@ namespace Langulus::Entity
    /// inside external, dynamically loaded modules. There are units for       
    /// graphics, input, AI, content, and whatever extensions you make.        
    ///                                                                        
-   struct Unit : Resolvable {
+   struct Unit : Resolvable, SeekInterface<Unit> {
       LANGULUS(UNINSERTABLE) false;
       LANGULUS_BASES(Resolvable);
 
@@ -69,14 +69,51 @@ namespace Langulus::Entity
       ///                                                                     
       ///   Seek                                                              
       ///                                                                     
-      LANGULUS_SEEK_INTERFACE();
-      LANGULUS_SEEK_TOKEN_INTERFACE();
+      using SeekInterface::SeekUnit;
+      using SeekInterface::SeekUnitAux;
+      using SeekInterface::SeekUnitExt;
+      using SeekInterface::SeekUnitAuxExt;
+      using SeekInterface::SeekTrait;
+      using SeekInterface::SeekTraitAux;
+      using SeekInterface::SeekValue;
+      using SeekInterface::SeekValueAux;
+
+      template<Seek = Seek::HereAndAbove>
+      NOD() Unit* SeekUnit(DMeta, Index = IndexFirst);
+      template<Seek = Seek::HereAndAbove>
+      NOD() Unit* SeekUnitAux(const Neat&, DMeta, Index = IndexFirst);
+      template<Seek = Seek::HereAndAbove>
+      NOD() Unit* SeekUnitExt(DMeta, const Neat&, Index = IndexFirst);
+      template<Seek = Seek::HereAndAbove>
+      NOD() Unit* SeekUnitAuxExt(DMeta, const Neat&, const Neat&, Index = IndexFirst);
+
+      template<Seek = Seek::HereAndAbove>
+      NOD() Trait SeekTrait(TMeta, Index = IndexFirst);
+      template<Seek = Seek::HereAndAbove>
+      NOD() Trait SeekTraitAux(const Neat&, TMeta, Index = IndexFirst);
+
+      template<Seek = Seek::HereAndAbove>
+      bool SeekValue(TMeta, CT::Data auto&, Index = IndexFirst) const;
+      template<Seek = Seek::HereAndAbove>
+      bool SeekValueAux(TMeta, const Neat&, CT::Data auto&, Index = IndexFirst) const;
 
       ///                                                                     
       ///   Gather                                                            
       ///                                                                     
-      LANGULUS_GATHER_INTERFACE();
-      LANGULUS_GATHER_TOKEN_INTERFACE();
+      using SeekInterface::GatherUnits;
+      using SeekInterface::GatherUnitsExt;
+      using SeekInterface::GatherTraits;
+
+      template<Seek = Seek::HereAndAbove>
+      NOD() TAny<Unit*> GatherUnits(DMeta);
+      template<Seek = Seek::HereAndAbove>
+      NOD() TAny<Unit*> GatherUnitsExt(DMeta, const Neat&);
+
+      template<Seek = Seek::HereAndAbove>
+      NOD() TraitList GatherTraits(TMeta);
+
+      template<CT::Data D, Seek = Seek::HereAndAbove>
+      NOD() TAny<D> GatherValues() const;
 
    protected:
       LANGULUS_API(ENTITY) void Couple(const Thing*);
