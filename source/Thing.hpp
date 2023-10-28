@@ -44,7 +44,7 @@ namespace Langulus::Entity
    /// and children/owner's units. The Thing is an aggregate of traits,       
    /// units, and subthings.                                                  
    ///                                                                        
-   class Thing final : public Resolvable {
+   class Thing final : public Resolvable, public SeekInterface<Thing> {
       LANGULUS(ABSTRACT) false;
       LANGULUS(PRODUCER) Thing;
       LANGULUS(UNINSERTABLE) false;
@@ -188,16 +188,14 @@ namespace Langulus::Entity
       const UnitMap& GetUnits() const noexcept;
 
       NOD() LANGULUS_API(ENTITY)
+            Unit* GetUnitMeta(DMeta, Index = IndexFirst);
+      NOD() LANGULUS_API(ENTITY)
       const Unit* GetUnitMeta(DMeta, Index = IndexFirst) const;
 
       NOD() LANGULUS_API(ENTITY)
-      Unit* GetUnitMeta(DMeta, Index = IndexFirst);
-
+            Unit* GetUnitExt(DMeta, const Neat&, Index = IndexFirst);
       NOD() LANGULUS_API(ENTITY)
-      const Unit* GetUnitExt(const Construct&, Index = IndexFirst) const;
-
-      NOD() LANGULUS_API(ENTITY)
-      Unit* GetUnitExt(const Construct&, Index = IndexFirst);
+      const Unit* GetUnitExt(DMeta, const Neat&, Index = IndexFirst) const;
 
       template<CT::Unit T = Unit>
       NOD()       Decay<T>* GetUnit(Index = IndexFirst);
@@ -272,14 +270,51 @@ namespace Langulus::Entity
       ///                                                                     
       ///   Seek                                                              
       ///                                                                     
-      LANGULUS_SEEK_INTERFACE();
-      LANGULUS_SEEK_TOKEN_INTERFACE();
+      using SeekInterface::SeekUnit;
+      using SeekInterface::SeekUnitAux;
+      using SeekInterface::SeekUnitExt;
+      using SeekInterface::SeekUnitAuxExt;
+      using SeekInterface::SeekTrait;
+      using SeekInterface::SeekTraitAux;
+      using SeekInterface::SeekValue;
+      using SeekInterface::SeekValueAux;
+
+      template<Seek = Seek::HereAndAbove>
+      NOD() Unit* SeekUnit(DMeta, Index = IndexFirst);
+      template<Seek = Seek::HereAndAbove>
+      NOD() Unit* SeekUnitAux(const Neat&, DMeta, Index = IndexFirst);
+      template<Seek = Seek::HereAndAbove>
+      NOD() Unit* SeekUnitExt(DMeta, const Neat&, Index = IndexFirst);
+      template<Seek = Seek::HereAndAbove>
+      NOD() Unit* SeekUnitAuxExt(DMeta, const Neat&, const Neat&, Index = IndexFirst);
+
+      template<Seek = Seek::HereAndAbove>
+      NOD() Trait SeekTrait(TMeta, Index = IndexFirst);
+      template<Seek = Seek::HereAndAbove>
+      NOD() Trait SeekTraitAux(const Neat&, TMeta, Index = IndexFirst);
+
+      template<Seek = Seek::HereAndAbove>
+      bool SeekValue(TMeta, CT::Data auto&, Index = IndexFirst) const;
+      template<Seek = Seek::HereAndAbove>
+      bool SeekValueAux(TMeta, const Neat&, CT::Data auto&, Index = IndexFirst) const;
 
       ///                                                                     
       ///   Gather                                                            
       ///                                                                     
-      LANGULUS_GATHER_INTERFACE();
-      LANGULUS_GATHER_TOKEN_INTERFACE();
+      using SeekInterface::GatherUnits;
+      using SeekInterface::GatherUnitsExt;
+      using SeekInterface::GatherTraits;
+
+      template<Seek = Seek::HereAndAbove>
+      NOD() TAny<Unit*> GatherUnits(DMeta);
+      template<Seek = Seek::HereAndAbove>
+      NOD() TAny<Unit*> GatherUnitsExt(DMeta, const Neat&);
+
+      template<Seek = Seek::HereAndAbove>
+      NOD() TraitList GatherTraits(TMeta);
+
+      template<CT::Data D, Seek = Seek::HereAndAbove>
+      NOD() TAny<D> GatherValues() const;
    };
 
 } // namespace Langulus::Entity

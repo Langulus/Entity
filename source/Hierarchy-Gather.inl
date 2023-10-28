@@ -9,6 +9,87 @@
 #pragma once
 #include "Hierarchy.hpp"
 
+#define TEMPLATE() template<class THIS>
+#define TME() SeekInterface<THIS>
+
+
+namespace Langulus::Entity
+{
+
+   /// Collects all units of the given type inside the hierarchy              
+   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
+   ///   @param meta - the units to seek for                                  
+   ///   @return the gathered units that match the type                       
+   TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
+   TAny<const Unit*> TME()::GatherUnits(DMeta meta) const {
+      return const_cast<THIS*>(static_cast<const THIS*>(this))
+         ->template GatherUnits<SEEK>(meta);
+   }
+
+   TEMPLATE() template<CT::Data T, Seek SEEK> LANGULUS(INLINED)
+   TAny<T*> TME()::GatherUnits() {
+      return static_cast<THIS*>(this)
+         ->template GatherUnits<SEEK>(MetaData::Of<Decay<T>>());
+   }
+
+   TEMPLATE() template<CT::Data T, Seek SEEK> LANGULUS(INLINED)
+   TAny<const T*> TME()::GatherUnits() const {
+      return const_cast<TME()*>(this)
+         ->template GatherUnits<T, SEEK>();
+   }
+
+   /// Collects all traits of the given type inside the hierarchy             
+   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
+   ///   @param trait - the trait to seek for                                 
+   ///   @return the gathered traits that match the type                      
+   TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
+   TraitList TME()::GatherTraits(TMeta trait) const {
+      return const_cast<THIS*>(static_cast<const THIS*>(this))
+         ->template GatherTraits<SEEK>(trait);
+   }
+
+   TEMPLATE() template<CT::Trait T, Seek SEEK> LANGULUS(INLINED)
+   TraitList TME()::GatherTraits() {
+      return static_cast<THIS*>(this)
+         ->template GatherTraits<SEEK>(T::GetTrait());
+   }
+
+   TEMPLATE() template<CT::Trait T, Seek SEEK> LANGULUS(INLINED)
+   TraitList TME()::GatherTraits() const {
+      return const_cast<TME()*>(this)
+         ->template GatherTraits<T, SEEK>();
+   }
+
+   #if LANGULUS_FEATURE(MANAGED_REFLECTION)
+      TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
+      TAny<Unit*> TME()::GatherUnits(const Token& token) {
+         return static_cast<THIS*>(this)
+            ->template GatherUnits<SEEK>(RTTI::GetMetaData(token));
+      }
+
+      TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
+      TAny<const Unit*> TME()::GatherUnits(const Token& token) const {
+         return static_cast<THIS*>(this)
+            ->template GatherUnits<SEEK>(RTTI::GetMetaData(token));
+      }
+      
+      TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
+      TraitList TME()::GatherTraits(const Token& token) {
+         return static_cast<THIS*>(this)
+            ->template GatherTraits<SEEK>(RTTI::GetMetaTrait(token));
+      }
+
+      TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
+      TraitList TME()::GatherTraits(const Token& token) const {
+         return static_cast<THIS*>(this)
+            ->template GatherTraits<SEEK>(RTTI::GetMetaTrait(token));
+      }
+   #endif
+
+} // namespace Langulus::Entity
+
+#undef TEMPLATE
+#undef TME
 
 namespace Langulus::Entity
 {
@@ -21,19 +102,6 @@ namespace Langulus::Entity
    LANGULUS(INLINED)
    TAny<Unit*> Hierarchy::GatherUnits(DMeta meta) {
       TAny<Unit*> result;
-      for (auto owner : *this)
-         result += owner->template GatherUnits<SEEK>(meta);
-      return Abandon(result);
-   }
-
-   /// Collects all units of the given type inside the hierarchy              
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
-   ///   @param meta - the units to seek for                                  
-   ///   @return the gathered units that match the type                       
-   template<Seek SEEK>
-   LANGULUS(INLINED)
-   TAny<const Unit*> Hierarchy::GatherUnits(DMeta meta) const {
-      TAny<const Unit*> result;
       for (auto owner : *this)
          result += owner->template GatherUnits<SEEK>(meta);
       return Abandon(result);
@@ -52,29 +120,16 @@ namespace Langulus::Entity
       return Abandon(result);
    }
 
-   /// Collects all traits of the given type inside the hierarchy             
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
-   ///   @param trait - the trait to seek for                                 
-   ///   @return the gathered traits that match the type                      
-   template<Seek SEEK>
-   LANGULUS(INLINED)
-   TAny<Trait> Hierarchy::GatherTraits(TMeta trait) const {
-      TAny<Trait> result;
-      for (auto owner : *this)
-         result += owner->template GatherTraits<SEEK>(trait);
-      return Abandon(result);
-   }
-
    /// Gather all values convertible to a type                                
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @tparam D - type to convert to                                       
+   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @return the gathered values                                          
-   template<Seek SEEK, CT::Data D>
+   template<CT::Data D, Seek SEEK>
    LANGULUS(INLINED)
    TAny<D> Hierarchy::GatherValues() const {
       TAny<D> result;
       for (auto owner : *this)
-         result += owner->template GatherValues<SEEK, D>();
+         result += owner->template GatherValues<D, SEEK>();
       return Abandon(result);
    }
 

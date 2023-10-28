@@ -95,7 +95,7 @@ namespace Langulus::Entity
 
       NOD() bool IsLocked() const noexcept;
 
-      const T& operator * () const noexcept;
+      const T& operator *  () const noexcept;
       const T* operator -> () const noexcept;
             T* operator -> ()       noexcept;
    };
