@@ -90,7 +90,7 @@ namespace Langulus::Entity
 
             if (stuff.template Is<Thing>()) {
                // Instantiate a child Thing                             
-               verb << CreateChild(stuff.GetArgument());
+               verb << CreateChild(stuff.GetDescriptor());
             }
             else if (stuff.template Is<Runtime>()) {
                // Instantiate a runtime                                 
@@ -104,7 +104,7 @@ namespace Langulus::Entity
                // Instantiate a module from the runtime                 
                auto runtime = GetRuntime();
                auto dependency = runtime->GetDependency(stuff.GetType());
-               verb << runtime->InstantiateModule(dependency, stuff.GetArgument());
+               verb << runtime->InstantiateModule(dependency, stuff.GetDescriptor());
             }
             else {
                // Instantiate anything else                             
@@ -499,7 +499,7 @@ namespace Langulus::Entity
       // Implicitly add a parent trait to descriptor, if one isn't      
       // already added - it will be stripped later, when normalizing    
       // the descriptor when producing the item from a factory          
-      if (not descriptor.Get<Traits::Parent>())
+      if (not descriptor.GetDescriptor().Get<Traits::Parent>())
          descriptor << Traits::Parent {this};
 
       if (producer) {

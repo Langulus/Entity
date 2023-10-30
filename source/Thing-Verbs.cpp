@@ -128,7 +128,7 @@ namespace Langulus::Entity
          if (construct.Is<Thing>()) {
             // Find an entity containing construct arguments            
             // Start with this one                                      
-            Verbs::Select selector {construct.GetArgument()};
+            Verbs::Select selector {construct.GetDescriptor()};
             Select(selector);
             if (selector.GetOutput()) {
                selectedEntities << this;
@@ -146,7 +146,7 @@ namespace Langulus::Entity
             for (auto& unit : selectedUnits) {
                bool localMismatch = false;
                auto unitBlock = unit->GetBlock();
-               construct.ForEach([&](const Block& part) {
+               construct.GetDescriptor().ForEach([&](const Block& part) {
                   for (Offset i = 0; i < part.GetCount(); ++i) {
                      auto element = part.GetElementResolved(i);
                      Verbs::Select selector {element};
