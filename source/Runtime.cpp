@@ -188,7 +188,7 @@ namespace Langulus::Entity
          if (found)
             found->mValue << module;
          else
-            mModules.Insert(info->mPriority, module);
+            mModules.Insert(info->mPriority, ModuleList {module});
 
          RegisterAllBases(mModulesByType, module, module->GetType());
       }
