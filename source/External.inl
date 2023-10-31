@@ -812,9 +812,9 @@ namespace Langulus::A
 
       while (data != dataEnd) {
          if constexpr (CT::Bool<R>) {
-            ++counter;
             if (not call(*reinterpret_cast<const Deref<A>*>(data)))
                return counter;
+            ++counter;
          }
          else call(*reinterpret_cast<const Deref<A>*>(data));
 
