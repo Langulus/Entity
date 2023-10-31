@@ -17,9 +17,9 @@ if(PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
         fetch_langulus_module(Fractalloc GIT_TAG 0126c1750d9101ab29227a735d2a7a06da672e02)
     endif()
 	fetch_langulus_module(SIMD    GIT_TAG 4aadc7d243c10a09e8095bf502909931b6ec6122)
-	fetch_langulus_module(Anyness GIT_TAG 350d1deb3d5a78dec41346f262db60aa9615f2bc)
-    fetch_langulus_module(Flow	  GIT_TAG 59ba825e0cbbe1145de4ee5d0eb68639bf3d5e26)
-	fetch_langulus_module(Math	  GIT_TAG be3d01184ad7b6d0182162099002ce4b54d085fa)
+	fetch_langulus_module(Anyness GIT_TAG 4608cf580abcb8700ba910c3fb9a7563164c31c2)
+    fetch_langulus_module(Flow	  GIT_TAG a5ee87b002cbcbe558e73503fbdfaaa60875c3b7)
+	fetch_langulus_module(Math	  GIT_TAG a0845fccd67fcecc183d01a63160b1f74cf27864)
 endif()
 
 # Build and install Entity library                                          
