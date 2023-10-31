@@ -800,7 +800,7 @@ namespace Langulus::A
       static_assert(CT::Constant<A>, "Color iterator must be constant");
       static_assert(CT::Dense<A>, "Color iterator must be dense");
 
-      LANGULUS_ASSUME(DevAssumes, mView.mFormat->IsExact<A>(),
+      LANGULUS_ASSUME(DevAssumes, mView.mFormat->IsSimilar<A>(),
          "Iterator type is not compatible with contained color data");
 
       // Iterate using the desired color type                           
@@ -809,6 +809,7 @@ namespace Langulus::A
          ? pixels->Get<Anyness::Bytes>().GetRaw()
          : pixels->GetRaw();
       const auto dataEnd = data + mView.GetBytesize();
+
       while (data != dataEnd) {
          if constexpr (CT::Bool<R>) {
             ++counter;
