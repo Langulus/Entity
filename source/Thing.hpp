@@ -107,7 +107,7 @@ namespace Langulus::Entity
 
       LANGULUS_API(ENTITY) Any Run(const Lingua&);
 
-      LANGULUS_API(ENTITY) void Update(Time);
+      LANGULUS_API(ENTITY) bool Update(Time);
       LANGULUS_API(ENTITY) void Refresh(bool force = false);
       LANGULUS_API(ENTITY) void Reset();
 

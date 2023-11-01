@@ -188,7 +188,8 @@ namespace Langulus::Entity
    /// updating all runtimes and flows at and under this Thing                
    /// Also synchronizes changes between all units, if mRefreshRequired       
    ///   @param deltaTime - how much time passes for the simulation           
-   void Thing::Update(Time deltaTime) {
+   ///   @return true if no exit was requested by any of the runtimes/flows   
+   bool Thing::Update(Time deltaTime) {
       // Refresh the hierarchy on any changes, before updating anything 
       Refresh();
 
@@ -196,19 +197,25 @@ namespace Langulus::Entity
          // This thing owns its flow, so we need to update it here      
          // This will execute any temporally based verbs and scripts    
          // Game logic basically happens in this flow                   
-         (*mFlow)->Update(deltaTime);
+         if (not (*mFlow)->Update(deltaTime))
+            return false;
       }
 
       if (mRuntime.IsLocked()) {
          // This thing owns its runtime, so we need to update it here   
          // This is where modules are updated in parallel, physical     
          // simulations happen, images get rendered, etc.               
-         (*mRuntime)->Update(deltaTime);
+         if (not (*mRuntime)->Update(deltaTime))
+            return false;
       }
 
       // Cascade the update down the hierarchy                          
-      for (auto& child : mChildren)
-         child->Update(deltaTime);
+      for (auto& child : mChildren) {
+         if (not child->Update(deltaTime))
+            return false;
+      }
+
+      return true;
    }
 
    /// Refresh all units and children down the hierarchy                      

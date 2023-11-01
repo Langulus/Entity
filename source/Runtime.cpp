@@ -495,11 +495,15 @@ namespace Langulus::Entity
    /// Update the runtime, by updating all module instantiations by order of  
    /// their priority                                                         
    ///   @param dt - delta time between update calls                          
-   void Runtime::Update(Time dt) {
+   ///   @return true if no exit was requested by any of the modules          
+   bool Runtime::Update(Time dt) {
       for (auto pair : mModules) {
-         for (auto module : pair.mValue)
-            module->Update(dt);
+         for (auto module : pair.mValue) {
+            if (not module->Update(dt))
+               return false;
+         }
       }
+      return true;
    }
 
    /// Stringify the runtime, for debugging purposes                          
