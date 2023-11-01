@@ -152,7 +152,7 @@ namespace Langulus::Entity
       const Path& GetDataPath() const;
 
       LANGULUS_API(ENTITY)
-      void Update(Time);
+      bool Update(Time);
 
       NOD() LANGULUS_API(ENTITY)
       explicit operator Debug() const;

@@ -93,7 +93,7 @@ namespace Langulus::Entity
       NOD() Runtime* GetRuntime() const noexcept { return mRuntime; }
 
    public:
-      virtual void Update(Time) = 0;
+      virtual bool Update(Time) { return true; }
    };
 
 } // namespace Langulus::Entity
