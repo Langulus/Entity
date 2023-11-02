@@ -365,6 +365,13 @@ namespace Langulus::Entity
       return HasUnits(MetaOf<Decay<T>>());
    }
 
+   /// Get the list of units, in order of addition                            
+   ///   @return a reference to the list of units                             
+   LANGULUS(INLINED)
+   const UnitList& Thing::GetUnits() const noexcept {
+      return mUnitsList;
+   }
+
    /// Create a unit by static type and arguments, relying on producers       
    /// in the hierarchy                                                       
    ///   @tparam T - the unit to create                                       
