@@ -222,6 +222,13 @@ namespace Langulus::Entity
       }
       return counter;
    }
+   
+   /// Get traits                                                             
+   ///   @return the map of traits                                            
+   LANGULUS_API(ENTITY)
+   const TraitMap& Thing::GetTraits() const noexcept {
+      return mTraits;
+   }
 
    /// Add/overwrite entity's name trait                                      
    ///   @param name - the name to set                                        

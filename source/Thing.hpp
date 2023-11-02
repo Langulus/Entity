@@ -185,7 +185,7 @@ namespace Langulus::Entity
       NOD() Count HasUnits() const;
 
       NOD() LANGULUS_API(ENTITY)
-      const UnitMap& GetUnits() const noexcept;
+      const UnitList& GetUnits() const noexcept;
 
       NOD() LANGULUS_API(ENTITY)
             Unit* GetUnitMeta(DMeta, Index = IndexFirst);
