@@ -258,6 +258,8 @@ namespace Langulus::Entity
          Logger::Error("Failed to load module `", path, "` - file is missing or corrupted; Error code: ");
          #if LANGULUS_OS(WINDOWS)
             Logger::Append(::GetLastError());
+         #else
+            Logger::Append(dlerror());
          #endif
          return {};
       }

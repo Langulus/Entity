@@ -17,7 +17,7 @@
       Logger::Verbose(Self(), __VA_ARGS__)
    #define ENTITY_VERBOSE_SELF_TAB(...) \
       const auto scoped = Logger::Verbose(Self(), __VA_ARGS__, Logger::Tabs {})
-   #define ENTITY_VERBOSE(...) \ 
+   #define ENTITY_VERBOSE(...) \
       Logger::Append(__VA_ARGS__)
 #else
    #define ENTITY_VERBOSE_ENABLED() 0
