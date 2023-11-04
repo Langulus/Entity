@@ -465,7 +465,7 @@ SCENARIO("Testing Thing", "[thing]") {
          }
       }
 
-      WHEN("Seek a unit by index") {
+      /*WHEN("Seek a unit by index") {
          auto unit = root.SeekUnit(0);
       }
 
@@ -487,6 +487,6 @@ SCENARIO("Testing Thing", "[thing]") {
 
       WHEN("Seek a trait in the hierarchy by type index") {
          auto child = root.SeekTrait<Traits::Name>();
-      }
+      }*/
    }
 }

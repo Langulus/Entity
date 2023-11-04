@@ -245,7 +245,6 @@ namespace Langulus::Entity
    ///   @param offset - the number of the matching trait to use              
    ///   @return true if output was rewritten                                 
    template<Seek SEEK>
-   LANGULUS(INLINED)
    bool Thing::SeekValue(TMeta meta, CT::Data auto& output, Index offset) const {
       using D = Deref<decltype(output)>;
 
