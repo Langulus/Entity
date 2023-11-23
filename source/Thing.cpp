@@ -261,11 +261,11 @@ namespace Langulus::Entity
       if (id) {
          // Search a typed trait                                        
          const auto found = mUnitsAmbiguous.FindIt(id);
-         return found ? *found->mValue[index] : nullptr;
+         return found ? found->mValue[index].Get() : nullptr;
       }
 
       // Get unit by index only                                         
-      return *mUnitsList[index];
+      return mUnitsList[index].Get();
    }
 
    /// Get a unit by type and offset (const)                                  
@@ -292,14 +292,14 @@ namespace Langulus::Entity
          if (found) {
             auto& bucket = found->mValue;
             if (not what)
-               return *bucket[index];
+               return bucket[index].Get();
 
             // Check all units in that bucket for required properties   
             for (auto& unit : bucket) {
                if (unit->CompareDescriptor(what)) {
                   // Match found                                        
                   if (index == 0)
-                     return *unit;
+                     return unit.Get();
                   else
                      --index;
                }
@@ -312,7 +312,7 @@ namespace Langulus::Entity
             if (unit->CompareDescriptor(what)) {
                // Match found                                           
                if (index == 0)
-                  return *unit;
+                  return unit.Get();
                else
                   --index;
             }
@@ -349,7 +349,7 @@ namespace Langulus::Entity
    ///   @param id - the index to pick                                        
    ///   @return the child entity, or nullptr of none was found               
    Thing* Thing::GetChild(const Index& id) {
-      return *mChildren[id];
+      return mChildren[id].Get();
    }
 
    /// Get child entity by offset                                             
@@ -368,7 +368,7 @@ namespace Langulus::Entity
       for (auto& child : mChildren) {
          if (child->GetName() == name) {
             if (matches == offset)
-               return *child;
+               return child.Get();
             ++matches;
          }
       }
@@ -428,13 +428,13 @@ namespace Langulus::Entity
    /// Get the current runtime                                                
    ///   @return the pointer to the runtime                                   
    Runtime* Thing::GetRuntime() const noexcept {
-      return const_cast<Runtime*>(**mRuntime);
+      return const_cast<Runtime*>(mRuntime->Get());
    }
 
    /// Get the current temporal flow                                          
    ///   @return the pointer to the flow                                      
    Temporal* Thing::GetFlow() const noexcept {
-      return const_cast<Temporal*>(**mFlow);
+      return const_cast<Temporal*>(mFlow->Get());
    }
 
    /// Create a local runtime for this thing                                  

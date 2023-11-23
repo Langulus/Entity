@@ -102,11 +102,11 @@ namespace Langulus::Entity
          }
          else if (id.template TraitIs<Traits::Runtime>()) {
             // Get the nearest runtime                                  
-            return Traits::Runtime {*mRuntime};
+            return Traits::Runtime {mRuntime->Get()};
          }
          else if (id.template TraitIs<Traits::Parent>()) {
             // Get the parent                                           
-            return Traits::Parent {*mOwner};
+            return Traits::Parent {mOwner.Get()};
          }
       }
 
