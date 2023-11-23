@@ -15,5 +15,3 @@ add_test(
 	NAME		LangulusEntityTest
 	COMMAND		LangulusEntityTest
 )
-
-langulus_copy_dlls(LangulusEntityTest ON LangulusEntityTest)
