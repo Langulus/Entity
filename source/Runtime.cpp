@@ -130,9 +130,9 @@ namespace Langulus::Entity
          map.Insert(type, module);
 
       for (auto& base : type->mBases) {
-         if (base.mType->template Is<Resolvable>())
+         if (base.GetType()->IsExact<Resolvable>())
             break;
-         RegisterAllBases(map, module, base.mType);
+         RegisterAllBases(map, module, base.GetType());
       }
    }
 
@@ -142,9 +142,9 @@ namespace Langulus::Entity
    ///   @param type - the type to register the module as                     
    void UnregisterAllBases(TUnorderedMap<DMeta, ModuleList>& map, Module* module, DMeta type) {
       for (auto& base : type->mBases) {
-         if (base.mType->template Is<Resolvable>())
+         if (base.GetType()->IsExact<Resolvable>())
             break;
-         UnregisterAllBases(map, module, base.mType);
+         UnregisterAllBases(map, module, base.GetType());
       }
 
       const auto found = map.FindIt(type);
@@ -331,8 +331,18 @@ namespace Langulus::Entity
          for (auto externalType : library.mTypes)
             mDependencies.Insert(externalType, library);
 
-         Logger::Info("Module `", library.mInfo()->mName, 
-            "` exposed the following types: ", library.mTypes);
+         Logger::Info(
+            "Module `", library.mInfo()->mName, 
+            "` exposed the following types: ", Logger::DarkGreen
+         );
+
+         bool first = true;
+         for (auto& t : library.mTypes) {
+            if (not first)
+               Logger::Append(", ");
+            Logger::Append(t);
+            first = false;
+         }
       }
       catch (...) {
          // Make sure we end up in an invariant state                   
@@ -405,7 +415,10 @@ namespace Langulus::Entity
 
       // Unregister external types, if no longer used                   
       IF_LANGULUS_MANAGED_REFLECTION(RTTI::UnloadLibrary(boundary));
-      Logger::Info("Module `", boundary, "` unloaded ", (wasMarked ? "(scheduled)" : ""));
+      Logger::Info(
+         "Module `", boundary, "` unloaded ",
+         Logger::DarkYellow, (wasMarked ? "(scheduled)" : "")
+      );
 
       // Unload the shared object                                       
       #if LANGULUS_OS(WINDOWS)
