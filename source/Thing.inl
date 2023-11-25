@@ -219,9 +219,9 @@ namespace Langulus::Entity
          mUnitsAmbiguous.Insert(type, TUnorderedSet<Ref<Unit>> {unit});
 
       for (auto& base : type->mBases) {
-         if (base.mType->template Is<Unit>())
+         if (base.GetType()->IsExact<Unit>())
             break;
-         AddUnitBases(unit, base.mType);
+         AddUnitBases(unit, base.GetType());
       }
    }
 
@@ -237,9 +237,9 @@ namespace Langulus::Entity
       }
 
       for (auto& base : type->mBases) {
-         if (base.mType->template Is<Unit>())
+         if (base.GetType()->IsExact<Unit>())
             break;
-         RemoveUnitBases(unit, base.mType);
+         RemoveUnitBases(unit, base.GetType());
       }
    }
 
@@ -500,7 +500,8 @@ namespace Langulus::Entity
       LANGULUS_ASSUME(UserAssumes, construct.GetType(),
          "Invalid construct type");
       const auto type = construct.GetType();
-      const auto producer = type->mProducer;
+      const auto producer = type and type->mProducerRetriever
+         ? type->mProducerRetriever() : nullptr;
       Construct descriptor {construct};
 
       // Implicitly add a parent trait to descriptor, if one isn't      
@@ -521,9 +522,17 @@ namespace Langulus::Entity
             );
 
             // Potential unit producers found, attempt creation         
+            producers.MakeOr();
             Verbs::Create creator {&descriptor};
             if (Flow::DispatchFlat(producers, creator))
                return Abandon(creator.GetOutput());
+
+            Logger::Error(
+               "Failed to create `", Logger::Push, Logger::DarkYellow, 
+               type, Logger::Pop, "` in unit(s) ", Logger::Push, 
+               Logger::DarkYellow, producers, Logger::Pop,
+               ": ", descriptor
+            );
          }
          else if (producer->template CastsTo<Module>()) {
             // Data is producible from a module                         
@@ -534,25 +543,41 @@ namespace Langulus::Entity
             );
 
             // Potential module producers found, attempt creation       
+            producers.MakeOr();
             Verbs::Create creator {&descriptor};
             if (Flow::DispatchFlat(producers, creator))
                return Abandon(creator.GetOutput());
+
+            Logger::Error(
+               "Failed to create `", Logger::Push, Logger::DarkYellow,
+               type, Logger::Pop, "` in module(s) ", Logger::Push,
+               Logger::DarkYellow, producers, Logger::Pop,
+               ": ", descriptor
+            );
          }
          else if (producer->template CastsTo<Thing>()) {
             // Data is producible from a thing                          
             TODO();
          }
       }
-      else if (type->mIsAbstract and not type->mConcrete) {
+      else if (type->mIsAbstract and not type->mConcreteRetriever) {
          // Data doesn't have a specific producer, but it is abstract   
          // so we know that only a module/unit can concretize it        
          // Gather all units in the desired part of the hierarchy       
          auto producers = GatherUnits<Unit, SEEK>();
          if (producers) {
             // Potential unit producers found, attempt creation there   
+            producers.MakeOr();
             Verbs::Create creator {&descriptor};
             if (Flow::DispatchFlat(producers, creator))
                return Abandon(creator.GetOutput());
+
+            Logger::Error(
+               "Failed to create abstract `", Logger::Push, Logger::DarkYellow,
+               type, Logger::Pop, "` in unit(s) ", Logger::Push,
+               Logger::DarkYellow, producers, Logger::Pop,
+               ": ", descriptor
+            );
          }
 
          //TODO try modules too?
@@ -568,11 +593,13 @@ namespace Langulus::Entity
          if (Verbs::Create::ExecuteStateless(creator))
             return Abandon(creator.GetOutput());
          
-         LANGULUS_THROW(Construct, 
-            "Requested data is not default/descriptor-constructible");
+         Logger::Error(
+            "Failed to create `", Logger::Push, Logger::DarkYellow,
+            type, Logger::Pop, "` statelessly: ", descriptor
+         );
       }
 
-      Logger::Error("Unable to create data: ", construct);
+      LANGULUS_THROW(Construct, "Unable to create data");
       return {};
    }
 

@@ -306,7 +306,7 @@ namespace Langulus::A
       LANGULUS_BASES(Entity::Module);
       using Entity::Module::Module;
 
-      NOD() virtual Anyness::Ref<File> GetFile(const Anyness::Path&) = 0;
+      NOD() virtual Anyness::Ref<File>   GetFile  (const Anyness::Path&) = 0;
       NOD() virtual Anyness::Ref<Folder> GetFolder(const Anyness::Path&) = 0;
 
       NOD() const Anyness::Path& GetWorkingPath() const noexcept;
@@ -348,8 +348,9 @@ namespace Langulus::A
 
       public:
          Reader() = delete;
-         Reader(File* f) : mFile {f} {}
-         virtual ~Reader() {}
+         Reader(File* f)
+            : mFile {f} {}
+         virtual ~Reader() = default;
 
          virtual Offset Read(Anyness::Block&) = 0;
       };
@@ -359,12 +360,13 @@ namespace Langulus::A
       protected:
          File* mFile;
          Offset mProgress {};
-         bool mAppend {};
+         bool mAppend = false;
 
       public:
          Writer() = delete;
-         Writer(File* f, bool append) : mFile {f}, mAppend {append} {}
-         virtual ~Writer() {}
+         Writer(File* f, bool append)
+            : mFile {f}, mAppend {append} {}
+         virtual ~Writer() = default;
 
          virtual Offset Write(const Anyness::Block&) = 0;
       };
@@ -379,8 +381,8 @@ namespace Langulus::A
    struct Folder : Entity::Unit {
    protected:
       Anyness::Path mFolderPath;
-      bool mExists {};
-      bool mIsReadOnly {};
+      bool mExists = false;
+      bool mIsReadOnly = false;
 
    public:
       LANGULUS(PRODUCER) FileSystem;
@@ -391,8 +393,8 @@ namespace Langulus::A
       NOD() bool IsReadOnly() const noexcept;
       NOD() const Anyness::Path& GetFolderPath() const noexcept;
 
-      NOD() virtual const File* GetFile(const Anyness::Path&) const = 0;
-      NOD() virtual const Folder* GetFolder(const Anyness::Path&) const = 0;
+      NOD() virtual Anyness::Ref<File>   GetFile  (const Anyness::Path&) const = 0;
+      NOD() virtual Anyness::Ref<Folder> GetFolder(const Anyness::Path&) const = 0;
    };
 
    ///                                                                        
