@@ -314,6 +314,9 @@ namespace Langulus::Entity
       try {
          // Make sure that all types used by the Runtime are reflected  
          // here, and not inside any library (nasty bugs otherwise)     
+         (void)MetaOf<Neat>();
+         (void)MetaOf<Any>();
+         (void)MetaOf<TAny<Any>>();
          (void)MetaOf<Real>();
          (void)MetaOf<Runtime>();
          (void)MetaOf<RTTI::Meta*>();
