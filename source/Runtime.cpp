@@ -343,7 +343,7 @@ namespace Langulus::Entity
          for (auto& t : library.mTypes) {
             if (not first)
                Logger::Append(", ");
-            Logger::Append(t);
+            Logger::Append(t->mToken);
             first = false;
          }
       }
