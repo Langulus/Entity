@@ -328,6 +328,7 @@ namespace Langulus::A
       LANGULUS(PRODUCER) FileSystem;
       LANGULUS_BASES(Entity::Unit);
       using Entity::Unit::Unit;
+      ~File() override = default;
 
       NOD() bool Exists() const noexcept;
       NOD() bool IsReadOnly() const noexcept;
@@ -388,6 +389,7 @@ namespace Langulus::A
       LANGULUS(PRODUCER) FileSystem;
       LANGULUS_BASES(Entity::Unit);
       using Entity::Unit::Unit;
+      ~Folder() override = default;
 
       NOD() bool Exists() const noexcept;
       NOD() bool IsReadOnly() const noexcept;
