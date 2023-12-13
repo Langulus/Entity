@@ -42,7 +42,6 @@ namespace Langulus::Entity
 {
 
    TUnorderedMap<Token, Runtime::SharedLibrary> Runtime::mLibraries;
-   TUnorderedMap<const RTTI::Meta*, Runtime::SharedLibrary> Runtime::mDependencies;
 
    /// Close a shared library handle, unloading it                            
    ///   @param library - the library handle                                  
@@ -217,7 +216,8 @@ namespace Langulus::Entity
    /// Load a shared library for a module                                     
    ///   @param name - the name for the dynamic library                       
    ///                 the filename will be derived from it, by prefixing     
-   ///                 with `Mod.`, and suffixing with `.so` or `.dll`        
+   ///                 with `LangulusMod`, and suffixing with `.so` or `.dll` 
+   ///                 the name also should correspond to the RTTI::Boundary  
    ///   @return the module handle (OS dependent)                             
    Runtime::SharedLibrary Runtime::LoadSharedLibrary(const Token& name) {
       // Check if this library is already loaded                        
@@ -312,41 +312,58 @@ namespace Langulus::Entity
       // It might throw if out of memory or on meta collision, while    
       // registering new types on the other side                        
       try {
-         // Make sure that all types used by the Runtime are reflected  
-         // here, and not inside any library (nasty bugs otherwise)     
-         /*(void)MetaOf<Neat>();
-         (void)MetaOf<Any>();
-         (void)MetaOf<TAny<Any>>();
-         (void)MetaOf<Real>();
-         (void)MetaOf<Runtime>();
-         (void)MetaOf<RTTI::Meta*>();
-         (void)MetaOf<const RTTI::Meta*>();
-         (void)MetaOf<DMeta>();
-         (void)MetaOf<Module>();
-         (void)MetaOf<Unit>();
-         (void)MetaOf<ModuleList>();
-         (void)MetaOf<SharedLibrary>();
-         (void)MetaOf<A::Folder>();
-         (void)MetaOf<A::File>();
-         (void)MetaOf<Referenced>();
-         (void)MetaOf<Resolvable>();*/
+         // Invoke the entry point, it should reflect external data     
+         MetaList types;
+         library.mEntry(library.mModuleType, types);
+         if (types.IsEmpty()) {
+            Logger::Error(
+               "A module must register at least one type"
+               " - the module instantiation type");
+            (void)UnloadSharedLibrary(library);
+            return {};
+         }
 
-         library.mEntry(library.mModuleType, library.mTypes);
+         // Make sure all registered types have the proper boundary     
+         bool firstType = true;
+         for (auto externalType : types) {
+            if (firstType)
+               library.mBoundary = externalType->mLibraryName;
+            else if (library.mBoundary == RTTI::MainBoundary
+                 or  library.mBoundary != externalType->mLibraryName) {
+               Logger::Error(
+                  "The external type `", externalType->mToken,
+                  "` registered by module `", path,
+                  "` has a mismatching boundary `", externalType->mLibraryName, '`');
+               (void)UnloadSharedLibrary(library);
+               return {};
+            }
+            firstType = false;
+         }
 
+         // Test if the boundary conflicts with any of the previously   
+         // loaded libraries                                            
+         for (auto lib : mLibraries) {
+            if (lib.mValue.mBoundary == library.mBoundary) {
+               Logger::Error(
+                  "The library `", path, "` boundary `", library.mBoundary,
+                  "` conflicts with already loaded library `", lib.mKey,
+                  "` boundary `", lib.mValue.mBoundary, '`'
+               );
+               (void)UnloadSharedLibrary(library);
+               return {};
+            }
+         }
+
+         // Library is properly registered                              
          mLibraries.Insert(name, library);
 
-         for (auto externalType : library.mTypes)
-            mDependencies.Insert(externalType, library);
-
+         // Do some info logging                                        
          Logger::Info(
             "Module `", library.mInfo()->mName, 
-            "` exposed the following types: ", Logger::DarkGreen
-         );
-
+            "` exposed the following types: ", Logger::DarkGreen);
          bool first = true;
-         for (auto& t : library.mTypes) {
-            if (not first)
-               Logger::Append(", ");
+         for (auto& t : types) {
+            if (not first) Logger::Append(", ");
             Logger::Append(t->mToken);
             first = false;
          }
@@ -388,15 +405,9 @@ namespace Langulus::Entity
             list = mModules.RemoveIt(list);
       }
 
-      // Remove dependencies                                            
-      for (auto externalType : library.mTypes) {
-         VERBOSE(this, ": Removing dependencies: ", externalType);
-         mDependencies.RemoveKey(externalType);
-      }
-
       // Collect garbage, and check if library's boundary is still used 
       const auto wasMarked = library.mMarkedForUnload;
-      const auto boundary = library.mInfo()->mName;
+      const auto boundary = library.mBoundary;
 
       IF_LANGULUS_MANAGED_MEMORY(Allocator::CollectGarbage());
 
@@ -445,8 +456,14 @@ namespace Langulus::Entity
    ///   @param type - the type to search for                                 
    ///   @return the shared library handle, you should check if it's valid    
    Runtime::SharedLibrary Runtime::GetDependency(DMeta type) const noexcept {
-      auto found = mDependencies.FindIt(type);
-      return found ? found->mValue : SharedLibrary {};
+      if (type->mLibraryName == RTTI::MainBoundary)
+         return {};
+
+      for (auto library : mLibraries) {
+         if (library.mValue.mBoundary == type->mLibraryName)
+            return library.mValue;
+      }
+      return {};
    }
 
    /// Get a module instance by type                                          
