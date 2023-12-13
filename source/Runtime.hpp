@@ -47,8 +47,8 @@ namespace Langulus::Entity
          Module::InfoFunction mInfo {};
          // Type of the module instance                                 
          DMeta mModuleType {};
-         // Set of types, that were registered upon entry               
-         MetaList mTypes;
+         // The RTTI::Boundary of the library                           
+         Token mBoundary;
          // Whether or not library is marked for unload                 
          bool mMarkedForUnload {};
 
@@ -63,7 +63,7 @@ namespace Langulus::Entity
             , mCreator {other->mCreator}
             , mInfo {other->mInfo}
             , mModuleType {other->mModuleType}
-            , mTypes {Abandon(other->mTypes)}
+            , mBoundary {other->mBoundary}
             , mMarkedForUnload {other->mMarkedForUnload} {}
 
          /// Check if the shared library handle is valid                      
@@ -92,8 +92,6 @@ namespace Langulus::Entity
       // This is a static registry - all Runtimes use the same shared   
       // library objects, but manage their own module instantiations    
       static TUnorderedMap<Token, SharedLibrary> mLibraries;
-      // Shared library dependencies for all externally registered types
-      static TUnorderedMap<const RTTI::Meta*, SharedLibrary> mDependencies;
       // Instantiated modules, sorted by priority                       
       TOrderedMap<Real, ModuleList> mModules;
       // Instantiated modules, indexed by type                          
