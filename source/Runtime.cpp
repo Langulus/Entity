@@ -314,7 +314,7 @@ namespace Langulus::Entity
       try {
          // Make sure that all types used by the Runtime are reflected  
          // here, and not inside any library (nasty bugs otherwise)     
-         (void)MetaOf<Neat>();
+         /*(void)MetaOf<Neat>();
          (void)MetaOf<Any>();
          (void)MetaOf<TAny<Any>>();
          (void)MetaOf<Real>();
@@ -326,6 +326,10 @@ namespace Langulus::Entity
          (void)MetaOf<Unit>();
          (void)MetaOf<ModuleList>();
          (void)MetaOf<SharedLibrary>();
+         (void)MetaOf<A::Folder>();
+         (void)MetaOf<A::File>();
+         (void)MetaOf<Referenced>();
+         (void)MetaOf<Resolvable>();*/
 
          library.mEntry(library.mModuleType, library.mTypes);
 
@@ -416,8 +420,9 @@ namespace Langulus::Entity
          }
       #endif
 
-      // Unregister external types, if no longer used                   
-      IF_LANGULUS_MANAGED_REFLECTION(RTTI::UnloadLibrary(boundary));
+      // If reached, then the library has no known allocations, using   
+      // its reflected types - now we can safely unregister these types 
+      IF_LANGULUS_MANAGED_REFLECTION(RTTI::UnloadBoundary(boundary));
       Logger::Info(
          "Module `", boundary, "` unloaded ",
          Logger::DarkYellow, (wasMarked ? "(scheduled)" : "")
