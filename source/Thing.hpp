@@ -7,6 +7,7 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
+#include "Runtime.hpp"
 #include "Unit.hpp"
 #include "Pin.hpp"
 #include <Anyness/Any.hpp>
@@ -86,11 +87,14 @@ namespace Langulus::Entity
       LANGULUS_API(ENTITY) Thing(Describe&&);
       LANGULUS_API(ENTITY) Thing(Thing*, const Neat& = {});
       LANGULUS_API(ENTITY) Thing(Thing&&) noexcept;
+      LANGULUS_API(ENTITY) Thing(Cloned<Thing>&&);
+      LANGULUS_API(ENTITY) Thing(Abandoned<Thing>&&);
       LANGULUS_API(ENTITY) ~Thing() IF_UNSAFE(noexcept);
 
       // Shallow copy is disabled, you should be able only to clone,    
       // move, or abandon                                               
       Thing(const Thing&) = delete;
+      auto operator = (auto) = delete;
 
       NOD() LANGULUS_API(ENTITY)
       Runtime*  GetRuntime() const noexcept;

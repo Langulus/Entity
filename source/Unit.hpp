@@ -21,7 +21,7 @@ namespace Langulus::Entity
    /// inside external, dynamically loaded modules. There are units for       
    /// graphics, input, AI, content, and whatever extensions you make.        
    ///                                                                        
-   struct Unit : Resolvable, SeekInterface<Unit> {
+   struct LANGULUS_API(ENTITY) Unit : Resolvable, SeekInterface<Unit> {
       LANGULUS(UNINSERTABLE) false;
       LANGULUS_BASES(Resolvable);
 
@@ -34,30 +34,26 @@ namespace Langulus::Entity
       Hierarchy mOwners;
 
    public:
-      /// A unit can not be default-created, nor be shallowly copied          
+      /// A unit can not be default-created, nor be shallow-copied            
       Unit() = delete;
       Unit(const Unit&) = delete;
       Unit& operator = (const Unit&) = delete;
 
       /// A unit can only be moved or created with type and owner             
-      LANGULUS_API(ENTITY) Unit(DMeta, const Neat& = {}) noexcept;
-      LANGULUS_API(ENTITY) Unit(Unit&&) noexcept;
-      LANGULUS_API(ENTITY) ~Unit() override;
+      Unit(DMeta, const Neat& = {}) noexcept;
+      Unit(Unit&&) noexcept;
+      Unit(Cloned<Unit>&&);
+      ~Unit() override;
 
-      LANGULUS_API(ENTITY) Unit& operator = (Unit&&) noexcept;
+      Unit& operator = (Unit&&) noexcept;
 
-      LANGULUS_API(ENTITY) void Select(Verb&);
+      void Select(Verb&);
 
    public:
-      virtual void Refresh() {}
+      virtual void Refresh();
 
-      NOD() LANGULUS_API(ENTITY)
       Runtime* GetRuntime() const noexcept;
-
-      NOD() LANGULUS_API(ENTITY)
       const Hierarchy& GetOwners() const noexcept;
-
-      NOD() LANGULUS_API(ENTITY)
       bool CompareDescriptor(const Neat&) const;
       
       ///                                                                     
@@ -116,9 +112,9 @@ namespace Langulus::Entity
       NOD() TAny<D> GatherValues() const;
 
    protected:
-      LANGULUS_API(ENTITY) void Couple(const Thing*);
-      LANGULUS_API(ENTITY) void Decouple(const Thing*);
-      LANGULUS_API(ENTITY) void ReplaceOwner(const Thing*, const Thing*);
+      void Couple(const Thing*);
+      void Decouple(const Thing*);
+      void ReplaceOwner(const Thing*, const Thing*);
    };
 
 } // namespace Langulus::Entity

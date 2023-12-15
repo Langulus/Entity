@@ -8,7 +8,6 @@
 ///                                                                           
 #include "Thing.inl"
 #include "Pin.inl"
-#include "Runtime.hpp"
 #include <Flow/Verbs/Interpret.hpp>
 
 #if 0
@@ -96,12 +95,12 @@ namespace Langulus::Entity
    ///   @param other - move that entity                                      
    Thing::Thing(Thing&& other) noexcept
       : Resolvable {Forward<Resolvable>(other)}
-      , mRuntime {::std::move(other.mRuntime)}
-      , mFlow {::std::move(other.mFlow)}
-      , mChildren {::std::move(other.mChildren)}
-      , mUnitsAmbiguous {::std::move(other.mUnitsAmbiguous)}
-      , mUnitsList {::std::move(other.mUnitsList)}
-      , mTraits {::std::move(other.mTraits)}
+      , mRuntime {Move(other.mRuntime)}
+      , mFlow {Move(other.mFlow)}
+      , mChildren {Move(other.mChildren)}
+      , mUnitsAmbiguous {Move(other.mUnitsAmbiguous)}
+      , mUnitsList {Move(other.mUnitsList)}
+      , mTraits {Move(other.mTraits)}
       , mRefreshRequired {true} {
       // Remap children                                                 
       for (auto& child : mChildren)
@@ -116,6 +115,60 @@ namespace Langulus::Entity
          other.mOwner->RemoveChild(&other);
 
       ENTITY_VERBOSE_SELF("moved from ", other);
+   }
+   
+   /// Abandon constructor                                                    
+   ///   @attention owner is never cloned, you're moving only the hierarchy   
+   ///              below the parent, however other's parent is notified of   
+   ///              the clone, because 'other' is duplicated in its children  
+   ///   @param other - clone that entity                                     
+   Thing::Thing(Abandoned<Thing>&& other)
+      : Resolvable {*other}
+      , mRuntime {Abandon(other->mRuntime)}
+      , mFlow {Abandon(other->mFlow)}
+      , mChildren {Abandon(other->mChildren)}
+      , mUnitsAmbiguous {Abandon(other->mUnitsAmbiguous)}
+      , mUnitsList {Abandon(other->mUnitsList)}
+      , mTraits {Abandon(other->mTraits)}
+      , mRefreshRequired {true} {
+      // Remap children                                                 
+      for (auto& child : mChildren)
+         child->mOwner = this;
+
+      // Remap units                                                    
+      for (auto& unit : mUnitsList)
+         unit->ReplaceOwner(&*other, this);
+
+      // Make sure the losing parent is notified of the change          
+      if (other->mOwner)
+         other->mOwner->RemoveChild(&*other);
+
+      ENTITY_VERBOSE_SELF("abandoned from ", other);
+   }
+
+   /// Clone constructor                                                      
+   ///   @attention owner is never cloned, you're moving only the hierarchy   
+   ///              below the parent, however other's parent is notified of   
+   ///              the clone, because 'other' is duplicated in its children  
+   ///   @param other - clone that entity                                     
+   Thing::Thing(Cloned<Thing>&& other)
+      : Resolvable {*other}
+      , mRuntime {Clone(other->mRuntime)}
+      , mFlow {Clone(other->mFlow)}
+      , mChildren {Clone(other->mChildren)}
+      , mUnitsAmbiguous {Clone(other->mUnitsAmbiguous)}
+      , mUnitsList {Clone(other->mUnitsList)}
+      , mTraits {Clone(other->mTraits)}
+      , mRefreshRequired {true} {
+      // Remap children                                                 
+      for (auto& child : mChildren)
+         child->mOwner = this;
+
+      // Remap units                                                    
+      for (auto& unit : mUnitsList)
+         unit->ReplaceOwner(&*other, this);
+
+      ENTITY_VERBOSE_SELF("cloned from ", other);
    }
 
    /// Thing destructor                                                       
@@ -332,10 +385,7 @@ namespace Langulus::Entity
    ///   @param offset - the unit index                                       
    ///   @return the unit if found, or nullptr if not                         
    Unit* Thing::GetUnitMeta(const Token& token, Index offset) {
-      const auto meta = dynamic_cast<DMeta>(
-         RTTI::DisambiguateMeta(token)
-      );
-      return GetUnitMeta(meta, offset);
+      return GetUnitMeta(RTTI::DisambiguateMeta(token), offset);
    }
 #endif
 

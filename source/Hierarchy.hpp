@@ -12,6 +12,24 @@
 #include <Anyness/TAny.hpp>
 #include <Anyness/Trait.hpp>
 
+namespace Langulus::Anyness
+{
+
+   /// Execute a verb for all elements inside a type-erased constant block    
+   ///   @param verb - the verb to execute                                    
+   template<CT::Data T>
+   void TAny<T>::Run(Flow::Verb& verb) const {
+      Flow::DispatchDeep(*this, verb);
+   }
+
+   /// Execute a verb for all elements inside a type-erased block             
+   ///   @param verb - the verb to execute                                    
+   template<CT::Data T>
+   void TAny<T>::Run(Flow::Verb& verb) {
+      Flow::DispatchDeep(*this, verb);
+   }
+
+} // namespace Langulus::Anyness
 
 namespace Langulus::Entity
 {
@@ -186,13 +204,18 @@ namespace Langulus::Entity
    };
 
 
+   /*template class  LANGULUS_API(ENTITY) Anyness::TPointer<Thing, true>;
+   template class  LANGULUS_API(ENTITY) Anyness::TAny<Ref<Thing>>;
+   template struct LANGULUS_API(ENTITY) SeekInterface<Hierarchy>;*/
+
+
    ///                                                                        
    ///   A hierarchy interface                                                
    ///                                                                        
    /// Simply a container of Things, with various quality-of-life             
    /// functions related to hierarchical retrieval of things, units & traits  
    ///                                                                        
-   struct Hierarchy : TAny<Ref<Thing>>, SeekInterface<Hierarchy> {
+   struct LANGULUS_API(ENTITY) Hierarchy : TAny<Ref<Thing>>, SeekInterface<Hierarchy> {
       using TAny::TAny;
       using TAny::operator =;
 

@@ -18,7 +18,7 @@ namespace Langulus
 {
    namespace Entity
    {
-      using MetaList = TUnorderedSet<const RTTI::Meta*>;
+      using MetaList = TUnorderedSet<AMeta>;
    }
 
    /// Helper function, that reflects and registers a list of any reflection  

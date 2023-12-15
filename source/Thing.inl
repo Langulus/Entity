@@ -49,7 +49,7 @@ namespace Langulus::Entity
             [this, &verb](const Neat& neat) {
                CreateInner(verb, neat);
             },
-            [this, &verb](const MetaData* type) {
+            [this, &verb](const DMeta& type) {
                CreateInner(verb, type);
             }
          );
@@ -216,12 +216,12 @@ namespace Langulus::Entity
       if (found)
          found->mValue << unit;
       else
-         mUnitsAmbiguous.Insert(type, TUnorderedSet<Ref<Unit>> {unit});
+         mUnitsAmbiguous.Insert(type, {unit});
 
       for (auto& base : type->mBases) {
-         if (base.GetType()->IsExact<Unit>())
+         if (base.mType->IsExact<Unit>())
             break;
-         AddUnitBases(unit, base.GetType());
+         AddUnitBases(unit, base.mType);
       }
    }
 
@@ -237,9 +237,9 @@ namespace Langulus::Entity
       }
 
       for (auto& base : type->mBases) {
-         if (base.GetType()->IsExact<Unit>())
+         if (base.mType->IsExact<Unit>())
             break;
-         RemoveUnitBases(unit, base.GetType());
+         RemoveUnitBases(unit, base.mType);
       }
    }
 
@@ -416,7 +416,7 @@ namespace Langulus::Entity
       }
       else {
          return static_cast<Decay<T>*>(
-            GetUnitMeta(nullptr, offset)
+            GetUnitMeta(DMeta {}, offset)
          );
       }
    }
@@ -435,7 +435,7 @@ namespace Langulus::Entity
       }
       else {
          return static_cast<const Decay<T>*>(
-            GetUnitMeta(nullptr, offset)
+            GetUnitMeta(DMeta {}, offset)
          );
       }
    }

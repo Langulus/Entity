@@ -46,6 +46,7 @@ namespace Langulus::Entity
    /// Lockable value, that wouldn't change on operator =, if locked          
    /// You are able to pin members of units, making them not dependent on     
    /// hierarchy. Otherwise, unpinned values may change on Unit::Refresh()    
+   /// When cloning, only the pinned values will be cloned                    
    ///                                                                        
    template<class T>
    struct Pin : A::Pinnable {

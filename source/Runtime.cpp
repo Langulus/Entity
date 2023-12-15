@@ -129,9 +129,9 @@ namespace Langulus::Entity
          map.Insert(type, module);
 
       for (auto& base : type->mBases) {
-         if (base.GetType()->IsExact<Resolvable>())
+         if (base.mType->IsExact<Resolvable>())
             break;
-         RegisterAllBases(map, module, base.GetType());
+         RegisterAllBases(map, module, base.mType);
       }
    }
 
@@ -141,9 +141,9 @@ namespace Langulus::Entity
    ///   @param type - the type to register the module as                     
    void UnregisterAllBases(TUnorderedMap<DMeta, ModuleList>& map, Module* module, DMeta type) {
       for (auto& base : type->mBases) {
-         if (base.GetType()->IsExact<Resolvable>())
+         if (base.mType->IsExact<Resolvable>())
             break;
-         UnregisterAllBases(map, module, base.GetType());
+         UnregisterAllBases(map, module, base.mType);
       }
 
       const auto found = map.FindIt(type);
