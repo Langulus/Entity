@@ -216,7 +216,7 @@ namespace Langulus::Entity
       if (found)
          found->mValue << unit;
       else
-         mUnitsAmbiguous.Insert(type, {unit});
+         mUnitsAmbiguous.Insert(type, unit);
 
       for (auto& base : type->mBases) {
          if (base.mType->IsExact<Unit>())
