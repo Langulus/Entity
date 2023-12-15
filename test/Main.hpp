@@ -14,7 +14,7 @@ using namespace Langulus::Entity;
 
 #define CATCH_CONFIG_ENABLE_BENCHMARKING
 
-class TestUnit1 : public Unit {
+class TestUnit1 final : public Unit {
 public:
    LANGULUS(ABSTRACT) false;
    LANGULUS_BASES(Unit);
@@ -25,10 +25,12 @@ public:
    TestUnit1(Describe&& describe)
       : Unit {MetaOf<TestUnit1>(), *describe} {}
 
-   void Refresh() final {}
+   ~TestUnit1() {}
+
+   void Refresh() {}
 };
 
-class TestUnit2 : public Unit {
+class TestUnit2 final : public Unit {
 public:
    LANGULUS(ABSTRACT) false;
    LANGULUS_BASES(Unit);
@@ -39,5 +41,7 @@ public:
    TestUnit2(Describe&& describe)
       : Unit {MetaOf<TestUnit2>(), *describe} {}
 
-   void Refresh() final {}
+   ~TestUnit2() {}
+
+   void Refresh() {}
 };

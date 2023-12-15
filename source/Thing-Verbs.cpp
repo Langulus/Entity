@@ -99,7 +99,7 @@ namespace Langulus::Entity
       TAny<Thing*> selectedEntities;
       bool mismatch = false;
 
-      const auto selectTrait = [&](const MetaTrait* trait) {
+      const auto selectTrait = [&](const TMeta& trait) {
          auto found = GetTrait(trait);
          if (not found) {
             mismatch = true;
@@ -110,7 +110,7 @@ namespace Langulus::Entity
          return Flow::Continue;
       };
 
-      const auto selectUnit = [&](const MetaData* type) {
+      const auto selectUnit = [&](const DMeta& type) {
          if (type->Is<Thing>())
             return Flow::Continue;
 
@@ -180,10 +180,10 @@ namespace Langulus::Entity
          [&](const Trait& trait) {
             return selectTrait(trait.GetTrait());
          },
-         [&](const MetaTrait* trait) {
+         [&](const TMeta& trait) {
             return selectTrait(trait);
          },
-         [&](const MetaData* type) {
+         [&](const DMeta& type) {
             return selectUnit(type);
          }
       );

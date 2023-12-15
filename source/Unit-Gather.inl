@@ -22,16 +22,6 @@ namespace Langulus::Entity
    TAny<Unit*> Unit::GatherUnits(DMeta meta) {
       return mOwners.template GatherUnits<SEEK>(meta);
    }
-
-   /// Collects all units of the given type inside the hierarchy              
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
-   ///   @param meta - the units to seek for                                  
-   ///   @return the gathered units that match the type                       
-   /*template<Seek SEEK>
-   LANGULUS(INLINED)
-   TAny<const Unit*> Unit::GatherUnits(DMeta meta) const {
-      return mOwners.template GatherUnits<SEEK>(meta);
-   }*/
    
    /// Collects all traits of the given type inside the hierarchy             
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
@@ -42,16 +32,6 @@ namespace Langulus::Entity
    TAny<Trait> Unit::GatherTraits(TMeta trait) {
       return mOwners.template GatherTraits<SEEK>(trait);
    }
-
-   /// Collects all traits of the given type inside the hierarchy             
-   ///   @tparam SEEK - where in the hierarchy are we seeking in?             
-   ///   @param trait - the trait to seek for                                 
-   ///   @return the gathered traits that match the type                      
-   /*template<Seek SEEK>
-   LANGULUS(INLINED)
-   TAny<Trait> Unit::GatherTraits(TMeta trait) const {
-      return mOwners.template GatherTraits<SEEK>(trait);
-   }*/
 
    /// Gather all values convertible to a type                                
    ///   @tparam D - type to convert to                                       
