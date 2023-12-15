@@ -28,7 +28,7 @@ namespace Langulus::Entity
    ///   @param other - the unit to move                                      
    Unit::Unit(Unit&& other) noexcept
       : Resolvable {Forward<Resolvable>(other)}
-      , mOwners {Move(other.mOwners)} {
+      , mOwners {::std::move(other.mOwners)} {
       // Replace the owner's unit pointer with the new one              
       for (auto owner : mOwners)
          owner->ReplaceUnit(&other, this);
@@ -46,8 +46,6 @@ namespace Langulus::Entity
       // Then, the unit should have exactly one reference left          
       LANGULUS_ASSUME(DevAssumes, GetReferences() < 2,
          "Unit destroyed while still in use");
-      //LANGULUS_ASSUME(DevAssumes, GetReferences() > 0,
-      //   "Unit destroyed at zero reference hints at potential undefined behavior");
    }
 
    /// Default unit selection simply relays to the owner                      
@@ -90,7 +88,7 @@ namespace Langulus::Entity
       // of them must be present, either in trait, or in other form     
       memberOffset = {};
       descriptor.ForEachTail([&](const Block& anythingElse) {
-         if (not GetMember(nullptr, memberOffset).Compare(anythingElse)) {
+         if (not GetMember(TMeta {}, memberOffset).Compare(anythingElse)) {
             mismatch = true;
             return Flow::Break;
          }
@@ -103,10 +101,13 @@ namespace Langulus::Entity
    }
    
    /// Get the list of unit owners                                            
-   ///   return the owners                                                    
+   ///   @return the owners                                                   
    const Hierarchy& Unit::GetOwners() const noexcept {
       return mOwners;
    }
+     
+   /// Refresh unit on environment change                                     
+   void Unit::Refresh() {}
 
    /// Get the runtime                                                        
    ///   @attention assumes units are correctly coupled and coupling to       

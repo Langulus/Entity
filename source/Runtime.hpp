@@ -108,10 +108,9 @@ namespace Langulus::Entity
       Runtime() = delete;
       Runtime(Runtime&&) noexcept = default;
 
-      LANGULUS_API(ENTITY)
-      Runtime(Thing*) noexcept;
-      LANGULUS_API(ENTITY)
-      ~Runtime();
+      LANGULUS_API(ENTITY) Runtime(Thing*) noexcept;
+      LANGULUS_API(ENTITY) Runtime(Cloned<Runtime>&&);
+      LANGULUS_API(ENTITY) ~Runtime();
 
       NOD() auto GetOwner() const noexcept { return mOwner; }
 
@@ -129,7 +128,7 @@ namespace Langulus::Entity
 
       template<CT::Module M>
       NOD() const ModuleList& GetModules() const noexcept {
-         return GetModules(RTTI::MetaData::Of<M>());
+         return GetModules(MetaDataOf<M>());
       }
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)

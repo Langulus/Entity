@@ -30,7 +30,7 @@ namespace Langulus::Entity
    TEMPLATE() template<CT::Data T, Seek SEEK> LANGULUS(INLINED)
    Decay<T>* TME()::SeekUnit(Index offset) {
       return static_cast<Decay<T>*>(static_cast<THIS*>(this)
-         ->template SeekUnit<SEEK>(MetaData::Of<Decay<T>>(), offset));
+         ->template SeekUnit<SEEK>(MetaDataOf<Decay<T>>(), offset));
    }
 
    TEMPLATE() template<CT::Data T, Seek SEEK> LANGULUS(INLINED)
@@ -55,7 +55,7 @@ namespace Langulus::Entity
    TEMPLATE() template<CT::Data T, Seek SEEK> LANGULUS(INLINED)
    Decay<T>* TME()::SeekUnitAux(const Neat& aux, Index offset) {
       return static_cast<Decay<T>*>(static_cast<THIS*>(this)
-         ->template SeekUnitAux<SEEK>(aux, MetaData::Of<Decay<T>>(), offset));
+         ->template SeekUnitAux<SEEK>(aux, MetaDataOf<Decay<T>>(), offset));
    }
 
    TEMPLATE() template<CT::Data T, Seek SEEK> LANGULUS(INLINED)
@@ -79,7 +79,7 @@ namespace Langulus::Entity
    TEMPLATE() template<CT::Data T, Seek SEEK> LANGULUS(INLINED)
    Decay<T>* TME()::SeekUnitExt(const Neat& ext, Index offset) {
       return static_cast<Decay<T>*>(static_cast<THIS*>(this)
-         ->template SeekUnitExt<SEEK>(MetaData::Of<Decay<T>>(), ext, offset));
+         ->template SeekUnitExt<SEEK>(MetaDataOf<Decay<T>>(), ext, offset));
    }
 
    TEMPLATE() template<CT::Data T, Seek SEEK> LANGULUS(INLINED)
@@ -105,7 +105,7 @@ namespace Langulus::Entity
    TEMPLATE() template<CT::Data T, Seek SEEK> LANGULUS(INLINED)
    Decay<T>* TME()::SeekUnitAuxExt(const Neat& aux, const Neat& ext, Index offset) {
       return static_cast<Decay<T>*>(static_cast<THIS*>(this)
-         ->template SeekUnitAuxExt<SEEK>(MetaData::Of<Decay<T>>(), aux, ext, offset));
+         ->template SeekUnitAuxExt<SEEK>(MetaDataOf<Decay<T>>(), aux, ext, offset));
    }
 
    TEMPLATE() template<CT::Data T, Seek SEEK> LANGULUS(INLINED)

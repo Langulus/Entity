@@ -29,7 +29,7 @@ namespace Langulus::Entity
    TEMPLATE() template<CT::Data T, Seek SEEK> LANGULUS(INLINED)
    TAny<T*> TME()::GatherUnits() {
       return static_cast<THIS*>(this)
-         ->template GatherUnits<SEEK>(MetaData::Of<Decay<T>>());
+         ->template GatherUnits<SEEK>(MetaDataOf<Decay<T>>());
    }
 
    TEMPLATE() template<CT::Data T, Seek SEEK> LANGULUS(INLINED)
