@@ -146,23 +146,23 @@ namespace Langulus::Entity
          // Then check each unit's static traits                        
          for (auto& unit : mUnitsList) {
             Offset index {};
-            auto t = unit->GetMember(nullptr, index);
+            auto t = unit->GetMember(TMeta {}, index);
             while (t) {
                try { results << t.template AsCast<D>(); }
                catch (...) {}
 
-               t = unit->GetMember(nullptr, ++index);
+               t = unit->GetMember(TMeta {}, ++index);
             }
          }
 
          // Then check the Thing's members                              
          Offset index {};
-         auto t = GetMember(nullptr, index);
+         auto t = GetMember(TMeta {}, index);
          while (t) {
             try { results << t.template AsCast<D>(); }
             catch (...) {}
 
-            t = GetMember(nullptr, ++index);
+            t = GetMember(TMeta {}, ++index);
          }
       }
 
