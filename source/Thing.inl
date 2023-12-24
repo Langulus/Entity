@@ -125,7 +125,7 @@ namespace Langulus::Entity
    Count Thing::AddChild(Thing* entity) {
       LANGULUS_ASSUME(UserAssumes, entity, "Bad entity pointer");
 
-      const auto added = mChildren.Merge(entity);
+      const auto added = mChildren.Merge(IndexBack, entity);
       if constexpr (TWOSIDED) {
          if (added) {
             if (entity->mOwner != this) {
@@ -359,8 +359,7 @@ namespace Langulus::Entity
    /// Count the number of matching units in this entity                      
    ///   @tparam T - the type of units to seach for, use Unit for all         
    ///   @return the number of matching units                                 
-   template<CT::Unit T>
-   LANGULUS(INLINED)
+   template<CT::Unit T> LANGULUS(INLINED)
    Count Thing::HasUnits() const {
       return HasUnits(MetaOf<Decay<T>>());
    }
@@ -378,8 +377,7 @@ namespace Langulus::Entity
    ///   @tparam A... - arguments for the unit's creation                     
    ///   @param arguments... - the arguments to provide for construct         
    ///   @return the created unit(s)                                          
-   template<CT::Unit T, class... A>
-   LANGULUS(INLINED)
+   template<CT::Unit T, class... A> LANGULUS(INLINED)
    Any Thing::CreateUnit(A&&...arguments) {
       return CreateData(
          Construct::From<Decay<T>>(Forward<A>(arguments)...)
@@ -393,8 +391,7 @@ namespace Langulus::Entity
    ///   @param token - the unit type token                                   
    ///   @param arguments... - the arguments to provide for construct         
    ///   @return the created unit(s)                                          
-   template<class... A>
-   LANGULUS(INLINED)
+   template<class... A> LANGULUS(INLINED)
    Any Thing::CreateUnitToken(const Token& token, A&&...arguments) {
       return CreateData(
          Construct::FromToken(token, Forward<A>(arguments)...)
@@ -406,8 +403,7 @@ namespace Langulus::Entity
    ///   @tparam T - the type of unit we're searching for                     
    ///   @param offset - optional offset (Nth match)                          
    ///   @return the unit if found, or nullptr if not                         
-   template<CT::Unit T>
-   LANGULUS(INLINED)
+   template<CT::Unit T> LANGULUS(INLINED)
    Decay<T>* Thing::GetUnit(Index offset) {
       if constexpr (not CT::Same<T, Unit>) {
          return static_cast<Decay<T>*>(
@@ -425,8 +421,7 @@ namespace Langulus::Entity
    ///   @tparam T - the type of unit we're searching for                     
    ///   @param offset - optional offset (Nth match)                          
    ///   @return the unit if found, or nullptr if not                         
-   template<CT::Unit T>
-   LANGULUS(INLINED)
+   template<CT::Unit T> LANGULUS(INLINED)
    const Decay<T>* Thing::GetUnit(Index offset) const {
       if constexpr (not CT::Same<T, Unit>) {
          return static_cast<const Decay<T>*>(
@@ -457,15 +452,13 @@ namespace Langulus::Entity
       ///   @param token - unit type token                                    
       ///   @param offset - optional offset (Nth match)                       
       ///   @return the unit if found, or nullptr if not                      
-      template<CT::Unit T>
-      LANGULUS(INLINED)
+      template<CT::Unit T> LANGULUS(INLINED)
       Decay<T>* Thing::GetUnitAs(const Token& token, Index offset) {
          return dynamic_cast<Decay<T>*>(GetUnitMeta(token, offset));
       }
    #endif
 
-   template<CT::Trait T>
-   LANGULUS(INLINED)
+   template<CT::Trait T> LANGULUS(INLINED)
    Trait Thing::GetTrait(const Index& offset) {
       return GetTrait(T::GetTrait(), offset);
    }
@@ -474,18 +467,16 @@ namespace Langulus::Entity
    ///   @tparam T - the trait to search for                                  
    ///   @param offset - the offset of the trait to return (optional)         
    ///   @return the trait or nullptr if none found                           
-   template<CT::Trait T>
-   LANGULUS(INLINED)
+   template<CT::Trait T> LANGULUS(INLINED)
    Trait* Thing::GetLocalTrait(const Index& offset) {
-      return GetLocalTrait(T::GetTrait(), offset);
+      return GetLocalTrait(MetaTraitOf<T>(), offset);
    }
 
    /// Get local trait by static type and offset                              
    ///   @tparam T - the trait to search for                                  
    ///   @param offset - the offset of the trait to return                    
    ///   @return the trait or nullptr if none found                           
-   template<CT::Trait T>
-   LANGULUS(INLINED)
+   template<CT::Trait T> LANGULUS(INLINED)
    const Trait* Thing::GetLocalTrait(const Index& offset) const {
       return const_cast<Thing&>(*this).template GetLocalTrait<T>(offset);
    }

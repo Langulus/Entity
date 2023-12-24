@@ -152,14 +152,14 @@ namespace Langulus::A
    /// Get the current working path (where the main exe was executed)         
    ///   @return the path                                                     
    LANGULUS(INLINED)
-   const Anyness::Path& FileSystem::GetWorkingPath() const noexcept {
+   const Path& FileSystem::GetWorkingPath() const noexcept {
       return mWorkingPath;
    }
 
    /// Get the current data path, like GetWorkingPath() / "data"              
    ///   @return the path                                                     
    LANGULUS(INLINED)
-   const Anyness::Path& FileSystem::GetDataPath() const noexcept {
+   const Path& FileSystem::GetDataPath() const noexcept {
       return mMainDataPath;
    }
 
@@ -186,7 +186,7 @@ namespace Langulus::A
    /// against all reflected file extensions                                  
    ///   @return the file format                                              
    LANGULUS(INLINED)
-   Anyness::DMeta File::GetFormat() const noexcept {
+   DMeta File::GetFormat() const noexcept {
       return mFormat;
    }
 
@@ -200,7 +200,7 @@ namespace Langulus::A
    /// Get the full path of the file                                          
    ///   @return a reference to the path                                      
    LANGULUS(INLINED)
-   const Anyness::Path& File::GetFilePath() const noexcept {
+   const Path& File::GetFilePath() const noexcept {
       return mFilePath;
    }
 
@@ -208,10 +208,9 @@ namespace Langulus::A
    /// Throws if deserialization isn't possible                               
    ///   @tparam T - the type to deserialize as, if possible                  
    ///   @return the deserialized instance of T                               
-   template<class T>
-   LANGULUS(INLINED)
+   template<class T> LANGULUS(INLINED)
    T File::ReadAs() const {
-      return ReadAs(RTTI::MetaData::Of<T>()).template As<T>();
+      return ReadAs(MetaDataOf<T>()).template As<T>();
    }
 
 
@@ -236,7 +235,7 @@ namespace Langulus::A
    /// Get the full path of the folder                                        
    ///   @return a reference to the path                                      
    LANGULUS(INLINED)
-   const Anyness::Path& Folder::GetFolderPath() const noexcept {
+   const Path& Folder::GetFolderPath() const noexcept {
       return mFolderPath;
    }
 
@@ -250,7 +249,7 @@ namespace Langulus::A
    ///   @param producer - the asset library and producer                     
    ///   @param desc - messy descriptor for the content                       
    LANGULUS(INLINED)
-   Asset::Asset(RTTI::DMeta type, AssetModule* producer, const Anyness::Neat& desc)
+   Asset::Asset(RTTI::DMeta type, AssetModule* producer, const Neat& desc)
       : Unit {type, desc}
       , ProducedFrom<AssetModule> {producer, desc} {}
 
@@ -266,10 +265,9 @@ namespace Langulus::A
    ///   @tparam T - the trait to search for                                  
    ///   @param index - the Nth data associated to the trait                  
    ///   @return a pointer to the data entry, or nullptr if none exists       
-   template<CT::Trait T>
-   LANGULUS(INLINED)
+   template<CT::Trait T> LANGULUS(INLINED)
    const Asset::Data* Asset::GetData(Offset index) const noexcept {
-      return GetData(T::GetTrait(), index);
+      return GetData(MetaTraitOf<T>(), index);
    }
 
    /// Get a single data entry from the contents                              
@@ -277,7 +275,7 @@ namespace Langulus::A
    ///   @param index - the Nth data associated to the trait                  
    ///   @return a pointer to the data entry, or nullptr if none exists       
    LANGULUS(INLINED)
-   const Asset::Data* Asset::GetData(Anyness::TMeta trait, Offset index) const noexcept {
+   const Asset::Data* Asset::GetData(TMeta trait, Offset index) const noexcept {
       if (not const_cast<Asset*>(this)->Generate(trait, index))
          return nullptr;
 
@@ -293,14 +291,14 @@ namespace Langulus::A
    template<CT::Trait T>
    LANGULUS(INLINED)
    const Asset::DataList* Asset::GetDataList() const noexcept {
-      return GetDataList(T::GetTrait());
+      return GetDataList(MetaTraitOf<T>());
    }
 
    /// Get a data list from the contents                                      
    ///   @param trait - the trait to search for                               
    ///   @return a pointer to the data list, or nullptr if none exists        
    LANGULUS(INLINED)
-   const Asset::DataList* Asset::GetDataList(Anyness::TMeta trait) const noexcept {
+   const Asset::DataList* Asset::GetDataList(TMeta trait) const noexcept {
       if (not const_cast<Asset*>(this)->Generate(trait))
          return nullptr;
 
@@ -311,18 +309,15 @@ namespace Langulus::A
    /// Commit data to an asset                                                
    ///   @attention data is always commited, even if such trait already exists
    ///   @tparam T - data trait, the intent we're commiting with              
-   ///   @tparam S - semantic and data type to commit (deducible)             
    ///   @param content - the data and semantic to commit                     
-   template<CT::Trait T, CT::Semantic S>
-   LANGULUS(INLINED)
-   void Asset::Commit(S&& content) {
-      static_assert(CT::Block<TypeOf<S>>,
-         "Content should be provided in a Block");
-      const auto found = mDataListMap.FindIt(T::GetTrait());
+   template<CT::Trait T, template<class> class S, CT::Block B>
+   requires CT::Semantic<S<B>> LANGULUS(INLINED)
+   void Asset::Commit(S<B>&& content) {
+      const auto found = mDataListMap.FindIt(MetaTraitOf<T>());
       if (found)
-         found->mValue << Anyness::Any {content.Forward()};
+         found->mValue << Any {content.Forward()};
       else
-         mDataListMap.Insert(T::GetTrait(), Anyness::Any {content.Forward()});
+         mDataListMap.Insert(MetaTraitOf<T>(), Any {content.Forward()});
    }
 
 
@@ -333,17 +328,17 @@ namespace Langulus::A
    /// Get the topology of the geometry                                       
    ///   @return the topology type                                            
    LANGULUS(INLINED)
-   Anyness::DMeta Mesh::GetTopology() const noexcept {
+   DMeta Mesh::GetTopology() const noexcept {
       return mView.mTopology;
    }
 
-   /// Check if topology matches a static type                                
-   ///   @tparam T type to check                                              
-   ///   @return true if T matches topology                                   
-   template<CT::Topology T>
-   LANGULUS(INLINED)
+   /// Check if topology matches one of the specified types                   
+   ///   @tparam T1, TN - types to check                                      
+   ///   @return true if T matches one of the topology types                  
+   template<CT::Topology T1, CT::Topology...TN> LANGULUS(INLINED)
    bool Mesh::CheckTopology() const {
-      return mView.mTopology and mView.mTopology->template Is<T>();
+      return   mView.mTopology == MetaDataOf<T1>()
+          or ((mView.mTopology == MetaDataOf<TN>()) or ...);
    }
 
    /// Helper that indirects in case there is an index buffer                 
@@ -483,7 +478,7 @@ namespace Langulus::A
          }
          return 0;
       }
-      else if (CheckTopology<A::TriangleStrip>() or CheckTopology<A::TriangleFan>()) {
+      else if (CheckTopology<A::TriangleStrip, A::TriangleFan>()) {
          if (mView.mIndexCount > 2)
             return 1 + (mView.mIndexCount - 2) * 2;
          else if (mView.mPrimitiveCount > 2)
@@ -497,47 +492,47 @@ namespace Langulus::A
    /// Get the point indices of a given line                                  
    ///   @param index - line index                                            
    ///   @return the point indices as a 32bit unsigned 2D vector              
-   inline Math::Vec2u Mesh::GetLineIndices(Offset index) const {
+   inline Vec2u Mesh::GetLineIndices(Offset index) const {
       const auto indices = GetData<Traits::Index>();
 
       if (CheckTopology<A::Line>()) {
-         return InnerGetIndices(indices, Math::Vec2u(index * 2, index * 2 + 1));
+         return InnerGetIndices(indices, Vec2u(index * 2, index * 2 + 1));
       }
       else if (CheckTopology<A::LineStrip>()) {
-         return InnerGetIndices(indices, Math::Vec2u(index > 0 ? index - 1 : 0, index > 0 ? index : 1));
+         return InnerGetIndices(indices, Vec2u(index > 0 ? index - 1 : 0, index > 0 ? index : 1));
       }
       else if (CheckTopology<A::LineLoop>()) {
          if (index == GetLineCount() - 1)
-            return InnerGetIndices(indices, Math::Vec2u(index, 0));
+            return InnerGetIndices(indices, Vec2u(index, 0));
          else
-            return InnerGetIndices(indices, Math::Vec2u(index > 0 ? index - 1 : 0, index > 0 ? index : 1));
+            return InnerGetIndices(indices, Vec2u(index > 0 ? index - 1 : 0, index > 0 ? index : 1));
       }
       else if (CheckTopology<A::Triangle>()) {
          switch (index % 3) {
          case 0: case 1:
-            return InnerGetIndices(indices, Math::Vec2u(index, index + 1));
+            return InnerGetIndices(indices, Vec2u(index, index + 1));
          case 2:
-            return InnerGetIndices(indices, Math::Vec2u(index, index - 2));
+            return InnerGetIndices(indices, Vec2u(index, index - 2));
          }
       }
       else if (CheckTopology<A::TriangleStrip>()) {
          switch (index % 3) {
          case 0:
-            return InnerGetIndices(indices, Math::Vec2u(index == 0 ? 0 : index - 2, index == 0 ? 1 : index - 1));
+            return InnerGetIndices(indices, Vec2u(index == 0 ? 0 : index - 2, index == 0 ? 1 : index - 1));
          case 1:
-            return InnerGetIndices(indices, Math::Vec2u(index - 1, index));
+            return InnerGetIndices(indices, Vec2u(index - 1, index));
          case 2:
-            return InnerGetIndices(indices, Math::Vec2u(index, index - 2));
+            return InnerGetIndices(indices, Vec2u(index, index - 2));
          }
       }
       else if (CheckTopology<A::TriangleFan>()) {
          switch (index % 3) {
          case 0:
-            return InnerGetIndices(indices, Math::Vec2u(0, index == 0 ? 1 : index - 1));
+            return InnerGetIndices(indices, Vec2u(0, index == 0 ? 1 : index - 1));
          case 1:
-            return InnerGetIndices(indices, Math::Vec2u(index - 1, index));
+            return InnerGetIndices(indices, Vec2u(index - 1, index));
          case 2:
-            return InnerGetIndices(indices, Math::Vec2u(index, 0));
+            return InnerGetIndices(indices, Vec2u(index, 0));
          }
       }
 
@@ -549,25 +544,23 @@ namespace Langulus::A
    ///   @param lineIndex - the line index                                    
    ///   @return data for the specific line                                   
    template<CT::Trait T>
-   Anyness::Any Mesh::GetLineTrait(Offset lineIndex) const {
+   Any Mesh::GetLineTrait(Offset lineIndex) const {
       const auto indices = GetLineIndices(lineIndex);
       const auto soughtt = GetData<T>(0);
       if (not soughtt or not *soughtt)
          return {};
 
-      Anyness::Block soughtDecayed;
-      if (soughtt->template CastsTo<Math::Triangle3>())
-         soughtDecayed = Anyness::Block::From(
-            soughtt->template As<Math::Point3*>(), soughtt->GetCount() * 3);
-      else if (soughtt->template CastsTo<Math::Triangle2>())
-         soughtDecayed = Anyness::Block::From(
-            soughtt->template As<Math::Point2*>(), soughtt->GetCount() * 3);
+      Any soughtDecayed;
+      if (soughtt->template CastsTo<Triangle3>())
+         soughtDecayed = soughtt->template ReinterpretAs<Point3>();
+      else if (soughtt->template CastsTo<Triangle2>())
+         soughtDecayed = soughtt->template ReinterpretAs<Point2>();
       else
-         soughtDecayed = *static_cast<const Anyness::Block*>(soughtt);
+         soughtDecayed = *soughtt;
 
-      Anyness::Any result;
-      result.InsertBlock(soughtDecayed.GetElement(indices[0]));
-      result.InsertBlock(soughtDecayed.GetElement(indices[1]));
+      Any result;
+      result.InsertBlock(IndexBack, soughtDecayed.GetElement(indices[0]));
+      result.InsertBlock(IndexBack, soughtDecayed.GetElement(indices[1]));
       return result;
    }
    
@@ -592,7 +585,7 @@ namespace Langulus::A
          LANGULUS_ASSERT(decayed.mPrimitiveCount % 3, Access, "Bad topology");
          return decayed.mPrimitiveCount / 3;
       }
-      else if (CheckTopology<A::TriangleStrip>() or CheckTopology<A::TriangleFan>()) {
+      else if (CheckTopology<A::TriangleStrip, A::TriangleFan>()) {
          if (mView.mIndexCount > 2)
             return mView.mIndexCount - 2;
 
@@ -606,25 +599,25 @@ namespace Langulus::A
    /// Get the indices of a given triangle                                    
    ///   @param index - triangle index                                        
    ///   @return the indices as a 32bit unsigned 3D vector                    
-   inline Math::Vec3u Mesh::GetTriangleIndices(Offset index) const {
+   inline Vec3u Mesh::GetTriangleIndices(Offset index) const {
       const auto indices = GetData<Traits::Index>(0);
 
       if (CheckTopology<A::Triangle>()) {
-         return InnerGetIndices(indices, Math::Vec3u(
+         return InnerGetIndices(indices, Vec3u(
             index * 3,
             index * 3 + 1,
             index * 3 + 2)
          );
       }
       else if (CheckTopology<A::TriangleStrip>()) {
-         return InnerGetIndices(indices, Math::Vec3u(
+         return InnerGetIndices(indices, Vec3u(
             index == 0 ? 0 : index - 1,
             index == 0 ? 1 : index,
             index == 0 ? 2 : index + 1)
          );
       }
       else if (CheckTopology<A::TriangleFan>()) {
-         return InnerGetIndices(indices, Math::Vec3u(
+         return InnerGetIndices(indices, Vec3u(
             0,
             index == 0 ? 1 : index,
             index == 0 ? 2 : index + 1)
@@ -639,24 +632,24 @@ namespace Langulus::A
    ///   @param triangleIndex - the triangle index                            
    ///   @return data for the specific triangle                               
    template<CT::Trait T>
-   Anyness::Any Mesh::GetTriangleTrait(Offset triangleIndex) const {
+   Any Mesh::GetTriangleTrait(Offset triangleIndex) const {
       const auto indices = GetTriangleIndices(triangleIndex);
       const auto soughtt = GetData<T>(0);
       if (not soughtt or not *soughtt)
          return {};
 
-      Anyness::Block soughtDecayed;
-      if (soughtt->template CastsTo<Math::Triangle3>())
-         soughtDecayed = soughtt->template ReinterpretAs<Math::Point3>();
-      else if (soughtt->template CastsTo<Math::Triangle2>())
-         soughtDecayed = soughtt->template ReinterpretAs<Math::Point2>();
+      Any soughtDecayed;
+      if (soughtt->template CastsTo<Triangle3>())
+         soughtDecayed = soughtt->template ReinterpretAs<Point3>();
+      else if (soughtt->template CastsTo<Triangle2>())
+         soughtDecayed = soughtt->template ReinterpretAs<Point2>();
       else
-         soughtDecayed = *static_cast<const Anyness::Block*>(soughtt);
+         soughtDecayed = *soughtt;
 
-      Anyness::Any result;
-      result.InsertBlock(soughtDecayed.GetElement(indices[0]));
-      result.InsertBlock(soughtDecayed.GetElement(indices[1]));
-      result.InsertBlock(soughtDecayed.GetElement(indices[2]));
+      Any result;
+      result.InsertBlock(IndexBack, soughtDecayed.GetElement(indices[0]));
+      result.InsertBlock(IndexBack, soughtDecayed.GetElement(indices[1]));
+      result.InsertBlock(IndexBack, soughtDecayed.GetElement(indices[2]));
       return result;
    }
    
@@ -690,7 +683,7 @@ namespace Langulus::A
    ///   @param rate - the rate                                               
    ///   @return the input trait list                                         
    LANGULUS(INLINED)
-   const Entity::TraitList& Material::GetInputs(Flow::Rate rate) const {
+   const TraitList& Material::GetInputs(Rate rate) const {
       return GetInputs(rate.GetInputIndex());
    }
 
@@ -699,21 +692,21 @@ namespace Langulus::A
    ///   @param rate - the input offset                                       
    ///   @return the input trait list                                         
    LANGULUS(INLINED)
-   const Entity::TraitList& Material::GetInputs(Offset rate) const {
+   const TraitList& Material::GetInputs(Offset rate) const {
       LANGULUS_ASSUME(DevAssumes,
-         Asset::mDataListMap.ContainsKey(Traits::Input::GetTrait()),
+         Asset::mDataListMap.ContainsKey(MetaOf<Traits::Input>()),
          "Material doesn't contain inputs"
       );
       LANGULUS_ASSUME(DevAssumes,
-         Asset::GetDataList<Traits::Input>()->GetCount() == Flow::Rate::InputCount,
+         Asset::GetDataList<Traits::Input>()->GetCount() == Rate::InputCount,
          "Material doesn't contain the correct number of rates"
       );
       LANGULUS_ASSUME(DevAssumes,
-         rate < Flow::Rate::InputCount,
+         rate < Rate::InputCount,
          "Input offset out of range"
       );
 
-      return *reinterpret_cast<const Entity::TraitList*>(
+      return *reinterpret_cast<const TraitList*>(
          Asset::GetData<Traits::Input>(rate)
       );
    }
@@ -722,7 +715,7 @@ namespace Langulus::A
    ///   @param rate - the rate                                               
    ///   @return the output trait list                                        
    LANGULUS(INLINED)
-   const Entity::TraitList& Material::GetOutputs(Flow::Rate rate) const {
+   const TraitList& Material::GetOutputs(Rate rate) const {
       return GetOutputs(rate.GetInputIndex());
    }
 
@@ -731,21 +724,21 @@ namespace Langulus::A
    ///   @param rate - the input offset                                       
    ///   @return the output trait list                                        
    LANGULUS(INLINED)
-   const Entity::TraitList& Material::GetOutputs(Offset rate) const {
+   const TraitList& Material::GetOutputs(Offset rate) const {
       LANGULUS_ASSUME(DevAssumes,
-         Asset::mDataListMap.ContainsKey(Traits::Output::GetTrait()),
+         Asset::mDataListMap.ContainsKey(MetaOf<Traits::Output>()),
          "Material doesn't contain inputs"
       );
       LANGULUS_ASSUME(DevAssumes,
-         Asset::GetDataList<Traits::Output>()->GetCount() == Flow::Rate::InputCount,
+         Asset::GetDataList<Traits::Output>()->GetCount() == Rate::InputCount,
          "Material doesn't contain the correct number of rates"
       );
       LANGULUS_ASSUME(DevAssumes,
-         rate < Flow::Rate::InputCount,
+         rate < Rate::InputCount,
          "Input offset out of range"
       );
 
-      return *reinterpret_cast<const Entity::TraitList*>(
+      return *reinterpret_cast<const TraitList*>(
          Asset::GetData<Traits::Output>(rate)
       );
    }
@@ -758,7 +751,7 @@ namespace Langulus::A
    /// Get the pixel format of the texture                                    
    ///   @return the pixel format type                                        
    LANGULUS(INLINED)
-   Anyness::DMeta Image::GetFormat() const noexcept {
+   DMeta Image::GetFormat() const noexcept {
       return mView.mFormat;
    }
 
@@ -789,7 +782,7 @@ namespace Langulus::A
       LANGULUS_ASSUME(DevAssumes, pixels->IsDense(),
          "Image data is not dense", " for ", Self());
       LANGULUS_ASSUME(DevAssumes,
-         pixels->CastsTo<Anyness::Bytes>() or pixels->CastsTo<A::Color>(),
+         pixels->CastsTo<Bytes>() or pixels->CastsTo<A::Color>(),
          "Image doesn't contain pixel data", 
          " - contains ", pixels->GetType(), " instead"
       );
@@ -805,8 +798,8 @@ namespace Langulus::A
 
       // Iterate using the desired color type                           
       UNUSED() Count counter = 0;
-      auto data = pixels->CastsTo<Anyness::Bytes>()
-         ? pixels->Get<Anyness::Bytes>().GetRaw()
+      auto data = pixels->CastsTo<Bytes>()
+         ? pixels->Get<Bytes>().GetRaw()
          : pixels->GetRaw();
       const auto dataEnd = data + mView.GetBytesize();
 
@@ -825,20 +818,17 @@ namespace Langulus::A
          return counter;
    }
 
-   /// Upload raw data to the image by a semantic                                
-   ///   @attention deletes any data previously commited                         
-   ///   @param data - the block of data                                         
-   LANGULUS(INLINED)
-   void Image::Upload(CT::Semantic auto&& data) {
-      using S = Decay<decltype(data)>;
-      using T = TypeOf<S>;
-      static_assert(CT::Block<T>, "Data must be inside a Block");
-
-      // Check if provided data matches the view requirements              
+   /// Upload raw data to the image by a semantic                             
+   ///   @attention deletes any data previously commited                      
+   ///   @param data - the block of data                                      
+   template<template<class> class S, CT::Block B>
+   requires CT::Semantic<S<B>> LANGULUS(INLINED)
+   void Image::Upload(S<B>&& data) {
+      // Check if provided data matches the view requirements           
       LANGULUS_ASSERT(mView.GetBytesize() == data->GetBytesize(), Image,
          "Data is of the wrong size");
 
-      // Reset data and commit the new one                                 
+      // Reset data and commit the new one                              
       mDataListMap.Reset();
       Commit<Traits::Color>(data.Forward());
    }

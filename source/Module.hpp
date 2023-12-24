@@ -132,9 +132,9 @@ namespace Langulus::CT
    \
    extern "C" { \
       LANGULUS_EXPORT() \
-      void LANGULUS_MODULE_ENTRY() (::Langulus::Entity::DMeta& meta, ::Langulus::Entity::MetaList& list) { \
+      void LANGULUS_MODULE_ENTRY() (::Langulus::DMeta& meta, ::Langulus::Entity::MetaList& list) { \
          using DM = ::Langulus::Decay<m>; \
-         meta = ::Langulus::RTTI::MetaData::Of<DM>(); \
+         meta = ::Langulus::MetaDataOf<DM>(); \
          ::Langulus::RegisterTypeList<DM, ::Langulus::Decay<cat>, __VA_ARGS__>(list); \
       } \
       \
@@ -144,7 +144,7 @@ namespace Langulus::CT
          static_assert(::Langulus::CT::DerivedFrom<m, ::Langulus::Entity::Module>, \
             "Langulus module class interface " \
             #m " doesn't inherit ::Langulus::Entity::Module"); \
-         static_assert(!::Langulus::CT::Abstract<m>, \
+         static_assert(not ::Langulus::CT::Abstract<m>, \
             "Langulus module class interface " \
             #m " is abstract, have you forgotten to define its interface?"); \
          return new m {rt, desc}; \
@@ -153,7 +153,7 @@ namespace Langulus::CT
       LANGULUS_EXPORT() \
       const ::Langulus::Entity::Module::Info* LANGULUS_MODULE_INFO() () { \
          static const ::Langulus::Entity::Module::Info i { \
-            prio, name, info, depo, ::Langulus::MetaOf<cat>() \
+            prio, name, info, depo, ::Langulus::MetaDataOf<cat>() \
          }; \
          return &i; \
       } \
