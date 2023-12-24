@@ -48,6 +48,10 @@ LANGULUS_EXCEPTION(Mesh);
 
 namespace Langulus
 {
+   using namespace Langulus::Flow;
+   using namespace Langulus::Anyness;
+   using namespace Langulus::Entity;
+   using namespace Langulus::Math;
 
    ///                                                                        
    ///   Vertex/index buffer view                                             
@@ -62,11 +66,11 @@ namespace Langulus
       // Starting index                                                 
       uint32_t mIndexStart {};
       // Data topology                                                  
-      RTTI::DMeta mTopology {};
+      DMeta mTopology {};
       // Double-sidedness                                               
       bool mBilateral {};
       // Texture mapping mode                                           
-      Math::MapMode mTextureMapping {};
+      MapMode mTextureMapping {};
 
       bool operator == (const MeshView&) const noexcept;
 
@@ -83,7 +87,7 @@ namespace Langulus
       uint32_t mHeight {1};
       uint32_t mDepth {1};
       uint32_t mFrames {1};
-      RTTI::DMeta mFormat {};
+      DMeta mFormat {};
       // Reverse RGBA to BGRA                                           
       // This is not a scalable solution and would eventually fail      
       bool mReverseFormat {};
@@ -153,17 +157,17 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract platform module                                             
    ///                                                                        
-   struct PlatformModule : Entity::Module {
-      LANGULUS_BASES(Entity::Module);
-      using Entity::Module::Module;
+   struct PlatformModule : Module {
+      LANGULUS_BASES(Module);
+      using Module::Module;
    };
 
    ///                                                                        
    ///   Abstract platform unit                                               
    ///                                                                        
-   struct Platform : Entity::Unit {
-      LANGULUS_BASES(Entity::Unit);
-      using Entity::Unit::Unit;
+   struct Platform : Unit {
+      LANGULUS_BASES(Unit);
+      using Unit::Unit;
    };
    
    ///                                                                        
@@ -175,7 +179,7 @@ namespace Langulus::A
       using Platform::Platform;
 
       NOD() virtual void* GetNativeHandle() const noexcept = 0;
-      NOD() virtual Math::Scale2 GetSize() const noexcept = 0;
+      NOD() virtual Scale2 GetSize() const noexcept = 0;
       NOD() virtual bool IsMinimized() const noexcept = 0;
    };
    
@@ -191,17 +195,17 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract physical module                                             
    ///                                                                        
-   struct PhysicalModule : Entity::Module {
-      LANGULUS_BASES(Entity::Module);
-      using Entity::Module::Module;
+   struct PhysicalModule : Module {
+      LANGULUS_BASES(Module);
+      using Module::Module;
    };
 
    ///                                                                        
    ///   Abstract physical unit                                               
    ///                                                                        
-   struct Physical : Entity::Unit {
-      LANGULUS_BASES(Entity::Unit);
-      using Entity::Unit::Unit;
+   struct Physical : Unit {
+      LANGULUS_BASES(Unit);
+      using Unit::Unit;
    };
 
    ///                                                                        
@@ -221,12 +225,12 @@ namespace Langulus::A
       LANGULUS_BASES(Physical);
       using Physical::Physical;
 
-      NOD() virtual bool Cull(const Math::LOD&) const noexcept = 0;
-      NOD() virtual Math::Level GetLevel() const noexcept = 0;
-      NOD() virtual Math::Mat4 GetModelTransform(const Math::LOD&) const noexcept = 0;
-      NOD() virtual Math::Mat4 GetModelTransform(const Math::Level& = {}) const noexcept = 0;
-      NOD() virtual Math::Mat4 GetViewTransform(const Math::LOD&) const noexcept = 0;
-      NOD() virtual Math::Mat4 GetViewTransform(const Math::Level& = {}) const noexcept = 0;
+      NOD() virtual bool Cull(const LOD&) const noexcept = 0;
+      NOD() virtual Level GetLevel() const noexcept = 0;
+      NOD() virtual Mat4 GetModelTransform(const LOD&) const noexcept = 0;
+      NOD() virtual Mat4 GetModelTransform(const Level& = {}) const noexcept = 0;
+      NOD() virtual Mat4 GetViewTransform(const LOD&) const noexcept = 0;
+      NOD() virtual Mat4 GetViewTransform(const Level& = {}) const noexcept = 0;
    };
    
    namespace UI
@@ -244,7 +248,7 @@ namespace Langulus::A
       ///   Abstract UI unit                                                  
       ///                                                                     
       struct Unit : Entity::Unit {
-         LANGULUS(PRODUCER) Module;
+         LANGULUS(PRODUCER) UI::Module;
          LANGULUS_BASES(Entity::Unit);
          using Entity::Unit::Unit;
       };
@@ -252,36 +256,36 @@ namespace Langulus::A
       ///                                                                     
       ///   Abstract UI system                                                
       ///                                                                     
-      struct System : Unit {
-         LANGULUS_BASES(Unit);
-         using Unit::Unit;
+      struct System : UI::Unit {
+         LANGULUS_BASES(UI::Unit);
+         using UI::Unit::Unit;
       };
 
       ///                                                                     
       ///   Abstract UI button                                                
       ///                                                                     
-      struct Button : Unit {
-         LANGULUS(PRODUCER) System;
-         LANGULUS_BASES(Unit);
-         using Unit::Unit;
+      struct Button : UI::Unit {
+         LANGULUS(PRODUCER) UI::System;
+         LANGULUS_BASES(UI::Unit);
+         using UI::Unit::Unit;
       };
 
       ///                                                                     
       ///   Abstract UI text field                                            
       ///                                                                     
-      struct Text : Unit {
-         LANGULUS(PRODUCER) System;
-         LANGULUS_BASES(Unit);
-         using Unit::Unit;
+      struct Text : UI::Unit {
+         LANGULUS(PRODUCER) UI::System;
+         LANGULUS_BASES(UI::Unit);
+         using UI::Unit::Unit;
       };
 
       ///                                                                     
       ///   Abstract UI input field                                           
       ///                                                                     
-      struct Input : Unit {
-         LANGULUS(PRODUCER) System;
-         LANGULUS_BASES(Unit);
-         using Unit::Unit;
+      struct Input : UI::Unit {
+         LANGULUS(PRODUCER) UI::System;
+         LANGULUS_BASES(UI::Unit);
+         using UI::Unit::Unit;
       };
 
    } // namespace Langulus::A::UI
@@ -292,51 +296,50 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract file system module                                          
    ///                                                                        
-   struct FileSystem : Entity::Module {
+   struct FileSystem : Module {
    protected:
       // Working directory path                                         
       // This is the only full path that is exposed to the system,      
       // unless LANGULUS(PARANOID) is enabled                           
-      Anyness::Path mWorkingPath;
+      Path mWorkingPath;
       // Main data directory, for both reading and writing              
       // Relative to mWorkingPath                                       
-      Anyness::Path mMainDataPath;
+      Path mMainDataPath;
 
    public:
-      LANGULUS_BASES(Entity::Module);
-      using Entity::Module::Module;
+      LANGULUS_BASES(Module);
+      using Module::Module;
 
-      NOD() virtual Anyness::Ref<File>   GetFile  (const Anyness::Path&) = 0;
-      NOD() virtual Anyness::Ref<Folder> GetFolder(const Anyness::Path&) = 0;
+      NOD() virtual Ref<File>   GetFile  (const Path&) = 0;
+      NOD() virtual Ref<Folder> GetFolder(const Path&) = 0;
 
-      NOD() const Anyness::Path& GetWorkingPath() const noexcept;
-      NOD() const Anyness::Path& GetDataPath() const noexcept;
+      NOD() const Path& GetWorkingPath() const noexcept;
+      NOD() const Path& GetDataPath() const noexcept;
    };
 
    ///                                                                        
    ///   Abstract file interface                                              
    ///                                                                        
-   struct File : Entity::Unit {
+   struct File : Unit {
    protected:
-      Anyness::Path mFilePath;
+      Path mFilePath;
       bool mExists {};
-      Anyness::DMeta mFormat {};
+      DMeta mFormat {};
       Size mByteCount {};
       bool mIsReadOnly {};
 
    public:
       LANGULUS(PRODUCER) FileSystem;
-      LANGULUS_BASES(Entity::Unit);
-      using Entity::Unit::Unit;
-      //~File() override = default;
+      LANGULUS_BASES(Unit);
+      using Unit::Unit;
 
       NOD() bool Exists() const noexcept;
       NOD() bool IsReadOnly() const noexcept;
-      NOD() const Anyness::Path& GetFilePath() const noexcept;
-      NOD() Anyness::DMeta GetFormat() const noexcept;
+      NOD() const Path& GetFilePath() const noexcept;
+      NOD() DMeta GetFormat() const noexcept;
       NOD() Size GetBytesize() const noexcept;
 
-      NOD() virtual Anyness::Any ReadAs(Anyness::DMeta) const = 0;
+      NOD() virtual Any ReadAs(DMeta) const = 0;
       
       template<class T>
       NOD() T ReadAs() const;
@@ -351,9 +354,8 @@ namespace Langulus::A
          Reader() = delete;
          Reader(File* f)
             : mFile {f} {}
-         virtual ~Reader() = default;
 
-         virtual Offset Read(Anyness::Block&) = 0;
+         virtual Offset Read(Any&) = 0;
       };
 
       /// Abstract file writer stream                                         
@@ -367,52 +369,50 @@ namespace Langulus::A
          Writer() = delete;
          Writer(File* f, bool append)
             : mFile {f}, mAppend {append} {}
-         virtual ~Writer() = default;
 
-         virtual Offset Write(const Anyness::Block&) = 0;
+         virtual Offset Write(const Any&) = 0;
       };
 
-      NOD() virtual Anyness::Ptr<Reader> NewReader() = 0;
-      NOD() virtual Anyness::Ptr<Writer> NewWriter(bool append) = 0;
+      NOD() virtual Ptr<Reader> NewReader() = 0;
+      NOD() virtual Ptr<Writer> NewWriter(bool append) = 0;
    };
 
    ///                                                                        
    ///   Abstract folder interface                                            
    ///                                                                        
-   struct Folder : Entity::Unit {
+   struct Folder : Unit {
    protected:
-      Anyness::Path mFolderPath;
+      Path mFolderPath;
       bool mExists = false;
       bool mIsReadOnly = false;
 
    public:
       LANGULUS(PRODUCER) FileSystem;
-      LANGULUS_BASES(Entity::Unit);
-      using Entity::Unit::Unit;
-      //~Folder() override = default;
+      LANGULUS_BASES(Unit);
+      using Unit::Unit;
 
       NOD() bool Exists() const noexcept;
       NOD() bool IsReadOnly() const noexcept;
-      NOD() const Anyness::Path& GetFolderPath() const noexcept;
+      NOD() const Path& GetFolderPath() const noexcept;
 
-      NOD() virtual Anyness::Ref<File>   GetFile  (const Anyness::Path&) const = 0;
-      NOD() virtual Anyness::Ref<Folder> GetFolder(const Anyness::Path&) const = 0;
+      NOD() virtual Ref<File>   GetFile  (const Path&) const = 0;
+      NOD() virtual Ref<Folder> GetFolder(const Path&) const = 0;
    };
 
    ///                                                                        
    ///   Abstract graphics module                                             
    ///                                                                        
-   struct GraphicsModule : Entity::Module {
-      LANGULUS_BASES(Entity::Module);
-      using Entity::Module::Module;
+   struct GraphicsModule : Module {
+      LANGULUS_BASES(Module);
+      using Module::Module;
    };
 
    ///                                                                        
    ///   Abstract graphics units                                              
    ///                                                                        
-   struct Graphics : Entity::Unit {
-      LANGULUS_BASES(Entity::Unit);
-      using Entity::Unit::Unit;
+   struct Graphics : Unit {
+      LANGULUS_BASES(Unit);
+      using Unit::Unit;
    };
 
    ///                                                                        
@@ -463,23 +463,23 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract asset module                                                
    ///                                                                        
-   struct AssetModule : Entity::Module {
+   struct AssetModule : Module {
       LANGULUS_BASES(Entity::Module);
-      using Entity::Module::Module;
+      using Module::Module;
    };
 
    ///                                                                        
    ///   Abstract asset unit                                                  
    ///                                                                        
-   struct Asset : Entity::Unit, Flow::ProducedFrom<AssetModule> {
+   struct Asset : Unit, ProducedFrom<AssetModule> {
       LANGULUS(PRODUCER) AssetModule;
-      LANGULUS_BASES(Entity::Unit);
+      LANGULUS_BASES(Unit);
       
-      Asset(RTTI::DMeta, AssetModule*, const Anyness::Neat&);
+      Asset(DMeta, AssetModule*, const Neat&);
 
-      using Data = Anyness::Any;
-      using DataList = Anyness::TAny<Data>;
-      using DataListMap = Anyness::TUnorderedMap<Anyness::TMeta, DataList>;
+      using Data = Any;
+      using DataList = TAny<Data>;
+      using DataListMap = TUnorderedMap<TMeta, DataList>;
 
    protected:
       NOD() const DataListMap& GetDataListMap() const noexcept;
@@ -488,18 +488,19 @@ namespace Langulus::A
       DataListMap mDataListMap;
 
    public:
-      virtual bool Generate(Anyness::TMeta, Offset = 0) = 0;
+      virtual bool Generate(TMeta, Offset = 0) = 0;
 
-      template<CT::Trait T, CT::Semantic S>
-      void Commit(S&&);
+      template<CT::Trait, template<class> class S, CT::Block B>
+      requires CT::Semantic<S<B>>
+      void Commit(S<B>&&);
 
-      template<CT::Trait T>
+      template<CT::Trait>
       NOD() const Data* GetData(Offset = 0) const noexcept;
-      NOD() const Data* GetData(Anyness::TMeta, Offset = 0) const noexcept;
+      NOD() const Data* GetData(TMeta, Offset = 0) const noexcept;
 
-      template<CT::Trait T>
+      template<CT::Trait>
       NOD() const DataList* GetDataList() const noexcept;
-      NOD() const DataList* GetDataList(Anyness::TMeta) const noexcept;
+      NOD() const DataList* GetDataList(TMeta) const noexcept;
    };
 
    ///                                                                        
@@ -513,39 +514,39 @@ namespace Langulus::A
       MeshView mView;
 
    public:
-      template<CT::Topology T>
+      template<CT::Topology, CT::Topology...>
       NOD() bool CheckTopology() const;
-      NOD() Anyness::DMeta GetTopology() const noexcept;
+      NOD() DMeta GetTopology() const noexcept;
 
-      NOD() Math::MapMode GetTextureMapper() const noexcept;
+      NOD() MapMode GetTextureMapper() const noexcept;
 
       NOD() const MeshView& GetView() const noexcept;
       NOD() MeshView& GetView() noexcept;
 
-      NOD() virtual Anyness::Ref<Mesh> GetLOD(const Math::LOD&) const = 0;
+      NOD() virtual Anyness::Ref<Mesh> GetLOD(const LOD&) const = 0;
 
-      NOD() Math::Vec2u InnerGetIndices(const Data*, const Math::Vec2u&) const;
-      NOD() Math::Vec3u InnerGetIndices(const Data*, const Math::Vec3u&) const;
+      NOD() Vec2u InnerGetIndices(const Data*, const Vec2u&) const;
+      NOD() Vec3u InnerGetIndices(const Data*, const Vec3u&) const;
 
       //                                                                
       NOD() bool MadeOfPoints() const noexcept;
       NOD() Count GetPointCount() const;
       template<CT::Trait T>
-      NOD() Anyness::Any GetPointTrait(Offset) const;
+      NOD() Any GetPointTrait(Offset) const;
 
       //                                                                
       NOD() bool MadeOfLines() const noexcept;
       NOD() Count GetLineCount() const;
-      NOD() Math::Vec2u GetLineIndices(Offset) const;
+      NOD() Vec2u GetLineIndices(Offset) const;
       template<CT::Trait T>
-      NOD() Anyness::Any GetLineTrait(Offset) const;
+      NOD() Any GetLineTrait(Offset) const;
 
       //                                                                
       NOD() bool MadeOfTriangles() const noexcept;
       NOD() Count GetTriangleCount() const;
-      NOD() Math::Vec3u GetTriangleIndices(Offset) const;
+      NOD() Vec3u GetTriangleIndices(Offset) const;
       template<CT::Trait T>
-      NOD() Anyness::Any GetTriangleTrait(Offset) const;
+      NOD() Any GetTriangleTrait(Offset) const;
    };
 
    ///                                                                        
@@ -555,13 +556,13 @@ namespace Langulus::A
       LANGULUS_BASES(Asset);
       using Asset::Asset;
 
-      NOD() virtual Anyness::Ref<Material> GetLOD(const Math::LOD&) const = 0;
+      NOD() virtual Ref<Material> GetLOD(const LOD&) const = 0;
 
-      NOD() const Entity::TraitList& GetInputs(Flow::Rate) const;
-      NOD() const Entity::TraitList& GetInputs(Offset) const;
+      NOD() const TraitList& GetInputs(Rate) const;
+      NOD() const TraitList& GetInputs(Offset) const;
 
-      NOD() const Entity::TraitList& GetOutputs(Flow::Rate) const;
-      NOD() const Entity::TraitList& GetOutputs(Offset) const;
+      NOD() const TraitList& GetOutputs(Rate) const;
+      NOD() const TraitList& GetOutputs(Offset) const;
    };
 
    ///                                                                        
@@ -575,17 +576,19 @@ namespace Langulus::A
       ImageView mView;
 
    public:
-      NOD() virtual Anyness::Ref<Image> GetLOD(const Math::LOD&) const = 0;
+      NOD() virtual Ref<Image> GetLOD(const LOD&) const = 0;
       NOD() virtual void* GetGPUHandle() const noexcept = 0;
 
-      NOD() Anyness::DMeta GetFormat() const noexcept;
+      NOD() DMeta GetFormat() const noexcept;
       NOD() const ImageView& GetView() const noexcept;
       NOD() ImageView& GetView() noexcept;
 
       template<class F>
       auto ForEachPixel(F&&) const;
 
-      void Upload(CT::Semantic auto&&);
+      template<template<class> class S, CT::Block B>
+      requires CT::Semantic<S<B>>
+      void Upload(S<B>&&);
    };
    
    ///                                                                        
