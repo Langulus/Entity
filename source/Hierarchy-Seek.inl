@@ -128,7 +128,7 @@ namespace Langulus::Entity
    TEMPLATE() template<CT::Trait T, Seek SEEK> LANGULUS(INLINED)
    Trait TME()::SeekTrait(Index offset) {
       return static_cast<THIS*>(this)
-         ->template SeekTrait<SEEK>(T::GetTrait(), offset);
+         ->template SeekTrait<SEEK>(MetaTraitOf<T>(), offset);
    }
 
    TEMPLATE() template<CT::Trait T, Seek SEEK> LANGULUS(INLINED)
@@ -152,7 +152,7 @@ namespace Langulus::Entity
    TEMPLATE() template<CT::Trait T, Seek SEEK> LANGULUS(INLINED)
    Trait TME()::SeekTraitAux(const Neat& aux, Index offset) {
       return static_cast<THIS*>(this)
-         ->template SeekTraitAux<SEEK>(aux, T::GetTrait(), offset);
+         ->template SeekTraitAux<SEEK>(aux, MetaTraitOf<T>(), offset);
    }
 
    TEMPLATE() template<CT::Trait T, Seek SEEK> LANGULUS(INLINED)
@@ -166,13 +166,13 @@ namespace Langulus::Entity
    TEMPLATE() template<CT::Trait T, Seek SEEK> LANGULUS(INLINED)
    bool TME()::SeekValue(CT::Data auto& output, Index offset) const {
       return static_cast<const THIS*>(this)
-         ->template SeekValue<SEEK>(T::GetTrait(), output, offset);
+         ->template SeekValue<SEEK>(MetaTraitOf<T>(), output, offset);
    }
 
    TEMPLATE() template<CT::Trait T, Seek SEEK> LANGULUS(INLINED)
    bool TME()::SeekValueAux(const Neat& aux, CT::Data auto& output, Index offset) const {
       return static_cast<const THIS*>(this)
-         ->template SeekValueAux<SEEK>(T::GetTrait(), aux, output, offset);
+         ->template SeekValueAux<SEEK>(MetaTraitOf<T>(), aux, output, offset);
    }
    
    #if LANGULUS_FEATURE(MANAGED_REFLECTION)
