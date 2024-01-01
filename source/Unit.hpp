@@ -31,7 +31,12 @@ namespace Langulus::Entity
       // Things that are coupled with this unit                         
       // Owners act as an environment for the unit's context, providing 
       // additional traits and other units for interoperability         
-      Hierarchy mOwners;
+      #if LANGULUS_COMPILER(MSVC)
+         #pragma warning(suppress: 4251)
+         Hierarchy mOwners;
+      #else
+         Hierarchy mOwners;
+      #endif
 
    public:
       /// A unit can not be default-created, nor be shallow-copied            
@@ -42,7 +47,6 @@ namespace Langulus::Entity
       /// A unit can only be moved or created with type and owner             
       Unit(DMeta, const Neat& = {}) noexcept;
       Unit(Unit&&) noexcept;
-      Unit(Cloned<Unit>&&);
       ~Unit() override;
 
       Unit& operator = (Unit&&) noexcept;
@@ -75,23 +79,23 @@ namespace Langulus::Entity
       using SeekInterface::SeekValueAux;
 
       template<Seek = Seek::HereAndAbove>
-      NOD() Unit* SeekUnit(DMeta, Index = IndexFirst);
+      NOD() Unit* SeekUnit(DMeta, Index = 0);
       template<Seek = Seek::HereAndAbove>
-      NOD() Unit* SeekUnitAux(const Neat&, DMeta, Index = IndexFirst);
+      NOD() Unit* SeekUnitAux(const Neat&, DMeta, Index = 0);
       template<Seek = Seek::HereAndAbove>
-      NOD() Unit* SeekUnitExt(DMeta, const Neat&, Index = IndexFirst);
+      NOD() Unit* SeekUnitExt(DMeta, const Neat&, Index = 0);
       template<Seek = Seek::HereAndAbove>
-      NOD() Unit* SeekUnitAuxExt(DMeta, const Neat&, const Neat&, Index = IndexFirst);
+      NOD() Unit* SeekUnitAuxExt(DMeta, const Neat&, const Neat&, Index = 0);
 
       template<Seek = Seek::HereAndAbove>
-      NOD() Trait SeekTrait(TMeta, Index = IndexFirst);
+      NOD() Trait SeekTrait(TMeta, Index = 0);
       template<Seek = Seek::HereAndAbove>
-      NOD() Trait SeekTraitAux(const Neat&, TMeta, Index = IndexFirst);
+      NOD() Trait SeekTraitAux(const Neat&, TMeta, Index = 0);
 
       template<Seek = Seek::HereAndAbove>
-      bool SeekValue(TMeta, CT::Data auto&, Index = IndexFirst) const;
+      bool SeekValue(TMeta, CT::Data auto&, Index = 0) const;
       template<Seek = Seek::HereAndAbove>
-      bool SeekValueAux(TMeta, const Neat&, CT::Data auto&, Index = IndexFirst) const;
+      bool SeekValueAux(TMeta, const Neat&, CT::Data auto&, Index = 0) const;
 
       ///                                                                     
       ///   Gather                                                            

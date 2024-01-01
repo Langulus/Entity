@@ -81,10 +81,6 @@ namespace Langulus::Entity
             return HashBytes(&mHandle, static_cast<int>(sizeof(mHandle)));
          }
       };
-
-      // @attention, any member that requires dynamic allocation must   
-      // have its member type reflected prior to loading any shared     
-      // objects. See Runtime::LoadSharedLibrary.                       
       
       // The owner of the runtime                                       
       Thing* mOwner {};
@@ -109,7 +105,6 @@ namespace Langulus::Entity
       Runtime(Runtime&&) noexcept = default;
 
       LANGULUS_API(ENTITY) Runtime(Thing*) noexcept;
-      LANGULUS_API(ENTITY) Runtime(Cloned<Runtime>&&);
       LANGULUS_API(ENTITY) ~Runtime();
 
       NOD() auto GetOwner() const noexcept { return mOwner; }
