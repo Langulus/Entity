@@ -28,7 +28,7 @@ namespace Langulus::Entity
    ///   @param trait - trait id                                              
    ///   @param offset - offset of result to use                              
    ///   @return a filled trait if fount, empty if not                        
-   Trait Thing::GetTrait(TMeta trait, const Index& offset) const {
+   Trait Thing::GetTrait(TMeta trait, Index offset) const {
       return GetTrait(Trait::FromMeta(trait, nullptr), offset);
    }
 
@@ -36,7 +36,7 @@ namespace Langulus::Entity
    ///   @param trait - trait id                                              
    ///   @param offset - offset of result to use                              
    ///   @return a filled trait if fount, empty if not                        
-   Trait Thing::GetTrait(TMeta trait, const Index& offset) {
+   Trait Thing::GetTrait(TMeta trait, Index offset) {
       return GetTrait(Trait::FromMeta(trait, nullptr), offset);
    }
 
@@ -44,7 +44,7 @@ namespace Langulus::Entity
    ///   @param id - the trait to search for                                  
    ///   @param index - the index of the trait we seek                        
    ///   @return a pointer to the trait, or nullptr if not found              
-   Trait* Thing::GetLocalTrait(TMeta id, const Index& index) {
+   Trait* Thing::GetLocalTrait(TMeta id, Index index) {
       if (id) {
          // Search a typed trait                                        
          const auto found = mTraits.FindIt(id);
@@ -75,7 +75,7 @@ namespace Langulus::Entity
    ///   @param id - the trait to search for                                  
    ///   @param offset - the index of the trait we seek                       
    ///   @return a pointer to the trait, or nullptr if not found              
-   const Trait* Thing::GetLocalTrait(TMeta id, const Index& offset) const {
+   const Trait* Thing::GetLocalTrait(TMeta id, Index offset) const {
       return const_cast<Thing&>(*this).GetLocalTrait(id, offset);
    }
 
@@ -83,7 +83,7 @@ namespace Langulus::Entity
    ///   @param id - trait to match                                           
    ///   @param index - offset of result to use                               
    ///   @return a non-empty trait, if found                                  
-   Trait Thing::GetTrait(const Trait& id, const Index& index) {
+   Trait Thing::GetTrait(const Trait& id, Index index) {
       if (id.GetTrait()) {
          // Handle some predefined traits here                          
          if (id.template TraitIs<Traits::Unit>()) {
@@ -145,7 +145,7 @@ namespace Langulus::Entity
    ///   @param id - trait to match                                           
    ///   @param index - offset of result to use                               
    ///   @return a non-empty trait, if found                                  
-   Trait Thing::GetTrait(const Trait& id, const Index& index) const {
+   Trait Thing::GetTrait(const Trait& id, Index index) const {
       return const_cast<Thing*>(this)->GetTrait(id, index);
    }
 

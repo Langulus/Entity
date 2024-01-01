@@ -787,7 +787,7 @@ namespace Langulus::A
          " - contains ", pixels->GetType(), " instead"
       );
 
-      using A = ArgumentOf<F>;
+      using A = Deref<ArgumentOf<F>>;
       using R = ReturnOf<F>;
 
       static_assert(CT::Constant<A>, "Color iterator must be constant");
@@ -799,23 +799,25 @@ namespace Langulus::A
       // Iterate using the desired color type                           
       UNUSED() Count counter = 0;
       auto data = pixels->CastsTo<Bytes>()
-         ? pixels->Get<Bytes>().GetRaw()
-         : pixels->GetRaw();
-      const auto dataEnd = data + mView.GetBytesize();
+         ? pixels->Get<Bytes>().GetRawAs<A>()
+         : pixels->GetRawAs<A>();
+      const auto dataEnd = data + mView.GetPixelCount();
 
       while (data != dataEnd) {
          if constexpr (CT::Bool<R>) {
-            if (not call(*reinterpret_cast<const Deref<A>*>(data)))
+            if (not call(*data))
                return counter;
             ++counter;
          }
-         else call(*reinterpret_cast<const Deref<A>*>(data));
+         else call(*data);
 
-         data += mView.mFormat->mSize;
+         ++data;
       }
 
       if constexpr (CT::Bool<R>)
          return counter;
+
+      //TODO map other kinds of pixel iterators?
    }
 
    /// Upload raw data to the image by a semantic                             

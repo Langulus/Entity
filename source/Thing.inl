@@ -458,17 +458,17 @@ namespace Langulus::Entity
       }
    #endif
 
-   template<CT::Trait T> LANGULUS(INLINED)
-   Trait Thing::GetTrait(const Index& offset) {
-      return GetTrait(T::GetTrait(), offset);
+   template<CT::TraitBased T> LANGULUS(INLINED)
+   Trait Thing::GetTrait(Index offset) {
+      return GetTrait(MetaTraitOf<T>(), offset);
    }
 
    /// Get local trait by static type and offset                              
    ///   @tparam T - the trait to search for                                  
    ///   @param offset - the offset of the trait to return (optional)         
    ///   @return the trait or nullptr if none found                           
-   template<CT::Trait T> LANGULUS(INLINED)
-   Trait* Thing::GetLocalTrait(const Index& offset) {
+   template<CT::TraitBased T> LANGULUS(INLINED)
+   Trait* Thing::GetLocalTrait(Index offset) {
       return GetLocalTrait(MetaTraitOf<T>(), offset);
    }
 
@@ -476,8 +476,8 @@ namespace Langulus::Entity
    ///   @tparam T - the trait to search for                                  
    ///   @param offset - the offset of the trait to return                    
    ///   @return the trait or nullptr if none found                           
-   template<CT::Trait T> LANGULUS(INLINED)
-   const Trait* Thing::GetLocalTrait(const Index& offset) const {
+   template<CT::TraitBased T> LANGULUS(INLINED)
+   const Trait* Thing::GetLocalTrait(Index offset) const {
       return const_cast<Thing&>(*this).template GetLocalTrait<T>(offset);
    }
 

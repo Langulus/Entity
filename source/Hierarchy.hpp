@@ -90,51 +90,51 @@ namespace Langulus::Entity
       /// above functions, which should be defined in THIS                    
       ///                                                                     
       template<Seek = Seek::HereAndAbove>
-      NOD() const Unit*     SeekUnit(DMeta, Index = IndexFirst) const;
+      NOD() const Unit*     SeekUnit(DMeta, Index = 0) const;
       template<CT::Data T = Unit, Seek = Seek::HereAndAbove>
-      NOD()       Decay<T>* SeekUnit(Index = IndexFirst);
+      NOD()       Decay<T>* SeekUnit(Index = 0);
       template<CT::Data T = Unit, Seek = Seek::HereAndAbove>
-      NOD() const Decay<T>* SeekUnit(Index = IndexFirst) const;
+      NOD() const Decay<T>* SeekUnit(Index = 0) const;
 
       template<Seek = Seek::HereAndAbove>
-      NOD() const Unit*     SeekUnitAux(const Neat&, DMeta, Index = IndexFirst) const;
+      NOD() const Unit*     SeekUnitAux(const Neat&, DMeta, Index = 0) const;
       template<CT::Data T = Unit, Seek = Seek::HereAndAbove>
-      NOD()       Decay<T>* SeekUnitAux(const Neat&, Index = IndexFirst);
+      NOD()       Decay<T>* SeekUnitAux(const Neat&, Index = 0);
       template<CT::Data T = Unit, Seek = Seek::HereAndAbove>
-      NOD() const Decay<T>* SeekUnitAux(const Neat&, Index = IndexFirst) const;
+      NOD() const Decay<T>* SeekUnitAux(const Neat&, Index = 0) const;
 
       template<Seek = Seek::HereAndAbove>
-      NOD() const Unit*     SeekUnitExt(DMeta, const Neat&, Index = IndexFirst) const;
+      NOD() const Unit*     SeekUnitExt(DMeta, const Neat&, Index = 0) const;
       template<CT::Data T = Unit, Seek = Seek::HereAndAbove>
-      NOD()       Decay<T>* SeekUnitExt(const Neat&, Index = IndexFirst);
+      NOD()       Decay<T>* SeekUnitExt(const Neat&, Index = 0);
       template<CT::Data T = Unit, Seek = Seek::HereAndAbove>
-      NOD() const Decay<T>* SeekUnitExt(const Neat&, Index = IndexFirst) const;
+      NOD() const Decay<T>* SeekUnitExt(const Neat&, Index = 0) const;
 
       template<Seek = Seek::HereAndAbove>
-      NOD() const Unit*     SeekUnitAuxExt(DMeta, const Neat&, const Neat&, Index = IndexFirst) const;
+      NOD() const Unit*     SeekUnitAuxExt(DMeta, const Neat&, const Neat&, Index = 0) const;
       template<CT::Data T = Unit, Seek = Seek::HereAndAbove>
-      NOD()       Decay<T>* SeekUnitAuxExt(const Neat&, const Neat&, Index = IndexFirst);
+      NOD()       Decay<T>* SeekUnitAuxExt(const Neat&, const Neat&, Index = 0);
       template<CT::Data T = Unit, Seek = Seek::HereAndAbove>
-      NOD() const Decay<T>* SeekUnitAuxExt(const Neat&, const Neat&, Index = IndexFirst) const;
+      NOD() const Decay<T>* SeekUnitAuxExt(const Neat&, const Neat&, Index = 0) const;
 
       template<Seek = Seek::HereAndAbove>
-      NOD() Trait           SeekTrait(TMeta, Index = IndexFirst) const;
+      NOD() Trait           SeekTrait(TMeta, Index = 0) const;
       template<CT::Trait = Trait, Seek = Seek::HereAndAbove>
-      NOD() Trait           SeekTrait(Index = IndexFirst);
+      NOD() Trait           SeekTrait(Index = 0);
       template<CT::Trait = Trait, Seek = Seek::HereAndAbove>
-      NOD() Trait           SeekTrait(Index = IndexFirst) const;
+      NOD() Trait           SeekTrait(Index = 0) const;
 
       template<Seek = Seek::HereAndAbove>
-      NOD() Trait SeekTraitAux(const Neat&, TMeta, Index = IndexFirst) const;
+      NOD() Trait SeekTraitAux(const Neat&, TMeta, Index = 0) const;
       template<CT::Trait = Trait, Seek = Seek::HereAndAbove>
-      NOD() Trait SeekTraitAux(const Neat&, Index = IndexFirst);
+      NOD() Trait SeekTraitAux(const Neat&, Index = 0);
       template<CT::Trait = Trait, Seek = Seek::HereAndAbove>
-      NOD() Trait SeekTraitAux(const Neat&, Index = IndexFirst) const;
+      NOD() Trait SeekTraitAux(const Neat&, Index = 0) const;
 
       template<CT::Trait = Trait, Seek = Seek::HereAndAbove>
       bool SeekValue(CT::Data auto&, Index = IndexFirst) const;
       template<CT::Trait = Trait, Seek = Seek::HereAndAbove>
-      bool SeekValueAux(const Neat&, CT::Data auto&, Index = IndexFirst) const;
+      bool SeekValueAux(const Neat&, CT::Data auto&, Index = 0) const;
 
 
       template<Seek = Seek::HereAndAbove>
@@ -166,29 +166,29 @@ namespace Langulus::Entity
       /// Available only when managed reflection is enabled                   
       ///                                                                     
       template<Seek = Seek::HereAndAbove>
-      NOD() Unit* SeekUnit(const Token&, Index = IndexFirst);
+      NOD() Unit* SeekUnit(const Token&, Index = 0);
       template<Seek = Seek::HereAndAbove>
-      NOD() const Unit* SeekUnit(const Token&, Index = IndexFirst) const;
+      NOD() const Unit* SeekUnit(const Token&, Index = 0) const;
 
       template<Seek = Seek::HereAndAbove>
-      NOD() Unit* SeekUnitAux(const Neat&, const Token&, Index = IndexFirst);
+      NOD() Unit* SeekUnitAux(const Neat&, const Token&, Index = 0);
       template<Seek = Seek::HereAndAbove>
-      NOD() const Unit* SeekUnitAux(const Neat&, const Token&, Index = IndexFirst) const;
+      NOD() const Unit* SeekUnitAux(const Neat&, const Token&, Index = 0) const;
       
       template<Seek = Seek::HereAndAbove>
-      NOD() Trait SeekTrait(const Token&, Index = IndexFirst);
+      NOD() Trait SeekTrait(const Token&, Index = 0);
       template<Seek = Seek::HereAndAbove>
-      NOD() Trait SeekTrait(const Token&, Index = IndexFirst) const;
+      NOD() Trait SeekTrait(const Token&, Index = 0) const;
 
       template<Seek = Seek::HereAndAbove>
-      NOD() Trait SeekTraitAux(const Neat&, const Token&, Index = IndexFirst);
+      NOD() Trait SeekTraitAux(const Neat&, const Token&, Index = 0);
       template<Seek = Seek::HereAndAbove>
-      NOD() Trait SeekTraitAux(const Neat&, const Token&, Index = IndexFirst) const;
+      NOD() Trait SeekTraitAux(const Neat&, const Token&, Index = 0) const;
 
       template<Seek = Seek::HereAndAbove>
-      bool SeekValue(const Token&, CT::Data auto&, Index = IndexFirst) const;
+      bool SeekValue(const Token&, CT::Data auto&, Index = 0) const;
       template<Seek = Seek::HereAndAbove>
-      bool SeekValueAux(const Token&, const Neat&, CT::Data auto&, Index = IndexFirst) const;
+      bool SeekValueAux(const Token&, const Neat&, CT::Data auto&, Index = 0) const;
 
 
       template<Seek = Seek::HereAndAbove>
@@ -204,18 +204,13 @@ namespace Langulus::Entity
    };
 
 
-   /*template class  LANGULUS_API(ENTITY) Anyness::TPointer<Thing, true>;
-   template class  LANGULUS_API(ENTITY) Anyness::TAny<Ref<Thing>>;
-   template struct LANGULUS_API(ENTITY) SeekInterface<Hierarchy>;*/
-
-
    ///                                                                        
    ///   A hierarchy interface                                                
    ///                                                                        
    /// Simply a container of Things, with various quality-of-life             
    /// functions related to hierarchical retrieval of things, units & traits  
    ///                                                                        
-   struct LANGULUS_API(ENTITY) Hierarchy : TAny<Ref<Thing>>, SeekInterface<Hierarchy> {
+   struct Hierarchy : TAny<Ref<Thing>>, SeekInterface<Hierarchy> {
       using TAny::TAny;
       using TAny::operator =;
 
@@ -232,23 +227,23 @@ namespace Langulus::Entity
       using SeekInterface::SeekValueAux;
 
       template<Seek = Seek::HereAndAbove>
-      NOD() Unit* SeekUnit(DMeta, Index = IndexFirst);
+      NOD() Unit* SeekUnit(DMeta, Index = 0);
       template<Seek = Seek::HereAndAbove>
-      NOD() Unit* SeekUnitAux(const Neat&, DMeta, Index = IndexFirst);
+      NOD() Unit* SeekUnitAux(const Neat&, DMeta, Index = 0);
       template<Seek = Seek::HereAndAbove>
-      NOD() Unit* SeekUnitExt(DMeta, const Neat&, Index = IndexFirst);
+      NOD() Unit* SeekUnitExt(DMeta, const Neat&, Index = 0);
       template<Seek = Seek::HereAndAbove>
-      NOD() Unit* SeekUnitAuxExt(DMeta, const Neat&, const Neat&, Index = IndexFirst);
+      NOD() Unit* SeekUnitAuxExt(DMeta, const Neat&, const Neat&, Index = 0);
 
       template<Seek = Seek::HereAndAbove>
-      NOD() Trait SeekTrait(TMeta, Index = IndexFirst);
+      NOD() Trait SeekTrait(TMeta, Index = 0);
       template<Seek = Seek::HereAndAbove>
-      NOD() Trait SeekTraitAux(const Neat&, TMeta, Index = IndexFirst);
+      NOD() Trait SeekTraitAux(const Neat&, TMeta, Index = 0);
 
       template<Seek = Seek::HereAndAbove>
-      bool SeekValue(TMeta, CT::Data auto&, Index = IndexFirst) const;
+      bool SeekValue(TMeta, CT::Data auto&, Index = 0) const;
       template<Seek = Seek::HereAndAbove>
-      bool SeekValueAux(TMeta, const Neat&, CT::Data auto&, Index = IndexFirst) const;
+      bool SeekValueAux(TMeta, const Neat&, CT::Data auto&, Index = 0) const;
 
       ///                                                                     
       ///   Gather                                                            
