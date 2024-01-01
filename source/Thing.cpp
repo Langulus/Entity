@@ -153,21 +153,11 @@ namespace Langulus::Entity
    ///   @param other - clone that entity                                     
    Thing::Thing(Cloned<Thing>&& other)
       : Resolvable {*other}
-      , mRuntime {Clone(other->mRuntime)}
-      , mFlow {Clone(other->mFlow)}
       , mChildren {Clone(other->mChildren)}
-      , mUnitsAmbiguous {Clone(other->mUnitsAmbiguous)}
-      , mUnitsList {Clone(other->mUnitsList)}
-      , mTraits {Clone(other->mTraits)}
       , mRefreshRequired {true} {
-      // Remap children                                                 
-      for (auto& child : mChildren)
-         child->mOwner = this;
-
-      // Remap units                                                    
-      for (auto& unit : mUnitsList)
-         unit->ReplaceOwner(&*other, this);
-
+      TODO();
+      // clone flow and runtime if pinned, recreate modules if new runtime, 
+      // recreate units and traits, then recreate children
       ENTITY_VERBOSE_SELF("cloned from ", other);
    }
 
@@ -321,12 +311,6 @@ namespace Langulus::Entity
       return mUnitsList[index].Get();
    }
 
-   /// Get a unit by type and offset (const)                                  
-   /// If type is nullptr searches only by offset                             
-   /// If type is not nullptr, gets the Nth matching unit, if any             
-   ///   @param type - the type of the unit                                   
-   ///   @param offset - the unit index to seek                               
-   ///   @return the unit if found, or nullptr if not                         
    const Unit* Thing::GetUnitMeta(DMeta type, Index offset) const {
       return const_cast<Thing*>(this)->GetUnitMeta(type, offset);
    }
@@ -398,14 +382,11 @@ namespace Langulus::Entity
    /// Get a child by index                                                   
    ///   @param id - the index to pick                                        
    ///   @return the child entity, or nullptr of none was found               
-   Thing* Thing::GetChild(const Index& id) {
-      return mChildren[id].Get();
+   Thing* Thing::GetChild(Index offset) {
+      return mChildren[offset].Get();
    }
 
-   /// Get child entity by offset                                             
-   ///   @param offset - the offset of the entity to return                   
-   ///   @return the child or nullptr if none found                           
-   const Thing* Thing::GetChild(const Index& offset) const {
+   const Thing* Thing::GetChild(Index offset) const {
       return const_cast<Thing*>(this)->GetChild(offset);
    }
 
@@ -413,7 +394,7 @@ namespace Langulus::Entity
    ///   @param name - name to seek                                           
    ///   @param offset - offset to seek                                       
    ///   @return the child entity, or nullptr of none was found               
-   Thing* Thing::GetNamedChild(const Token& name, const Index& offset) {
+   Thing* Thing::GetNamedChild(const Token& name, Index offset) {
       Index matches = 0;
       for (auto& child : mChildren) {
          if (child->GetName() == name) {
@@ -426,11 +407,7 @@ namespace Langulus::Entity
       return nullptr;
    }
 
-   /// Get child entity by name and offset                                    
-   ///   @param name - the name trait to search for                           
-   ///   @param offset - the offset of the matching entity to return          
-   ///   @return the child or nullptr if none found                           
-   const Thing* Thing::GetNamedChild(const Token& name, const Index& offset) const {
+   const Thing* Thing::GetNamedChild(const Token& name, Index offset) const {
       return const_cast<Thing*>(this)->GetNamedChild(name, offset);
    }
 
