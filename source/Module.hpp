@@ -8,7 +8,7 @@
 ///                                                                           
 #pragma once
 #include "Common.hpp"
-#include <Anyness/TUnorderedSet.hpp>
+#include <Anyness/TSet.hpp>
 #include <Flow/Resolvable.hpp>
 
 LANGULUS_EXCEPTION(Module);
