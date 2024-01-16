@@ -213,6 +213,7 @@ namespace Langulus::Entity
    struct Hierarchy : TAny<Ref<Thing>>, SeekInterface<Hierarchy> {
       using TAny::TAny;
       using TAny::operator =;
+      using TAny::operator ==;
 
       ///                                                                     
       ///   Seek                                                              

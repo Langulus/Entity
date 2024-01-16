@@ -214,7 +214,7 @@ namespace Langulus::Entity
    inline void Thing::AddUnitBases(Unit* unit, DMeta type) {
       const auto found = mUnitsAmbiguous.FindIt(type);
       if (found)
-         found->mValue << unit;
+         *found.mValue << unit;
       else
          mUnitsAmbiguous.Insert(type, unit);
 
@@ -231,7 +231,7 @@ namespace Langulus::Entity
    inline void Thing::RemoveUnitBases(Unit* unit, DMeta type) {
       const auto found = mUnitsAmbiguous.FindIt(type);
       if (found) {
-         auto& set = found->mValue;
+         auto& set = *found.mValue;
          if (set.Remove(unit) and not set)
             mUnitsAmbiguous.RemoveIt(found);
       }
@@ -256,7 +256,7 @@ namespace Langulus::Entity
       // Check if the unit instance is already registered here          
       const auto meta = unit->GetType();
       const auto found = mUnitsAmbiguous.FindIt(meta);
-      if (found and found->mValue.Find(unit))
+      if (found and found.mValue->Find(unit))
          return 0;
 
       // We must guarantee, that no unit is coupled to entities with    
@@ -297,7 +297,7 @@ namespace Langulus::Entity
       if (not foundType)
          return 0;
 
-      const auto unitIndex = foundType->mValue.Find(unit);
+      const auto unitIndex = foundType.mValue->Find(unit);
       if (unitIndex) {
          // Decouple before unit is destroyed                           
          if constexpr (TWOSIDED)
