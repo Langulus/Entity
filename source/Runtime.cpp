@@ -74,7 +74,7 @@ namespace Langulus::Entity
       auto attempts = mLibraries.GetCount();
       while (attempts) {
          for (auto library : KeepIterator(mLibraries)) {
-            if (UnloadSharedLibrary(library->mValue))
+            if (UnloadSharedLibrary(*library.mValue))
                library = mLibraries.RemoveIt(library);
          }
 
@@ -185,7 +185,7 @@ namespace Langulus::Entity
       try {
          auto found = mModules.FindIt(info->mPriority);
          if (found)
-            found->mValue << module;
+            *found.mValue << module;
          else
             mModules.Insert(info->mPriority, ModuleList {module});
 
@@ -197,8 +197,8 @@ namespace Langulus::Entity
          // Make sure we end up in an invariant state                   
          auto found = mModules.FindIt(info->mPriority);
          if (found) {
-            found->mValue.Remove(module);
-            if (not found->mValue)
+            found.mValue->Remove(module);
+            if (not *found.mValue)
                mModules.RemoveIt(found);
          }
 
@@ -223,7 +223,7 @@ namespace Langulus::Entity
       // Check if this library is already loaded                        
       const auto preloaded = mLibraries.FindIt(name);
       if (preloaded)
-         return preloaded->mValue;
+         return *preloaded.mValue;
 
       // File prefix                                                    
       Path path;
@@ -391,17 +391,17 @@ namespace Langulus::Entity
       Logger::Info("Unloading module `", library.mInfo()->mName, "`...");
 
       for (auto list : KeepIterator(mModules)) {
-         for (auto mod : KeepIterator(list->mValue)) {
+         for (auto mod : KeepIterator(*list.mValue)) {
             if (mod->Is(library.mModuleType)) {
                // Delete module instance                                
                const auto modType = mod->GetType();
                UnregisterAllBases(mModulesByType, *mod, modType);
                delete *mod;
-               mod = list->mValue.RemoveIt(mod);
+               mod = list.mValue->RemoveIt(mod);
             }
          }
 
-         if (not list->mValue)
+         if (not *list.mValue)
             list = mModules.RemoveIt(list);
       }
 
@@ -472,7 +472,7 @@ namespace Langulus::Entity
    const ModuleList& Runtime::GetModules(DMeta type) const noexcept {
       auto found = mModulesByType.FindIt(type);
       if (found)
-         return found->mValue;
+         return *found.mValue;
 
       static const ModuleList emptyFallback {};
       return emptyFallback;
