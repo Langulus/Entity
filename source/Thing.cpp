@@ -449,7 +449,7 @@ namespace Langulus::Entity
    ///   @return the number of matching units                                 
    Count Thing::HasUnits(DMeta type) const {
       const auto found = mUnitsAmbiguous.FindIt(type);
-      return found ? found->mValue.GetCount() : 0;
+      return found ? found.mValue->GetCount() : 0;
    }
 
    /// Get the current runtime                                                
