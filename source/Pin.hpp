@@ -43,7 +43,7 @@ namespace Langulus::Entity
    ///                                                                        
    ///   Pinnable item                                                        
    ///                                                                        
-   /// Lockable value, that wouldn't change on operator =, if locked          
+   ///   Lockable value, that wouldn't change on operator =, if locked        
    /// You are able to pin members of units, making them not dependent on     
    /// hierarchy. Otherwise, unpinned values may change on Unit::Refresh()    
    /// When cloning, only the pinned values will be cloned                    
@@ -70,35 +70,50 @@ namespace Langulus::Entity
          LANGULUS_PROPERTY_TRAIT(mLocked, State),
       LANGULUS_PROPERTIES_END();
 
+      ///                                                                     
+      ///   Construction                                                      
+      ///                                                                     
       Pin() requires CT::Inner::Defaultable<T>;
       Pin(const Pin&) requires CT::Inner::CopyMakable<T>;
       Pin(Pin&&) requires CT::Inner::MoveMakable<T>;
       template<template<class> class S>
       Pin(S<Pin>&&) requires CT::Inner::SemanticMakable<S, T>;
 
-      template<CT::NotPinnable... A>
-      Pin(A&&...) requires ::std::constructible_from<T, A&&...>;
+      template<CT::NotPinnable...A>
+      Pin(A&&...) requires ::std::constructible_from<T, A...>;
 
+      ///                                                                     
+      ///   Assignment                                                        
+      ///                                                                     
       Pin& operator = (const Pin&) requires CT::Inner::CopyAssignable<T>;
       Pin& operator = (Pin&&) requires CT::Inner::MoveAssignable<T>;
       template<template<class> class S>
       Pin& operator = (S<Pin>&&) requires CT::Inner::SemanticAssignable<S, T>;
 
       template<CT::NotPinnable A>
-      Pin& operator = (A&&) requires ::std::assignable_from<T, A&&>;
+      Pin& operator = (A&&) requires ::std::assignable_from<T, A>;
 
+      ///                                                                     
+      ///   Capsulation                                                       
+      ///                                                                     
+      NOD() bool IsLocked() const noexcept;
+
+      T const& operator *  () const noexcept;
+      T const* operator -> () const noexcept;
+      T*       operator -> ()       noexcept;
+
+      ///                                                                     
+      ///   Comparison                                                        
+      ///                                                                     
       bool operator == (const Pin&) const requires CT::Inner::Comparable<T>;
       template<CT::NotPinnable A>
       bool operator == (const A&) const requires CT::Inner::Comparable<T, A>;
 
+      ///                                                                     
+      ///   Services                                                          
+      ///                                                                     
       void Lock() noexcept;
       void Unlock() noexcept;
-
-      NOD() bool IsLocked() const noexcept;
-
-      const T& operator *  () const noexcept;
-      const T* operator -> () const noexcept;
-            T* operator -> ()       noexcept;
    };
 
 } // namespace Langulus::Entity
