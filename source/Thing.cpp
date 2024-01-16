@@ -304,7 +304,7 @@ namespace Langulus::Entity
       if (id) {
          // Search a typed trait                                        
          const auto found = mUnitsAmbiguous.FindIt(id);
-         return found ? found->mValue[index].Get() : nullptr;
+         return found ? (*found.mValue)[index].Get() : nullptr;
       }
 
       // Get unit by index only                                         
@@ -327,7 +327,7 @@ namespace Langulus::Entity
          // Search a typed unit                                         
          const auto found = mUnitsAmbiguous.FindIt(meta);
          if (found) {
-            auto& bucket = found->mValue;
+            auto& bucket = *found.mValue;
             if (not what)
                return bucket[index].Get();
 
