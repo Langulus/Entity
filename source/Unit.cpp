@@ -74,7 +74,8 @@ bool Unit::CompareDescriptor(const Neat& descriptor) const {
    bool mismatch {};
    Offset memberOffset {};
    descriptor.ForEach([&](const Trait& trait) {
-      if (not GetMember(trait.GetTrait(), memberOffset).Compare(trait)) {
+      if (not GetMember(trait.GetTrait(), memberOffset)
+      .Compare(static_cast<const Any&>(trait))) {
          mismatch = true;
          return Flow::Break;
       }
