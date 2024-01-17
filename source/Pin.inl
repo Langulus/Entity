@@ -37,19 +37,15 @@ namespace Langulus::Entity
 
    /// Semantic construction                                                  
    ///   @param other - the value to initialize with                          
-   TEMPLATE()
-   template<template<class> class S>
-   LANGULUS(INLINED)
+   TEMPLATE() template<template<class> class S> LANGULUS(INLINED)
    PINNED()::Pin(S<Pin>&& other) requires CT::Inner::SemanticMakable<S, T>
       : mValue {S<T> {other->mValue}}
       , mLocked {other->mLocked} {}
 
    /// Forward any compatible arguments towards contained value constructor   
    ///   @param arguments... - the arguments to forward                       
-   TEMPLATE()
-   template<CT::NotPinnable... A>
-   LANGULUS(INLINED)
-   PINNED()::Pin(A&&... arguments) requires ::std::constructible_from<T, A&&...>
+   TEMPLATE() template<CT::NotPinnable...A> LANGULUS(INLINED)
+   PINNED()::Pin(A&&...arguments) requires ::std::constructible_from<T, A...>
       : mValue {Forward<A>(arguments)...} {}
 
    /// Shallow-copy assignment                                                
@@ -71,9 +67,7 @@ namespace Langulus::Entity
    /// Semantic assignment                                                    
    ///   @attention doesn't change value, if locked                           
    ///   @param rhs - the pinned value to move-assign                         
-   TEMPLATE()
-   template<template<class> class S>
-   LANGULUS(INLINED)
+   TEMPLATE() template<template<class> class S> LANGULUS(INLINED)
    PINNED()& PINNED()::operator = (S<Pin>&& rhs) requires CT::Inner::SemanticAssignable<S, T> {
       if (not mLocked)
          mValue = S<T> {rhs->mValue};
@@ -82,12 +76,10 @@ namespace Langulus::Entity
 
    /// Forward any compatible argument towards contained value assigner       
    ///   @param argument - the argument to forward                            
-   TEMPLATE()
-   template<CT::NotPinnable A>
-   LANGULUS(INLINED)
-   PINNED()& PINNED()::operator = (A&& argument) requires ::std::assignable_from<T, A&&> {
+   TEMPLATE() template<CT::NotPinnable A> LANGULUS(INLINED)
+   PINNED()& PINNED()::operator = (A&& arg) requires ::std::assignable_from<T, A> {
       if (not mLocked)
-         mValue = Forward<A>(argument);
+         mValue = Forward<A>(arg);
       return *this;
    }
 
@@ -102,9 +94,7 @@ namespace Langulus::Entity
    /// Compare with anything that is comparable to the contained value        
    ///   @param rhs - thing to compare with                                   
    ///   @return true if contained value equals rhs                           
-   TEMPLATE()
-   template<CT::NotPinnable A>
-   LANGULUS(INLINED)
+   TEMPLATE() template<CT::NotPinnable A> LANGULUS(INLINED)
    bool PINNED()::operator == (const A& rhs) const requires CT::Inner::Comparable<T, A> {
       return mValue == rhs;
    }

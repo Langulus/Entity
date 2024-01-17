@@ -303,7 +303,7 @@ namespace Langulus::A
          return nullptr;
 
       const auto found = mDataListMap.FindIt(trait);
-      return found ? &found->mValue : nullptr;
+      return found ? found.mValue : nullptr;
    }
 
    /// Commit data to an asset                                                
@@ -315,9 +315,9 @@ namespace Langulus::A
    void Asset::Commit(S<B>&& content) {
       const auto found = mDataListMap.FindIt(MetaTraitOf<T>());
       if (found)
-         found->mValue << Any {content.Forward()};
+         *found.mValue << Any {content.Forward()};
       else
-         mDataListMap.Insert(MetaTraitOf<T>(), Any {content.Forward()});
+         mDataListMap.Insert(MetaTraitOf<T>(), content.Forward());
    }
 
 

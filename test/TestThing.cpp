@@ -188,10 +188,10 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.GetReferences() == 1);
 
             auto it = root.mTraits.begin();
-            REQUIRE(it->mKey == MetaOf<Traits::Count>());
-            REQUIRE(it->mValue.GetCount() == 1);
-            REQUIRE(it->mValue[0] == Traits::Count {666});
-            REQUIRE(&it->mValue[0] == trait);
+            REQUIRE(*it.mKey == MetaOf<Traits::Count>());
+            REQUIRE(it.mValue->GetCount() == 1);
+            REQUIRE((*it.mValue)[0] == Traits::Count {666});
+            REQUIRE(&(*it.mValue)[0] == trait);
          }
       }
 
@@ -215,10 +215,10 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.GetReferences() == 1);
 
             auto it = root.mTraits.begin();
-            REQUIRE(it->mKey == MetaOf<Traits::Name>());
-            REQUIRE(it->mValue.GetCount() == 1);
-            REQUIRE(it->mValue[0] == Traits::Name {"Dimo"});
-            REQUIRE(&it->mValue[0] == trait);
+            REQUIRE(*it.mKey == MetaOf<Traits::Name>());
+            REQUIRE(it.mValue->GetCount() == 1);
+            REQUIRE((*it.mValue)[0] == Traits::Name {"Dimo"});
+            REQUIRE(&(*it.mValue)[0] == trait);
          }
       }
    }
