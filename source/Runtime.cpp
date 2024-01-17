@@ -87,7 +87,7 @@ namespace Langulus::Entity
       if (mLibraries) {
          Logger::Error(this, ": Can't unload last module(s): ");
          for (auto library : mLibraries)
-            Logger::Append(library->mKey, " ");
+            Logger::Append(library.mKey, " ");
          Logger::Error(this, ": This likely involves a memory leak, "
             "that withholds managed data, reflected by the given modules");
 
@@ -124,7 +124,7 @@ namespace Langulus::Entity
       VERBOSE("Registering `", type, '`');
       auto found = map.FindIt(type);
       if (found)
-         found->mValue << module;
+         *found.mValue << module;
       else
          map.Insert(type, module);
 
@@ -148,7 +148,7 @@ namespace Langulus::Entity
 
       const auto found = map.FindIt(type);
       if (found) {
-         auto& list = found->mValue;
+         auto& list = *found.mValue;
          if (list.Remove(module) and not list) {
             VERBOSE("Unregistering `", type, '`');
             map.RemoveIt(found);
