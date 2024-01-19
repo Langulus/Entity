@@ -99,7 +99,7 @@ namespace Langulus::Entity
       NOD() bool UnloadSharedLibrary(const SharedLibrary&);
 
    public:
-      LANGULUS_CONVERSIONS(Debug);
+      LANGULUS_CONVERSIONS(Text);
 
       Runtime() = delete;
       Runtime(Runtime&&) noexcept = default;
@@ -147,7 +147,7 @@ namespace Langulus::Entity
       bool Update(Time);
 
       NOD() LANGULUS_API(ENTITY)
-      explicit operator Debug() const;
+      explicit operator Text() const;
    };
 
 } // namespace Langulus::Entity
