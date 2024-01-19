@@ -190,16 +190,11 @@ namespace Langulus::Entity
    }
 
    /// Convert to text, by writing a short name or address                    
-   Thing::operator Debug() const {
+   Thing::operator Text() const {
       const auto name = GetName();
-      if (name) {
-         Debug result;
-         result += '#';
-         result += name;
-         return result;
-      }
-      
-      return Resolvable::operator Debug();
+      if (name)
+         return Text {'#', name};
+      return Resolvable::operator Text();
    }
 
    /// Dump the entity's hierarchy in log                                     
