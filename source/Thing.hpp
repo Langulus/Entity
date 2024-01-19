@@ -119,7 +119,7 @@ namespace Langulus::Entity
       bool operator == (const Thing&) const;
 
       NOD() LANGULUS_API(ENTITY)
-      explicit operator Debug() const;
+      explicit operator Text() const;
 
    public:
       ///                                                                     
@@ -261,9 +261,9 @@ namespace Langulus::Entity
       Trait* GetLocalTrait(TMeta, Index = 0);
 
       template<CT::TraitBased = Trait>
-      NOD()       Trait* GetLocalTrait(Index = 0);
+      NOD() Trait* GetLocalTrait(Index = 0);
       template<CT::TraitBased = Trait>
-      NOD() const Trait* GetLocalTrait(Index = 0) const;
+      NOD() Trait const* GetLocalTrait(Index = 0) const;
 
       LANGULUS_API(ENTITY)
       void SetName(const Text&);
