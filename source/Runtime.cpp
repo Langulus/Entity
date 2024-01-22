@@ -547,7 +547,7 @@ namespace Langulus::Entity
    }
 
    /// Stringify the runtime, for debugging purposes                          
-   Runtime::operator Debug() const {
+   Runtime::operator Text() const {
       return IdentityOf(this);
    }
 
