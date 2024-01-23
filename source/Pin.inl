@@ -67,8 +67,9 @@ namespace Langulus::Entity
    /// Semantic assignment                                                    
    ///   @attention doesn't change value, if locked                           
    ///   @param rhs - the pinned value to move-assign                         
-   TEMPLATE() template<template<class> class S> LANGULUS(INLINED)
-   PINNED()& PINNED()::operator = (S<Pin>&& rhs) requires CT::Inner::SemanticAssignable<S, T> {
+   TEMPLATE() template<template<class> class S>
+   requires CT::Inner::SemanticAssignable<S, T> LANGULUS(INLINED)
+   PINNED()& PINNED()::operator = (S<Pin>&& rhs) {
       if (not mLocked)
          mValue = S<T> {rhs->mValue};
       return *this;
@@ -76,8 +77,9 @@ namespace Langulus::Entity
 
    /// Forward any compatible argument towards contained value assigner       
    ///   @param argument - the argument to forward                            
-   TEMPLATE() template<CT::NotPinnable A> LANGULUS(INLINED)
-   PINNED()& PINNED()::operator = (A&& arg) requires ::std::assignable_from<T, A> {
+   TEMPLATE() template<CT::NotPinnable A>
+   requires CT::AssignableFrom<T, A> LANGULUS(INLINED)
+   PINNED()& PINNED()::operator = (A&& arg) {
       if (not mLocked)
          mValue = Forward<A>(arg);
       return *this;

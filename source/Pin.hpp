@@ -87,11 +87,13 @@ namespace Langulus::Entity
       ///                                                                     
       Pin& operator = (const Pin&) requires CT::Inner::CopyAssignable<T>;
       Pin& operator = (Pin&&) requires CT::Inner::MoveAssignable<T>;
-      template<template<class> class S>
-      Pin& operator = (S<Pin>&&) requires CT::Inner::SemanticAssignable<S, T>;
 
-      template<CT::NotPinnable A>
-      Pin& operator = (A&&) requires ::std::assignable_from<T, A>;
+      template<template<class> class S>
+      requires CT::Inner::SemanticAssignable<S, T>
+      Pin& operator = (S<Pin>&&);
+
+      template<CT::NotPinnable A> requires CT::AssignableFrom<T, A>
+      Pin& operator = (A&&);
 
       ///                                                                     
       ///   Capsulation                                                       
