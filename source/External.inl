@@ -113,7 +113,7 @@ namespace Langulus
    ///   @return the size in bytes                                            
    LANGULUS(INLINED)
    Size ImageView::GetPixelBytesize() const noexcept {
-      return mFormat ? mFormat->mSize : 0;
+      return mFormat ? mFormat->mSize : Size {0};
    }
 
    /// Get the bytesize of the entire image across all dimensions             
