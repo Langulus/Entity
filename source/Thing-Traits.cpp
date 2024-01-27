@@ -60,11 +60,11 @@ namespace Langulus::Entity
          mTraits.ForEachValue([&](TAny<Trait>& list) noexcept {
             if (offset < list.GetCount()) {
                found = &list[offset];
-               return Flow::Break;
+               return Loop::Break;
             }
 
             offset -= list.GetCount();
-            return Flow::Continue;
+            return Loop::Continue;
          });
       }
 

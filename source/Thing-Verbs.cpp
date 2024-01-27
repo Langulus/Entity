@@ -103,25 +103,25 @@ namespace Langulus::Entity
          auto found = GetTrait(trait);
          if (not found) {
             mismatch = true;
-            return Flow::Break;
+            return Loop::Break;
          }
 
          selectedTraits << Abandon(found);
-         return Flow::Continue;
+         return Loop::Continue;
       };
 
       const auto selectUnit = [&](const DMeta& type) {
          if (type->Is<Thing>())
-            return Flow::Continue;
+            return Loop::Continue;
 
          auto found = GetUnitMeta(type);
          if (not found) {
             mismatch = true;
-            return Flow::Break;
+            return Loop::Break;
          }
 
          selectedUnits << found;
-         return Flow::Continue;
+         return Loop::Continue;
       };
 
       const auto selectConstruct = [&](const Construct& construct) {
@@ -132,13 +132,13 @@ namespace Langulus::Entity
             Select(selector);
             if (selector.GetOutput()) {
                selectedEntities << this;
-               return Flow::Continue;
+               return Loop::Continue;
             }
          }
          else if (construct.CastsTo<Unit>()) {
             // Find a unit containing construct arguments               
             if (not selectUnit(construct.GetType()))
-               return Flow::Break;
+               return Loop::Break;
 
             // selectedComponents has been populated with results       
             // Filter them additionally by construct arguments          
@@ -153,11 +153,11 @@ namespace Langulus::Entity
                      if (not Flow::DispatchFlat(unitBlock, selector)) {
                         // Abort on first failure                       
                         localMismatch = true;
-                        return Flow::Break;
+                        return Loop::Break;
                      }
                   }
 
-                  return Flow::Continue;
+                  return Loop::Continue;
                });
 
                if (not localMismatch) {
@@ -170,7 +170,7 @@ namespace Langulus::Entity
             selectedUnits = Move(filteredSelectedComponents);
          }
 
-         return Flow::Break;
+         return Loop::Break;
       };
 
       verb.ForEachDeep(

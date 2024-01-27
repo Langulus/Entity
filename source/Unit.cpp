@@ -77,11 +77,11 @@ bool Unit::CompareDescriptor(const Neat& descriptor) const {
       if (not GetMember(trait.GetTrait(), memberOffset)
       .Compare(static_cast<const Any&>(trait))) {
          mismatch = true;
-         return Flow::Break;
+         return Loop::Break;
       }
 
       ++memberOffset;
-      return Flow::Continue;
+      return Loop::Continue;
    });
 
    // Then we run another check, based on data types, again, all        
@@ -90,11 +90,11 @@ bool Unit::CompareDescriptor(const Neat& descriptor) const {
    descriptor.ForEachTail([&](const Block& anythingElse) {
       if (not GetMember(TMeta {}, memberOffset).Compare(anythingElse)) {
          mismatch = true;
-         return Flow::Break;
+         return Loop::Break;
       }
 
       ++memberOffset;
-      return Flow::Continue;
+      return Loop::Continue;
    });
 
    return not mismatch;
