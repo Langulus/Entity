@@ -78,13 +78,13 @@ namespace Langulus::Entity
             if (offset == 0) {
                // Found match                                           
                result = const_cast<Unit*>(unit);
-               return Flow::Break;
+               return Loop::Break;
             }
             else --offset;
          }
 
          // Just keep searching...                                      
-         return Flow::Continue;
+         return Loop::Continue;
       });
 
       if (result)
@@ -153,11 +153,11 @@ namespace Langulus::Entity
             if (offset == 0) {
                // We're done                                            
                result = const_cast<Unit*>(unit);
-               return Flow::Break;
+               return Loop::Break;
             }
             else --offset;
          }
-         return Flow::Continue;
+         return Loop::Continue;
       });
 
       if (result)
@@ -221,11 +221,11 @@ namespace Langulus::Entity
          if (trait.TraitIs(meta)) {
             // Found match                                              
             result = trait;
-            return Flow::Break;
+            return Loop::Break;
          }
 
          // Just keep searching...                                      
-         return Flow::Continue;
+         return Loop::Continue;
       });
 
       if (result)
@@ -328,7 +328,7 @@ namespace Langulus::Entity
                catch (...) {}
             }
 
-            return Flow::Continue;
+            return Loop::Continue;
          });
       }
       else {
@@ -347,7 +347,7 @@ namespace Langulus::Entity
             }
             catch(...) { }
 
-            return Flow::Continue;
+            return Loop::Continue;
          });
       }
 
