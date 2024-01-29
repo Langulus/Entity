@@ -445,7 +445,7 @@ namespace Langulus::Entity
       // Scan descriptor                                                
       bool done = false;
       if (meta) {
-         aux.ForEachDeep([&](const Trait& trait) {
+         aux.ForEachDeep([&](const Trait& trait) -> LoopControl {
             if (trait.TraitIs(meta)) {
                // Found match                                           
                try {
@@ -468,7 +468,7 @@ namespace Langulus::Entity
          });
       }
       else {
-         aux.ForEachDeep([&](const Block& group) {
+         aux.ForEachDeep([&](const Block& group) -> LoopControl {
             try {
                // Found match if these don't throw                      
                if constexpr (CT::DescriptorMakable<D>)
