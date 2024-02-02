@@ -80,7 +80,7 @@ namespace Langulus
       Event(const Event&);
       Event(Event&&);
 
-      template<class... T>
+      template<class...T>
       Event(T&&...) requires (::std::constructible_from<Anyness::Any, T&&...>);
    };
 
@@ -89,12 +89,12 @@ namespace Langulus
    {
 
       /// Concept for detecting any Event type specialization                 
-      template<class... T>
+      template<class...T>
       concept Event = ((DerivedFrom<T, ::Langulus::Event> 
           and sizeof(T) == sizeof(::Langulus::Event)) and ...);
 
-      template<class... T>
-      concept NotEvent = not Event<T...>;
+      template<class...T>
+      concept NotEvent = ((not Event<T>) and ...);
 
    } // namespace Langulus::CT
 
