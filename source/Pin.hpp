@@ -26,12 +26,12 @@ namespace Langulus
    {
 
       /// Concept for a pinnable value                                        
-      template<class... T>
+      template<class...T>
       concept Pinnable = (DerivedFrom<T, A::Pinnable> and ...);
 
       /// Concept for a non-pinnable value                                    
-      template<class... T>
-      concept NotPinnable = not Pinnable<T...>;
+      template<class...T>
+      concept NotPinnable = ((not Pinnable<T>) and ...);
 
    } // namespace Langulus::CT
 } // namespace Langulus
