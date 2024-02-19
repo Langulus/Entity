@@ -36,7 +36,7 @@ namespace Langulus
    ///                 with the currently set RTTI boundary. These types will 
    ///                 be unloaded when shared library is unloaded. Unload    
    ///                 will be forbidden, if they're still in use.            
-   template<class... T>
+   template<class...T>
    void RegisterTypeList(Entity::MetaList& list) {
       // Merge to avoid duplications                                    
       (list << ... << MetaOf<T>());

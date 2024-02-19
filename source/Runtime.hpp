@@ -99,7 +99,7 @@ namespace Langulus::Entity
       NOD() bool UnloadSharedLibrary(const SharedLibrary&);
 
    public:
-      LANGULUS_CONVERSIONS(Text);
+      LANGULUS_CONVERTS_TO(Text);
 
       Runtime() = delete;
       Runtime(Runtime&&) noexcept = default;

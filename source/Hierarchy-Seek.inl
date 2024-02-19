@@ -9,8 +9,8 @@
 #pragma once
 #include "Hierarchy.hpp"
 
-#define TEMPLATE() template<class THIS>
-#define TME() SeekInterface<THIS>
+#define TEMPLATE()   template<class THIS>
+#define TME()        SeekInterface<THIS>
 
 
 namespace Langulus::Entity
@@ -164,17 +164,35 @@ namespace Langulus::Entity
 
 
    TEMPLATE() template<CT::Trait T, Seek SEEK> LANGULUS(INLINED)
-   bool TME()::SeekValue(CT::Data auto& output, Index offset) const {
+   bool TME()::SeekValue(CT::NotTagged auto& output, Index offset) const {
       return static_cast<const THIS*>(this)
          ->template SeekValue<SEEK>(MetaTraitOf<T>(), output, offset);
    }
 
    TEMPLATE() template<CT::Trait T, Seek SEEK> LANGULUS(INLINED)
-   bool TME()::SeekValueAux(const Neat& aux, CT::Data auto& output, Index offset) const {
+   bool TME()::SeekValueAux(const Neat& aux, CT::NotTagged auto& output, Index offset) const {
       return static_cast<const THIS*>(this)
          ->template SeekValueAux<SEEK>(MetaTraitOf<T>(), aux, output, offset);
    }
    
+
+
+   TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
+   bool TME()::SeekValue(CT::Tagged auto& output, Index offset) const {
+      using T = Deref<decltype(output)>;
+      return static_cast<const THIS*>(this)->template
+         SeekValue<SEEK>(MetaTraitOf<typename T::TagType>(), output.mData, offset);
+   }
+
+   TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
+   bool TME()::SeekValueAux(const Neat& aux, CT::Tagged auto& output, Index offset) const {
+      using T = Deref<decltype(output)>;
+      return static_cast<const THIS*>(this)->template
+         SeekValueAux<SEEK>(MetaTraitOf<typename T::TagType>(), aux, output.mData, offset);
+   }
+   
+
+
    #if LANGULUS_FEATURE(MANAGED_REFLECTION)
       ///                                                                     
       /// Token based interface                                               
@@ -239,6 +257,7 @@ namespace Langulus::Entity
 
 #undef TEMPLATE
 #undef TME
+
 
 namespace Langulus::Entity
 {
@@ -371,7 +390,7 @@ namespace Langulus::Entity
       // Scan descriptor                                                
       Trait result;
       aux.ForEachDeep([&](const Trait& trait) {
-         if (trait.TraitIs(meta)) {
+         if (trait.IsTrait(meta)) {
             if (offset == 0) {
                // Match found                                           
                result = trait;
@@ -446,7 +465,7 @@ namespace Langulus::Entity
       bool done = false;
       if (meta) {
          aux.ForEachDeep([&](const Trait& trait) -> LoopControl {
-            if (trait.TraitIs(meta)) {
+            if (trait.IsTrait(meta)) {
                // Found match                                           
                try {
                   if constexpr (CT::DescriptorMakable<D>)
@@ -483,7 +502,7 @@ namespace Langulus::Entity
                --offset;
                return not done;
             }
-            catch(...) { }
+            catch (...) { }
 
             return Loop::Continue;
          });
