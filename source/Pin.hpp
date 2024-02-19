@@ -34,6 +34,7 @@ namespace Langulus
       concept NotPinnable = ((not Pinnable<T>) and ...);
 
    } // namespace Langulus::CT
+
 } // namespace Langulus
 
 
@@ -59,16 +60,13 @@ namespace Langulus::Entity
       T mValue;
 
       // Is the pinnable value pinned?                                  
-      bool mLocked = false;
+      Traits::State::Tag<bool> mLocked = false;
 
    public:
       LANGULUS(ABSTRACT) false;
       LANGULUS(TYPED) T;
       LANGULUS_BASES(A::Pinnable);
-
-      LANGULUS_PROPERTIES_START(Pin)
-         LANGULUS_PROPERTY_TRAIT(mLocked, State),
-      LANGULUS_PROPERTIES_END();
+      LANGULUS_MEMBERS(&Pin::mValue, &Pin::mLocked);
 
       ///                                                                     
       ///   Construction                                                      

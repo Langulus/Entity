@@ -35,6 +35,10 @@ namespace Langulus::Entity
    /// It is a placeholder type, that can be extended by external modules     
    struct Lingua : Text {
       LANGULUS(ABSTRACT) true;
+      LANGULUS_CONVERTS_FROM();
+
+   private:
+      using Text::SerializationRules;
    };
 
 

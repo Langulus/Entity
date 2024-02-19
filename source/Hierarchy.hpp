@@ -131,10 +131,16 @@ namespace Langulus::Entity
       template<CT::Trait = Trait, Seek = Seek::HereAndAbove>
       NOD() Trait SeekTraitAux(const Neat&, Index = 0) const;
 
+
       template<CT::Trait = Trait, Seek = Seek::HereAndAbove>
-      bool SeekValue(CT::Data auto&, Index = IndexFirst) const;
+      bool SeekValue(CT::NotTagged auto&, Index = IndexFirst) const;
       template<CT::Trait = Trait, Seek = Seek::HereAndAbove>
-      bool SeekValueAux(const Neat&, CT::Data auto&, Index = 0) const;
+      bool SeekValueAux(const Neat&, CT::NotTagged auto&, Index = 0) const;
+
+      template<Seek = Seek::HereAndAbove>
+      bool SeekValue(CT::Tagged auto&, Index = IndexFirst) const;
+      template<Seek = Seek::HereAndAbove>
+      bool SeekValueAux(const Neat&, CT::Tagged auto&, Index = 0) const;
 
 
       template<Seek = Seek::HereAndAbove>
