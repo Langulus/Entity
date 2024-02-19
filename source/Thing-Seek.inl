@@ -218,7 +218,7 @@ namespace Langulus::Entity
       // Scan descriptor                                                
       Trait result;
       aux.ForEachDeep([&](const Trait& trait) {
-         if (trait.TraitIs(meta)) {
+         if (trait.IsTrait(meta)) {
             // Found match                                              
             result = trait;
             return Loop::Break;
@@ -312,7 +312,7 @@ namespace Langulus::Entity
       bool done = false;
       if (meta) {
          aux.ForEachDeep([&](const Trait& trait) {
-            if (trait.TraitIs(meta)) {
+            if (trait.IsTrait(meta)) {
                // Found match                                           
                try {
                   if constexpr (CT::Pinnable<D>)
