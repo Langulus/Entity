@@ -172,7 +172,7 @@ namespace Langulus::Entity
       template<bool TWOSIDED = true>
       Count RemoveUnit(Unit*);
 
-      template<CT::Unit T, class... A>
+      template<CT::Unit T, class...A>
       Any CreateUnit(A&&...);
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
@@ -229,10 +229,10 @@ namespace Langulus::Entity
       ///                                                                     
       ///   Trait management                                                  
       ///                                                                     
-      LANGULUS_API(ENTITY) Trait* AddTrait(const Trait&);
+      LANGULUS_API(ENTITY) Trait* AddTrait(Trait);
 
       LANGULUS_API(ENTITY) Count RemoveTrait(TMeta);
-      LANGULUS_API(ENTITY) Count RemoveTrait(const Trait&);
+      LANGULUS_API(ENTITY) Count RemoveTrait(Trait);
 
       NOD() LANGULUS_API(ENTITY)
       Count HasTraits(TMeta) const;
