@@ -152,7 +152,7 @@ namespace Langulus::Entity
    /// Add a new trait to the thing                                           
    ///   @param trait - trait to shallow copy                                 
    ///   @return the new trait instance                                       
-   Trait* Thing::AddTrait(const Trait& trait) {
+   Trait* Thing::AddTrait(Trait trait) {
       const auto tmeta = trait.GetTrait();
       auto found = mTraits.FindIt(tmeta);
       if (found) {
@@ -185,7 +185,7 @@ namespace Langulus::Entity
    /// Remove an exact-matching trait from this entity                        
    ///   @param trait - type and value to remove                              
    ///   @return the number of removed traits                                 
-   Count Thing::RemoveTrait(const Trait& trait) {
+   Count Thing::RemoveTrait(Trait trait) {
       const auto found = mTraits.FindIt(trait.GetTrait());
       if (found) {
          const auto removed = found.mValue->Remove(trait);
