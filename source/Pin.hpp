@@ -72,7 +72,7 @@ namespace Langulus::Entity
       ///   Construction                                                      
       ///                                                                     
       Pin() requires CT::Inner::Defaultable<T>;
-      Pin(const Pin&) requires CT::Inner::CopyMakable<T>;
+      Pin(const Pin&) requires CT::Inner::ReferMakable<T>;
       Pin(Pin&&) requires CT::Inner::MoveMakable<T>;
       template<template<class> class S>
       Pin(S<Pin>&&) requires CT::Inner::SemanticMakable<S, T>;
@@ -83,7 +83,7 @@ namespace Langulus::Entity
       ///                                                                     
       ///   Assignment                                                        
       ///                                                                     
-      Pin& operator = (const Pin&) requires CT::Inner::CopyAssignable<T>;
+      Pin& operator = (const Pin&) requires CT::Inner::ReferAssignable<T>;
       Pin& operator = (Pin&&) requires CT::Inner::MoveAssignable<T>;
 
       template<template<class> class S>
