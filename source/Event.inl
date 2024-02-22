@@ -106,13 +106,13 @@ namespace Langulus
 
    /// Copy-construction creates a new timestamp                              
    ///   @attention creates a new timestamp                                   
-   ///   @param other - event properties and payload to shallow-copy          
+   ///   @param other - event properties and payload to refer to              
    LANGULUS(INLINED)
    Event::Event(const Event& other)
       : mType {other.mType}
       , mState {other.mState}
       , mTimestamp {SteadyClock::Now()}
-      , mPayload {other.mPayload} {}
+      , mPayload {Refer(other.mPayload)} {}
 
    /// Move-construction                                                      
    ///   @param other - event properties and payload to move                  
@@ -121,7 +121,7 @@ namespace Langulus
       : mType {other.mType}
       , mState {other.mState}
       , mTimestamp {other.mTimestamp}
-      , mPayload {::std::move(other.mPayload)} {}
+      , mPayload {Move(other.mPayload)} {}
 
    /// Instantiate an event of a specific type, manually                      
    /// This constructor also generates the timestamp                          

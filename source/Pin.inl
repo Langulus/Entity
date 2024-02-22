@@ -23,11 +23,11 @@ namespace Langulus::Entity
       static_assert(not CT::Pinnable<T>, "Can't nest pinnable types");
    }
 
-   /// Shallow-copy construction                                              
-   ///   @param other - the pinned value to shallow-copy                      
+   /// Refer construction                                                     
+   ///   @param other - the pinned value to refer to                          
    TEMPLATE() LANGULUS(INLINED)
-   PINNED()::Pin(const Pin& other) requires CT::Inner::CopyMakable<T>
-      : Pin {Copy(other)} {}
+   PINNED()::Pin(const Pin& other) requires CT::Inner::ReferMakable<T>
+      : Pin {Refer(other)} {}
 
    /// Move construction                                                      
    ///   @param other - the pinned value to move                              
@@ -48,12 +48,12 @@ namespace Langulus::Entity
    PINNED()::Pin(A&&...arguments) requires ::std::constructible_from<T, A...>
       : mValue {Forward<A>(arguments)...} {}
 
-   /// Shallow-copy assignment                                                
+   /// Refer assignment                                                       
    ///   @attention doesn't change value, if locked                           
-   ///   @param rhs - the pinned value to shallow-copy assign                 
+   ///   @param rhs - the pinned value to refer to                            
    TEMPLATE() LANGULUS(INLINED)
-   PINNED()& PINNED()::operator = (const Pin& rhs) requires CT::Inner::CopyAssignable<T> {
-      return operator = (Copy(rhs));
+   PINNED()& PINNED()::operator = (const Pin& rhs) requires CT::Inner::ReferAssignable<T> {
+      return operator = (Refer(rhs));
    }
 
    /// Move assignment                                                        
