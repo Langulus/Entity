@@ -482,7 +482,7 @@ namespace Langulus::Entity
       if (mFlow.IsLocked())
          return mFlow->Get();
 
-      mFlow->New(this);
+      mFlow->New();//this
       mFlow.Lock();
 
       // Dispatch the change to all children                            
