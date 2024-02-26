@@ -17,6 +17,7 @@ class TestUnit1 final : public Unit {
 public:
    LANGULUS(ABSTRACT) false;
    LANGULUS_BASES(Unit);
+   IF_LANGULUS_MANAGED_MEMORY(LANGULUS(POOL_TACTIC) RTTI::PoolTactic::Type);
 
    TestUnit1()
       : Unit {MetaOf<TestUnit1>()} {}
@@ -33,6 +34,7 @@ class TestUnit2 final : public Unit {
 public:
    LANGULUS(ABSTRACT) false;
    LANGULUS_BASES(Unit);
+   IF_LANGULUS_MANAGED_MEMORY(LANGULUS(POOL_TACTIC) RTTI::PoolTactic::Type);
 
    TestUnit2()
       : Unit {MetaOf<TestUnit2>()} {}

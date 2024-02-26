@@ -13,9 +13,9 @@
 #if 0
    #define ENTITY_VERBOSE_ENABLED() 1
    #define ENTITY_VERBOSE_SELF(...) \
-      Logger::Verbose(Self(), __VA_ARGS__)
+      Logger::Verbose(this, ": ", __VA_ARGS__)
    #define ENTITY_VERBOSE_SELF_TAB(...) \
-      const auto scoped = Logger::Verbose(Self(), __VA_ARGS__, Logger::Tabs {})
+      const auto scoped = Logger::Verbose(this, ": ", __VA_ARGS__, Logger::Tabs {})
    #define ENTITY_VERBOSE(...) \
       Logger::Append(__VA_ARGS__)
 #else
@@ -143,7 +143,7 @@ namespace Langulus::Entity
       if (other->mOwner)
          other->mOwner->RemoveChild(&*other);
 
-      ENTITY_VERBOSE_SELF("abandoned from ", other);
+      ENTITY_VERBOSE_SELF("abandoned from ", *other);
    }
 
    /// Clone constructor                                                      
@@ -158,25 +158,49 @@ namespace Langulus::Entity
       TODO();
       // clone flow and runtime if pinned, recreate modules if new runtime, 
       // recreate units and traits, then recreate children
-      ENTITY_VERBOSE_SELF("cloned from ", other);
+      ENTITY_VERBOSE_SELF("cloned from ", *other);
    }
 
-   /// Thing destructor                                                       
+   /// Destructor                                                             
    Thing::~Thing() IF_UNSAFE(noexcept) {
-      ENTITY_VERBOSE_SELF_TAB("Destroying (", GetReferences(), " uses)");
+      Detach();
+      LANGULUS_ASSUME(DevAssumes, GetReferences() == 1, "Bad reference count");
+   }
+
+   /// A nested call to detach all parents of all children                    
+   void Thing::Detach() {
+      ENTITY_VERBOSE_SELF_TAB("Decoupling (", GetReferences(), " uses):");
 
       // The thing might be on the stack, make sure we decouple it from 
       // its owner, if that's the case                                  
-      if (mOwner and GetReferences() > 1)
+      if (mOwner and GetReferences() > 1) {
+         ENTITY_VERBOSE_SELF("Decoupling from owner: ", *mOwner);
+         IF_SAFE(Count removed = )
          mOwner->RemoveChild<false>(this);
+         LANGULUS_ASSUME(DevAssumes, removed, "Parent is missing");
+         ENTITY_VERBOSE_SELF("...", GetReferences(), " uses ");
+      }
 
-      // Decouple all children from their parent                        
-      for (auto& child : mChildren)
-         child->mOwner.Reset();
+      // Decouple all children from this                                
+      for (auto& child : mChildren) {
+         if (child->mOwner) {
+            ENTITY_VERBOSE_SELF("Decoupling child: ", child);
+            LANGULUS_ASSUME(DevAssumes,
+               child->mOwner == this, "Parent mismatch");
+            child->mOwner.Reset();
+            ENTITY_VERBOSE_SELF("...", GetReferences(), " uses remain");
+         }
+      }
 
       // Decouple all units from this owner                             
-      for (auto& unit : mUnitsList)
+      for (auto& unit : mUnitsList) {
+         ENTITY_VERBOSE_SELF("Decoupling unit: ", unit);
          unit->mOwners.Remove(this);
+         ENTITY_VERBOSE_SELF("...", GetReferences(), " uses remain");
+      }
+
+      for (auto& child : mChildren)
+         child->Detach();
    }
 
    /// Compare two entities                                                   
@@ -472,7 +496,7 @@ namespace Langulus::Entity
       for (auto& child : mChildren)
          child->ResetRuntime(mRuntime->Get());
 
-      ENTITY_VERBOSE_SELF("New runtime: ", mRuntime);
+      ENTITY_VERBOSE_SELF("New runtime: ", *mRuntime);
       return mRuntime->Get();
    }
 
@@ -489,7 +513,7 @@ namespace Langulus::Entity
       for (auto& child : mChildren)
          child->ResetFlow(mFlow->Get());
 
-      ENTITY_VERBOSE_SELF("New flow: ", mFlow);
+      ENTITY_VERBOSE_SELF("New flow: ", *mFlow);
       return mFlow->Get();
    }
 
