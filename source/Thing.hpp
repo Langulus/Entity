@@ -55,6 +55,7 @@ namespace Langulus::Entity
       LANGULUS(UNINSERTABLE) false;
       LANGULUS_BASES(Resolvable);
       LANGULUS_VERBS(Verbs::Create, Verbs::Select);
+      IF_LANGULUS_MANAGED_MEMORY(LANGULUS(POOL_TACTIC) RTTI::PoolTactic::Type);
 
    protected: IF_LANGULUS_TESTING(public:)
       LANGULUS_API(ENTITY) void ResetRuntime(Runtime*);
@@ -111,7 +112,7 @@ namespace Langulus::Entity
       LANGULUS_API(ENTITY) void Create(Verb&);
 
       template<Seek = Seek::HereAndAbove>
-      Any RunIn(Verb&);
+      Any RunIn(CT::VerbBased auto&);
 
       LANGULUS_API(ENTITY) Any Run(const Lingua&);
 
@@ -164,6 +165,10 @@ namespace Langulus::Entity
       LANGULUS_API(ENTITY)
       void DumpHierarchy() const;
 
+   protected:
+      void Detach();
+
+   public:
       ///                                                                     
       ///   Unit management                                                   
       ///                                                                     
