@@ -64,7 +64,7 @@ namespace Langulus::Entity
       ///   Flow                                                              
       ///                                                                     
       template<Seek = Seek::HereAndAbove>
-      Any RunIn(Verb&);
+      Any RunIn(CT::VerbBased auto&);
 
       ///                                                                     
       ///   Seek                                                              

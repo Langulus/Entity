@@ -176,7 +176,7 @@ namespace Langulus::Entity
    ///   @param verb - the verb to execute                                    
    ///   @return verb output                                                  
    template<Seek SEEK>
-   Any Thing::RunIn(Verb& verb) {
+   Any Thing::RunIn(CT::VerbBased auto& verb) {
       if constexpr (SEEK & Seek::Here) {
          // Execute here                                                
          Do(verb);
@@ -600,7 +600,7 @@ namespace Langulus::Entity
    ///   @param verb - the verb to execute                                    
    ///   @return the verb output                                              
    template<Seek SEEK>
-   Any Unit::RunIn(Verb& verb) {
+   Any Unit::RunIn(CT::VerbBased auto& verb) {
       if (not mOwners) {
          Logger::Warning(Self(), "No owners available for executing: ", verb);
          return false;
