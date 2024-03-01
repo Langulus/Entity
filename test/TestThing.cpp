@@ -50,7 +50,7 @@ SCENARIO("Testing Thing", "[thing]") {
       REQUIRE(not root.mUnitsList);
       REQUIRE(not root.mUnitsAmbiguous);
       REQUIRE(not root.mTraits);
-      REQUIRE(root.GetReferences() == 2);
+      REQUIRE(root.GetReferences() == 1);
 
       REQUIRE(child.mOwner == &root);
       REQUIRE(child.mRuntime == nullptr);
@@ -62,7 +62,7 @@ SCENARIO("Testing Thing", "[thing]") {
       REQUIRE(not child.mUnitsList);
       REQUIRE(not child.mUnitsAmbiguous);
       REQUIRE(not child.mTraits);
-      REQUIRE(child.GetReferences() == 2);
+      REQUIRE(child.GetReferences() == 1);
    }
    
    GIVEN("A root Thing") {
@@ -94,7 +94,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(root.mChildren.GetCount() == 1);
          REQUIRE(not root.mUnitsList);
          REQUIRE(not root.mTraits);
-         REQUIRE(root.GetReferences() == 2);
+         REQUIRE(root.GetReferences() == 1);
 
          auto child1 = root.mChildren[0];
          REQUIRE(child1 == child);
@@ -125,14 +125,14 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.mChildren.IsEmpty());
             REQUIRE(root.mUnitsList.GetCount() == 1);
             REQUIRE(root.mTraits.IsEmpty());
-            REQUIRE(root.GetReferences() == 2);
+            REQUIRE(root.GetReferences() == 1);
 
             auto it = root.mUnitsList.begin();
             REQUIRE(it->GetType() == MetaOf<TestUnit1>());
             REQUIRE(*it == &testUnit);
             REQUIRE(it->mOwners.GetCount() == 1);
             REQUIRE(it->mOwners[0] == &root);
-            REQUIRE(it->GetReferences() == 3);
+            REQUIRE(it->GetReferences() == 1);
          }
       }
 
@@ -149,7 +149,7 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.mChildren.IsEmpty());
             REQUIRE(root.mUnitsList.GetCount() == 1);
             REQUIRE(root.mTraits.IsEmpty());
-            REQUIRE(root.GetReferences() == 2);
+            REQUIRE(root.GetReferences() == 1);
 
             auto it = root.mUnitsList.begin();
             REQUIRE(it->GetType() == MetaOf<TestUnit1>());
@@ -241,7 +241,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(root.mUnitsList.GetCount() == 2);
          REQUIRE(root.mTraits.GetCount() == 1);
          REQUIRE(root.GetName() == "Root");
-         REQUIRE(root.GetReferences() == 5);
+         REQUIRE(root.GetReferences() == 1);
 
          auto child1 = root.mChildren[0];
          REQUIRE(child1->mOwner == &root);
