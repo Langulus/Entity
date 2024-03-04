@@ -12,11 +12,16 @@
 
 #if 0
    #define ENTITY_VERBOSE_ENABLED() 1
-   #define ENTITY_VERBOSE_SELF(...)            Logger::Verbose(Self(), __VA_ARGS__)
-   #define ENTITY_VERBOSE(...)                 Logger::Append(__VA_ARGS__)
+   #define ENTITY_VERBOSE_SELF(...) \
+      Logger::Verbose(this, ": ", __VA_ARGS__)
+   #define ENTITY_VERBOSE_SELF_TAB(...) \
+      const auto scoped = Logger::Verbose(this, ": ", __VA_ARGS__, Logger::Tabs {})
+   #define ENTITY_VERBOSE(...) \
+      Logger::Append(__VA_ARGS__)
 #else
    #define ENTITY_VERBOSE_ENABLED() 0
    #define ENTITY_VERBOSE_SELF(...)
+   #define ENTITY_VERBOSE_SELF_TAB(...)
    #define ENTITY_VERBOSE(...)
 #endif
 
@@ -162,7 +167,7 @@ namespace Langulus::Entity
 
       mTraits.Insert(tmeta, trait);
       mRefreshRequired = true;
-      ENTITY_VERBOSE(trait << " added");
+      ENTITY_VERBOSE_SELF(trait, " added");
       return &mTraits[tmeta].Last();
    }
 
@@ -174,7 +179,7 @@ namespace Langulus::Entity
       if (found) {
          const auto removed = found.mValue->GetCount();
          mTraits.RemoveIt(found);
-         ENTITY_VERBOSE_SELF(trait << " removed");
+         ENTITY_VERBOSE_SELF(trait, " removed");
          mRefreshRequired = true;
          return removed;
       }
@@ -190,7 +195,7 @@ namespace Langulus::Entity
       if (found) {
          const auto removed = found.mValue->Remove(trait);
          if (removed) {
-            ENTITY_VERBOSE_SELF(trait << " removed");
+            ENTITY_VERBOSE_SELF(trait, " removed");
             mRefreshRequired = true;
             return removed;
          }

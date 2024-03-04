@@ -497,7 +497,7 @@ namespace Langulus::Entity
    /// Get a file interface, relying on external modules to find it           
    ///   @param path - the path for the file                                  
    ///   @return the file interface, or nullptr if file doesn't exist         
-   Ptr<A::File> Runtime::GetFile(const Path& path) {
+   Ref<A::File> Runtime::GetFile(const Path& path) {
       auto& fileSystems = GetModules<A::FileSystem>();
       LANGULUS_ASSERT(fileSystems, Module,
          "Can't retrieve file `", path, "` - no file system module available");
@@ -507,7 +507,7 @@ namespace Langulus::Entity
    /// Get a folder interface, relying on external modules to find it         
    ///   @param path - the path for the folder                                
    ///   @return the folder interface, or nullptr if folder doesn't exist     
-   Ptr<A::Folder> Runtime::GetFolder(const Path& path) {
+   Ref<A::Folder> Runtime::GetFolder(const Path& path) {
       auto& fileSystems = GetModules<A::FileSystem>();
       LANGULUS_ASSERT(fileSystems, Module,
          "Can't retrieve folder `", path, "` - no file system module available");

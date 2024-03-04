@@ -135,9 +135,9 @@ namespace Langulus::Entity
       #endif
 
       NOD() LANGULUS_API(ENTITY)
-      Ptr<A::File> GetFile(const Path&);
+      Ref<A::File> GetFile(const Path&);
       NOD() LANGULUS_API(ENTITY)
-      Ptr<A::Folder> GetFolder(const Path&);
+      Ref<A::Folder> GetFolder(const Path&);
       NOD() LANGULUS_API(ENTITY)
       const Path& GetWorkingPath() const;
       NOD() LANGULUS_API(ENTITY)

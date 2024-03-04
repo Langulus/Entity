@@ -32,7 +32,7 @@ SCENARIO("Testing Thing", "[thing]") {
       REQUIRE(not root.mUnitsList);
       REQUIRE(not root.mUnitsAmbiguous);
       REQUIRE(not root.mTraits);
-      REQUIRE(root.GetReferences() == 1);
+      REQUIRE(root.Reference(0) == 1);
    }
 
    WHEN("Creating a Thing with a parent") {
@@ -50,7 +50,7 @@ SCENARIO("Testing Thing", "[thing]") {
       REQUIRE(not root.mUnitsList);
       REQUIRE(not root.mUnitsAmbiguous);
       REQUIRE(not root.mTraits);
-      REQUIRE(root.GetReferences() == 1);
+      REQUIRE(root.Reference(0) == 1);
 
       REQUIRE(child.mOwner == &root);
       REQUIRE(child.mRuntime == nullptr);
@@ -62,7 +62,7 @@ SCENARIO("Testing Thing", "[thing]") {
       REQUIRE(not child.mUnitsList);
       REQUIRE(not child.mUnitsAmbiguous);
       REQUIRE(not child.mTraits);
-      REQUIRE(child.GetReferences() == 1);
+      REQUIRE(child.Reference(0) == 1);
    }
    
    GIVEN("A root Thing") {
@@ -94,7 +94,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(root.mChildren.GetCount() == 1);
          REQUIRE(not root.mUnitsList);
          REQUIRE(not root.mTraits);
-         REQUIRE(root.GetReferences() == 1);
+         REQUIRE(root.Reference(0) == 1);
 
          auto child1 = root.mChildren[0];
          REQUIRE(child1 == child);
@@ -107,7 +107,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(not child1->mChildren);
          REQUIRE(not child1->mUnitsList);
          REQUIRE(not child1->mTraits);
-         REQUIRE(child1->GetReferences() == 3);
+         REQUIRE(child1->Reference(0) == 3);
       }
 
       WHEN("Adding an existing unit") {
@@ -125,14 +125,14 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.mChildren.IsEmpty());
             REQUIRE(root.mUnitsList.GetCount() == 1);
             REQUIRE(root.mTraits.IsEmpty());
-            REQUIRE(root.GetReferences() == 1);
+            REQUIRE(root.Reference(0) == 1);
 
             auto it = root.mUnitsList.begin();
             REQUIRE(it->GetType() == MetaOf<TestUnit1>());
             REQUIRE(*it == &testUnit);
             REQUIRE(it->mOwners.GetCount() == 1);
             REQUIRE(it->mOwners[0] == &root);
-            REQUIRE(it->GetReferences() == 1);
+            REQUIRE(it->Reference(0) == 1);
          }
       }
 
@@ -149,14 +149,18 @@ SCENARIO("Testing Thing", "[thing]") {
             REQUIRE(root.mChildren.IsEmpty());
             REQUIRE(root.mUnitsList.GetCount() == 1);
             REQUIRE(root.mTraits.IsEmpty());
-            REQUIRE(root.GetReferences() == 1);
+            REQUIRE(root.Reference(0) == 1);
 
             auto it = root.mUnitsList.begin();
             REQUIRE(it->GetType() == MetaOf<TestUnit1>());
             REQUIRE(*it == unit.As<TestUnit1*>());
+            REQUIRE(unit.GetUses() == 3);
+            REQUIRE(Fractalloc::Instance.Find({}, unit.As<TestUnit1*>())->GetUses() == 3);
+            REQUIRE(unit.As<TestUnit1*>()->Reference(0) == 3);
+            REQUIRE(Fractalloc::Instance.Find({}, unit.As<TestUnit1*>())->GetUses() == 3);
             REQUIRE(it->mOwners.GetCount() == 1);
             REQUIRE(it->mOwners[0] == &root);
-            REQUIRE(it->GetReferences() == 3);
+            REQUIRE(it->Reference(0) == 3);
          }
       }
 
@@ -175,7 +179,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(not root.mUnitsList);
          REQUIRE(not root.mUnitsAmbiguous);
          REQUIRE(root.mTraits.GetCount() == 1);
-         REQUIRE(root.GetReferences() == 1);
+         REQUIRE(root.Reference(0) == 1);
 
          auto it = root.mTraits.begin();
          REQUIRE(*it.mKey == MetaOf<Traits::Count>());
@@ -200,7 +204,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(not root.mUnitsAmbiguous);
          REQUIRE(root.mTraits.GetCount() == 1);
          REQUIRE(root.GetName() == "Dimo");
-         REQUIRE(root.GetReferences() == 1);
+         REQUIRE(root.Reference(0) == 1);
 
          auto it = root.mTraits.begin();
          REQUIRE(*it.mKey == MetaOf<Traits::Name>());
@@ -241,7 +245,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(root.mUnitsList.GetCount() == 2);
          REQUIRE(root.mTraits.GetCount() == 1);
          REQUIRE(root.GetName() == "Root");
-         REQUIRE(root.GetReferences() == 1);
+         REQUIRE(root.Reference(0) == 1);
 
          auto child1 = root.mChildren[0];
          REQUIRE(child1->mOwner == &root);
@@ -254,7 +258,16 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(child1->mUnitsList.GetCount() == 2);
          REQUIRE(child1->mTraits.GetCount() == 1);
          REQUIRE(child1->GetName() == "Child1");
-         REQUIRE(child1->GetReferences() == 6);
+
+         // the child1 container has 1 reference
+         // the root.mChildren[0] contains 1 reference
+         // child1's TestUnit1 owner contains 1 references from owner
+         // child1's TestUnit2 owner contains 1 reference from owner
+         // child1's GrandChild1 owner contains 1 reference
+         // child1's GrandChild2 owner contains 1 reference
+         //---------------------------------------------------
+         // total: 8 references confirmed
+         REQUIRE(child1->Reference(0) == 6);
 
          auto child2 = root.mChildren[1];
          REQUIRE(child2->mOwner == &root);
@@ -267,7 +280,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(not child2->mUnitsList);
          REQUIRE(child2->mTraits.GetCount() == 1);
          REQUIRE(child2->GetName() == "Child2");
-         REQUIRE(child2->GetReferences() == 2);
+         REQUIRE(child2->Reference(0) == 2);
 
          auto grandchild1 = child1->mChildren[0];
          REQUIRE(grandchild1->mOwner == child1);
@@ -280,7 +293,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(not grandchild1->mUnitsList);
          REQUIRE(grandchild1->mTraits.GetCount() == 1);
          REQUIRE(grandchild1->GetName() == "GrandChild1");
-         REQUIRE(grandchild1->GetReferences() == 2);
+         REQUIRE(grandchild1->Reference(0) == 2);
 
          auto grandchild2 = child1->mChildren[1];
          REQUIRE(grandchild2->mOwner == child1);
@@ -293,7 +306,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(not grandchild2->mUnitsList);
          REQUIRE(grandchild2->mTraits.GetCount() == 1);
          REQUIRE(grandchild2->GetName() == "GrandChild2");
-         REQUIRE(grandchild2->GetReferences() == 2);
+         REQUIRE(grandchild2->Reference(0) == 2);
 
          Logger::Special("End: Creating a Thing by descriptor");
       }

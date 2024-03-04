@@ -25,7 +25,9 @@ public:
    TestUnit1(Describe&& describe)
       : Unit {MetaOf<TestUnit1>(), *describe} {}
 
-   ~TestUnit1() {}
+   ~TestUnit1() {
+      Logger::Verbose(this, ": destroying...");
+   }
 
    void Refresh() {}
 };
@@ -42,7 +44,9 @@ public:
    TestUnit2(Describe&& describe)
       : Unit {MetaOf<TestUnit2>(), *describe} {}
 
-   ~TestUnit2() {}
+   ~TestUnit2() {
+      Logger::Verbose(this, ": destroying...");
+   }
 
    void Refresh() {}
 };

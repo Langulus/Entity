@@ -65,9 +65,9 @@ namespace Langulus::Entity
       // Runtime should be destroyed last, hence it is the first member 
 
       // Runtime                                                        
-      Pin<Ptr<Runtime>> mRuntime;
+      Pin<Ref<Runtime>> mRuntime;
       // Temporal flow                                                  
-      Pin<Ptr<Temporal>> mFlow;
+      Pin<Ref<Temporal>> mFlow;
       // Hierarchy                                                      
       Hierarchy mChildren;
       // Units indexed by all their relevant reflected bases            
@@ -94,7 +94,9 @@ namespace Langulus::Entity
       LANGULUS_API(ENTITY) Thing(Thing&&) noexcept;
       LANGULUS_API(ENTITY) Thing(Cloned<Thing>&&);
       LANGULUS_API(ENTITY) Thing(Abandoned<Thing>&&);
+
       LANGULUS_API(ENTITY) ~Thing() IF_UNSAFE(noexcept);
+      void Detach();
 
       // Shallow copy is disabled, you should be able only to clone,    
       // move, or abandon                                               
@@ -112,7 +114,7 @@ namespace Langulus::Entity
       LANGULUS_API(ENTITY) void Create(Verb&);
 
       template<Seek = Seek::HereAndAbove>
-      Any RunIn(CT::VerbBased auto&);
+      auto& RunIn(CT::VerbBased auto&);
 
       LANGULUS_API(ENTITY) Any Run(const Lingua&);
 
@@ -164,9 +166,6 @@ namespace Langulus::Entity
 
       LANGULUS_API(ENTITY)
       void DumpHierarchy() const;
-
-   protected:
-      void Detach();
 
    public:
       ///                                                                     

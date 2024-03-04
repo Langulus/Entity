@@ -15,13 +15,20 @@
 
 #if 0
    #define ENTITY_VERBOSE_ENABLED() 1
-   #define ENTITY_VERBOSE_SELF(...)            Logger::Verbose(Self(), __VA_ARGS__)
-   #define ENTITY_VERBOSE(...)                 Logger::Append(__VA_ARGS__)
-   #define ENTITY_CREATION_VERBOSE_SELF(...)   Logger::Verbose(Self(), __VA_ARGS__)
-   #define ENTITY_SELECTION_VERBOSE_SELF(...)  Logger::Verbose(Self(), __VA_ARGS__)
+   #define ENTITY_VERBOSE_SELF(...) \
+      Logger::Verbose(this, ": ", __VA_ARGS__)
+   #define ENTITY_VERBOSE_SELF_TAB(...) \
+      const auto scoped = Logger::Verbose(this, ": ", __VA_ARGS__, Logger::Tabs {})
+   #define ENTITY_VERBOSE(...) \
+      Logger::Append(__VA_ARGS__)
+   #define ENTITY_CREATION_VERBOSE_SELF(...) \
+      Logger::Verbose(Self(), __VA_ARGS__)
+   #define ENTITY_SELECTION_VERBOSE_SELF(...) \
+      Logger::Verbose(Self(), __VA_ARGS__)
 #else
    #define ENTITY_VERBOSE_ENABLED() 0
    #define ENTITY_VERBOSE_SELF(...)
+   #define ENTITY_VERBOSE_SELF_TAB(...)
    #define ENTITY_VERBOSE(...)
    #define ENTITY_CREATION_VERBOSE_SELF(...)
    #define ENTITY_SELECTION_VERBOSE_SELF(...)
@@ -176,20 +183,19 @@ namespace Langulus::Entity
    ///   @param verb - the verb to execute                                    
    ///   @return verb output                                                  
    template<Seek SEEK>
-   Any Thing::RunIn(CT::VerbBased auto& verb) {
+   auto& Thing::RunIn(CT::VerbBased auto& verb) {
       if constexpr (SEEK & Seek::Here) {
          // Execute here                                                
          Do(verb);
          if (verb.IsDone())
-            return verb.GetOutput();
+            return verb;
       }
 
       if constexpr (SEEK & Seek::Above) {
          // Execute in parents up to root, if requested                 
          if (mOwner) {
-            mOwner->template RunIn<Seek::HereAndAbove>(verb);
-            if (verb.IsDone())
-               return verb.GetOutput();
+            if (mOwner->template RunIn<Seek::HereAndAbove>(verb).IsDone())
+               return verb;
          }
       }
 
@@ -198,14 +204,12 @@ namespace Langulus::Entity
          for (auto& child : mChildren) {
             Verb local {verb};
             local.ShortCircuit(false);
-            verb << Abandon(child->template RunIn<Seek::HereAndBelow>(local));
+            verb << Abandon(
+               child->template RunIn<Seek::HereAndBelow>(local).GetOutput());
          }
-
-         if (verb.IsDone())
-            return verb.GetOutput();
       }
 
-      return {};
+      return verb;
    }
    
    /// Register unit by all its bases in mUnitsAmbiguous                      
@@ -280,7 +284,9 @@ namespace Langulus::Entity
       mUnitsList << unit;
       AddUnitBases(unit, meta);
       mRefreshRequired = true;
-      ENTITY_VERBOSE(unit, " added as unit");
+
+      ENTITY_VERBOSE(
+         unit, " added as unit (now at ", Reference(0), " references)");
       return 1;
    }
 
@@ -490,16 +496,26 @@ namespace Langulus::Entity
    Any Thing::CreateData(const Construct& construct) {
       LANGULUS_ASSUME(UserAssumes, construct.GetType(),
          "Invalid construct type");
+
       const auto type = construct.GetType();
       const auto producer = type and type->mProducerRetriever
          ? type->mProducerRetriever() : nullptr;
-      Construct descriptor {construct};
+      ENTITY_VERBOSE_SELF(
+         "Acting as producer context for making `", 
+         type, "` (at ", Reference(0), " references)"
+      );
 
       // Implicitly add a parent trait to descriptor, if one isn't      
       // already added - it will be stripped later, when normalizing    
       // the descriptor when producing the item from a factory          
-      if (not descriptor.GetDescriptor().Get<Traits::Parent>())
+      Construct descriptor {construct};
+      if (not descriptor.GetDescriptor().Get<Traits::Parent>()) {
          descriptor << Traits::Parent {this};
+         ENTITY_VERBOSE_SELF(
+            "Referenced as Traits::Parent (now at ", Reference(0),
+            " references)"
+         );
+      }
 
       if (producer) {
          // Data has a specific producer, we can narrow the required    
@@ -600,26 +616,27 @@ namespace Langulus::Entity
    ///   @param verb - the verb to execute                                    
    ///   @return the verb output                                              
    template<Seek SEEK>
-   Any Unit::RunIn(CT::VerbBased auto& verb) {
+   auto& Unit::RunIn(CT::VerbBased auto& verb) {
       if (not mOwners) {
          Logger::Warning(Self(), "No owners available for executing: ", verb);
-         return false;
+         return verb;
       }
 
       // Dispatch to all owner, accumulate outputs                      
       for (auto& owner : mOwners) {
-         Verb local {verb};
+         auto local = verb;
          local.ShortCircuit(false);
-         verb << Abandon(owner->template RunIn<SEEK>(local));
+         verb << Abandon(owner->template RunIn<SEEK>(local).GetOutput());
       }
 
-      return verb.GetOutput();
+      return verb;
    }
 
 } // namespace Langulus::Entity
 
 #undef ENTITY_VERBOSE_ENABLED
 #undef ENTITY_VERBOSE_SELF
+#undef ENTITY_VERBOSE_SELF_TAB
 #undef ENTITY_VERBOSE
 #undef ENTITY_CREATION_VERBOSE_SELF
 #undef ENTITY_SELECTION_VERBOSE_SELF

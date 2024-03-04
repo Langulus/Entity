@@ -32,7 +32,7 @@ namespace Langulus::Entity
    /// Default-constructor, always creates a parentless root thing            
    Thing::Thing()
       : Resolvable {MetaOf<Thing>()} {
-      ENTITY_VERBOSE_SELF("Created (root, ", GetReferences(), " references)");
+      ENTITY_VERBOSE_SELF("Created (root, ", Reference(0), " references)");
    }
    
    /// Descriptor-constructor                                                 
@@ -47,12 +47,13 @@ namespace Langulus::Entity
       if (mOwner) {
          ENTITY_VERBOSE_SELF(
             "Created as child to ", mOwner,
-            " (", GetReferences(), " references)"
+            " (", Reference(0), " references; parent now has ",
+            mOwner->Reference(0), " references)"
          );
       }
       else {
          ENTITY_VERBOSE_SELF(
-            "Created (root, ", GetReferences(), " references)"
+            "Created (root, ", Reference(0), " references)"
          );
       }
    }
@@ -78,12 +79,13 @@ namespace Langulus::Entity
       if (mOwner) {
          ENTITY_VERBOSE_SELF(
             "Created as child to ", mOwner,
-            " (", GetReferences(), " references)"
+            " (", Reference(0), " references; parent now has ",
+            mOwner->Reference(0), " references)"
          );
       }
       else {
          ENTITY_VERBOSE_SELF(
-            "Created (root, ", GetReferences(), " references)"
+            "Created (root, ", Reference(0), " references)"
          );
       }
    }
@@ -156,7 +158,7 @@ namespace Langulus::Entity
       , mChildren {Clone(other->mChildren)}
       , mRefreshRequired {true} {
       TODO();
-      // clone flow and runtime if pinned, recreate modules if new runtime, 
+      //TODO clone flow and runtime if pinned, recreate modules if new runtime, 
       // recreate units and traits, then recreate children
       ENTITY_VERBOSE_SELF("cloned from ", *other);
    }
@@ -164,22 +166,31 @@ namespace Langulus::Entity
    /// Destructor                                                             
    Thing::~Thing() IF_UNSAFE(noexcept) {
       Detach();
-      LANGULUS_ASSUME(DevAssumes, GetReferences() == 1, "Bad reference count");
+
+      /*if (Reference(0) == 1) {
+         // If after detaching the entire hierarchy, there's still one  
+         // reference remaining, then we're sure that this reference is 
+         // because the Thing is on the stack                           
+         //TODO requires the destruction of the hierarchy, too? othwise some member could still hold a ref to this thing?
+         //TODO alternatively, items without jurisdiction are never referenced, so we could detect things on the stack, by comparing references before and after Detach()
+         //TODO eventually we can just do Fractalloc::CheckAuthority(this)
+         Reference(-1);
+      }*/
    }
 
    /// A nested call to detach all parents of all children                    
    void Thing::Detach() {
-      ENTITY_VERBOSE_SELF_TAB("Decoupling (", GetReferences(), " uses):");
+      ENTITY_VERBOSE_SELF_TAB("Destroying (", Reference(0), " uses):");
 
       // The thing might be on the stack, make sure we decouple it from 
       // its owner, if that's the case                                  
-      if (mOwner and GetReferences() > 1) {
+      /*if (mOwner and Reference(0)) {
          ENTITY_VERBOSE_SELF("Decoupling from owner: ", *mOwner);
          IF_SAFE(Count removed = )
          mOwner->RemoveChild<false>(this);
          LANGULUS_ASSUME(DevAssumes, removed, "Parent is missing");
-         ENTITY_VERBOSE_SELF("...", GetReferences(), " uses ");
-      }
+         ENTITY_VERBOSE_SELF("...", Reference(0), " uses ");
+      }*/
 
       // Decouple all children from this                                
       for (auto& child : mChildren) {
@@ -188,7 +199,7 @@ namespace Langulus::Entity
             LANGULUS_ASSUME(DevAssumes,
                child->mOwner == this, "Parent mismatch");
             child->mOwner.Reset();
-            ENTITY_VERBOSE_SELF("...", GetReferences(), " uses remain");
+            ENTITY_VERBOSE_SELF("...", Reference(0), " uses remain");
          }
       }
 
@@ -196,11 +207,13 @@ namespace Langulus::Entity
       for (auto& unit : mUnitsList) {
          ENTITY_VERBOSE_SELF("Decoupling unit: ", unit);
          unit->mOwners.Remove(this);
-         ENTITY_VERBOSE_SELF("...", GetReferences(), " uses remain");
+         ENTITY_VERBOSE_SELF("...", Reference(0), " uses remain");
       }
 
-      for (auto& child : mChildren)
+      for (auto& child : mChildren) {
          child->Detach();
+         ENTITY_VERBOSE_SELF("...", Reference(0), " uses remain");
+      }
    }
 
    /// Compare two entities                                                   
@@ -521,7 +534,8 @@ namespace Langulus::Entity
    ///   @param descriptor - instructions for the entity's creation           
    ///   @return the new child instance                                       
    Ref<Thing> Thing::CreateChild(const Neat& descriptor) {
-      ENTITY_VERBOSE_SELF_TAB("Producing child: ");
+      ENTITY_VERBOSE_SELF_TAB(
+         "Producing child (at ", Reference(0), " references): ");
       Ref<Thing> newThing;
       newThing.New(this, descriptor);
       return Abandon(newThing);

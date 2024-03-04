@@ -10,15 +10,23 @@
 #include "Runtime.hpp"
 #include <Flow/Verbs/Interpret.hpp>
 
+
 #if 0
    #define ENTITY_VERBOSE_ENABLED() 1
-   #define ENTITY_VERBOSE_SELF(...)            Logger::Verbose(Self(), __VA_ARGS__)
-   #define ENTITY_VERBOSE(...)                 Logger::Append(__VA_ARGS__)
-   #define ENTITY_CREATION_VERBOSE_SELF(...)   Logger::Verbose(Self(), __VA_ARGS__)
-   #define ENTITY_SELECTION_VERBOSE_SELF(...)  Logger::Verbose(Self(), __VA_ARGS__)
+   #define ENTITY_VERBOSE_SELF(...) \
+      Logger::Verbose(this, ": ", __VA_ARGS__)
+   #define ENTITY_VERBOSE_SELF_TAB(...) \
+      const auto scoped = Logger::Verbose(this, ": ", __VA_ARGS__, Logger::Tabs {})
+   #define ENTITY_VERBOSE(...) \
+      Logger::Append(__VA_ARGS__)
+   #define ENTITY_CREATION_VERBOSE_SELF(...) \
+      Logger::Verbose(Self(), __VA_ARGS__)
+   #define ENTITY_SELECTION_VERBOSE_SELF(...) \
+      Logger::Verbose(Self(), __VA_ARGS__)
 #else
    #define ENTITY_VERBOSE_ENABLED() 0
    #define ENTITY_VERBOSE_SELF(...)
+   #define ENTITY_VERBOSE_SELF_TAB(...)
    #define ENTITY_VERBOSE(...)
    #define ENTITY_CREATION_VERBOSE_SELF(...)
    #define ENTITY_SELECTION_VERBOSE_SELF(...)
@@ -68,8 +76,7 @@ namespace Langulus::Entity
       // Dispatch to entity first, using reflected and default verbs,   
       // but disallowing custom dispatch, because we're currently in it 
       // and there's a potential for infinite regress                   
-      Resolvable::Run<false>(verb);
-      if (verb.IsDone())
+      if (Resolvable::Run<false>(verb).IsDone())
          return;
 
       // If verb is still not satisfied, dispatch to ALL units          

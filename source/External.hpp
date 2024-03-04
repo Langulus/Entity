@@ -373,8 +373,8 @@ namespace Langulus::A
          virtual Offset Write(const Any&) = 0;
       };
 
-      NOD() virtual Ptr<Reader> NewReader() = 0;
-      NOD() virtual Ptr<Writer> NewWriter(bool append) = 0;
+      NOD() virtual Ref<Reader> NewReader() = 0;
+      NOD() virtual Ref<Writer> NewWriter(bool append) = 0;
    };
 
    ///                                                                        
