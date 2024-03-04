@@ -399,7 +399,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(nullptr == Allocator::Find(MetaOf<TestUnit2>(), unitmemory2));
       }
 
-      WHEN("Replace local units") {
+      /*WHEN("Replace local units") {
          TestUnit2 replacement;
          auto replaced = root.ReplaceUnit(root.GetUnit<TestUnit1>(), &replacement);
 
@@ -407,7 +407,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(root.mUnitsList.GetCount() == 2);
          REQUIRE(root.mUnitsAmbiguous[MetaOf<TestUnit2>()].GetCount() == 2);
          REQUIRE(root.mUnitsAmbiguous[MetaOf<TestUnit2>()].Contains(&replacement));
-      }
+      }*/
 
       WHEN("Count available units") {
          auto found = root.HasUnits<TestUnit1>();

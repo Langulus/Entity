@@ -471,10 +471,10 @@ namespace Langulus::Entity
    ///   @attention assumes both units are different and not nullptr          
    ///   @param replaceThis - the unit to replace                             
    ///   @param withThis - the unit to replace with                           
-   Count Thing::ReplaceUnit(Unit* replaceThis, Unit* withThis) {
+   /*Count Thing::ReplaceUnit(Unit* replaceThis, Unit* withThis) {
       RemoveUnit(replaceThis);
       return AddUnit(withThis);
-   }
+   }*/
 
    /// Count the number of matching units in this entity                      
    ///   @param type - the type of units to search for                        
