@@ -29,8 +29,9 @@ Unit::Unit(Unit&& other) noexcept
    : Resolvable {Forward<Resolvable>(other)}
    , mOwners {::std::move(other.mOwners)} {
    // Replace the owner's unit pointer with the new one                 
-   for (auto owner : mOwners)
-      owner->ReplaceUnit(&other, this);
+   TODO();
+   /*for (auto owner : mOwners)
+      owner->ReplaceUnit(&other, this);*/
 }
 
 /// Unit destruction                                                          
@@ -77,8 +78,9 @@ Unit& Unit::operator = (Unit&& other) noexcept {
    mOwners = Move(other.mOwners);
 
    // Update all coupled owners                                         
-   for (auto owner : mOwners)
-      owner->ReplaceUnit(&other, this);
+   TODO();
+   /*for (auto owner : mOwners)
+      owner->ReplaceUnit(&other, this);*/
    return *this;
 }
    
