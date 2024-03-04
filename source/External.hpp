@@ -523,7 +523,7 @@ namespace Langulus::A
       NOD() const MeshView& GetView() const noexcept;
       NOD() MeshView& GetView() noexcept;
 
-      NOD() virtual Anyness::Ref<Mesh> GetLOD(const LOD&) const = 0;
+      NOD() virtual Ref<Mesh> GetLOD(const LOD&) const = 0;
 
       NOD() Vec2u InnerGetIndices(const Data*, const Vec2u&) const;
       NOD() Vec3u InnerGetIndices(const Data*, const Vec3u&) const;
