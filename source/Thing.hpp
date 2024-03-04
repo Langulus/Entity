@@ -187,8 +187,8 @@ namespace Langulus::Entity
       template<CT::Unit T = Unit, bool TWOSIDED = true>
       Count RemoveUnits();
 
-      LANGULUS_API(ENTITY)
-      Count ReplaceUnit(Unit*, Unit*);
+      /*LANGULUS_API(ENTITY)
+      Count ReplaceUnit(Unit*, Unit*);*/
 
       NOD() LANGULUS_API(ENTITY)
       Count HasUnits(DMeta) const;

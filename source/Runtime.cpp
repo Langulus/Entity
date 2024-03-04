@@ -62,6 +62,16 @@ namespace Langulus::Entity
    Runtime::Runtime(Thing* owner) noexcept
       : mOwner {owner} {
       VERBOSE(this, ": Initializing...");
+      // We always prefer 'type' definitions that are in the main       
+      // boundary, to avoid segfaults when unloading libraries from     
+      // mModulesByType - it is indexed by a DMeta                      
+      // So we make sure that the base modules are defined here         
+      (void)MetaDataOf<A::PlatformModule>();
+      (void)MetaDataOf<A::PhysicalModule>();
+      (void)MetaDataOf<A::UI::Module>();
+      (void)MetaDataOf<A::FileSystem>();
+      (void)MetaDataOf<A::GraphicsModule>();
+      (void)MetaDataOf<A::AssetModule>();
       VERBOSE(this, ": Initialized");
    }
 
@@ -125,8 +135,16 @@ namespace Langulus::Entity
       auto found = map.FindIt(type);
       if (found)
          *found.mValue << module;
-      else
-         map.Insert(type, module);
+      else {
+         // We always prefer 'type' definition that is in the main      
+         // boundary, to avoid segfaults when unloading libraries from  
+         // mModulesByType - it is indexed by a DMeta                   
+         auto localDefinition = RTTI::GetMetaData(type->mToken, RTTI::MainBoundary);
+         if (localDefinition)
+            map.Insert(localDefinition, module);
+         else
+            map.Insert(type, module);
+      }
 
       for (auto& base : type->mBases) {
          if (base.mType->IsExact<Resolvable>())
@@ -219,6 +237,7 @@ namespace Langulus::Entity
    ///                 with `LangulusMod`, and suffixing with `.so` or `.dll` 
    ///                 the name also should correspond to the RTTI::Boundary  
    ///   @return the module handle (OS dependent)                             
+   LANGULUS(NOINLINE)
    Runtime::SharedLibrary Runtime::LoadSharedLibrary(const Token& name) {
       // Check if this library is already loaded                        
       const auto preloaded = mLibraries.FindIt(name);
@@ -384,6 +403,7 @@ namespace Langulus::Entity
    /// Unload a DLL/SO extension module                                       
    ///   @param library - the library handle to unload                        
    ///   @return true if shared library was unloaded successfully             
+   LANGULUS(NOINLINE)
    bool Runtime::UnloadSharedLibrary(const SharedLibrary& library) {
       if (library.mHandle == 0)
          return true;
