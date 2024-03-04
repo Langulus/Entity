@@ -182,8 +182,8 @@ namespace Langulus::Entity
    ///   @tparam SEEK - the direction in which to seek a valid context        
    ///   @param verb - the verb to execute                                    
    ///   @return verb output                                                  
-   template<Seek SEEK>
-   auto& Thing::RunIn(CT::VerbBased auto& verb) {
+   template<Seek SEEK, CT::VerbBased V>
+   V& Thing::RunIn(V& verb) {
       if constexpr (SEEK & Seek::Here) {
          // Execute here                                                
          Do(verb);
@@ -202,7 +202,7 @@ namespace Langulus::Entity
       if constexpr (SEEK & Seek::Below) {
          // Execute in children, if requested                              
          for (auto& child : mChildren) {
-            Verb local {verb};
+            V local = verb;
             local.ShortCircuit(false);
             verb << Abandon(
                child->template RunIn<Seek::HereAndBelow>(local).GetOutput());
@@ -615,8 +615,8 @@ namespace Langulus::Entity
    ///   @tparam SEEK - direction to seek valid execution context in          
    ///   @param verb - the verb to execute                                    
    ///   @return the verb output                                              
-   template<Seek SEEK>
-   auto& Unit::RunIn(CT::VerbBased auto& verb) {
+   template<Seek SEEK, CT::VerbBased V>
+   V& Unit::RunIn(V& verb) {
       if (not mOwners) {
          Logger::Warning(Self(), "No owners available for executing: ", verb);
          return verb;
@@ -624,7 +624,7 @@ namespace Langulus::Entity
 
       // Dispatch to all owner, accumulate outputs                      
       for (auto& owner : mOwners) {
-         auto local = verb;
+         V local = verb;
          local.ShortCircuit(false);
          verb << Abandon(owner->template RunIn<SEEK>(local).GetOutput());
       }
