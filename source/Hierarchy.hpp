@@ -18,15 +18,17 @@ namespace Langulus::Anyness
    /// Execute a verb for all elements inside a type-erased constant block    
    ///   @param verb - the verb to execute                                    
    template<CT::Data T>
-   void TAny<T>::Run(Flow::Verb& verb) const {
+   Flow::Verb& TAny<T>::Run(Flow::Verb& verb) const {
       Flow::DispatchDeep(*this, verb);
+      return verb;
    }
 
    /// Execute a verb for all elements inside a type-erased block             
    ///   @param verb - the verb to execute                                    
    template<CT::Data T>
-   void TAny<T>::Run(Flow::Verb& verb) {
+   Flow::Verb& TAny<T>::Run(Flow::Verb& verb) {
       Flow::DispatchDeep(*this, verb);
+      return verb;
    }
 
 } // namespace Langulus::Anyness
