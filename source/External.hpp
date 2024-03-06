@@ -355,6 +355,8 @@ namespace Langulus::A
          Reader(File* f)
             : mFile {f} {}
 
+         File* GetFile() const noexcept { return mFile; }
+
          virtual Offset Read(Any&) = 0;
       };
 
@@ -370,11 +372,13 @@ namespace Langulus::A
          Writer(File* f, bool append)
             : mFile {f}, mAppend {append} {}
 
+         File* GetFile() const noexcept { return mFile; }
+
          virtual Offset Write(const Any&) = 0;
       };
 
-      NOD() virtual Ref<Reader> NewReader() = 0;
-      NOD() virtual Ref<Writer> NewWriter(bool append) = 0;
+      NOD() virtual Ref<Reader> NewReader() const = 0;
+      NOD() virtual Ref<Writer> NewWriter(bool append) const = 0;
    };
 
    ///                                                                        
