@@ -340,6 +340,9 @@ namespace Langulus::A
       NOD() Size GetBytesize() const noexcept;
 
       NOD() virtual Any ReadAs(DMeta) const = 0;
+
+      NOD() virtual Ref<File>    RelativeFile  (const Path&) const = 0;
+      NOD() virtual Ref<Folder>  RelativeFolder(const Path&) const = 0;
       
       template<class T>
       NOD() T ReadAs() const;
@@ -399,8 +402,8 @@ namespace Langulus::A
       NOD() bool IsReadOnly() const noexcept;
       NOD() const Path& GetFolderPath() const noexcept;
 
-      NOD() virtual Ref<File>   GetFile  (const Path&) const = 0;
-      NOD() virtual Ref<Folder> GetFolder(const Path&) const = 0;
+      NOD() virtual Ref<File>   RelativeFile  (const Path&) const = 0;
+      NOD() virtual Ref<Folder> RelativeFolder(const Path&) const = 0;
    };
 
    ///                                                                        
