@@ -47,7 +47,6 @@ namespace Langulus::Entity
       /// A unit can only be moved or created with type and owner             
       Unit(DMeta, const Neat& = {}) noexcept;
       Unit(Unit&&) noexcept;
-      ~Unit() override;
 
       Unit& operator = (Unit&&) noexcept;
 
@@ -116,7 +115,7 @@ namespace Langulus::Entity
       NOD() TAny<D> GatherValues() const;
 
    protected:
-      void Couple(const Thing*);
+      void Couple(const Neat&);
       void Decouple(const Thing*);
       void ReplaceOwner(const Thing*, const Thing*);
    };
