@@ -15,13 +15,7 @@ using namespace Langulus::Entity;
 ///   @param classid - type of the unit                                       
 ///   @param descriptor - the unit descriptor, used to extract unit owner     
 Unit::Unit(DMeta classid, const Neat& descriptor) noexcept
-   : Resolvable {classid} {
-   // Couple any Thing provided in the descriptor                       
-   const Thing* owner = nullptr;
-   if (not descriptor.ExtractTrait<Traits::Parent>(owner))
-      descriptor.ExtractData(owner);
-   Couple(owner);
-}
+   : Resolvable {classid} {}
 
 /// Move unit                                                                 
 ///   @param other - the unit to move                                         
@@ -32,36 +26,6 @@ Unit::Unit(Unit&& other) noexcept
    TODO();
    /*for (auto owner : mOwners)
       owner->ReplaceUnit(&other, this);*/
-}
-
-/// Unit destruction                                                          
-Unit::~Unit() {
-   // The unit might be on the stack, make sure we decouple it from     
-   // all its owners, if that's the case                                
-   //if (Reference(0) == mOwners.GetCount() + 1) {
-      // After removing
-   //}
-
-
-   //if (Reference(-1)) {
-      /*for (auto owner : mOwners)
-         owner->RemoveUnit<false>(this);
-   //}
-
-   if (Reference(0) == 1) {
-      // If after detaching the entire hierarchy, there's still one  
-      // reference remaining, then we're sure that this reference is 
-      // because the Thing is on the stack                           
-      //TODO requires the destruction of the hierarchy, too? othwise some member could still hold a ref to this thing?
-      //TODO alternatively, items without jurisdiction are never referenced, so we could detect things on the stack, by comparing references before and after Detach()
-      //TODO eventually we can just do Fractalloc::CheckAuthority(this)
-      Reference(-1);
-   }*/
-
-   /*auto heap = Fractalloc::Instance.Find(GetType(), this);
-   if (not heap) {
-      // The unit is on the stack, or outside jurisdiction              
-   }*/
 }
 
 /// Default unit selection simply relays to the owner                         
@@ -137,15 +101,18 @@ Runtime* Unit::GetRuntime() const noexcept {
    return mOwners[0]->GetRuntime();
 }
 
-/// Couple the component with an entity (always two-sided)                    
+/// Couple the component with an entity, extracted from a descriptor's        
+/// Traits::Parent, if any was defined (always two-sided)                     
 /// This will call refresh to all units in that entity on next tick           
-///   @param entity - the entity to couple with                               
-void Unit::Couple(const Thing* entity) {
-   if (not entity)
-      return;
+///   @param descriptor - the descriptor to scan for parents                  
+void Unit::Couple(const Neat& descriptor) {
+   // Couple any Thing provided in the descriptor                       
+   const Thing* owner = nullptr;
+   if (not descriptor.ExtractTrait<Traits::Parent>(owner))
+      descriptor.ExtractData(owner);
 
-   if (mOwners.Merge(IndexBack, const_cast<Thing*>(entity)))
-      const_cast<Thing*>(entity)->AddUnit<false>(this);
+   if (owner and mOwners.Merge(IndexBack, const_cast<Thing*>(owner)))
+      const_cast<Thing*>(owner)->AddUnit<false>(this);
 }
 
 /// Decouple the component from an entity (always two-sided)                  
