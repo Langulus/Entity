@@ -287,28 +287,57 @@ namespace Langulus::Entity
    ///   @return the unit if found, or nullptr otherwise                      
    template<Seek SEEK> LANGULUS(INLINED)
    Unit* Hierarchy::SeekUnitAux(const Neat& aux, DMeta meta, Index offset) {
+      const Unit* result {};
+
       // Scan descriptor even if hierarchy is empty                     
-      Unit* result {};
-      aux.ForEachDeep([&](const Unit* unit) {
-         if (unit->CastsTo(meta)) {
-            // Found match                                              
-            if (offset == 0) {
-               // We're done                                            
-               result = const_cast<Unit*>(unit);
-               return Loop::Break;
+      if constexpr (SEEK & Seek::Here) {
+         aux.ForEachDeep([&](const Unit* unit) {
+            if (unit->CastsTo(meta)) {
+               // Found match                                           
+               if (offset == 0) {
+                  // We're done                                         
+                  result = unit;
+                  return Loop::Break;
+               }
+               else --offset;
             }
-            else --offset;
-         }
 
-         return Loop::Continue;
-      });
+            return Loop::Continue;
+         });
 
-      if (result)
-         return result;
-
+         if (result)
+            return const_cast<Unit*>(result);
+      }
+      
       // If reached, then no unit was found in the descriptor           
-      // Let's delve into the hierarchy                                 
-      return SeekUnit<SEEK>(meta, offset);
+      // Let's delve into the hierarchy, by scanning for Traits::Parent 
+      // and Traits::Child inside the 'aux'                             
+      //return SeekValue<SEEK>(meta, output, offset);
+      if constexpr (SEEK & Seek::Above) {
+         aux.ForEachTrait([&](const Traits::Parent& trait) -> LoopControl {
+            trait.ForEach([&](const Thing& parent) {
+               if (nullptr != (result = parent.SeekUnit<Seek::HereAndAbove>(meta, offset)))
+                  // Value was found                                    
+                  return Loop::Break;
+               return Loop::Continue;
+            });
+            return result == nullptr;
+         });
+      }
+
+      if constexpr (SEEK & Seek::Below) {
+         aux.ForEachTrait([&](const Traits::Child& trait) -> LoopControl {
+            trait.ForEach([&](const Thing& child) {
+               if (nullptr != (result = child.SeekUnit<Seek::HereAndBelow>(meta, offset)))
+                  // Value was found                                    
+                  return Loop::Break;
+               return Loop::Continue;
+            });
+            return result == nullptr;
+         });
+      }
+
+      return const_cast<Unit*>(result);
    }
 
    /// Seek a unit with specific properties                                   
@@ -462,18 +491,42 @@ namespace Langulus::Entity
       }
 
       // Scan descriptor                                                
-      bool done = false;
-      if (meta) {
-         aux.ForEachDeep([&](const Trait& trait) -> LoopControl {
-            if (trait.IsTrait(meta)) {
-               // Found match                                           
+      if constexpr (SEEK & Seek::Here) {
+         bool done = false;
+         if (meta) {
+            aux.ForEachTrait([&](const Trait& trait) -> LoopControl {
+               if (trait.IsTrait(meta)) {
+                  // Found match                                        
+                  try {
+                     if constexpr (CT::DescriptorMakable<D>)
+                        output = D {Describe(static_cast<const Any&>(trait))};
+                     else if constexpr (CT::Pinnable<D>)
+                        output = trait.template AsCast<TypeOf<D>>();
+                     else
+                        output = trait.template AsCast<D>();
+
+                     // Didn't throw, but we're done only if offset     
+                     // matches                                         
+                     done = offset == 0;
+                     --offset;
+                     return not done;
+                  }
+                  catch (...) {}
+               }
+
+               return Loop::Continue;
+            });
+         }
+         else {
+            aux.ForEachDeep([&](const Block& group) -> LoopControl {
                try {
+                  // Found match if these don't throw                   
                   if constexpr (CT::DescriptorMakable<D>)
-                     output = D {Describe(static_cast<const Any&>(trait))};
+                     output = D {Describe(group)};
                   else if constexpr (CT::Pinnable<D>)
-                     output = trait.template AsCast<TypeOf<D>>();
+                     output = group.template AsCast<TypeOf<D>>();
                   else
-                     output = trait.template AsCast<D>();
+                     output = group.template AsCast<D>();
 
                   // Didn't throw, but we're done only if offset matches
                   done = offset == 0;
@@ -481,46 +534,55 @@ namespace Langulus::Entity
                   return not done;
                }
                catch (...) {}
-            }
 
-            return Loop::Continue;
-         });
-      }
-      else {
-         aux.ForEachDeep([&](const Block& group) -> LoopControl {
-            try {
-               // Found match if these don't throw                      
-               if constexpr (CT::DescriptorMakable<D>)
-                  output = D {Describe(group)};
-               else if constexpr (CT::Pinnable<D>)
-                  output = group.template AsCast<TypeOf<D>>();
-               else
-                  output = group.template AsCast<D>();
-
-               // Didn't throw, but we're done only if offset matches   
-               done = offset == 0;
-               --offset;
-               return not done;
-            }
-            catch (...) { }
-
-            return Loop::Continue;
-         });
-      }
-
-      if (done) {
-         // Trait was found in the descriptor                           
-         if constexpr (CT::Pinnable<D>) {
-            // Make sure to pin the pinnable value                      
-            output.mLocked = true;
+               return Loop::Continue;
+            });
          }
 
-         return true;
+         if (done) {
+            // Trait was found in the descriptor, which means our intent
+            // is to set it to a custom value - pin it, so it doesn't   
+            // get overwritten on update/refresh                        
+            if constexpr (CT::Pinnable<D>)
+               output.mLocked = true;
+            return true;
+         }
       }
 
       // If reached, then no trait was found in the descriptor          
-      // Let's delve into the hierarchy                                 
-      return SeekValue<SEEK>(meta, output, offset);
+      // Let's delve into the hierarchy, by scanning for Traits::Parent 
+      // and Traits::Child inside the 'aux'                             
+      //return SeekValue<SEEK>(meta, output, offset);
+      bool done = false;
+      if constexpr (SEEK & Seek::Above) {
+         aux.ForEachTrait([&](const Traits::Parent& trait) -> LoopControl {
+            trait.ForEach([&](const Thing& parent) {
+               if (parent.SeekValue<Seek::HereAndAbove>(meta, output, offset)) {
+                  // Value was found                                    
+                  done = true;
+                  return Loop::Break;
+               }
+               return Loop::Continue;
+            });
+            return not done;
+         });
+      }
+
+      if constexpr (SEEK & Seek::Below) {
+         aux.ForEachTrait([&](const Traits::Child& trait) -> LoopControl {
+            trait.ForEach([&](const Thing& child) {
+               if (child.SeekValue<Seek::HereAndBelow>(meta, output, offset)) {
+                  // Value was found                                    
+                  done = true;
+                  return Loop::Break;
+               }
+               return Loop::Continue;
+            });
+            return not done;
+         });
+      }
+
+      return done;
    }
 
 } // namespace Langulus::Entity
