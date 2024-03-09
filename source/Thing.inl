@@ -186,17 +186,15 @@ namespace Langulus::Entity
    V& Thing::RunIn(V& verb) {
       if constexpr (SEEK & Seek::Here) {
          // Execute here                                                
-         Do(verb);
-         if (verb.IsDone())
+         if (Run(verb).IsDone())
             return verb;
       }
 
       if constexpr (SEEK & Seek::Above) {
          // Execute in parents up to root, if requested                 
-         if (mOwner) {
-            if (mOwner->template RunIn<Seek::HereAndAbove>(verb).IsDone())
-               return verb;
-         }
+         if (mOwner and mOwner->template
+         RunIn<Seek::HereAndAbove>(verb).IsDone())
+            return verb;
       }
 
       if constexpr (SEEK & Seek::Below) {
@@ -204,9 +202,30 @@ namespace Langulus::Entity
          for (auto& child : mChildren) {
             V local = verb;
             local.ShortCircuit(false);
-            verb << Abandon(
-               child->template RunIn<Seek::HereAndBelow>(local).GetOutput());
+            verb << Abandon(child->template
+               RunIn<Seek::HereAndBelow>(local).GetOutput());
          }
+      }
+
+      return verb;
+   }
+
+   /// Execute verb in this thing only, scanning units for required verbs     
+   ///   @param verb - the verb to execute                                    
+   ///   @return verb output                                                  
+   template<CT::VerbBased V>
+   V& Thing::Run(V& verb) {
+      // Dispatch to entity first, using reflected and default verbs,   
+      // but disallowing custom dispatch, because we're currently in it 
+      // and there's a potential for infinite regress                   
+      if (Resolvable::Run<false>(verb).IsDone())
+         return verb;
+
+      // If verb is still not satisfied, dispatch to ALL units          
+      for (auto& unit : mUnitsList) {
+         V local = verb;
+         local.ShortCircuit(false);
+         verb << Abandon(unit->Run(local).GetOutput());
       }
 
       return verb;
@@ -225,6 +244,7 @@ namespace Langulus::Entity
       for (auto& base : type->mBases) {
          if (base.mType->IsExact<Unit>())
             break;
+
          AddUnitBases(unit, base.mType);
       }
    }
@@ -243,6 +263,7 @@ namespace Langulus::Entity
       for (auto& base : type->mBases) {
          if (base.mType->IsExact<Unit>())
             break;
+
          RemoveUnitBases(unit, base.mType);
       }
    }

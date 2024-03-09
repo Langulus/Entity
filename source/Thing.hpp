@@ -115,6 +115,8 @@ namespace Langulus::Entity
 
       template<Seek = Seek::HereAndAbove, CT::VerbBased V>
       V& RunIn(V&);
+      template<CT::VerbBased V>
+      V& Run(V&);
 
       LANGULUS_API(ENTITY) Any Run(const Lingua&);
 

@@ -73,18 +73,7 @@ namespace Langulus::Entity
    /// units, so the custom dispatcher forwards verbs to these units          
    ///   @param verb - any verb                                               
    void Thing::Do(Verb& verb) {
-      // Dispatch to entity first, using reflected and default verbs,   
-      // but disallowing custom dispatch, because we're currently in it 
-      // and there's a potential for infinite regress                   
-      if (Resolvable::Run<false>(verb).IsDone())
-         return;
-
-      // If verb is still not satisfied, dispatch to ALL units          
-      for (auto& unit : mUnitsList) {
-         Verb local {verb};
-         local.ShortCircuit(false);
-         verb << Abandon(unit->Run(local));
-      }
+      Run(verb);
    }
 
    /// Create/Destroy stuff inside entity's context                           
