@@ -13,6 +13,8 @@ using namespace Langulus;
 
 #define CATCH_CONFIG_ENABLE_BENCHMARKING
 
+
+/// A unit implementation for testing                                         
 class TestUnit1 final : public Unit {
 public:
    LANGULUS(ABSTRACT) false;
@@ -23,7 +25,7 @@ public:
       : Unit {MetaOf<TestUnit1>()} {}
 
    TestUnit1(Describe&& describe)
-      : Unit {MetaOf<TestUnit1>(), *describe} {
+      : Unit {MetaOf<TestUnit1>()} {
       Couple(*describe);
    }
 
@@ -34,6 +36,7 @@ public:
    void Refresh() {}
 };
 
+/// A unit implementation for testing                                         
 class TestUnit2 final : public Unit {
 public:
    LANGULUS(ABSTRACT) false;
@@ -44,7 +47,7 @@ public:
       : Unit {MetaOf<TestUnit2>()} {}
 
    TestUnit2(Describe&& describe)
-      : Unit {MetaOf<TestUnit2>(), *describe} {
+      : Unit {MetaOf<TestUnit2>()} {
       Couple(*describe);
    }
 

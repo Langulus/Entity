@@ -13,8 +13,7 @@ using namespace Langulus::Entity;
 
 /// Manual construction                                                       
 ///   @param classid - type of the unit                                       
-///   @param descriptor - the unit descriptor, used to extract unit owner     
-Unit::Unit(DMeta classid, const Neat& descriptor) noexcept
+Unit::Unit(DMeta classid) noexcept
    : Resolvable {classid} {}
 
 /// Move unit                                                                 
