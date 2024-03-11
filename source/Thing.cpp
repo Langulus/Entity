@@ -126,9 +126,9 @@ namespace Langulus::Entity
    ///   @param other - clone that entity                                     
    Thing::Thing(Abandoned<Thing>&& other)
       : Resolvable {*other}
+      , mChildren {Abandon(other->mChildren)}
       , mRuntime {Abandon(other->mRuntime)}
       , mFlow {Abandon(other->mFlow)}
-      , mChildren {Abandon(other->mChildren)}
       , mUnitsAmbiguous {Abandon(other->mUnitsAmbiguous)}
       , mUnitsList {Abandon(other->mUnitsList)}
       , mTraits {Abandon(other->mTraits)}

@@ -125,7 +125,7 @@ namespace Langulus::Entity
          ", so attempting to create it...");
       const auto instance = InstantiateModule(library, descriptor);
       if (not instance)
-         UnloadSharedLibrary(library);
+         (void) UnloadSharedLibrary(library);
       return instance;
    }
    
