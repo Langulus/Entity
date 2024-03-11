@@ -62,14 +62,13 @@ namespace Langulus::Entity
       LANGULUS_API(ENTITY) void ResetFlow(Temporal*);
 
       // The order of members is critical!                              
-      // Runtime should be destroyed last, hence it is the first member 
-
+      // Hierarchy should be destroyed last, hence it is the first      
+      // member                                                         
+      Hierarchy mChildren;
       // Runtime                                                        
       Pin<Ref<Runtime>> mRuntime;
       // Temporal flow                                                  
       Pin<Ref<Temporal>> mFlow;
-      // Hierarchy                                                      
-      Hierarchy mChildren;
       // Units indexed by all their relevant reflected bases            
       UnitMap mUnitsAmbiguous;
       // Units indexed by concrete type, in order of addition           

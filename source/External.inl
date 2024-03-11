@@ -250,7 +250,7 @@ namespace Langulus::A
    ///   @param desc - messy descriptor for the content                       
    LANGULUS(INLINED)
    Asset::Asset(RTTI::DMeta type, AssetModule* producer, const Neat& desc)
-      : Unit {type, desc}
+      : Unit {type}
       , ProducedFrom<AssetModule> {producer, desc} {}
 
    /// Get the entire content data map                                        

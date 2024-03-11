@@ -97,9 +97,9 @@ namespace Langulus::Entity
    ///   @param other - move that entity                                      
    Thing::Thing(Thing&& other) noexcept
       : Resolvable {Forward<Resolvable>(other)}
+      , mChildren {Move(other.mChildren)}
       , mRuntime {Move(other.mRuntime)}
       , mFlow {Move(other.mFlow)}
-      , mChildren {Move(other.mChildren)}
       , mUnitsAmbiguous {Move(other.mUnitsAmbiguous)}
       , mUnitsList {Move(other.mUnitsList)}
       , mTraits {Move(other.mTraits)}
@@ -121,8 +121,8 @@ namespace Langulus::Entity
    
    /// Abandon constructor                                                    
    ///   @attention owner is never cloned, you're moving only the hierarchy   
-   ///              below the parent, however other's parent is notified of   
-   ///              the clone, because 'other' is duplicated in its children  
+   ///      below the parent, however other's parent is notified of the clone,
+   ///      because 'other' is duplicated in its children                     
    ///   @param other - clone that entity                                     
    Thing::Thing(Abandoned<Thing>&& other)
       : Resolvable {*other}
@@ -150,8 +150,8 @@ namespace Langulus::Entity
 
    /// Clone constructor                                                      
    ///   @attention owner is never cloned, you're moving only the hierarchy   
-   ///              below the parent, however other's parent is notified of   
-   ///              the clone, because 'other' is duplicated in its children  
+   ///      below the parent, however other's parent is notified of the clone,
+   ///      because 'other' is duplicated in its children                     
    ///   @param other - clone that entity                                     
    Thing::Thing(Cloned<Thing>&& other)
       : Resolvable {*other}
@@ -166,31 +166,18 @@ namespace Langulus::Entity
    /// Destructor                                                             
    Thing::~Thing() IF_UNSAFE(noexcept) {
       Detach();
-
-      /*if (Reference(0) == 1) {
-         // If after detaching the entire hierarchy, there's still one  
-         // reference remaining, then we're sure that this reference is 
-         // because the Thing is on the stack                           
-         //TODO requires the destruction of the hierarchy, too? othwise some member could still hold a ref to this thing?
-         //TODO alternatively, items without jurisdiction are never referenced, so we could detect things on the stack, by comparing references before and after Detach()
-         //TODO eventually we can just do Fractalloc::CheckAuthority(this)
-         Reference(-1);
-      }*/
    }
 
    /// A nested call to detach all parents of all children                    
    void Thing::Detach() {
       ENTITY_VERBOSE_SELF_TAB("Destroying (", Reference(0), " uses):");
 
-      // The thing might be on the stack, make sure we decouple it from 
-      // its owner, if that's the case                                  
-      /*if (mOwner and Reference(0)) {
-         ENTITY_VERBOSE_SELF("Decoupling from owner: ", *mOwner);
-         IF_SAFE(Count removed = )
-         mOwner->RemoveChild<false>(this);
-         LANGULUS_ASSUME(DevAssumes, removed, "Parent is missing");
-         ENTITY_VERBOSE_SELF("...", Reference(0), " uses ");
-      }*/
+      if (not mRuntime.IsLocked())
+         mRuntime->Reset();
+      if (not mFlow.IsLocked())
+         mFlow->Reset();
+
+      mTraits.Reset();
 
       // Decouple all children from this                                
       for (auto& child : mChildren) {
@@ -199,6 +186,7 @@ namespace Langulus::Entity
             LANGULUS_ASSUME(DevAssumes,
                child->mOwner == this, "Parent mismatch");
             child->mOwner.Reset();
+            child->Detach();
             ENTITY_VERBOSE_SELF("...", Reference(0), " uses remain");
          }
       }
@@ -206,14 +194,17 @@ namespace Langulus::Entity
       // Decouple all units from this owner                             
       for (auto& unit : mUnitsList) {
          ENTITY_VERBOSE_SELF("Decoupling unit: ", unit);
-         unit->mOwners.Remove(this);
+         unit->mOwners.Reset();// .Remove(this);
          ENTITY_VERBOSE_SELF("...", Reference(0), " uses remain");
       }
 
-      for (auto& child : mChildren) {
+      mUnitsAmbiguous.Reset();
+      mUnitsList.Reset();
+
+      /*for (auto& child : mChildren) {
          child->Detach();
          ENTITY_VERBOSE_SELF("...", Reference(0), " uses remain");
-      }
+      }*/
    }
 
    /// Compare two entities                                                   

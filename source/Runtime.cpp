@@ -103,7 +103,7 @@ namespace Langulus::Entity
 
          IF_LANGULUS_MANAGED_MEMORY(Allocator::CollectGarbage());
          IF_LANGULUS_MEMORY_STATISTICS(Allocator::DumpPools());
-         LANGULUS_THROW(Destruct, "Can't unload last module(s)");
+         LANGULUS_OOPS(Destruct, "Can't unload last module(s)");
       }
    }
 
@@ -123,7 +123,10 @@ namespace Langulus::Entity
       // A module instance doesn't exist yet, so instantiate it         
       VERBOSE(this, ": Module `", name, "` is not instantiated yet"
          ", so attempting to create it...");
-      return InstantiateModule(library, descriptor);
+      const auto instance = InstantiateModule(library, descriptor);
+      if (not instance)
+         UnloadSharedLibrary(library);
+      return instance;
    }
    
    /// Register by all bases in mModulesByType                                

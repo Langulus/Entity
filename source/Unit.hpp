@@ -45,7 +45,7 @@ namespace Langulus::Entity
       Unit& operator = (const Unit&) = delete;
 
       /// A unit can only be moved or created with type and owner             
-      Unit(DMeta, const Neat& = {}) noexcept;
+      Unit(DMeta) noexcept;
       Unit(Unit&&) noexcept;
 
       Unit& operator = (Unit&&) noexcept;
