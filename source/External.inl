@@ -91,8 +91,7 @@ namespace Langulus
          and mHeight == rhs.mHeight
          and mDepth == rhs.mDepth
          and mFrames == rhs.mFrames
-         and (mFormat == rhs.mFormat
-            or (mFormat and mFormat->IsExact(rhs.mFormat)));
+         and mFormat == rhs.mFormat;
    }
 
    /// Get the number of pixels in the texture                                
