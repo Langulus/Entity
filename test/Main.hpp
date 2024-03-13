@@ -7,15 +7,16 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include <Entity/External.hpp>
+#include <Entity/Thing.hpp>
 
 using namespace Langulus;
+using namespace Entity;
 
 #define CATCH_CONFIG_ENABLE_BENCHMARKING
 
 
 /// A unit implementation for testing                                         
-class TestUnit1 final : public Unit {
+class TestUnit1 final : public A::Unit {
 public:
    LANGULUS(ABSTRACT) false;
    LANGULUS_BASES(Unit);
@@ -37,7 +38,7 @@ public:
 };
 
 /// A unit implementation for testing                                         
-class TestUnit2 final : public Unit {
+class TestUnit2 final : public A::Unit {
 public:
    LANGULUS(ABSTRACT) false;
    LANGULUS_BASES(Unit);

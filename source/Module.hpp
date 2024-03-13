@@ -8,18 +8,16 @@
 ///                                                                           
 #pragma once
 #include "Common.hpp"
-#include <Anyness/TSet.hpp>
-#include <Flow/Resolvable.hpp>
 
 LANGULUS_EXCEPTION(Module);
 
 
 namespace Langulus
 {
-   namespace Entity
-   {
-      using MetaList = TUnorderedSet<AMeta>;
-   }
+
+   using MetaList = Anyness::TUnorderedSet<AMeta>;
+   using TraitList = TAny<Anyness::Trait>;
+   using ModuleList = TAny<A::Module*>;
 
    /// Helper function, that reflects and registers a list of any reflection  
    /// primitives, like data, verbs, and traits.                              
@@ -37,30 +35,30 @@ namespace Langulus
    ///                 be unloaded when shared library is unloaded. Unload    
    ///                 will be forbidden, if they're still in use.            
    template<class...T>
-   void RegisterTypeList(Entity::MetaList& list) {
+   void RegisterTypeList(MetaList& list) {
       // Merge to avoid duplications                                    
       (list << ... << MetaOf<T>());
    }
 
 } // namespace Langulus
 
-namespace Langulus::Entity
+namespace Langulus::A
 {
 
    ///                                                                        
    ///   External module interface                                            
    ///                                                                        
    class Module : public Resolvable {
-      LANGULUS(PRODUCER) Runtime;
+      LANGULUS(PRODUCER) Entity::Runtime;
       LANGULUS(UNINSERTABLE) false;
       LANGULUS_BASES(Resolvable);
 
    private:
       // Runtime that owns the module instance                          
-      Runtime* mRuntime;
+      Entity::Runtime* mRuntime;
 
    public:
-      Module(DMeta classid, Runtime* runtime) IF_UNSAFE(noexcept)
+      Module(DMeta classid, Entity::Runtime* runtime) IF_UNSAFE(noexcept)
          : Resolvable {classid}
          , mRuntime {runtime} {}
 
@@ -75,7 +73,7 @@ namespace Langulus::Entity
 
       struct Info {
          // Define the order in which module updates, relative to others
-         Real mPriority;
+         Langulus::Real mPriority;
          // Name of the module                                          
          const char* mName;
          // Information about the module                                
@@ -87,23 +85,23 @@ namespace Langulus::Entity
       };
 
       using EntryFunction = void(*)(DMeta&, MetaList&);
-      using CreateFunction = Module*(*)(Runtime*, const Neat&);
+      using CreateFunction = Module*(*)(Entity::Runtime*, const Neat&);
       using InfoFunction = const Info*(*)();
 
-      NOD() Runtime* GetRuntime() const noexcept { return mRuntime; }
+      NOD() Entity::Runtime* GetRuntime() const noexcept { return mRuntime; }
 
    public:
-      virtual bool Update(Time) { return true; }
+      virtual bool Update(Langulus::Time) { return true; }
    };
 
-} // namespace Langulus::Entity
+} // namespace Langulus::A
 
 namespace Langulus::CT
 {
 
    /// Any type that inherits Module is considered a module                   
    template<class T>
-   concept Module = DerivedFrom<T, ::Langulus::Entity::Module>;
+   concept Module = DerivedFrom<T, ::Langulus::A::Module>;
 
 } // namespace Langulus::CT
 
@@ -132,18 +130,18 @@ namespace Langulus::CT
    \
    extern "C" { \
       LANGULUS_EXPORT() \
-      void LANGULUS_MODULE_ENTRY() (::Langulus::DMeta& meta, ::Langulus::Entity::MetaList& list) { \
+      void LANGULUS_MODULE_ENTRY() (::Langulus::DMeta& meta, ::Langulus::MetaList& list) { \
          using DM = ::Langulus::Decay<m>; \
          meta = ::Langulus::MetaDataOf<DM>(); \
          ::Langulus::RegisterTypeList<DM, ::Langulus::Decay<cat>, __VA_ARGS__>(list); \
       } \
       \
       LANGULUS_EXPORT() \
-      ::Langulus::Entity::Module* LANGULUS_MODULE_CREATE() ( \
+      ::Langulus::A::Module* LANGULUS_MODULE_CREATE() ( \
          ::Langulus::Entity::Runtime* rt, const ::Langulus::Anyness::Neat& desc) { \
-         static_assert(::Langulus::CT::DerivedFrom<m, ::Langulus::Entity::Module>, \
+         static_assert(::Langulus::CT::DerivedFrom<m, ::Langulus::A::Module>, \
             "Langulus module class interface " \
-            #m " doesn't inherit ::Langulus::Entity::Module"); \
+            #m " doesn't inherit ::Langulus::A::Module"); \
          static_assert(not ::Langulus::CT::Abstract<m>, \
             "Langulus module class interface " \
             #m " is abstract, have you forgotten to define its interface?"); \
@@ -151,8 +149,8 @@ namespace Langulus::CT
       } \
       \
       LANGULUS_EXPORT() \
-      const ::Langulus::Entity::Module::Info* LANGULUS_MODULE_INFO() () { \
-         static const ::Langulus::Entity::Module::Info i { \
+      const ::Langulus::A::Module::Info* LANGULUS_MODULE_INFO() () { \
+         static const ::Langulus::A::Module::Info i { \
             prio, name, info, depo, ::Langulus::MetaDataOf<cat>() \
          }; \
          return &i; \

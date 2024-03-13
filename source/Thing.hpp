@@ -27,8 +27,8 @@ LANGULUS_DEFINE_TRAIT(Unit,
 namespace Langulus::Entity
 {
 
-   using UnitList = TAny<Ref<Unit>>;
-   using UnitMap = TUnorderedMap<DMeta, TUnorderedSet<Ref<Unit>>>;
+   using UnitList = TAny<Ref<A::Unit>>;
+   using UnitMap = TUnorderedMap<DMeta, TUnorderedSet<Ref<A::Unit>>>;
    using TraitMap = TUnorderedMap<TMeta, TraitList>;
 
    /// A text specialization, dedicated for natural language text             
@@ -148,7 +148,7 @@ namespace Langulus::Entity
       Count RemoveChild(Thing*);
 
       LANGULUS_API(ENTITY)
-      Module* LoadMod(const Token&, const Neat& = {});
+      A::Module* LoadMod(const Token&, const Neat& = {});
 
       NOD() LANGULUS_API(ENTITY)
       const Hierarchy& GetChildren() const noexcept;
@@ -173,9 +173,9 @@ namespace Langulus::Entity
       ///   Unit management                                                   
       ///                                                                     
       template<bool TWOSIDED = true>
-      Count AddUnit(Unit*);
+      Count AddUnit(A::Unit*);
       template<bool TWOSIDED = true>
-      Count RemoveUnit(Unit*);
+      Count RemoveUnit(A::Unit*);
 
       template<CT::Unit T, class...A>
       Any CreateUnit(A&&...);
@@ -185,7 +185,7 @@ namespace Langulus::Entity
          Any CreateUnitToken(const Token&, A&&...);
       #endif
 
-      template<CT::Unit T = Unit, bool TWOSIDED = true>
+      template<CT::Unit = A::Unit, bool TWOSIDED = true>
       Count RemoveUnits();
 
       /*LANGULUS_API(ENTITY)
@@ -201,34 +201,34 @@ namespace Langulus::Entity
       const UnitList& GetUnits() const noexcept;
 
       NOD() LANGULUS_API(ENTITY)
-            Unit* GetUnitMeta(DMeta, Index = 0);
+            A::Unit* GetUnitMeta(DMeta, Index = 0);
       NOD() LANGULUS_API(ENTITY)
-      const Unit* GetUnitMeta(DMeta, Index = 0) const;
+      const A::Unit* GetUnitMeta(DMeta, Index = 0) const;
 
       NOD() LANGULUS_API(ENTITY)
-            Unit* GetUnitExt(DMeta, const Neat&, Index = 0);
+            A::Unit* GetUnitExt(DMeta, const Neat&, Index = 0);
       NOD() LANGULUS_API(ENTITY)
-      const Unit* GetUnitExt(DMeta, const Neat&, Index = 0) const;
+      const A::Unit* GetUnitExt(DMeta, const Neat&, Index = 0) const;
 
-      template<CT::Unit T = Unit>
+      template<CT::Unit T = A::Unit>
       NOD()       Decay<T>* GetUnit(Index = 0);
-      template<CT::Unit T = Unit>
+      template<CT::Unit T = A::Unit>
       NOD() const Decay<T>* GetUnit(Index = 0) const;
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
          NOD() LANGULUS_API(ENTITY)
-         const Unit* GetUnitMeta(const Token&, Index = 0) const;
+         A::Unit const* GetUnitMeta(const Token&, Index = 0) const;
 
          NOD() LANGULUS_API(ENTITY)
-         Unit* GetUnitMeta(const Token&, Index = 0);
+         A::Unit* GetUnitMeta(const Token&, Index = 0);
 
          template<CT::Unit T>
          NOD() Decay<T>* GetUnitAs(const Token&, Index = 0);
       #endif
 
    private:
-      LANGULUS_API(ENTITY) void AddUnitBases(Unit*, DMeta);
-      LANGULUS_API(ENTITY) void RemoveUnitBases(Unit*, DMeta);
+      LANGULUS_API(ENTITY) void AddUnitBases(A::Unit*, DMeta);
+      LANGULUS_API(ENTITY) void RemoveUnitBases(A::Unit*, DMeta);
 
    public:
       ///                                                                     
@@ -293,13 +293,13 @@ namespace Langulus::Entity
       using SeekInterface::SeekValueAux;
 
       template<Seek = Seek::HereAndAbove>
-      NOD() Unit* SeekUnit(DMeta, Index = 0);
+      NOD() A::Unit* SeekUnit(DMeta, Index = 0);
       template<Seek = Seek::HereAndAbove>
-      NOD() Unit* SeekUnitAux(const Neat&, DMeta, Index = 0);
+      NOD() A::Unit* SeekUnitAux(const Neat&, DMeta, Index = 0);
       template<Seek = Seek::HereAndAbove>
-      NOD() Unit* SeekUnitExt(DMeta, const Neat&, Index = 0);
+      NOD() A::Unit* SeekUnitExt(DMeta, const Neat&, Index = 0);
       template<Seek = Seek::HereAndAbove>
-      NOD() Unit* SeekUnitAuxExt(DMeta, const Neat&, const Neat&, Index = 0);
+      NOD() A::Unit* SeekUnitAuxExt(DMeta, const Neat&, const Neat&, Index = 0);
 
       template<Seek = Seek::HereAndAbove>
       NOD() Trait SeekTrait(TMeta, Index = 0);
@@ -319,9 +319,9 @@ namespace Langulus::Entity
       using SeekInterface::GatherTraits;
 
       template<Seek = Seek::HereAndAbove>
-      NOD() TAny<Unit*> GatherUnits(DMeta);
+      NOD() TAny<A::Unit*> GatherUnits(DMeta);
       template<Seek = Seek::HereAndAbove>
-      NOD() TAny<Unit*> GatherUnitsExt(DMeta, const Neat&);
+      NOD() TAny<A::Unit*> GatherUnitsExt(DMeta, const Neat&);
 
       template<Seek = Seek::HereAndAbove>
       NOD() TraitList GatherTraits(TMeta);

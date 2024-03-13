@@ -22,7 +22,7 @@ namespace Langulus::Entity
    ///   @param offset - the match to return                                  
    ///   @return a pointer to the found unit, or nullptr if not found         
    TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-   const Unit* TME()::SeekUnit(DMeta type, Index offset) const {
+   const A::Unit* TME()::SeekUnit(DMeta type, Index offset) const {
       return const_cast<THIS*>(static_cast<const THIS*>(this))
          ->template SeekUnit<SEEK>(type, offset);
    }
@@ -47,7 +47,7 @@ namespace Langulus::Entity
    ///   @param offset - the match to return                                  
    ///   @return a pointer to the found unit, or nullptr if not found         
    TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-   const Unit* TME()::SeekUnitAux(const Neat& aux, DMeta type, Index offset) const {
+   const A::Unit* TME()::SeekUnitAux(const Neat& aux, DMeta type, Index offset) const {
       return const_cast<THIS*>(static_cast<const THIS*>(this))
          ->template SeekUnitAux<SEEK>(aux, type, offset);
    }
@@ -71,7 +71,7 @@ namespace Langulus::Entity
    ///   @param offset - the match to return                                  
    ///   @return a pointer to the found unit, or nullptr if not found         
    TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-   const Unit* TME()::SeekUnitExt(DMeta type, const Neat& ext, Index offset) const {
+   const A::Unit* TME()::SeekUnitExt(DMeta type, const Neat& ext, Index offset) const {
       return const_cast<THIS*>(static_cast<const THIS*>(this))
          ->template SeekUnitExt<SEEK>(type, ext, offset);
    }
@@ -97,7 +97,7 @@ namespace Langulus::Entity
    ///   @param offset - the match to return                                  
    ///   @return a pointer to the found unit, or nullptr if not found         
    TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-   const Unit* TME()::SeekUnitAuxExt(DMeta type, const Neat& aux, const Neat& ext, Index offset) const {
+   const A::Unit* TME()::SeekUnitAuxExt(DMeta type, const Neat& aux, const Neat& ext, Index offset) const {
       return const_cast<THIS*>(static_cast<const THIS*>(this))
          ->template SeekUnitAuxExt<SEEK>(type, aux, ext, offset);
    }
@@ -199,25 +199,25 @@ namespace Langulus::Entity
       /// Available only when managed reflection is enabled                   
       ///                                                                     
       TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-      Unit* TME()::SeekUnit(const Token& dataToken, Index offset) {
+      A::Unit* TME()::SeekUnit(const Token& dataToken, Index offset) {
          return static_cast<THIS*>(this)
             ->template SeekUnit<SEEK>(RTTI::GetMetaData(dataToken), offset);
       }
 
       TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-      const Unit* TME()::SeekUnit(const Token& dataToken, Index offset) const {
+      const A::Unit* TME()::SeekUnit(const Token& dataToken, Index offset) const {
          return static_cast<THIS*>(this)
             ->template SeekUnit<SEEK>(RTTI::GetMetaData(dataToken), offset);
       }
 
       TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-      Unit* TME()::SeekUnitAux(const Neat& aux, const Token& dataToken, Index offset) {
+      A::Unit* TME()::SeekUnitAux(const Neat& aux, const Token& dataToken, Index offset) {
          return static_cast<THIS*>(this)
             ->template SeekUnitAux<SEEK>(aux, RTTI::GetMetaData(dataToken), offset);
       }
 
       TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-      const Unit* TME()::SeekUnitAux(const Neat& aux, const Token& dataToken, Index offset) const {
+      const A::Unit* TME()::SeekUnitAux(const Neat& aux, const Token& dataToken, Index offset) const {
          return static_cast<THIS*>(this)
             ->template SeekUnitAux<SEEK>(aux, RTTI::GetMetaData(dataToken), offset);
       }
@@ -268,7 +268,7 @@ namespace Langulus::Entity
    ///   @param offset - which of the matches to return                       
    ///   @return the found unit, or nullptr if no such unit was found         
    template<Seek SEEK> LANGULUS(INLINED)
-   Unit* Hierarchy::SeekUnit(DMeta meta, Index offset) {
+   A::Unit* Hierarchy::SeekUnit(DMeta meta, Index offset) {
       for (auto owner : *this) {
          Unit* result = owner->template SeekUnit<SEEK>(meta, offset);
          if (result)
@@ -286,7 +286,7 @@ namespace Langulus::Entity
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
    template<Seek SEEK> LANGULUS(INLINED)
-   Unit* Hierarchy::SeekUnitAux(const Neat& aux, DMeta meta, Index offset) {
+   A::Unit* Hierarchy::SeekUnitAux(const Neat& aux, DMeta meta, Index offset) {
       const Unit* result {};
 
       // Scan descriptor even if hierarchy is empty                     
@@ -347,7 +347,7 @@ namespace Langulus::Entity
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
    template<Seek SEEK> LANGULUS(INLINED)
-   Unit* Hierarchy::SeekUnitExt(DMeta type, const Neat& ext, Index offset) {
+   A::Unit* Hierarchy::SeekUnitExt(DMeta type, const Neat& ext, Index offset) {
       for (auto owner : *this) {
          Unit* result = owner->template SeekUnitExt<SEEK>(type, ext, offset);
          if (result)
@@ -366,7 +366,7 @@ namespace Langulus::Entity
    ///   @param offset - the index of the unit to return                      
    ///   @return a pointer to the found unit, or nullptr if not found         
    template<Seek SEEK> LANGULUS(INLINED)
-   Unit* Hierarchy::SeekUnitAuxExt(DMeta type, const Neat& aux, const Neat& ext, Index offset) {
+   A::Unit* Hierarchy::SeekUnitAuxExt(DMeta type, const Neat& aux, const Neat& ext, Index offset) {
       // Scan descriptor even if hierarchy is empty                     
       Unit* result {};
       aux.ForEachDeep([&](const Unit* u) {
