@@ -30,8 +30,8 @@ namespace Langulus::Entity
    ///   @param offset - which of the matches to return                       
    ///   @return the found unit, or nullptr if no such unit was found         
    template<Seek SEEK>
-   Unit* Thing::SeekUnit(DMeta meta, Index offset) {
-      Unit* result = nullptr;
+   A::Unit* Thing::SeekUnit(DMeta meta, Index offset) {
+      A::Unit* result = nullptr;
       if constexpr (SEEK & Seek::Here) {
          // Seek here if requested                                      
          result = GetUnitMeta(meta, offset);
@@ -69,10 +69,9 @@ namespace Langulus::Entity
    ///   @param meta - the type of the unit to seek for                       
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
-   template<Seek SEEK>
-   LANGULUS(INLINED)
-   Unit* Thing::SeekUnitAux(const Neat& aux, DMeta meta, Index offset) {
-      Unit* result {};
+   template<Seek SEEK> LANGULUS(INLINED)
+   A::Unit* Thing::SeekUnitAux(const Neat& aux, DMeta meta, Index offset) {
+      A::Unit* result {};
       aux.ForEachDeep([&](const Unit* unit) {
          if (unit->CastsTo(meta)) {
             if (offset == 0) {
@@ -100,10 +99,9 @@ namespace Langulus::Entity
    ///   @param ext - the type and properties of the unit to seek for         
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
-   template<Seek SEEK>
-   LANGULUS(INLINED)
-   Unit* Thing::SeekUnitExt(DMeta type, const Neat& ext, Index offset) {
-      Unit* result = nullptr;
+   template<Seek SEEK> LANGULUS(INLINED)
+   A::Unit* Thing::SeekUnitExt(DMeta type, const Neat& ext, Index offset) {
+      A::Unit* result = nullptr;
       if constexpr (SEEK & Seek::Here) {
          // Seek here if requested                                      
          result = GetUnitExt(type, ext, offset);
@@ -141,11 +139,10 @@ namespace Langulus::Entity
    ///   @param ext - the unit type and properties to seek for                
    ///   @param offset - the Nth match to return                              
    ///   @return a pointer to the found unit, or nullptr if not found         
-   template<Seek SEEK>
-   LANGULUS(INLINED)
-   Unit* Thing::SeekUnitAuxExt(DMeta type, const Neat& aux, const Neat& ext, Index offset) {
+   template<Seek SEEK> LANGULUS(INLINED)
+   A::Unit* Thing::SeekUnitAuxExt(DMeta type, const Neat& aux, const Neat& ext, Index offset) {
       // Scan descriptor even if hierarchy is empty                     
-      Unit* result {};
+      A::Unit* result {};
       aux.ForEachDeep([&](const Unit* unit) {
          if (unit->CastsTo(type)) {
             //TODO check construct arguments
@@ -212,8 +209,7 @@ namespace Langulus::Entity
    ///   @param meta - the trait type to search for                           
    ///   @param offset - the number of the matching trait to use              
    ///   @return the trait, which is not empty, if trait was found            
-   template<Seek SEEK>
-   LANGULUS(INLINED)
+   template<Seek SEEK> LANGULUS(INLINED)
    Trait Thing::SeekTraitAux(const Neat& aux, TMeta meta, Index offset) {
       // Scan descriptor                                                
       Trait result;
@@ -297,8 +293,7 @@ namespace Langulus::Entity
    ///   @param output - [out] the found value will be written here           
    ///   @param offset - the number of the matching trait to use              
    ///   @return true if value has been found and rewritten                   
-   template<Seek SEEK>
-   LANGULUS(INLINED)
+   template<Seek SEEK> LANGULUS(INLINED)
    bool Thing::SeekValueAux(TMeta meta, const Neat& aux, CT::Data auto& output, Index offset) const {
       using D = Deref<decltype(output)>;
 

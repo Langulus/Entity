@@ -10,8 +10,13 @@
 #include "Hierarchy.hpp"
 
 
-namespace Langulus::Entity
+namespace Langulus::A
 {
+
+   using Entity::Thing;
+   using Entity::Hierarchy;
+   using Entity::Runtime;
+
 
    ///                                                                        
    ///   An abstract unit                                                     
@@ -21,7 +26,7 @@ namespace Langulus::Entity
    /// inside external, dynamically loaded modules. There are units for       
    /// graphics, input, AI, content, and whatever extensions you make.        
    ///                                                                        
-   struct LANGULUS_API(ENTITY) Unit : Resolvable, SeekInterface<Unit> {
+   struct LANGULUS_API(ENTITY) Unit : Resolvable, Entity::SeekInterface<Unit> {
       LANGULUS(UNINSERTABLE) false;
       LANGULUS_BASES(Resolvable);
 
@@ -50,7 +55,7 @@ namespace Langulus::Entity
 
       Unit& operator = (Unit&&) noexcept;
 
-      void Select(Verb&);
+      void Select(Flow::Verb&);
 
    public:
       virtual void Refresh();
@@ -127,6 +132,6 @@ namespace Langulus::CT
 
    /// Any type that inherits Unit is considered a unit                       
    template<class T>
-   concept Unit = DerivedFrom<T, Entity::Unit>;
+   concept Unit = DerivedFrom<T, A::Unit>;
 
 } // namespace Langulus::CT

@@ -8,8 +8,15 @@
 ///                                                                           
 #include "Thing.hpp"
 #include "Runtime.hpp"
-#include "External.inl"
-#include <Anyness/Path.hpp>
+#include "../include/Langulus/Asset.hpp"
+#include "../include/Langulus/Graphics.hpp"
+#include "../include/Langulus/Image.hpp"
+#include "../include/Langulus/IO.hpp"
+#include "../include/Langulus/Material.hpp"
+#include "../include/Langulus/Mesh.hpp"
+#include "../include/Langulus/Physical.hpp"
+#include "../include/Langulus/Platform.hpp"
+#include "../include/Langulus/UI.hpp"
 
 #if LANGULUS_OS(WINDOWS)
    #include <Windows.h>
@@ -98,6 +105,7 @@ namespace Langulus::Entity
          Logger::Error(this, ": Can't unload last module(s): ");
          for (auto library : mLibraries)
             Logger::Append(library.mKey, " ");
+
          Logger::Error(this, ": This likely involves a memory leak, "
             "that withholds managed data, reflected by the given modules");
 
@@ -111,7 +119,7 @@ namespace Langulus::Entity
    ///   @param name - module name                                            
    ///   @param descriptor - module initialization descriptor                 
    ///   @return the new module instance                                      
-   Module* Runtime::InstantiateModule(const Token& name, const Neat& descriptor) {
+   A::Module* Runtime::InstantiateModule(const Token& name, const Neat& descriptor) {
       // Load the library if not loaded yet                             
       const auto library = LoadSharedLibrary(name);
 
@@ -133,7 +141,7 @@ namespace Langulus::Entity
    ///   @param map - [in/out] the map to fill                                
    ///   @param module - the module instance to push                          
    ///   @param type - the type to unregister the module as                   
-   void RegisterAllBases(TUnorderedMap<DMeta, ModuleList>& map, Module* module, DMeta type) {
+   void RegisterAllBases(TUnorderedMap<DMeta, ModuleList>& map, A::Module* module, DMeta type) {
       VERBOSE("Registering `", type, '`');
       auto found = map.FindIt(type);
       if (found)
@@ -160,7 +168,7 @@ namespace Langulus::Entity
    ///   @param map - [in/out] the map to unregister from                     
    ///   @param module - the module instance to push                          
    ///   @param type - the type to register the module as                     
-   void UnregisterAllBases(TUnorderedMap<DMeta, ModuleList>& map, Module* module, DMeta type) {
+   void UnregisterAllBases(TUnorderedMap<DMeta, ModuleList>& map, A::Module* module, DMeta type) {
       for (auto& base : type->mBases) {
          if (base.mType->IsExact<Resolvable>())
             break;
@@ -181,13 +189,13 @@ namespace Langulus::Entity
    ///   @param library - the library handle                                  
    ///   @param descriptor - module initialization descriptor                 
    ///   @return the new module instance                                      
-   Module* Runtime::InstantiateModule(const SharedLibrary& library, const Neat& descriptor) {
+   A::Module* Runtime::InstantiateModule(const SharedLibrary& library, const Neat& descriptor) {
       if (not library.IsValid())
          return nullptr;
 
       // Use the creation point of the library to instantiate module    
       const auto info = library.mInfo();
-      Module* module {};
+      A::Module* module {};
 
       try { module = library.mCreator(this, descriptor); }
       catch (...) {
@@ -292,11 +300,11 @@ namespace Langulus::Entity
 
       // Get entry, creator, info and exit points from the library      
       #if LANGULUS_OS(WINDOWS)
-         library.mEntry = reinterpret_cast<Module::EntryFunction>(
+         library.mEntry = reinterpret_cast<A::Module::EntryFunction>(
             GetProcAddress(dll, LANGULUS_MODULE_ENTRY_TOKEN()));
-         library.mCreator = reinterpret_cast<Module::CreateFunction>(
+         library.mCreator = reinterpret_cast<A::Module::CreateFunction>(
             GetProcAddress(dll, LANGULUS_MODULE_CREATE_TOKEN()));
-         library.mInfo = reinterpret_cast<Module::InfoFunction>(
+         library.mInfo = reinterpret_cast<A::Module::InfoFunction>(
             GetProcAddress(dll, LANGULUS_MODULE_INFO_TOKEN()));
       #elif LANGULUS_OS(LINUX)
          library.mEntry = reinterpret_cast<Module::EntryFunction>(
@@ -516,44 +524,6 @@ namespace Langulus::Entity
       return GetModules(RTTI::GetMetaData(token));
    }
 #endif
-
-   /// Get a file interface, relying on external modules to find it           
-   ///   @param path - the path for the file                                  
-   ///   @return the file interface, or nullptr if file doesn't exist         
-   Ref<A::File> Runtime::GetFile(const Path& path) {
-      auto& fileSystems = GetModules<A::FileSystem>();
-      LANGULUS_ASSERT(fileSystems, Module,
-         "Can't retrieve file `", path, "` - no file system module available");
-      return fileSystems.template As<A::FileSystem*>()->GetFile(path);
-   }
-   
-   /// Get a folder interface, relying on external modules to find it         
-   ///   @param path - the path for the folder                                
-   ///   @return the folder interface, or nullptr if folder doesn't exist     
-   Ref<A::Folder> Runtime::GetFolder(const Path& path) {
-      auto& fileSystems = GetModules<A::FileSystem>();
-      LANGULUS_ASSERT(fileSystems, Module,
-         "Can't retrieve folder `", path, "` - no file system module available");
-      return fileSystems.template As<A::FileSystem*>()->GetFolder(path);
-   }
-
-   /// Get the current working path (where the main exe was executed)         
-   ///   @return the path                                                     
-   const Path& Runtime::GetWorkingPath() const {
-      auto& fileSystems = GetModules<A::FileSystem>();
-      LANGULUS_ASSERT(fileSystems, Module,
-         "Can't retrieve working path", " - no file system module available");
-      return fileSystems.template As<A::FileSystem*>()->GetWorkingPath();
-   }
-
-   /// Get the current data path, like GetWorkingPath() / "data"              
-   ///   @return the path                                                     
-   const Path& Runtime::GetDataPath() const {
-      auto& fileSystems = GetModules<A::FileSystem>();
-      LANGULUS_ASSERT(fileSystems, Module,
-         "Can't retrieve data path", " - no file system module available");
-      return fileSystems.template As<A::FileSystem*>()->GetDataPath();
-   }
 
    /// Update the runtime, by updating all module instantiations by order of  
    /// their priority                                                         

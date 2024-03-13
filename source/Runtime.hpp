@@ -8,15 +8,10 @@
 ///                                                                           
 #pragma once
 #include "Module.hpp"
-#include <Anyness/TMap.hpp>
-#include <Anyness/TAny.hpp>
 
 
 namespace Langulus::Entity
 {
-
-   using ModuleList = TAny<Module*>;
-
 
    ///                                                                        
    ///   Runtime                                                              
@@ -40,11 +35,11 @@ namespace Langulus::Entity
          // Library handle, returned by dlopen or LoadLibrary           
          uintptr_t mHandle {};
          // Exported entry function, that registers library types       
-         Module::EntryFunction mEntry {};
+         A::Module::EntryFunction mEntry {};
          // Exported module instantiation function, produces modules    
-         Module::CreateFunction mCreator {};
+         A::Module::CreateFunction mCreator {};
          // Information function, returning module description          
-         Module::InfoFunction mInfo {};
+         A::Module::InfoFunction mInfo {};
          // Type of the module instance                                 
          DMeta mModuleType {};
          // The RTTI::Boundary of the library                           
@@ -110,10 +105,10 @@ namespace Langulus::Entity
       NOD() auto GetOwner() const noexcept { return mOwner; }
 
       NOD() LANGULUS_API(ENTITY)
-      Module* InstantiateModule(const Token&, const Neat& = {});
+      A::Module* InstantiateModule(const Token&, const Neat& = {});
 
       NOD() LANGULUS_API(ENTITY)
-      Module* InstantiateModule(const SharedLibrary&, const Neat& = {});
+      A::Module* InstantiateModule(const SharedLibrary&, const Neat& = {});
 
       NOD() LANGULUS_API(ENTITY)
       SharedLibrary GetDependency(DMeta) const noexcept;

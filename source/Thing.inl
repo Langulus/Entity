@@ -75,7 +75,7 @@ namespace Langulus::Entity
             // Instantiate a temporal flow                              
             verb << CreateFlow();
          }
-         else if (stuff->template CastsTo<Module>()) {
+         else if (stuff->template CastsTo<A::Module>()) {
             // Instantiate a module from the runtime                    
             auto runtime = GetRuntime();
             auto dependency = runtime->GetDependency(stuff);
@@ -107,7 +107,7 @@ namespace Langulus::Entity
                // Instantiate a temporal flow                           
                verb << CreateFlow();
             }
-            else if (stuff.template CastsTo<Module>()) {
+            else if (stuff.template CastsTo<A::Module>()) {
                // Instantiate a module from the runtime                 
                auto runtime = GetRuntime();
                auto dependency = runtime->GetDependency(stuff.GetType());
@@ -234,7 +234,7 @@ namespace Langulus::Entity
    /// Register unit by all its bases in mUnitsAmbiguous                      
    ///   @param unit - the unit instance to register                          
    ///   @param type - the type to register the unit as                       
-   inline void Thing::AddUnitBases(Unit* unit, DMeta type) {
+   inline void Thing::AddUnitBases(A::Unit* unit, DMeta type) {
       const auto found = mUnitsAmbiguous.FindIt(type);
       if (found)
          *found.mValue << unit;
@@ -242,7 +242,7 @@ namespace Langulus::Entity
          mUnitsAmbiguous.Insert(type, unit);
 
       for (auto& base : type->mBases) {
-         if (base.mType->IsExact<Unit>())
+         if (base.mType->IsExact<A::Unit>())
             break;
 
          AddUnitBases(unit, base.mType);
@@ -252,7 +252,7 @@ namespace Langulus::Entity
    /// Unregister unit by all its bases in mUnitsAmbiguous                    
    ///   @param unit - the unit instance to unregister                        
    ///   @param type - the type to unregister the unit as                     
-   inline void Thing::RemoveUnitBases(Unit* unit, DMeta type) {
+   inline void Thing::RemoveUnitBases(A::Unit* unit, DMeta type) {
       const auto found = mUnitsAmbiguous.FindIt(type);
       if (found) {
          auto& set = *found.mValue;
@@ -261,7 +261,7 @@ namespace Langulus::Entity
       }
 
       for (auto& base : type->mBases) {
-         if (base.mType->IsExact<Unit>())
+         if (base.mType->IsExact<A::Unit>())
             break;
 
          RemoveUnitBases(unit, base.mType);
@@ -277,7 +277,7 @@ namespace Langulus::Entity
    ///   @param unit - the unit to add                                        
    ///   @return 1 if unit has been added                                     
    template<bool TWOSIDED>
-   Count Thing::AddUnit(Unit* unit) {
+   Count Thing::AddUnit(A::Unit* unit) {
       // Check if the unit instance is already registered here          
       const auto meta = unit->GetType();
       const auto found = mUnitsAmbiguous.FindIt(meta);
@@ -318,7 +318,7 @@ namespace Langulus::Entity
    ///   @param unit - unit to remove from the entity                         
    ///   @return 1 if unit has been removed                                   
    template<bool TWOSIDED>
-   Count Thing::RemoveUnit(Unit* unit) {
+   Count Thing::RemoveUnit(A::Unit* unit) {
       const auto meta = unit->GetType();
       const auto foundType = mUnitsAmbiguous.FindIt(meta);
       if (not foundType)
@@ -351,7 +351,7 @@ namespace Langulus::Entity
    ///   @return the number of removed units                                  
    template<CT::Unit T, bool TWOSIDED>
    Count Thing::RemoveUnits() {
-      if constexpr (CT::Same<T, Unit>) {
+      if constexpr (CT::Same<T, A::Unit>) {
          // Remove all units                                            
          const auto removed = mUnitsList.GetCount();
          if constexpr (TWOSIDED) {
@@ -432,7 +432,7 @@ namespace Langulus::Entity
    ///   @return the unit if found, or nullptr if not                         
    template<CT::Unit T> LANGULUS(INLINED)
    Decay<T>* Thing::GetUnit(Index offset) {
-      if constexpr (not CT::Same<T, Unit>) {
+      if constexpr (not CT::Same<T, A::Unit>) {
          return static_cast<Decay<T>*>(
             GetUnitMeta(MetaOf<Decay<T>>(), offset)
          );
@@ -450,7 +450,7 @@ namespace Langulus::Entity
    ///   @return the unit if found, or nullptr if not                         
    template<CT::Unit T> LANGULUS(INLINED)
    const Decay<T>* Thing::GetUnit(Index offset) const {
-      if constexpr (not CT::Same<T, Unit>) {
+      if constexpr (not CT::Same<T, A::Unit>) {
          return static_cast<const Decay<T>*>(
             GetUnitMeta(MetaOf<Decay<T>>(), offset)
          );
@@ -469,7 +469,7 @@ namespace Langulus::Entity
       ///   @param offset - optional offset (Nth match)                       
       ///   @return the unit if found, or nullptr if not                      
       LANGULUS(INLINED)
-      const Unit* Thing::GetUnitMeta(const Token& token, Index offset) const {
+      const A::Unit* Thing::GetUnitMeta(const Token& token, Index offset) const {
          return const_cast<Thing*>(this)->GetUnitMeta(token, offset);
       }
 
@@ -541,7 +541,7 @@ namespace Langulus::Entity
       if (producer) {
          // Data has a specific producer, we can narrow the required    
          // contexts for creation a lot                                 
-         if (producer->template CastsTo<Unit>()) {
+         if (producer->template CastsTo<A::Unit>()) {
             // Data is producible from a unit                           
             auto producers = GatherUnits<SEEK>(producer);
             LANGULUS_ASSERT(producers, Construct, 
@@ -562,7 +562,7 @@ namespace Langulus::Entity
                ": ", descriptor
             );
          }
-         else if (producer->template CastsTo<Module>()) {
+         else if (producer->template CastsTo<A::Module>()) {
             // Data is producible from a module                         
             auto producers = GetRuntime()->GetModules(producer);
             LANGULUS_ASSERT(producers, Construct,
@@ -592,7 +592,7 @@ namespace Langulus::Entity
          // Data doesn't have a specific producer, but it is abstract   
          // so we know that only a module/unit can concretize it        
          // Gather all units in the desired part of the hierarchy       
-         auto producers = GatherUnits<Unit, SEEK>();
+         auto producers = GatherUnits<A::Unit, SEEK>();
          if (producers) {
             // Potential unit producers found, attempt creation there   
             producers.MakeOr();
@@ -631,13 +631,18 @@ namespace Langulus::Entity
       return {};
    }
 
+} // namespace Langulus::Entity
+
+namespace Langulus::A
+{
+
    /// Execute verb in all owners, seeking valid context in the specified     
    /// seek direction                                                         
    ///   @tparam SEEK - direction to seek valid execution context in          
    ///   @param verb - the verb to execute                                    
    ///   @return the verb output                                              
    template<Seek SEEK, CT::VerbBased V>
-   V& Unit::RunIn(V& verb) {
+   V& A::Unit::RunIn(V& verb) {
       if (not mOwners) {
          Logger::Warning(Self(), "No owners available for executing: ", verb);
          return verb;
@@ -653,7 +658,7 @@ namespace Langulus::Entity
       return verb;
    }
 
-} // namespace Langulus::Entity
+} // namespace Langulus::A
 
 #undef ENTITY_VERBOSE_ENABLED
 #undef ENTITY_VERBOSE_SELF

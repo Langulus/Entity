@@ -7,12 +7,10 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include "Thing.hpp"
-#include "Unit.hpp"
+#include "Platform.hpp"
 
-#include "../../source/Hierarchy.hpp"
-#include "../../source/Hierarchy-Seek.inl"
-#include "../../source/Hierarchy-Gather.inl"
 
-#include "../../source/External.hpp"
-#include "../../source/External.inl"
+namespace Langulus::A
+{
+
+} // namespace Langulus::A

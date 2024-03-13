@@ -10,7 +10,7 @@
 #include "Unit.hpp"
 
 
-namespace Langulus::Entity
+namespace Langulus::A
 {
       
    /// Find a specific unit, searching into the hierarchy                     

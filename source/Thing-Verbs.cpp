@@ -91,7 +91,7 @@ namespace Langulus::Entity
    void Thing::Select(Verb& verb) {
       // Probe every part of the argument and check if it matches       
       TAny<Trait> selectedTraits;
-      TAny<Unit*> selectedUnits;
+      TAny<A::Unit*> selectedUnits;
       TAny<Thing*> selectedEntities;
       bool mismatch = false;
 
@@ -131,14 +131,14 @@ namespace Langulus::Entity
                return Loop::Continue;
             }
          }
-         else if (construct.CastsTo<Unit>()) {
+         else if (construct.CastsTo<A::Unit>()) {
             // Find a unit containing construct arguments               
             if (not selectUnit(construct.GetType()))
                return Loop::Break;
 
             // selectedComponents has been populated with results       
             // Filter them additionally by construct arguments          
-            TAny<Unit*> filteredSelectedComponents;
+            TAny<A::Unit*> filteredSelectedComponents;
             for (auto& unit : selectedUnits) {
                bool localMismatch = false;
                auto unitBlock = unit->GetBlock();

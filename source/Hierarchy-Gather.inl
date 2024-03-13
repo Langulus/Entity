@@ -21,7 +21,7 @@ namespace Langulus::Entity
    ///   @param meta - the units to seek for                                  
    ///   @return the gathered units that match the type                       
    TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-   TAny<const Unit*> TME()::GatherUnits(DMeta meta) const {
+   TAny<const A::Unit*> TME()::GatherUnits(DMeta meta) const {
       return const_cast<THIS*>(static_cast<const THIS*>(this))
          ->template GatherUnits<SEEK>(meta);
    }
@@ -62,13 +62,13 @@ namespace Langulus::Entity
 
    #if LANGULUS_FEATURE(MANAGED_REFLECTION)
       TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-      TAny<Unit*> TME()::GatherUnits(const Token& token) {
+      TAny<A::Unit*> TME()::GatherUnits(const Token& token) {
          return static_cast<THIS*>(this)
             ->template GatherUnits<SEEK>(RTTI::GetMetaData(token));
       }
 
       TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-      TAny<const Unit*> TME()::GatherUnits(const Token& token) const {
+      TAny<const A::Unit*> TME()::GatherUnits(const Token& token) const {
          return static_cast<THIS*>(this)
             ->template GatherUnits<SEEK>(RTTI::GetMetaData(token));
       }
@@ -100,7 +100,7 @@ namespace Langulus::Entity
    ///   @return the gathered units that match the type                       
    template<Seek SEEK>
    LANGULUS(INLINED)
-   TAny<Unit*> Hierarchy::GatherUnits(DMeta meta) {
+   TAny<A::Unit*> Hierarchy::GatherUnits(DMeta meta) {
       TAny<Unit*> result;
       for (auto owner : *this)
          result += owner->template GatherUnits<SEEK>(meta);

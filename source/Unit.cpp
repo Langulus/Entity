@@ -8,7 +8,7 @@
 ///                                                                           
 #include "Thing.inl"
 
-using namespace Langulus::Entity;
+using namespace Langulus::A;
 
 
 /// Manual construction                                                       
@@ -29,7 +29,7 @@ Unit::Unit(Unit&& other) noexcept
 
 /// Default unit selection simply relays to the owner                         
 ///   @param verb - the selection verb                                        
-void Unit::Select(Verb& verb) {
+void Unit::Select(Flow::Verb& verb) {
    for (auto owner : mOwners)
       owner->Select(verb);
 }
@@ -54,7 +54,7 @@ bool Unit::CompareDescriptor(const Neat& descriptor) const {
    // First we compare traits only, all of them must be present         
    bool mismatch {};
    Offset memberOffset {};
-   descriptor.ForEach([&](const Trait& trait) {
+   descriptor.ForEach([&](const Anyness::Trait& trait) {
       if (not GetMember(trait.GetTrait(), memberOffset)
       .Compare(static_cast<const Any&>(trait))) {
          mismatch = true;
@@ -68,7 +68,7 @@ bool Unit::CompareDescriptor(const Neat& descriptor) const {
    // Then we run another check, based on data types, again, all        
    // of them must be present, either in trait, or in other form        
    memberOffset = {};
-   descriptor.ForEachTail([&](const Block& anythingElse) {
+   descriptor.ForEachTail([&](const Anyness::Block& anythingElse) {
       if (not GetMember(TMeta {}, memberOffset).Compare(anythingElse)) {
          mismatch = true;
          return Loop::Break;

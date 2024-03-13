@@ -10,15 +10,14 @@
 #include "Unit.hpp"
 
 
-namespace Langulus::Entity
+namespace Langulus::A
 {
    
    /// Collects all units of the given type inside the hierarchy              
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param meta - the units to seek for                                  
    ///   @return the gathered units that match the type                       
-   template<Seek SEEK>
-   LANGULUS(INLINED)
+   template<Seek SEEK> LANGULUS(INLINED)
    TAny<Unit*> Unit::GatherUnits(DMeta meta) {
       return mOwners.template GatherUnits<SEEK>(meta);
    }
@@ -27,9 +26,8 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param trait - the trait to seek for                                 
    ///   @return the gathered traits that match the type                      
-   template<Seek SEEK>
-   LANGULUS(INLINED)
-   TAny<Trait> Unit::GatherTraits(TMeta trait) {
+   template<Seek SEEK> LANGULUS(INLINED)
+   TraitList Unit::GatherTraits(TMeta trait) {
       return mOwners.template GatherTraits<SEEK>(trait);
    }
 
@@ -37,8 +35,7 @@ namespace Langulus::Entity
    ///   @tparam D - type to convert to                                       
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @return the gathered values                                          
-   template<CT::Data D, Seek SEEK>
-   LANGULUS(INLINED)
+   template<CT::Data D, Seek SEEK> LANGULUS(INLINED)
    TAny<D> Unit::GatherValues() const {
       return mOwners.template GatherValues<SEEK, D>();
    }
