@@ -7,10 +7,4 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include "Platform.hpp"
-
-
-namespace Langulus::A
-{
-
-} // namespace Langulus::A
+#include "Entity/Thing.hpp"

@@ -6,6 +6,7 @@
 /// Distributed under GNU General Public License v3+                          
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
+#include "Unit.hpp"
 #include "Thing.inl"
 
 using namespace Langulus::A;

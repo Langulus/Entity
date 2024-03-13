@@ -92,9 +92,9 @@ namespace Langulus::A
       NOD() Unit* SeekUnitAuxExt(DMeta, const Neat&, const Neat&, Index = 0);
 
       template<Seek = Seek::HereAndAbove>
-      NOD() Trait SeekTrait(TMeta, Index = 0);
+      NOD() Langulus::Trait SeekTrait(TMeta, Index = 0);
       template<Seek = Seek::HereAndAbove>
-      NOD() Trait SeekTraitAux(const Neat&, TMeta, Index = 0);
+      NOD() Langulus::Trait SeekTraitAux(const Neat&, TMeta, Index = 0);
 
       template<Seek = Seek::HereAndAbove>
       bool SeekValue(TMeta, CT::Data auto&, Index = 0) const;

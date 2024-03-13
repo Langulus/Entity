@@ -7,10 +7,9 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include <Entity/Thing.hpp>
+#include <Langulus.hpp>
 
 using namespace Langulus;
-using namespace Entity;
 
 #define CATCH_CONFIG_ENABLE_BENCHMARKING
 

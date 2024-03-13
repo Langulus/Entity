@@ -8,6 +8,7 @@
 ///                                                                           
 #pragma once
 #include "Unit.hpp"
+#include "Hierarchy-Gather.inl"
 
 
 namespace Langulus::A

@@ -7,15 +7,10 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include "Module.hpp"
-#include "Unit.hpp"
-#include "Runtime.hpp"
-#include <Anyness/Path.hpp>
-#include <Flow/Factory.hpp>
-#include <Flow/Rate.hpp>
+#include "../Entity/Thing.hpp"
 #include <Math/LOD.hpp>
-#include <Math/Mapping.hpp>
-#include <Math/Scale.hpp>
+#include <Math/Level.hpp>
+#include <Math/Matrix.hpp>
 
 
 namespace Langulus::A
@@ -54,12 +49,12 @@ namespace Langulus::A
       LANGULUS_BASES(Physical);
       using Physical::Physical;
 
-      NOD() virtual bool  Cull(const LOD&) const noexcept = 0;
-      NOD() virtual Level GetLevel() const noexcept = 0;
-      NOD() virtual Mat4  GetModelTransform(const LOD&) const noexcept = 0;
-      NOD() virtual Mat4  GetModelTransform(const Level& = {}) const noexcept = 0;
-      NOD() virtual Mat4  GetViewTransform(const LOD&) const noexcept = 0;
-      NOD() virtual Mat4  GetViewTransform(const Level& = {}) const noexcept = 0;
+      NOD() virtual bool  Cull(const Math::LOD&) const noexcept = 0;
+      NOD() virtual Math::Level GetLevel() const noexcept = 0;
+      NOD() virtual Math::Mat4  GetModelTransform(const Math::LOD&) const noexcept = 0;
+      NOD() virtual Math::Mat4  GetModelTransform(const Math::Level& = {}) const noexcept = 0;
+      NOD() virtual Math::Mat4  GetViewTransform(const Math::LOD&) const noexcept = 0;
+      NOD() virtual Math::Mat4  GetViewTransform(const Math::Level& = {}) const noexcept = 0;
    };
 
 } // namespace Langulus::A

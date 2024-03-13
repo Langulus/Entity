@@ -8,6 +8,7 @@
 ///                                                                           
 #pragma once
 #include "Unit.hpp"
+#include "Hierarchy-Seek.inl"
 
 
 namespace Langulus::A
@@ -64,7 +65,7 @@ namespace Langulus::A
    ///   @param offset - the offset to apply                                  
    ///   @return the trait, which is not empty, if trait was found            
    template<Seek SEEK> LANGULUS(INLINED)
-   Trait Unit::SeekTrait(TMeta meta, Index offset) {
+   Langulus::Trait Unit::SeekTrait(TMeta meta, Index offset) {
       return mOwners.template SeekTrait<SEEK>(meta, offset);
    }
    
@@ -75,7 +76,7 @@ namespace Langulus::A
    ///   @param offset - the number of the matching trait to use              
    ///   @return the trait, which is not empty, if trait was found            
    template<Seek SEEK> LANGULUS(INLINED)
-   Trait Unit::SeekTraitAux(const Neat& aux, TMeta meta, Index offset) {
+   Langulus::Trait Unit::SeekTraitAux(const Neat& aux, TMeta meta, Index offset) {
       return mOwners.template SeekTraitAux<SEEK>(aux, meta, offset);
    }
     

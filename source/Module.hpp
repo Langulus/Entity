@@ -15,8 +15,8 @@ LANGULUS_EXCEPTION(Module);
 namespace Langulus
 {
 
-   using MetaList = Anyness::TUnorderedSet<AMeta>;
-   using TraitList = TAny<Anyness::Trait>;
+   using MetaList = TUnorderedSet<AMeta>;
+   using TraitList = TAny<Trait>;
    using ModuleList = TAny<A::Module*>;
 
    /// Helper function, that reflects and registers a list of any reflection  
@@ -39,6 +39,13 @@ namespace Langulus
       // Merge to avoid duplications                                    
       (list << ... << MetaOf<T>());
    }
+
+   namespace Entity
+   {
+
+      class Runtime;
+
+   } // namespace Langulus::Entity
 
 } // namespace Langulus
 
@@ -84,14 +91,18 @@ namespace Langulus::A
          DMeta mCategory;
       };
 
-      using EntryFunction = void(*)(DMeta&, MetaList&);
+      using EntryFunction  = void(*)(DMeta&, MetaList&);
       using CreateFunction = Module*(*)(Entity::Runtime*, const Neat&);
-      using InfoFunction = const Info*(*)();
+      using InfoFunction   = const Info*(*)();
 
-      NOD() Entity::Runtime* GetRuntime() const noexcept { return mRuntime; }
+      NOD() Entity::Runtime* GetRuntime() const noexcept {
+         return mRuntime;
+      }
 
    public:
-      virtual bool Update(Langulus::Time) { return true; }
+      virtual bool Update(Langulus::Time) {
+         return true;
+      }
    };
 
 } // namespace Langulus::A

@@ -13,6 +13,9 @@
 namespace Langulus::Entity
 {
 
+   class Thing;
+
+
    ///                                                                        
    ///   Seek interface for Hierarchy/Thing/Unit                              
    ///                                                                        

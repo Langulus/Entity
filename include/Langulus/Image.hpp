@@ -7,7 +7,8 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include "Asset.hpp>
+#include "Asset.hpp"
+#include <Math/Color.hpp>
 
 LANGULUS_DEFINE_TRAIT(Image, "Image unit");
 LANGULUS_EXCEPTION(Image);
@@ -16,20 +17,14 @@ LANGULUS_EXCEPTION(Image);
 namespace Langulus
 {
 
-   using namespace Langulus::Flow;
-   using namespace Langulus::Anyness;
-   using namespace Langulus::Entity;
-   using namespace Langulus::Math;
-
-
    ///                                                                        
    ///   Universal pixel buffer view                                          
    ///                                                                        
    struct ImageView {
-      uint32_t mWidth {1};
-      uint32_t mHeight {1};
-      uint32_t mDepth {1};
-      uint32_t mFrames {1};
+      uint32_t mWidth  = 1;
+      uint32_t mHeight = 1;
+      uint32_t mDepth  = 1;
+      uint32_t mFrames = 1;
       DMeta mFormat {};
       // Reverse RGBA to BGRA                                           
       // This is not a scalable solution and would eventually fail      
@@ -61,7 +56,7 @@ namespace Langulus::A
       ImageView mView;
 
    public:
-      NOD() virtual Ref<Image> GetLOD(const LOD&) const = 0;
+      NOD() virtual Ref<Image> GetLOD(const Math::LOD&) const = 0;
       NOD() virtual void* GetGPUHandle() const noexcept = 0;
 
       NOD() DMeta GetFormat() const noexcept;
@@ -87,7 +82,52 @@ namespace Langulus::A
       NOD() constexpr Iterator<false> last() const noexcept;
       constexpr A::IteratorEnd        end() const noexcept { return {}; }
    };
-   
+  
+
+   ///                                                                        
+   /// Image iterator                                                         
+   ///                                                                        
+   template<bool MUTABLE>
+   struct Image::Iterator : A::Iterator {
+      static constexpr bool Mutable = MUTABLE;
+      LANGULUS(ABSTRACT) false;
+
+   protected:
+      // Current iterator position pointer                              
+      Byte const* mValue;
+      // Iterator position which is considered the 'end' iterator       
+      Byte const* mEnd;
+      // Iterator position which is considered the 'end' iterator       
+      Image* mImage;
+
+      constexpr Iterator(Image*, Byte const* it, Byte const* end) noexcept;
+
+   public:
+      Iterator() noexcept = delete;
+      constexpr Iterator(const Iterator&) noexcept = default;
+      constexpr Iterator(Iterator&&) noexcept = default;
+      constexpr Iterator(const A::IteratorEnd&) noexcept;
+
+      constexpr Iterator& operator = (const Iterator&) noexcept = default;
+      constexpr Iterator& operator = (Iterator&&) noexcept = default;
+
+      NOD() constexpr bool operator == (const Iterator&) const noexcept;
+      NOD() constexpr bool operator == (const A::IteratorEnd&) const noexcept;
+
+      // Prefix operator                                                
+      constexpr Iterator& operator ++ () noexcept;
+
+      // Suffix operator                                                
+      NOD() constexpr Iterator operator ++ (int) noexcept;
+
+      constexpr explicit operator bool() const noexcept;
+      constexpr operator Iterator<false>() const noexcept requires Mutable;
+
+      template<CT::ColorBased T>
+      T As() const;
+   };
+
+
    ///                                                                        
    ///   Abstract font content                                                
    ///                                                                        
@@ -106,3 +146,5 @@ namespace Langulus::CT
    concept Image = DerivedFrom<T, A::Image>;
 
 } // namespace Langulus::CT
+
+#include "Image.inl"

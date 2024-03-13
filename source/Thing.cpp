@@ -6,9 +6,9 @@
 /// Distributed under GNU General Public License v3+                          
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
-#include "Thing.inl"
+#include "Thing.hpp"
 #include "Pin.inl"
-#include <Flow/Verbs/Interpret.hpp>
+#include "Thing.inl"
 
 #if 0
    #define ENTITY_VERBOSE_ENABLED() 1
@@ -194,17 +194,12 @@ namespace Langulus::Entity
       // Decouple all units from this owner                             
       for (auto& unit : mUnitsList) {
          ENTITY_VERBOSE_SELF("Decoupling unit: ", unit);
-         unit->mOwners.Reset();// .Remove(this);
+         unit->mOwners.Reset();
          ENTITY_VERBOSE_SELF("...", Reference(0), " uses remain");
       }
 
       mUnitsAmbiguous.Reset();
       mUnitsList.Reset();
-
-      /*for (auto& child : mChildren) {
-         child->Detach();
-         ENTITY_VERBOSE_SELF("...", Reference(0), " uses remain");
-      }*/
    }
 
    /// Compare two entities                                                   

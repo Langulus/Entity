@@ -31,6 +31,7 @@ namespace Langulus::Entity
    template<Seek SEEK>
    TAny<A::Unit*> Thing::GatherUnits(DMeta meta) {
       TAny<A::Unit*> result;
+
       if constexpr (SEEK & Seek::Here) {
          // Seek here if requested                                      
          const auto found = mUnitsAmbiguous.Find(meta);

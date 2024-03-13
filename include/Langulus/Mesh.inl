@@ -8,14 +8,11 @@
 ///                                                                           
 #pragma once
 #include "Mesh.hpp"
+#include <Math/Primitives.hpp>
 
 
 namespace Langulus
 {
-
-   ///                                                                        
-   ///   Vertex/index buffer view                                             
-   ///                                                                        
    
    /// Compare geometry views                                                 
    ///   @param rhs - the geometry view to compare against                    
@@ -245,7 +242,8 @@ namespace Langulus::A
    /// Get the point indices of a given line                                  
    ///   @param index - line index                                            
    ///   @return the point indices as a 32bit unsigned 2D vector              
-   inline Vec2u Mesh::GetLineIndices(Offset index) const {
+   inline Math::Vec2u Mesh::GetLineIndices(Offset index) const {
+      using Math::Vec2u;
       const auto indices = GetData<Traits::Index>();
 
       if (CheckTopology<A::Line>())
@@ -350,7 +348,8 @@ namespace Langulus::A
    /// Get the indices of a given triangle                                    
    ///   @param index - triangle index                                        
    ///   @return the indices as a 32bit unsigned 3D vector                    
-   inline Vec3u Mesh::GetTriangleIndices(Offset index) const {
+   inline Math::Vec3u Mesh::GetTriangleIndices(Offset index) const {
+      using Math::Vec3u;
       const auto indices = GetData<Traits::Index>(0);
 
       if (CheckTopology<A::Triangle>()) {

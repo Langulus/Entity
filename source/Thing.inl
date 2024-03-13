@@ -8,10 +8,7 @@
 ///                                                                           
 #pragma once
 #include "Thing.hpp"
-#include "Runtime.hpp"
 #include "Thing-Gather.inl"
-#include <Flow/Verbs/Interpret.hpp>
-#include <Flow/Verbs/Create.hpp>
 
 #if 0
    #define ENTITY_VERBOSE_ENABLED() 1
@@ -198,7 +195,7 @@ namespace Langulus::Entity
       }
 
       if constexpr (SEEK & Seek::Below) {
-         // Execute in children, if requested                              
+         // Execute in children, if requested                           
          for (auto& child : mChildren) {
             V local = verb;
             local.ShortCircuit(false);
