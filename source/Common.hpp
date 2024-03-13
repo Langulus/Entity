@@ -31,20 +31,11 @@ namespace Langulus
 
 } // namespace Langulus::Entity
 
-namespace Langulus::Entity
-{
-
-   class Thing;
-   class Runtime;
-   struct Hierarchy;
-
-} // namespace Langulus::Entity
-
 namespace Langulus::A
 {
 
-   struct Unit;
    class Module;
+   struct Unit;
 
    struct PlatformModule;
    struct Platform;

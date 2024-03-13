@@ -543,5 +543,43 @@ namespace Langulus::Entity
    Runtime::operator Text() const {
       return IdentityOf(this);
    }
+   
+   /// Get a file interface, relying on external modules to find it           
+   ///   @param path - the path for the file                                  
+   ///   @return the file interface, or nullptr if file doesn't exist         
+   Ref<A::File> Runtime::GetFile(const Path& path) {
+      auto& fileSystems = GetModules<A::FileSystem>();
+      LANGULUS_ASSERT(fileSystems, Module,
+         "Can't retrieve file `", path, "` - no file system module available");
+      return fileSystems.template As<A::FileSystem*>()->GetFile(path);
+   }
+   
+   /// Get a folder interface, relying on external modules to find it         
+   ///   @param path - the path for the folder                                
+   ///   @return the folder interface, or nullptr if folder doesn't exist     
+   Ref<A::Folder> Runtime::GetFolder(const Path& path) {
+      auto& fileSystems = GetModules<A::FileSystem>();
+      LANGULUS_ASSERT(fileSystems, Module,
+         "Can't retrieve folder `", path, "` - no file system module available");
+      return fileSystems.template As<A::FileSystem*>()->GetFolder(path);
+   }
+
+   /// Get the current working path (where the main exe was executed)         
+   ///   @return the path                                                     
+   const Path& Runtime::GetWorkingPath() const {
+      auto& fileSystems = GetModules<A::FileSystem>();
+      LANGULUS_ASSERT(fileSystems, Module,
+         "Can't retrieve working path", " - no file system module available");
+      return fileSystems.template As<A::FileSystem*>()->GetWorkingPath();
+   }
+
+   /// Get the current data path, like GetWorkingPath() / "data"              
+   ///   @return the path                                                     
+   const Path& Runtime::GetDataPath() const {
+      auto& fileSystems = GetModules<A::FileSystem>();
+      LANGULUS_ASSERT(fileSystems, Module,
+         "Can't retrieve data path", " - no file system module available");
+      return fileSystems.template As<A::FileSystem*>()->GetDataPath();
+   }
 
 } // namespace Langulus::Entity

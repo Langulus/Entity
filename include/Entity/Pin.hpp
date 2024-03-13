@@ -7,18 +7,13 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include "../../source/Thing.hpp"
-#include "../../source/Thing.inl"
-#include "../../source/Thing-Gather.inl"
-#include "../../source/Thing-Seek.inl"
-#include "Unit.hpp"
-#include "Pin.hpp"
+#include "../../source/Pin.inl"
 
 
 namespace Langulus
 {
 
-   using Thing   = Entity::Thing;
-   using Runtime = Entity::Runtime;
+   template<class T>
+   using Pin = Entity::Pin<T>;
 
 } // namespace Langulus

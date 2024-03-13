@@ -8,9 +8,11 @@
 ///                                                                           
 #pragma once
 #include "Asset.hpp"
+#include <Flow/Rate.hpp>
 
 LANGULUS_DEFINE_TRAIT(Material, "Material unit");
 LANGULUS_DEFINE_TRAIT(Shader,   "Shader unit");
+LANGULUS_EXCEPTION(Material);
 
 
 namespace Langulus
@@ -64,7 +66,7 @@ namespace Langulus
 
    namespace A
    {
-      
+
       ///                                                                     
       ///   Abstract material content                                         
       ///                                                                     
@@ -72,14 +74,16 @@ namespace Langulus
          LANGULUS_BASES(Asset);
          using Asset::Asset;
 
-         NOD() virtual Ref<Material> GetLOD(const LOD&) const = 0;
+         NOD() virtual Ref<Material> GetLOD(const Math::LOD&) const = 0;
 
-         NOD() const TraitList& GetInputs(Rate) const;
+         NOD() const TraitList& GetInputs(Flow::Rate) const;
          NOD() const TraitList& GetInputs(Offset) const;
 
-         NOD() const TraitList& GetOutputs(Rate) const;
+         NOD() const TraitList& GetOutputs(Flow::Rate) const;
          NOD() const TraitList& GetOutputs(Offset) const;
       };
 
    } // namespace Langulus::A
 } // namespace Langulus
+
+#include "Material.inl"

@@ -6,10 +6,8 @@
 /// Distributed under GNU General Public License v3+                          
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
+#include "Thing.hpp"
 #include "Thing.inl"
-#include "Runtime.hpp"
-#include <Flow/Verbs/Interpret.hpp>
-
 
 #if 0
    #define ENTITY_VERBOSE_ENABLED() 1
@@ -50,8 +48,7 @@ namespace Langulus::Entity
       // Each trained AI in the hierarchy will produce its own          
       // interpretation                                                 
       auto messages = CreateData(
-         Construct::From<Lingua>(static_cast<const Text&>(text))
-      );
+         Construct::From<Lingua>(static_cast<const Text&>(text)));
 
       Verbs::InterpretAs<Flow::Temporal> interpreter;
       if (not Flow::DispatchFlat(messages, interpreter)) {  
@@ -90,9 +87,9 @@ namespace Langulus::Entity
    ///   @param verb - the selection verb                                     
    void Thing::Select(Verb& verb) {
       // Probe every part of the argument and check if it matches       
-      TAny<Trait> selectedTraits;
+      TAny<Trait>    selectedTraits;
       TAny<A::Unit*> selectedUnits;
-      TAny<Thing*> selectedEntities;
+      TAny<Thing*>   selectedEntities;
       bool mismatch = false;
 
       const auto selectTrait = [&](const TMeta& trait) {

@@ -9,8 +9,8 @@
 #pragma once
 #include "Pin.hpp"
 
-#define TEMPLATE() template<class T>
-#define PINNED() Pin<T>
+#define TEMPLATE()   template<class T>
+#define PINNED()     Pin<T>
 
 
 namespace Langulus::Entity

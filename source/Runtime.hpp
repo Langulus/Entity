@@ -13,6 +13,9 @@
 namespace Langulus::Entity
 {
 
+   class Thing;
+
+
    ///                                                                        
    ///   Runtime                                                              
    ///                                                                        
@@ -99,7 +102,7 @@ namespace Langulus::Entity
       Runtime() = delete;
       Runtime(Runtime&&) noexcept = default;
 
-      LANGULUS_API(ENTITY) Runtime(Thing*) noexcept;
+      LANGULUS_API(ENTITY)  Runtime(Thing*) noexcept;
       LANGULUS_API(ENTITY) ~Runtime();
 
       NOD() auto GetOwner() const noexcept { return mOwner; }

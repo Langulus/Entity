@@ -7,15 +7,7 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include "Module.hpp"
-#include "Unit.hpp"
-#include "Runtime.hpp"
-#include <Anyness/Path.hpp>
-#include <Flow/Factory.hpp>
-#include <Flow/Rate.hpp>
-#include <Math/LOD.hpp>
-#include <Math/Mapping.hpp>
-#include <Math/Scale.hpp>
+#include "../Entity/Thing.hpp"
 
 LANGULUS_DEFINE_TRAIT(FOV,
    "Horizontal field of view angle, usually a real number");
