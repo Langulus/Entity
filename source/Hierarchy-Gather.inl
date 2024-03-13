@@ -9,8 +9,8 @@
 #pragma once
 #include "Hierarchy.hpp"
 
-#define TEMPLATE() template<class THIS>
-#define TME() SeekInterface<THIS>
+#define TEMPLATE()   template<class THIS>
+#define TME()        SeekInterface<THIS>
 
 
 namespace Langulus::Entity
@@ -98,10 +98,9 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param meta - the units to seek for                                  
    ///   @return the gathered units that match the type                       
-   template<Seek SEEK>
-   LANGULUS(INLINED)
+   template<Seek SEEK> LANGULUS(INLINED)
    TAny<A::Unit*> Hierarchy::GatherUnits(DMeta meta) {
-      TAny<Unit*> result;
+      TAny<A::Unit*> result;
       for (auto owner : *this)
          result += owner->template GatherUnits<SEEK>(meta);
       return Abandon(result);
@@ -111,8 +110,7 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @param trait - the trait to seek for                                 
    ///   @return the gathered traits that match the type                      
-   template<Seek SEEK>
-   LANGULUS(INLINED)
+   template<Seek SEEK> LANGULUS(INLINED)
    TAny<Trait> Hierarchy::GatherTraits(TMeta trait) {
       TAny<Trait> result;
       for (auto owner : *this)
@@ -124,8 +122,7 @@ namespace Langulus::Entity
    ///   @tparam D - type to convert to                                       
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @return the gathered values                                          
-   template<CT::Data D, Seek SEEK>
-   LANGULUS(INLINED)
+   template<CT::Data D, Seek SEEK> LANGULUS(INLINED)
    TAny<D> Hierarchy::GatherValues() const {
       TAny<D> result;
       for (auto owner : *this)

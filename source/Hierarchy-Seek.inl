@@ -270,7 +270,7 @@ namespace Langulus::Entity
    template<Seek SEEK> LANGULUS(INLINED)
    A::Unit* Hierarchy::SeekUnit(DMeta meta, Index offset) {
       for (auto owner : *this) {
-         Unit* result = owner->template SeekUnit<SEEK>(meta, offset);
+         A::Unit* result = owner->template SeekUnit<SEEK>(meta, offset);
          if (result)
             return result;
       }
@@ -287,11 +287,11 @@ namespace Langulus::Entity
    ///   @return the unit if found, or nullptr otherwise                      
    template<Seek SEEK> LANGULUS(INLINED)
    A::Unit* Hierarchy::SeekUnitAux(const Neat& aux, DMeta meta, Index offset) {
-      const Unit* result {};
+      const A::Unit* result {};
 
       // Scan descriptor even if hierarchy is empty                     
       if constexpr (SEEK & Seek::Here) {
-         aux.ForEachDeep([&](const Unit* unit) {
+         aux.ForEachDeep([&](const A::Unit* unit) {
             if (unit->CastsTo(meta)) {
                // Found match                                           
                if (offset == 0) {
@@ -306,7 +306,7 @@ namespace Langulus::Entity
          });
 
          if (result)
-            return const_cast<Unit*>(result);
+            return const_cast<A::Unit*>(result);
       }
       
       // If reached, then no unit was found in the descriptor           
@@ -337,7 +337,7 @@ namespace Langulus::Entity
          });
       }
 
-      return const_cast<Unit*>(result);
+      return const_cast<A::Unit*>(result);
    }
 
    /// Seek a unit with specific properties                                   
@@ -349,7 +349,7 @@ namespace Langulus::Entity
    template<Seek SEEK> LANGULUS(INLINED)
    A::Unit* Hierarchy::SeekUnitExt(DMeta type, const Neat& ext, Index offset) {
       for (auto owner : *this) {
-         Unit* result = owner->template SeekUnitExt<SEEK>(type, ext, offset);
+         A::Unit* result = owner->template SeekUnitExt<SEEK>(type, ext, offset);
          if (result)
             return result;
       }
@@ -368,14 +368,14 @@ namespace Langulus::Entity
    template<Seek SEEK> LANGULUS(INLINED)
    A::Unit* Hierarchy::SeekUnitAuxExt(DMeta type, const Neat& aux, const Neat& ext, Index offset) {
       // Scan descriptor even if hierarchy is empty                     
-      Unit* result {};
-      aux.ForEachDeep([&](const Unit* u) {
+      A::Unit* result {};
+      aux.ForEachDeep([&](const A::Unit* u) {
          if (u->CastsTo(type)) {
             //TODO check construct arguments
             // Found match                                              
             if (offset == 0) {
                // We're done                                            
-               result = const_cast<Unit*>(u);
+               result = const_cast<A::Unit*>(u);
                return Loop::Break;
             }
             else --offset;

@@ -9,6 +9,7 @@
 #pragma once
 #include "../Entity/Thing.hpp"
 #include <Flow/Factory.hpp>
+#include <Math/LOD.hpp>
 
 
 namespace Langulus::A

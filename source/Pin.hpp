@@ -7,7 +7,7 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include "Module.hpp"
+#include "Common.hpp"
 
 
 namespace Langulus

@@ -65,5 +65,3 @@ namespace Langulus::A
    };
 
 } // namespace Langulus::A
-
-#include "Platform.inl"

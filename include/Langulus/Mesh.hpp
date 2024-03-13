@@ -7,7 +7,8 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include "Asset.hpp>
+#include "Asset.hpp"
+#include <Math/Mapping.hpp>
 
 LANGULUS_DEFINE_TRAIT(Mesh, "Mesh unit");
 LANGULUS_EXCEPTION(Mesh);
@@ -15,12 +16,6 @@ LANGULUS_EXCEPTION(Mesh);
 
 namespace Langulus
 {
-
-   using namespace Langulus::Flow;
-   using namespace Langulus::Anyness;
-   using namespace Langulus::Entity;
-   using namespace Langulus::Math;
-
 
    ///                                                                        
    ///   Vertex/index buffer view                                             
@@ -39,7 +34,7 @@ namespace Langulus
       // Double-sidedness                                               
       bool mBilateral {};
       // Texture mapping mode                                           
-      MapMode mTextureMapping {};
+      Math::MapMode mTextureMapping {};
 
       bool operator == (const MeshView&) const noexcept;
 
@@ -67,15 +62,15 @@ namespace Langulus::A
       NOD() bool CheckTopology() const;
       NOD() DMeta GetTopology() const noexcept;
 
-      NOD() MapMode GetTextureMapper() const noexcept;
+      NOD() Math::MapMode GetTextureMapper() const noexcept;
 
       NOD() const MeshView& GetView() const noexcept;
       NOD() MeshView& GetView() noexcept;
 
-      NOD() virtual Ref<Mesh> GetLOD(const LOD&) const = 0;
+      NOD() virtual Ref<Mesh> GetLOD(const Math::LOD&) const = 0;
 
-      NOD() Vec2u InnerGetIndices(const Data*, const Vec2u&) const;
-      NOD() Vec3u InnerGetIndices(const Data*, const Vec3u&) const;
+      NOD() Math::Vec2u InnerGetIndices(const Data*, const Math::Vec2u&) const;
+      NOD() Math::Vec3u InnerGetIndices(const Data*, const Math::Vec3u&) const;
 
       //                                                                
       NOD() bool MadeOfPoints() const noexcept;
@@ -86,14 +81,14 @@ namespace Langulus::A
       //                                                                
       NOD() bool MadeOfLines() const noexcept;
       NOD() Count GetLineCount() const;
-      NOD() Vec2u GetLineIndices(Offset) const;
+      NOD() Math::Vec2u GetLineIndices(Offset) const;
       template<CT::Trait T>
       NOD() Any GetLineTrait(Offset) const;
 
       //                                                                
       NOD() bool MadeOfTriangles() const noexcept;
       NOD() Count GetTriangleCount() const;
-      NOD() Vec3u GetTriangleIndices(Offset) const;
+      NOD() Math::Vec3u GetTriangleIndices(Offset) const;
       template<CT::Trait T>
       NOD() Any GetTriangleTrait(Offset) const;
    };
@@ -108,3 +103,5 @@ namespace Langulus::CT
    concept Mesh = DerivedFrom<T, A::Mesh>;
 
 } // namespace Langulus::CT
+
+#include "Mesh.inl"

@@ -6,9 +6,9 @@
 /// Distributed under GNU General Public License v3+                          
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
+#include "Thing.hpp"
 #include "Thing.inl"
 #include "Thing-Seek.inl"
-#include "Pin.inl"
 
 #if 0
    #define ENTITY_VERBOSE_ENABLED() 1
@@ -220,7 +220,7 @@ namespace Langulus::Entity
       if (not found)
          return 0;
 
-      Count counter {};
+      Count counter = 0;
       for (auto& trait : *found.mValue) {
          if (trait == trait)
             ++counter;
