@@ -323,7 +323,7 @@ namespace Langulus::Entity
    ///   @param id - the type of the unit                                     
    ///   @param index - the unit index to seek                                
    ///   @return the unit if found, or nullptr if not                         
-   Unit* Thing::GetUnitMeta(DMeta id, Index index) {
+   A::Unit* Thing::GetUnitMeta(DMeta id, Index index) {
       if (id) {
          // Search a typed trait                                        
          const auto found = mUnitsAmbiguous.FindIt(id);
@@ -334,7 +334,7 @@ namespace Langulus::Entity
       return mUnitsList[index].Get();
    }
 
-   const Unit* Thing::GetUnitMeta(DMeta type, Index offset) const {
+   const A::Unit* Thing::GetUnitMeta(DMeta type, Index offset) const {
       return const_cast<Thing*>(this)->GetUnitMeta(type, offset);
    }
    
@@ -345,7 +345,7 @@ namespace Langulus::Entity
    ///   @param what - the desired properties of the unit                     
    ///   @param index - the unit index to seek                                
    ///   @return the unit if found, or nullptr if not                         
-   Unit* Thing::GetUnitExt(DMeta meta, const Neat& what, Index index) {
+   A::Unit* Thing::GetUnitExt(DMeta meta, const Neat& what, Index index) {
       if (meta) {
          // Search a typed unit                                         
          const auto found = mUnitsAmbiguous.FindIt(meta);
@@ -382,7 +382,7 @@ namespace Langulus::Entity
       return nullptr;
    }
 
-   const Unit* Thing::GetUnitExt(DMeta meta, const Neat& what, Index index) const {
+   const A::Unit* Thing::GetUnitExt(DMeta meta, const Neat& what, Index index) const {
       return const_cast<Thing*>(this)->GetUnitExt(meta, what, index);
    }
 
@@ -391,7 +391,7 @@ namespace Langulus::Entity
    ///   @param token - the type name of the unit                             
    ///   @param offset - the unit index                                       
    ///   @return the unit if found, or nullptr if not                         
-   Unit* Thing::GetUnitMeta(const Token& token, Index offset) {
+   A::Unit* Thing::GetUnitMeta(const Token& token, Index offset) {
       return GetUnitMeta(RTTI::DisambiguateMeta(token), offset);
    }
 #endif
@@ -538,7 +538,7 @@ namespace Langulus::Entity
    ///   @param module - name of the module                                   
    ///   @param descriptor - instructions for module setup                    
    ///   @return the instantiated module interface                            
-   Module* Thing::LoadMod(const Token& module, const Neat& descriptor) {
+   A::Module* Thing::LoadMod(const Token& module, const Neat& descriptor) {
       const auto runtime = GetRuntime();
       LANGULUS_ASSUME(UserAssumes, runtime,
          "No runtime available for loading a module");

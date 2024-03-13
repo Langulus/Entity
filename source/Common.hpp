@@ -7,6 +7,12 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
+#include <Anyness/TSet.hpp>
+#include <Anyness/TMap.hpp>
+#include <Anyness/TAny.hpp>
+#include <Anyness/Ref.hpp>
+#include <Anyness/Trait.hpp>
+#include <Anyness/Path.hpp>
 #include <Flow/Verb.hpp>
 #include <Flow/Resolvable.hpp>
 
@@ -17,30 +23,28 @@
 #endif
 
 
+namespace Langulus
+{
+
+   using namespace Anyness;
+   using namespace Flow;
+
+} // namespace Langulus::Entity
+
 namespace Langulus::Entity
 {
 
-   using namespace ::Langulus::Anyness;
-
-   using Flow::Verb;
-   using Flow::Seek;
-   using Flow::Resolvable;
-   using Flow::Temporal;
-   using Flow::Code;
-
-   //                                                                   
-   // Some predeclarations:                                             
-
-   struct Unit;
    class Thing;
    class Runtime;
-   class Module;
    struct Hierarchy;
 
 } // namespace Langulus::Entity
 
 namespace Langulus::A
 {
+
+   struct Unit;
+   class Module;
 
    struct PlatformModule;
    struct Platform;
@@ -69,6 +73,18 @@ namespace Langulus::A
    struct Mesh;
    struct Material;
    struct Image;
+
+   namespace UI
+   {
+
+      struct Module;
+      struct Unit;
+      struct System;
+      struct Button;
+      struct Text;
+      struct Input;
+
+   } // namespace Langulus::A::UI
 
 } // namespace Langulus::A
 
