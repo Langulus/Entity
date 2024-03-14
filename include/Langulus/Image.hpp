@@ -78,8 +78,6 @@ namespace Langulus::A
 
       NOD() constexpr Iterator<true>  begin() noexcept;
       NOD() constexpr Iterator<false> begin() const noexcept;
-      NOD() constexpr Iterator<true>  last() noexcept;
-      NOD() constexpr Iterator<false> last() const noexcept;
       constexpr A::IteratorEnd        end() const noexcept { return {}; }
    };
   
@@ -93,6 +91,8 @@ namespace Langulus::A
       LANGULUS(ABSTRACT) false;
 
    protected:
+      friend struct Image;
+
       // Current iterator position pointer                              
       Byte const* mValue;
       // Iterator position which is considered the 'end' iterator       

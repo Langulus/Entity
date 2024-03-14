@@ -181,6 +181,8 @@ namespace Langulus::Entity
          if (list.Remove(module) and not list) {
             VERBOSE("Unregistering `", type, '`');
             map.RemoveIt(found);
+            if (not map)
+               map.Reset();
          }
       }
    }
@@ -230,6 +232,8 @@ namespace Langulus::Entity
             if (not *found.mValue)
                mModules.RemoveIt(found);
          }
+         if (not mModules)
+            mModules.Reset();
 
          UnregisterAllBases(mModulesByType, module, module->GetType());
          delete module;
@@ -243,10 +247,10 @@ namespace Langulus::Entity
    }
 
    /// Load a shared library for a module                                     
-   ///   @param name - the name for the dynamic library                       
-   ///                 the filename will be derived from it, by prefixing     
-   ///                 with `LangulusMod`, and suffixing with `.so` or `.dll` 
-   ///                 the name also should correspond to the RTTI::Boundary  
+   ///   @param name - the name for the dynamic library - the filename will   
+   ///      be derived from it, by prefixing with `LangulusMod`, and          
+   ///      suffixing with `.so` or `.dll` the name also should correspond to 
+   ///      the RTTI::Boundary                                                
    ///   @return the module handle (OS dependent)                             
    LANGULUS(NOINLINE)
    Runtime::SharedLibrary Runtime::LoadSharedLibrary(const Token& name) {
@@ -285,7 +289,8 @@ namespace Langulus::Entity
       #endif
 
       if (not dll) {
-         Logger::Error("Failed to load module `", path, "` - file is missing or corrupted; Error code: ");
+         Logger::Error("Failed to load module `", path, "` - "
+            "file is missing or corrupted; Error code: ");
          #if LANGULUS_OS(WINDOWS)
             Logger::Append(::GetLastError());
          #else
@@ -403,6 +408,8 @@ namespace Langulus::Entity
          Logger::Error("Could not enter `", path, "` due to an exception");
          if (UnloadSharedLibrary(library))
             mLibraries.RemoveKey(name);
+         if (not mLibraries)
+            mLibraries.Reset();
          return {};
       }
 
@@ -436,6 +443,12 @@ namespace Langulus::Entity
             list = mModules.RemoveIt(list);
       }
 
+      // Make sure memory for the maps is released                      
+      if (not mModulesByType)
+         mModulesByType.Reset();
+      if (not mModules)
+         mModules.Reset();
+
       // Collect garbage, and check if library's boundary is still used 
       const auto wasMarked = library.mMarkedForUnload;
       const auto boundary = library.mBoundary;
@@ -453,8 +466,7 @@ namespace Langulus::Entity
                Logger::Warning(
                   "Module `", boundary, "` can't be unloaded yet, because "
                   "exposed data is still in use in ", poolsInUse, " memory pools. "
-                  "Unload has been postponed to the next library unload."
-               );
+                  "Unload has been postponed to the next library unload.");
                const_cast<SharedLibrary&>(library).mMarkedForUnload = true;
             }
 

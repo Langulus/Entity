@@ -34,7 +34,7 @@ namespace Langulus
 namespace Langulus::A
 {
 
-   class Module;
+   /*class Module;
    struct Unit;
 
    struct PlatformModule;
@@ -75,7 +75,7 @@ namespace Langulus::A
       struct Text;
       struct Input;
 
-   } // namespace Langulus::A::UI
+   }*/ // namespace Langulus::A::UI
 
 } // namespace Langulus::A
 

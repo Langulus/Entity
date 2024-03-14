@@ -14,6 +14,11 @@ LANGULUS_EXCEPTION(Module);
 
 namespace Langulus
 {
+   namespace A
+   {
+      class Module;
+   }
+
 
    using MetaList = TUnorderedSet<AMeta>;
    using TraitList = TAny<Trait>;
