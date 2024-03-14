@@ -8,6 +8,8 @@
 ///                                                                           
 #pragma once
 #include "Hierarchy.hpp"
+#include "Thing.hpp"
+#include "Unit.hpp"
 
 #define TEMPLATE()   template<class THIS>
 #define TME()        SeekInterface<THIS>

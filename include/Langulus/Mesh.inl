@@ -300,10 +300,10 @@ namespace Langulus::A
          return {};
 
       Any soughtDecayed;
-      if (soughtt->template CastsTo<Triangle3>())
-         soughtDecayed = soughtt->template ReinterpretAs<Point3>();
-      else if (soughtt->template CastsTo<Triangle2>())
-         soughtDecayed = soughtt->template ReinterpretAs<Point2>();
+      if (soughtt->template CastsTo<Math::Triangle3>())
+         soughtDecayed = soughtt->template ReinterpretAs<Math::Point3>();
+      else if (soughtt->template CastsTo<Math::Triangle2>())
+         soughtDecayed = soughtt->template ReinterpretAs<Math::Point2>();
       else
          soughtDecayed = *soughtt;
 
@@ -389,10 +389,10 @@ namespace Langulus::A
          return {};
 
       Any soughtDecayed;
-      if (soughtt->template CastsTo<Triangle3>())
-         soughtDecayed = soughtt->template ReinterpretAs<Point3>();
-      else if (soughtt->template CastsTo<Triangle2>())
-         soughtDecayed = soughtt->template ReinterpretAs<Point2>();
+      if (soughtt->template CastsTo<Math::Triangle3>())
+         soughtDecayed = soughtt->template ReinterpretAs<Math::Point3>();
+      else if (soughtt->template CastsTo<Math::Triangle2>())
+         soughtDecayed = soughtt->template ReinterpretAs<Math::Point2>();
       else
          soughtDecayed = *soughtt;
 
