@@ -72,11 +72,11 @@ namespace Langulus::Entity
    template<Seek SEEK> LANGULUS(INLINED)
    A::Unit* Thing::SeekUnitAux(const Neat& aux, DMeta meta, Index offset) {
       A::Unit* result {};
-      aux.ForEachDeep([&](const Unit* unit) {
+      aux.ForEachDeep([&](const A::Unit* unit) {
          if (unit->CastsTo(meta)) {
             if (offset == 0) {
                // Found match                                           
-               result = const_cast<Unit*>(unit);
+               result = const_cast<A::Unit*>(unit);
                return Loop::Break;
             }
             else --offset;
@@ -143,13 +143,13 @@ namespace Langulus::Entity
    A::Unit* Thing::SeekUnitAuxExt(DMeta type, const Neat& aux, const Neat& ext, Index offset) {
       // Scan descriptor even if hierarchy is empty                     
       A::Unit* result {};
-      aux.ForEachDeep([&](const Unit* unit) {
+      aux.ForEachDeep([&](const A::Unit* unit) {
          if (unit->CastsTo(type)) {
             //TODO check construct arguments
             // Found match                                              
             if (offset == 0) {
                // We're done                                            
-               result = const_cast<Unit*>(unit);
+               result = const_cast<A::Unit*>(unit);
                return Loop::Break;
             }
             else --offset;

@@ -10,6 +10,12 @@
 #include "Module.hpp"
 
 
+namespace Langulus::A
+{
+   struct File;
+   struct Folder;
+}
+
 namespace Langulus::Entity
 {
 

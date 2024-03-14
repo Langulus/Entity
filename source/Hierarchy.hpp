@@ -10,6 +10,11 @@
 #include "Module.hpp"
 
 
+namespace Langulus::A
+{
+   struct Unit;
+}
+
 namespace Langulus::Entity
 {
 
