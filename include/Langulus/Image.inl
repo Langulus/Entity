@@ -161,7 +161,8 @@ namespace Langulus::A
       Commit<Traits::Color>(data.Forward());
    }
 
-   constexpr Image::Iterator<true> Image::begin() noexcept {
+   LANGULUS(INLINED)
+   Image::Iterator<true> Image::begin() noexcept {
       return {
          this,
          reinterpret_cast<const Byte*>(GetData<Traits::Color>()->GetRaw()),
@@ -169,7 +170,8 @@ namespace Langulus::A
       };
    }
 
-   constexpr Image::Iterator<false> Image::begin() const noexcept {
+   LANGULUS(INLINED)
+   Image::Iterator<false> Image::begin() const noexcept {
       return {
          const_cast<Image*>(this),
          reinterpret_cast<const Byte*>(GetData<Traits::Color>()->GetRaw()),
