@@ -312,11 +312,11 @@ namespace Langulus::Entity
          library.mInfo = reinterpret_cast<A::Module::InfoFunction>(
             GetProcAddress(dll, LANGULUS_MODULE_INFO_TOKEN()));
       #elif LANGULUS_OS(LINUX)
-         library.mEntry = reinterpret_cast<Module::EntryFunction>(
+         library.mEntry = reinterpret_cast<A::Module::EntryFunction>(
             dlsym(dll, LANGULUS_MODULE_ENTRY_TOKEN()));
-         library.mCreator = reinterpret_cast<Module::CreateFunction>(
+         library.mCreator = reinterpret_cast<A::Module::CreateFunction>(
             dlsym(dll, LANGULUS_MODULE_CREATE_TOKEN()));
-         library.mInfo = reinterpret_cast<Module::InfoFunction>(
+         library.mInfo = reinterpret_cast<A::Module::InfoFunction>(
             dlsym(dll, LANGULUS_MODULE_INFO_TOKEN()));
       #else 
          #error Unsupported OS
