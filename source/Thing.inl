@@ -9,6 +9,7 @@
 #pragma once
 #include "Thing.hpp"
 #include "Thing-Gather.inl"
+#include "Thing-Seek.inl"
 
 #if 0
    #define ENTITY_VERBOSE_ENABLED() 1

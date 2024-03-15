@@ -8,6 +8,8 @@
 ///                                                                           
 #include "Unit.hpp"
 #include "Thing.inl"
+#include "Unit-Gather.inl"
+#include "Unit-Seek.inl"
 
 using namespace Langulus::A;
 
