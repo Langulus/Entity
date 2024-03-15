@@ -7,12 +7,12 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
+#include "Pin.hpp"
 #include "Unit.hpp"
 #include "../../source/Thing.hpp"
 #include "../../source/Thing.inl"
 #include "../../source/Thing-Gather.inl"
 #include "../../source/Thing-Seek.inl"
-#include "Pin.hpp"
 
 
 namespace Langulus
