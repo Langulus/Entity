@@ -76,9 +76,9 @@ namespace Langulus::A
       template<bool MUTABLE>
       struct Iterator;
 
-      NOD() constexpr Iterator<true>  begin() noexcept;
-      NOD() constexpr Iterator<false> begin() const noexcept;
-      constexpr A::IteratorEnd        end() const noexcept { return {}; }
+      NOD() Iterator<true>  begin() noexcept;
+      NOD() Iterator<false> begin() const noexcept;
+      constexpr A::IteratorEnd end() const noexcept { return {}; }
    };
   
 
