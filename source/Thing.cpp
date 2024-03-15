@@ -7,7 +7,6 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #include "Thing.hpp"
-#include "Pin.inl"
 #include "Thing.inl"
 
 #if 0
