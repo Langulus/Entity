@@ -107,11 +107,11 @@ namespace Langulus::Entity
          }
          else if (id.template IsTrait<Traits::Runtime>()) {
             // Get the nearest runtime                                  
-            return Traits::Runtime {mRuntime->Get()};
+            return Traits::Runtime {&**mRuntime};
          }
          else if (id.template IsTrait<Traits::Parent>()) {
             // Get the parent                                           
-            return Traits::Parent {mOwner.Get()};
+            return Traits::Parent {&*mOwner};
          }
       }
 
@@ -119,28 +119,6 @@ namespace Langulus::Entity
       auto found = GetLocalTrait(id.GetTrait(), index);
       if (found)
          return *found;
-
-      // Then check each unit's static traits                           
-      //TODO, hm, this feeds back onto units, so we should probably expose
-      //traits explicitly from the unit itself, in order for them to be reachable
-      //this way we also save on this whole loop with many indirections
-      /*Trait output;
-      for (auto& unit : mUnitsList) {
-         auto t = unit->GetMember(id.GetTrait(), index);
-         if (t) {
-            output = Trait::From(id.GetTrait(), t);
-            break;
-         }
-      }
-
-      if (output)
-         return Abandon(output); */
-
-      // Finally, check this entity's static traits                     
-      //TODO shouldn't this be handled at the beginning of this func?
-      /*auto t = GetMember(id.GetTrait(), index);
-      if (t)
-         return Trait::From(id.GetTrait(), t);*/
 
       // Nothing was found                                              
       return {};
