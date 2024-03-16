@@ -237,10 +237,85 @@ namespace Langulus::A
    }
 
    /// Interpret the pixel as a desired color format                          
-   template<bool M> template<CT::ColorBased T> LANGULUS(INLINED)
+   template<bool M> template<CT::ColorBased T>
    T Image::Iterator<M>::As() const {
-      TODO();
-      return {};
+      const auto from = mImage->GetView().mFormat;
+      LANGULUS_ASSUME(DevAssumes, from, "No color type");
+      const auto fromRed = from->GetMember(MetaOf<Traits::R>());
+      const auto fromGre = from->GetMember(MetaOf<Traits::G>());
+      const auto fromBlu = from->GetMember(MetaOf<Traits::B>());
+      const auto fromAlf = from->GetMember(MetaOf<Traits::A>());
+      const RTTI::Member* fromAny =
+         fromRed ? fromRed :
+         fromGre ? fromGre :
+         fromBlu ? fromBlu :
+         fromAlf ? fromAlf :
+         nullptr;
+
+      LANGULUS_ASSUME(DevAssumes, fromAny, "Supposed color type doesn't have "
+         "a recognizable channel member");
+
+      // Get the values (and normalize them if we have to)              
+      // Missing RGB channels are defaulted to 0, while missing Alpha   
+      // channel is defaulted to 255 (or 1, if normalized)              
+      const Anyness::Block pixel {{}, from, 1, mValue, nullptr};
+      T result;
+      using TT = TypeOf<T>;
+
+      if constexpr (requires { result.r; }) {
+         if (fromRed)
+            result.r = pixel.GetMember(*fromRed, 0).AsCast<TT>();
+         else
+            result.r = TT {0};
+      }
+
+      if constexpr (requires { result.g; }) {
+         if (fromGre)
+            result.g = pixel.GetMember(*fromGre, 0).AsCast<TT>();
+         else
+            result.g = TT {0};
+      }
+
+      if constexpr (requires { result.b; }) {
+         if (fromBlu)
+            result.b = pixel.GetMember(*fromBlu, 0).AsCast<TT>();
+         else
+            result.b = TT {0};
+      }
+
+      if constexpr (requires { result.a; }) {
+         if (fromAlf)
+            result.a = pixel.GetMember(*fromAlf, 0).AsCast<TT>();
+         else if constexpr (CT::Integer<TT>)
+            result.a = std::numeric_limits<TT>::max();
+         else
+            result.a = TT {1};
+      }
+
+      if constexpr (not CT::Integer<TT>) {
+         if (fromAny->GetType()->CastsTo<A::Integer>()) {
+            // We have to normalize the color                           
+            if (fromAny->GetType()->CastsTo<A::Unsigned>()) {
+               // Unsigned normalization                                
+               switch (fromAny->GetType()->mSize) {
+               case 1:
+                  result /= TT {255};
+                  break;
+               case 2:
+                  result /= TT {65535};
+                  break;
+               case 4:
+                  result /= TT {16777215};
+                  break;
+               default:
+                  LANGULUS_OOPS(Image, "Unhandled channel size");
+               }
+            }
+            else LANGULUS_OOPS(Image, "Unhandled channel format");
+         }
+      }
+
+      return result;
    }
 
 } // namespace Langulus::A

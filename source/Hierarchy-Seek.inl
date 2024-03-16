@@ -183,15 +183,21 @@ namespace Langulus::Entity
    TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
    bool TME()::SeekValue(CT::Tagged auto& output, Index offset) const {
       using T = Deref<decltype(output)>;
-      return static_cast<const THIS*>(this)->template
-         SeekValue<SEEK>(MetaTraitOf<typename T::TagType>(), output.mData, offset);
+      auto lambda = [&]<class T>() {
+         return static_cast<const THIS*>(this)->template
+            SeekValue<SEEK>(MetaTraitOf<T>(), output.mData, offset);
+      };
+      return T::Tags::ForEachOr(lambda);
    }
 
    TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
    bool TME()::SeekValueAux(const Neat& aux, CT::Tagged auto& output, Index offset) const {
       using T = Deref<decltype(output)>;
-      return static_cast<const THIS*>(this)->template
-         SeekValueAux<SEEK>(MetaTraitOf<typename T::TagType>(), aux, output.mData, offset);
+      auto lambda = [&]<class T>() {
+         return static_cast<const THIS*>(this)->template
+            SeekValueAux<SEEK>(MetaTraitOf<T>(), aux, output.mData, offset);
+      };
+      return T::Tags::ForEachOr(lambda);
    }
    
 
