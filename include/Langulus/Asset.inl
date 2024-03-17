@@ -57,8 +57,7 @@ namespace Langulus::A
    /// Get a data list from the contents                                      
    ///   @tparam T - the trait to search for                                  
    ///   @return a pointer to the data list, or nullptr if none exists        
-   template<CT::Trait T>
-   LANGULUS(INLINED)
+   template<CT::Trait T> LANGULUS(INLINED)
    const Asset::DataList* Asset::GetDataList() const noexcept {
       return GetDataList(MetaTraitOf<T>());
    }
