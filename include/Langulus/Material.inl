@@ -17,7 +17,7 @@ namespace Langulus::A
    ///   @param rate - the rate                                               
    ///   @return the input trait list                                         
    LANGULUS(INLINED)
-   const TraitList& Material::GetInputs(Rate rate) const {
+   const TraitList& Material::GetInputs(RefreshRate rate) const {
       return GetInputs(rate.GetInputIndex());
    }
 
@@ -31,10 +31,10 @@ namespace Langulus::A
          Asset::mDataListMap.ContainsKey(MetaOf<Traits::Input>()),
          "Material doesn't contain inputs");
       LANGULUS_ASSUME(DevAssumes,
-         Asset::GetDataList<Traits::Input>()->GetCount() == Rate::InputCount,
+         Asset::GetDataList<Traits::Input>()->GetCount() == RefreshRate::InputCount,
          "Material doesn't contain the correct number of rates");
       LANGULUS_ASSUME(DevAssumes,
-         rate < Rate::InputCount,
+         rate < RefreshRate::InputCount,
          "Input offset out of range");
 
       return *reinterpret_cast<const TraitList*>(
@@ -45,7 +45,7 @@ namespace Langulus::A
    ///   @param rate - the rate                                               
    ///   @return the output trait list                                        
    LANGULUS(INLINED)
-   const TraitList& Material::GetOutputs(Rate rate) const {
+   const TraitList& Material::GetOutputs(RefreshRate rate) const {
       return GetOutputs(rate.GetInputIndex());
    }
 
@@ -59,10 +59,10 @@ namespace Langulus::A
          Asset::mDataListMap.ContainsKey(MetaOf<Traits::Output>()),
          "Material doesn't contain inputs");
       LANGULUS_ASSUME(DevAssumes,
-         Asset::GetDataList<Traits::Output>()->GetCount() == Rate::InputCount,
+         Asset::GetDataList<Traits::Output>()->GetCount() == RefreshRate::InputCount,
          "Material doesn't contain the correct number of rates");
       LANGULUS_ASSUME(DevAssumes,
-         rate < Rate::InputCount,
+         rate < RefreshRate::InputCount,
          "Input offset out of range");
 
       return *reinterpret_cast<const TraitList*>(

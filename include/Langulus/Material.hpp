@@ -76,10 +76,10 @@ namespace Langulus
 
          NOD() virtual Ref<Material> GetLOD(const Math::LOD&) const = 0;
 
-         NOD() const TraitList& GetInputs(Flow::Rate) const;
+         NOD() const TraitList& GetInputs(RefreshRate) const;
          NOD() const TraitList& GetInputs(Offset) const;
 
-         NOD() const TraitList& GetOutputs(Flow::Rate) const;
+         NOD() const TraitList& GetOutputs(RefreshRate) const;
          NOD() const TraitList& GetOutputs(Offset) const;
       };
 
