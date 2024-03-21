@@ -21,6 +21,13 @@ namespace Langulus::A
    struct AssetModule : Module {
       LANGULUS_BASES(Module);
       using Module::Module;
+
+   protected:
+      // Data folder, where assets will be saved or loaded from         
+      Ref<A::Folder> mFolder;
+
+   public:
+      const Ref<A::Folder>& GetFolder() const noexcept;
    };
 
    ///                                                                        

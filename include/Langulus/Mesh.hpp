@@ -61,6 +61,7 @@ namespace Langulus::A
       template<CT::Topology, CT::Topology...>
       NOD() bool CheckTopology() const;
       NOD() DMeta GetTopology() const noexcept;
+      NOD() Math::MapModeType GetTextureMapper() const noexcept;
 
       NOD() MeshView const& GetView() const noexcept;
       NOD() MeshView&       GetView() noexcept;

@@ -81,6 +81,13 @@ namespace Langulus::A
    DMeta Mesh::GetTopology() const noexcept {
       return mView.mTopology;
    }
+   
+   /// Get the texture mapping mode                                           
+   ///   @return the texture mapping mode                                     
+   LANGULUS(INLINED)
+   Math::MapModeType Mesh::GetTextureMapper() const noexcept {
+      return mView.mTextureMapping;
+   }
 
    /// Check if topology matches one of the specified types                   
    ///   @tparam T1, TN - types to check                                      
