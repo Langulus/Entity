@@ -13,6 +13,13 @@
 namespace Langulus::A
 {
    
+   /// Retrieve the asset module's repository folder                          
+   ///   @return a reference to the folder interface                          
+   LANGULUS(INLINED)
+   const Ref<A::Folder>& AssetModule::GetFolder() const noexcept {
+      return mFolder;
+   }
+
    /// Asset constructor                                                      
    ///   @param type - concrete type of the asset                             
    ///   @param producer - the asset library and producer                     
