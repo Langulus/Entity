@@ -82,14 +82,6 @@ namespace Langulus::A
       return mView.mTopology;
    }
 
-   /// Set the topology of the geometry                                       
-   ///   @attention will reset all contents                                   
-   LANGULUS(INLINED)
-   void Mesh::SetTopology(DMeta t) noexcept {
-      mView.mTopology = t;
-      mDataListMap.Reset();
-   }
-
    /// Check if topology matches one of the specified types                   
    ///   @tparam T1, TN - types to check                                      
    ///   @return true if T matches one of the topology types                  
@@ -97,21 +89,6 @@ namespace Langulus::A
    bool Mesh::CheckTopology() const {
       return   mView.mTopology == MetaDataOf<T1>()
           or ((mView.mTopology == MetaDataOf<TN>()) or ...);
-   }
-   
-   /// Get texture mapping mode                                               
-   ///   @return the texturing mode                                           
-   LANGULUS(INLINED)
-   Math::MapMode Mesh::GetTextureMapper() const noexcept {
-      return mView.mTextureMapping;
-   }
-
-   /// Set texture mapping mode                                               
-   ///   @attention will reset texture coordinates                            
-   LANGULUS(INLINED)
-   void Mesh::SetTextureMapper(Math::MapMode m) noexcept {
-      mView.mTextureMapping = m;
-      mDataListMap.RemoveKey(MetaTraitOf<Traits::Sampler>());
    }
 
    /// Get the geometry view (const)                                          
