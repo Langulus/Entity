@@ -80,7 +80,7 @@ namespace Langulus::A
    ///   @param content - the data and semantic to commit                     
    template<CT::Trait T, template<class> class S, CT::Block B>
    requires CT::Semantic<S<B>> LANGULUS(INLINED)
-   void Asset::Commit(S<B>&& content) {
+   void Asset::Commit(S<B>&& content) const {
       const auto found = mDataListMap.FindIt(MetaTraitOf<T>());
       if (found)
          *found.mValue << Any {content.Forward()};

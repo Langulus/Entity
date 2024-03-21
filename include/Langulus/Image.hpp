@@ -68,7 +68,7 @@ namespace Langulus::A
 
       template<template<class> class S, CT::Block B>
       requires CT::Semantic<S<B>>
-      void Upload(S<B>&&);
+      void Upload(S<B>&&) const;
 
       ///                                                                     
       ///   Iteration                                                         

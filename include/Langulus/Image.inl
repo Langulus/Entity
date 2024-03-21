@@ -151,7 +151,7 @@ namespace Langulus::A
    ///   @param data - the block of data                                      
    template<template<class> class S, CT::Block B>
    requires CT::Semantic<S<B>> LANGULUS(INLINED)
-   void Image::Upload(S<B>&& data) {
+   void Image::Upload(S<B>&& data) const {
       // Check if provided data matches the view requirements           
       LANGULUS_ASSERT(mView.GetBytesize() == data->GetBytesize(), Image,
          "Data is of the wrong size");

@@ -40,14 +40,14 @@ namespace Langulus::A
       NOD() const DataListMap& GetDataListMap() const noexcept;
 
       // Map of lists of generated data                                 
-      DataListMap mDataListMap;
+      mutable DataListMap mDataListMap;
 
    public:
       virtual bool Generate(TMeta, Offset = 0) = 0;
 
       template<CT::Trait, template<class> class S, CT::Block B>
       requires CT::Semantic<S<B>>
-      void Commit(S<B>&&);
+      void Commit(S<B>&&) const;
 
       template<CT::Trait>
       NOD() const Data* GetData(Offset = 0) const noexcept;

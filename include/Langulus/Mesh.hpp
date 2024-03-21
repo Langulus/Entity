@@ -34,7 +34,7 @@ namespace Langulus
       // Double-sidedness                                               
       bool mBilateral {};
       // Texture mapping mode                                           
-      Math::MapMode mTextureMapping {};
+      Math::MapModeType mTextureMapping {};
 
       bool operator == (const MeshView&) const noexcept;
 
@@ -61,10 +61,6 @@ namespace Langulus::A
       template<CT::Topology, CT::Topology...>
       NOD() bool CheckTopology() const;
       NOD() DMeta GetTopology() const noexcept;
-      void  SetTopology(DMeta) noexcept;
-
-      NOD() Math::MapMode GetTextureMapper() const noexcept;
-      void SetTextureMapper(Math::MapMode) noexcept;
 
       NOD() MeshView const& GetView() const noexcept;
       NOD() MeshView&       GetView() noexcept;
