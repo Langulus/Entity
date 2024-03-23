@@ -27,18 +27,9 @@ namespace Langulus::A
    ///   @return the input trait list                                         
    LANGULUS(INLINED)
    const TraitList& Material::GetInputs(Offset rate) const {
-      LANGULUS_ASSUME(DevAssumes,
-         Asset::mDataListMap.ContainsKey(MetaOf<Traits::Input>()),
-         "Material doesn't contain inputs");
-      LANGULUS_ASSUME(DevAssumes,
-         Asset::GetDataList<Traits::Input>()->GetCount() == RefreshRate::InputCount,
-         "Material doesn't contain the correct number of rates");
-      LANGULUS_ASSUME(DevAssumes,
-         rate < RefreshRate::InputCount,
+      LANGULUS_ASSUME(DevAssumes, rate < RefreshRate::InputCount,
          "Input offset out of range");
-
-      return *reinterpret_cast<const TraitList*>(
-         Asset::GetData<Traits::Input>(rate));
+      return mInputs[rate];
    }
 
    /// Get output traits for a given rate (const)                             
@@ -55,18 +46,9 @@ namespace Langulus::A
    ///   @return the output trait list                                        
    LANGULUS(INLINED)
    const TraitList& Material::GetOutputs(Offset rate) const {
-      LANGULUS_ASSUME(DevAssumes,
-         Asset::mDataListMap.ContainsKey(MetaOf<Traits::Output>()),
-         "Material doesn't contain inputs");
-      LANGULUS_ASSUME(DevAssumes,
-         Asset::GetDataList<Traits::Output>()->GetCount() == RefreshRate::InputCount,
-         "Material doesn't contain the correct number of rates");
-      LANGULUS_ASSUME(DevAssumes,
-         rate < RefreshRate::InputCount,
+      LANGULUS_ASSUME(DevAssumes, rate < RefreshRate::InputCount,
          "Input offset out of range");
-
-      return *reinterpret_cast<const TraitList*>(
-         Asset::GetData<Traits::Output>(rate));
+      return mOutputs[rate];
    }
 
 } // namespace Langulus::A

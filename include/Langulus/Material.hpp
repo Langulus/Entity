@@ -81,6 +81,10 @@ namespace Langulus
 
          NOD() const TraitList& GetOutputs(RefreshRate) const;
          NOD() const TraitList& GetOutputs(Offset) const;
+
+      protected:
+         mutable TraitList mInputs[RefreshRate::InputCount];
+         mutable TraitList mOutputs[RefreshRate::InputCount];
       };
 
    } // namespace Langulus::A

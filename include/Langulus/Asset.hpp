@@ -30,6 +30,7 @@ namespace Langulus::A
       const Ref<A::Folder>& GetFolder() const noexcept;
    };
 
+
    ///                                                                        
    ///   Abstract asset unit                                                  
    ///                                                                        
@@ -44,8 +45,6 @@ namespace Langulus::A
       using DataListMap = TUnorderedMap<TMeta, DataList>;
 
    protected:
-      NOD() const DataListMap& GetDataListMap() const noexcept;
-
       // Map of lists of generated data                                 
       mutable DataListMap mDataListMap;
 
@@ -63,6 +62,18 @@ namespace Langulus::A
       template<CT::Trait>
       NOD() const DataList* GetDataList() const noexcept;
       NOD() const DataList* GetDataList(TMeta) const noexcept;
+
+   protected:
+      template<CT::Trait>
+      NOD() Data* GetData(Offset = 0) noexcept;
+      NOD() Data* GetData(TMeta, Offset = 0) noexcept;
+
+      template<CT::Trait>
+      NOD() DataList* GetDataList() noexcept;
+      NOD() DataList* GetDataList(TMeta) noexcept;
+
+      NOD() DataListMap const& GetDataListMap() const noexcept;
+      NOD() DataListMap& GetDataListMap() noexcept;
    };
 
 } // namespace Langulus::A
