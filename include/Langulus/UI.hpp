@@ -17,53 +17,60 @@ namespace Langulus::A::UI
    ///                                                                        
    ///   Abstract UI module                                                   
    ///                                                                        
-   struct Module : A::Module {
+   struct Module : virtual A::Module {
       LANGULUS_BASES(A::Module);
-      using A::Module::Module;
+      Module()
+         : Resolvable {DMeta {}}
+         , A::Module {nullptr} {}
    };
 
    ///                                                                        
    ///   Abstract UI unit                                                     
    ///                                                                        
-   struct Unit : A::Unit {
+   struct Unit : virtual A::Unit {
       LANGULUS(PRODUCER) UI::Module;
       LANGULUS_BASES(A::Unit);
-      using A::Unit::Unit;
+      Unit()
+         : Resolvable {DMeta {}} {}
    };
 
    ///                                                                        
    ///   Abstract UI system                                                   
    ///                                                                        
-   struct System : UI::Unit {
+   struct System : virtual UI::Unit {
       LANGULUS_BASES(UI::Unit);
-      using UI::Unit::Unit;
+      System()
+         : Resolvable {DMeta {}} {}
    };
 
    ///                                                                        
    ///   Abstract UI button                                                   
    ///                                                                        
-   struct Button : UI::Unit {
+   struct Button : virtual UI::Unit {
       LANGULUS(PRODUCER) UI::System;
       LANGULUS_BASES(UI::Unit);
-      using UI::Unit::Unit;
+      Button()
+         : Resolvable {DMeta {}} {}
    };
 
    ///                                                                        
    ///   Abstract UI text field                                               
    ///                                                                        
-   struct Text : UI::Unit {
+   struct Text : virtual UI::Unit {
       LANGULUS(PRODUCER) UI::System;
       LANGULUS_BASES(UI::Unit);
-      using UI::Unit::Unit;
+      Text()
+         : Resolvable {DMeta {}} {}
    };
 
    ///                                                                        
    ///   Abstract UI input field                                              
    ///                                                                        
-   struct Input : UI::Unit {
+   struct Input : virtual UI::Unit {
       LANGULUS(PRODUCER) UI::System;
       LANGULUS_BASES(UI::Unit);
-      using UI::Unit::Unit;
+      Input()
+         : Resolvable {DMeta {}} {}
    };
 
 } // namespace Langulus::A::UI

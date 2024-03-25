@@ -20,7 +20,7 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract file system module                                          
    ///                                                                        
-   struct FileSystem : Module {
+   struct FileSystem : virtual Module {
    protected:
       // Working directory path                                         
       // This is the only full path that is exposed to the system,      
@@ -32,7 +32,6 @@ namespace Langulus::A
 
    public:
       LANGULUS_BASES(Module);
-      using Module::Module;
 
       NOD() virtual Ref<File>   GetFile  (const Path&) = 0;
       NOD() virtual Ref<Folder> GetFolder(const Path&) = 0;
@@ -44,7 +43,7 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract file interface                                              
    ///                                                                        
-   struct File : Unit {
+   struct File : virtual Unit {
    protected:
       Path mFilePath;
       bool mExists {};
@@ -55,7 +54,6 @@ namespace Langulus::A
    public:
       LANGULUS(PRODUCER) FileSystem;
       LANGULUS_BASES(Unit);
-      using Unit::Unit;
 
       NOD() bool Exists() const noexcept;
       NOD() bool IsReadOnly() const noexcept;
@@ -111,7 +109,7 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract folder interface                                            
    ///                                                                        
-   struct Folder : Unit {
+   struct Folder : virtual Unit {
    protected:
       Path mFolderPath;
       bool mExists = false;
@@ -120,7 +118,6 @@ namespace Langulus::A
    public:
       LANGULUS(PRODUCER) FileSystem;
       LANGULUS_BASES(Unit);
-      using Unit::Unit;
 
       NOD() bool Exists() const noexcept;
       NOD() bool IsReadOnly() const noexcept;
