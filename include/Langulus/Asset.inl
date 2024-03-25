@@ -20,15 +20,6 @@ namespace Langulus::A
       return mFolder;
    }
 
-   /// Asset constructor                                                      
-   ///   @param type - concrete type of the asset                             
-   ///   @param producer - the asset library and producer                     
-   ///   @param desc - messy descriptor for the content                       
-   LANGULUS(INLINED)
-   Asset::Asset(RTTI::DMeta type, AssetModule* producer, const Neat& desc)
-      : Unit {type}
-      , ProducedFrom<AssetModule> {producer, desc} {}
-
    /// Get the entire content data map                                        
    ///   @attention this doesn't generate any data                            
    ///   @return a reference to the contents                                  

@@ -18,9 +18,9 @@ namespace Langulus
    ///   @return true if both views are the same                              
    LANGULUS(INLINED)
    bool ImageView::operator == (const ImageView& rhs) const noexcept {
-      return mWidth == rhs.mWidth
+      return mWidth  == rhs.mWidth
          and mHeight == rhs.mHeight
-         and mDepth == rhs.mDepth
+         and mDepth  == rhs.mDepth
          and mFrames == rhs.mFrames
          and mFormat == rhs.mFormat;
    }

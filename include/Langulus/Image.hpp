@@ -49,13 +49,15 @@ namespace Langulus::A
    ///   Abstract texture content                                             
    ///                                                                        
    struct Image : Asset {
-      LANGULUS_BASES(Asset);
-      using Asset::Asset;
-
    protected:
       ImageView mView;
 
    public:
+      LANGULUS_BASES(Asset);
+      Image()
+         : Resolvable {DMeta {}}
+         , ProducedFrom {nullptr, {}} {}
+
       NOD() virtual Ref<Image> GetLOD(const Math::LOD&) const = 0;
       NOD() virtual void* GetGPUHandle() const noexcept = 0;
 
@@ -78,7 +80,7 @@ namespace Langulus::A
 
       NOD() Iterator<true>  begin() noexcept;
       NOD() Iterator<false> begin() const noexcept;
-      constexpr A::IteratorEnd end() const noexcept { return {}; }
+      NOD() A::IteratorEnd end() const noexcept { return {}; }
    };
   
 
@@ -133,7 +135,9 @@ namespace Langulus::A
    ///                                                                        
    struct Font : Image {
       LANGULUS_BASES(Image);
-      using Image::Image;
+      Font()
+         : Resolvable {DMeta {}}
+         , ProducedFrom {nullptr, {}} {}
    };
 
 } // namespace Langulus::A

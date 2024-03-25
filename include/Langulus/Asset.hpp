@@ -18,9 +18,11 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract asset module                                                
    ///                                                                        
-   struct AssetModule : Module {
+   struct AssetModule : virtual Module {
       LANGULUS_BASES(Module);
-      using Module::Module;
+      AssetModule()
+         : Resolvable {DMeta {}}
+         , Module {nullptr} {}
 
    protected:
       // Data folder, where assets will be saved or loaded from         
@@ -34,12 +36,10 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract asset unit                                                  
    ///                                                                        
-   struct Asset : Unit, ProducedFrom<AssetModule> {
+   struct Asset : virtual Unit, virtual ProducedFrom<AssetModule> {
       LANGULUS(PRODUCER) AssetModule;
       LANGULUS_BASES(Unit);
       
-      Asset(DMeta, AssetModule*, const Neat&);
-
       using Data = Any;
       using DataList = TAny<Data>;
       using DataListMap = TUnorderedMap<TMeta, DataList>;
@@ -49,6 +49,10 @@ namespace Langulus::A
       mutable DataListMap mDataListMap;
 
    public:
+      Asset()
+         : Resolvable {DMeta {}}
+         , ProducedFrom {nullptr, {}} {}
+
       virtual bool Generate(TMeta, Offset = 0) = 0;
 
       template<CT::Trait, template<class> class S, CT::Block B>

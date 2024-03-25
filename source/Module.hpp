@@ -60,7 +60,7 @@ namespace Langulus::A
    ///                                                                        
    ///   External module interface                                            
    ///                                                                        
-   class Module : public Resolvable {
+   class Module : public virtual Resolvable {
       LANGULUS(PRODUCER) Entity::Runtime;
       LANGULUS(UNINSERTABLE) false;
       LANGULUS_BASES(Resolvable);
@@ -70,12 +70,13 @@ namespace Langulus::A
       Entity::Runtime* mRuntime;
 
    public:
-      Module(DMeta classid, Entity::Runtime* runtime) IF_UNSAFE(noexcept)
-         : Resolvable {classid}
+      Module(Entity::Runtime* runtime) IF_UNSAFE(noexcept)
+         : Resolvable {DMeta {}}
          , mRuntime {runtime} {}
 
-      /// Never allow construction of uninitialized modules                   
-      Module() = delete;
+      Module() noexcept
+         : Resolvable {DMeta {}} {}
+
       Module(const Module&) = delete;
       Module(Module&&) = delete;
       virtual ~Module() {}
