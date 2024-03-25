@@ -23,62 +23,70 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract graphics module                                             
    ///                                                                        
-   struct GraphicsModule : Module {
+   struct GraphicsModule : virtual Module {
       LANGULUS_BASES(Module);
-      using Module::Module;
+      GraphicsModule()
+         : Resolvable {DMeta {}}
+         , Module {nullptr} {}
    };
 
    ///                                                                        
    ///   Abstract graphics units                                              
    ///                                                                        
-   struct Graphics : Unit {
+   struct Graphics : virtual Unit {
       LANGULUS_BASES(Unit);
-      using Unit::Unit;
+      Graphics()
+         : Resolvable {DMeta {}} {}
    };
 
    ///                                                                        
    ///   Abstract graphics renderer                                           
    ///                                                                        
-   struct Renderer : Graphics {
+   struct Renderer : virtual Graphics {
       LANGULUS(PRODUCER) GraphicsModule;
       LANGULUS_BASES(Graphics);
-      using Graphics::Graphics;
+      Renderer()
+         : Resolvable {DMeta {}} {}
    };
 
    ///                                                                        
    ///   Abstract graphics layer                                              
    ///                                                                        
-   struct Layer : Graphics {
+   struct Layer : virtual Graphics {
       LANGULUS(PRODUCER) Renderer;
       LANGULUS_BASES(Graphics);
-      using Graphics::Graphics;
+      Layer()
+         : Resolvable {DMeta {}} {}
    };
 
    ///                                                                        
    ///   Abstract graphics camera                                             
    ///                                                                        
-   struct Camera : Graphics {
+   struct Camera : virtual Graphics {
       LANGULUS(PRODUCER) Layer;
       LANGULUS_BASES(Graphics);
-      using Graphics::Graphics;
+      Camera()
+         : Resolvable {DMeta {}} {}
    };
 
    ///                                                                        
    ///   Abstract graphics renderable                                         
    ///                                                                        
-   struct Renderable : Graphics {
+   struct Renderable : virtual Graphics {
       LANGULUS(PRODUCER) Layer;
       LANGULUS_BASES(Graphics);
-      using Graphics::Graphics;
+      Renderable()
+         : Resolvable {DMeta {}} {}
    };
 
    ///                                                                        
    ///   Abstract graphics light                                              
    ///                                                                        
-   struct Light : Graphics {
+   struct Light : virtual Graphics {
       LANGULUS(PRODUCER) Layer;
       LANGULUS_BASES(Graphics);
-      using Graphics::Graphics;
+      Light()
+         : Resolvable {DMeta {}} {}
    };
 
 } // namespace Langulus::A

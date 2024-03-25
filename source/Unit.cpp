@@ -14,11 +14,6 @@
 using namespace Langulus::A;
 
 
-/// Manual construction                                                       
-///   @param classid - type of the unit                                       
-Unit::Unit(DMeta classid) noexcept
-   : Resolvable {classid} {}
-
 /// Move unit                                                                 
 ///   @param other - the unit to move                                         
 Unit::Unit(Unit&& other) noexcept

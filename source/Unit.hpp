@@ -21,12 +21,15 @@ namespace Langulus::A
    ///                                                                        
    ///   An abstract unit                                                     
    ///                                                                        
-   /// Unit is a shorter name for a component, or extension. It's used for    
+   ///   Unit is a shorter name for a component, or extension. It's used for  
    /// composing Things' behavior. Units are usually produced from factories  
    /// inside external, dynamically loaded modules. There are units for       
    /// graphics, input, AI, content, and whatever extensions you make.        
    ///                                                                        
-   struct LANGULUS_API(ENTITY) Unit : Resolvable, Entity::SeekInterface<Unit> {
+   struct LANGULUS_API(ENTITY) Unit
+      : virtual Resolvable
+      , Entity::SeekInterface<Unit>
+   {
       LANGULUS(UNINSERTABLE) false;
       LANGULUS_BASES(Resolvable);
 
@@ -44,15 +47,13 @@ namespace Langulus::A
       #endif
 
    public:
-      /// A unit can not be default-created, nor be shallow-copied            
-      Unit() = delete;
-      Unit(const Unit&) = delete;
-      Unit& operator = (const Unit&) = delete;
+      Unit() noexcept
+         : Resolvable {DMeta {}} {}
 
-      /// A unit can only be moved or created with type and owner             
-      Unit(DMeta) noexcept;
+      Unit(const Unit&) = delete;
       Unit(Unit&&) noexcept;
 
+      Unit& operator = (const Unit&) = delete;
       Unit& operator = (Unit&&) noexcept;
 
       void Select(Flow::Verb&);

@@ -28,23 +28,26 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract platform module                                             
    ///                                                                        
-   struct PlatformModule : Module {
+   struct PlatformModule : virtual Module {
       LANGULUS_BASES(Module);
-      using Module::Module;
+      PlatformModule()
+         : Resolvable {DMeta {}}
+         , Module {nullptr} {}
    };
 
    ///                                                                        
    ///   Abstract platform unit                                               
    ///                                                                        
-   struct Platform : Unit {
+   struct Platform : virtual Unit {
       LANGULUS_BASES(Unit);
-      using Unit::Unit;
+      Platform()
+         : Resolvable {DMeta {}} {}
    };
    
    ///                                                                        
    ///   Abstract platform window                                             
    ///                                                                        
-   struct Window : Platform {
+   struct Window : virtual Platform {
       LANGULUS(PRODUCER) PlatformModule;
       LANGULUS_BASES(Platform);
       using Platform::Platform;
@@ -58,7 +61,7 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract platform cursor                                             
    ///                                                                        
-   struct Cursor : Platform {
+   struct Cursor : virtual Platform {
       LANGULUS(PRODUCER) PlatformModule;
       LANGULUS_BASES(Platform);
       using Platform::Platform;

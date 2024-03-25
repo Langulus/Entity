@@ -19,35 +19,40 @@ namespace Langulus::A
    ///                                                                        
    ///   Abstract physical module                                             
    ///                                                                        
-   struct PhysicalModule : Module {
+   struct PhysicalModule : virtual Module {
       LANGULUS_BASES(Module);
-      using Module::Module;
+      PhysicalModule()
+         : Resolvable {DMeta {}}
+         , Module {nullptr} {}
    };
 
    ///                                                                        
    ///   Abstract physical unit                                               
    ///                                                                        
-   struct Physical : Unit {
+   struct Physical : virtual Unit {
       LANGULUS_BASES(Unit);
-      using Unit::Unit;
+      Physical()
+         : Resolvable {DMeta {}} {}
    };
 
    ///                                                                        
    ///   Abstract physical world unit                                         
    ///                                                                        
-   struct World : Physical {
+   struct World : virtual Physical {
       LANGULUS(PRODUCER) PhysicalModule;
       LANGULUS_BASES(Physical);
-      using Physical::Physical;
+      World()
+         : Resolvable {DMeta {}} {}
    };
    
    ///                                                                        
    ///   Abstract physical instance unit                                      
    ///                                                                        
-   struct Instance : Physical {
+   struct Instance : virtual Physical {
       LANGULUS(PRODUCER) World;
       LANGULUS_BASES(Physical);
-      using Physical::Physical;
+      Instance()
+         : Resolvable {DMeta {}} {}
 
       NOD() virtual bool  Cull(const Math::LOD&) const noexcept = 0;
       NOD() virtual Math::Level GetLevel() const noexcept = 0;

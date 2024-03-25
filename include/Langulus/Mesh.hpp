@@ -51,13 +51,15 @@ namespace Langulus::A
    ///   Abstract geometry content                                            
    ///                                                                        
    struct Mesh : Asset {
-      LANGULUS_BASES(Asset);
-      using Asset::Asset;
-
    protected:
       MeshView mView;
 
    public:
+      LANGULUS_BASES(Asset);
+      Mesh()
+         : Resolvable {DMeta {}}
+         , ProducedFrom {nullptr, {}} {}
+
       template<CT::Topology, CT::Topology...>
       NOD() bool CheckTopology() const;
       NOD() DMeta GetTopology() const noexcept;
