@@ -33,12 +33,11 @@ namespace Langulus
    /// This is possible only when managed reflection feature is enabled.      
    /// If it is not, it is your resposibility to manage these dependencies.   
    ///   @param list - a set of all the registered types. Be aware, these     
-   ///                 do not include bases and members, but only             
-   ///                 intentionally exposed types. Bases and members will    
-   ///                 still be exported if not yet reflected, and associated 
-   ///                 with the currently set RTTI boundary. These types will 
-   ///                 be unloaded when shared library is unloaded. Unload    
-   ///                 will be forbidden, if they're still in use.            
+   ///      do not include bases and members, but only intentionally exposed  
+   ///      types. Bases and members will still be exported if not yet        
+   ///      reflected, and associated with the currently set RTTI boundary.   
+   ///      These types will be unloaded when shared library is unloaded.     
+   ///      Unload will be forbidden, if they're still in use.                
    template<class...T>
    void RegisterTypeList(MetaList& list) {
       // Merge to avoid duplications                                    
@@ -71,12 +70,10 @@ namespace Langulus::A
 
    public:
       Module(Entity::Runtime* runtime) IF_UNSAFE(noexcept)
-         : Resolvable {DMeta {}}
+         : Resolvable {this}
          , mRuntime {runtime} {}
 
-      Module() noexcept
-         : Resolvable {DMeta {}} {}
-
+      Module() noexcept = delete;
       Module(const Module&) = delete;
       Module(Module&&) = delete;
       virtual ~Module() {}

@@ -21,9 +21,7 @@ namespace Langulus::A
    ///                                                                        
    struct PhysicalModule : virtual Module {
       LANGULUS_BASES(Module);
-      PhysicalModule()
-         : Resolvable {DMeta {}}
-         , Module {nullptr} {}
+      PhysicalModule() : Resolvable {this}, Module {nullptr} {}
    };
 
    ///                                                                        
@@ -31,8 +29,7 @@ namespace Langulus::A
    ///                                                                        
    struct Physical : virtual Unit {
       LANGULUS_BASES(Unit);
-      Physical()
-         : Resolvable {DMeta {}} {}
+      Physical() : Resolvable {this} {}
    };
 
    ///                                                                        
@@ -41,8 +38,7 @@ namespace Langulus::A
    struct World : virtual Physical {
       LANGULUS(PRODUCER) PhysicalModule;
       LANGULUS_BASES(Physical);
-      World()
-         : Resolvable {DMeta {}} {}
+      World() : Resolvable {this} {}
    };
    
    ///                                                                        
@@ -51,10 +47,9 @@ namespace Langulus::A
    struct Instance : virtual Physical {
       LANGULUS(PRODUCER) World;
       LANGULUS_BASES(Physical);
-      Instance()
-         : Resolvable {DMeta {}} {}
+      Instance() : Resolvable {this} {}
 
-      NOD() virtual bool  Cull(const Math::LOD&) const noexcept = 0;
+      NOD() virtual bool        Cull(const Math::LOD&) const noexcept = 0;
       NOD() virtual Math::Level GetLevel() const noexcept = 0;
       NOD() virtual Math::Mat4  GetModelTransform(const Math::LOD&) const noexcept = 0;
       NOD() virtual Math::Mat4  GetModelTransform(const Math::Level& = {}) const noexcept = 0;
