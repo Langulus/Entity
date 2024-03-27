@@ -29,15 +29,13 @@ namespace Langulus::Entity
 {
 
    /// Default-constructor, always creates a parentless root thing            
-   Thing::Thing()
-      : Resolvable {MetaOf<Thing>()} {
+   Thing::Thing() : Resolvable {this} {
       ENTITY_VERBOSE_SELF("Created (root, ", Reference(0), " references)");
    }
    
    /// Descriptor-constructor                                                 
    ///   @param describe - instructions for creating the entity               
-   Thing::Thing(Describe&& describe)
-      : Resolvable {MetaOf<Thing>()} {
+   Thing::Thing(Describe&& describe) : Resolvable {this} {
       if (*describe) {
          Verbs::Create creator {&(*describe)};
          Create(creator);
@@ -61,7 +59,7 @@ namespace Langulus::Entity
    ///   @param parent - the thing that owns this thing                       
    ///   @param descriptor - instructions for creating the thing              
    Thing::Thing(Thing* parent, const Neat& descriptor)
-      : Resolvable {MetaOf<Thing>()}
+      : Resolvable {this}
       , mOwner {parent} {
       if (parent) {
          parent->AddChild<false>(this);
@@ -91,11 +89,11 @@ namespace Langulus::Entity
 
    /// Move constructor                                                       
    ///   @attention owner is never moved, you're moving only the hierarchy    
-   ///              below the parent, however other's parent is notified of   
-   ///              the move, because 'other' is removed from its children    
+   ///      below the parent, however other's parent is notified of the move, 
+   ///      because 'other' is removed from its children                      
    ///   @param other - move that entity                                      
    Thing::Thing(Thing&& other) noexcept
-      : Resolvable {Forward<Resolvable>(other)}
+      : Resolvable {this}
       , mChildren {Move(other.mChildren)}
       , mRuntime {Move(other.mRuntime)}
       , mFlow {Move(other.mFlow)}
@@ -124,7 +122,7 @@ namespace Langulus::Entity
    ///      because 'other' is duplicated in its children                     
    ///   @param other - clone that entity                                     
    Thing::Thing(Abandoned<Thing>&& other)
-      : Resolvable {*other}
+      : Resolvable {this}
       , mChildren {Abandon(other->mChildren)}
       , mRuntime {Abandon(other->mRuntime)}
       , mFlow {Abandon(other->mFlow)}
@@ -153,7 +151,7 @@ namespace Langulus::Entity
    ///      because 'other' is duplicated in its children                     
    ///   @param other - clone that entity                                     
    Thing::Thing(Cloned<Thing>&& other)
-      : Resolvable {*other}
+      : Resolvable {this}
       , mChildren {Clone(other->mChildren)}
       , mRefreshRequired {true} {
       TODO();

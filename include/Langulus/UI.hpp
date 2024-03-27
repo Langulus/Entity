@@ -19,9 +19,7 @@ namespace Langulus::A::UI
    ///                                                                        
    struct Module : virtual A::Module {
       LANGULUS_BASES(A::Module);
-      Module()
-         : Resolvable {DMeta {}}
-         , A::Module {nullptr} {}
+      Module() : Resolvable {this}, A::Module {nullptr} {}
    };
 
    ///                                                                        
@@ -30,8 +28,7 @@ namespace Langulus::A::UI
    struct Unit : virtual A::Unit {
       LANGULUS(PRODUCER) UI::Module;
       LANGULUS_BASES(A::Unit);
-      Unit()
-         : Resolvable {DMeta {}} {}
+      Unit() : Resolvable {this} {}
    };
 
    ///                                                                        
@@ -39,8 +36,7 @@ namespace Langulus::A::UI
    ///                                                                        
    struct System : virtual UI::Unit {
       LANGULUS_BASES(UI::Unit);
-      System()
-         : Resolvable {DMeta {}} {}
+      System() : Resolvable {this} {}
    };
 
    ///                                                                        
@@ -49,8 +45,7 @@ namespace Langulus::A::UI
    struct Button : virtual UI::Unit {
       LANGULUS(PRODUCER) UI::System;
       LANGULUS_BASES(UI::Unit);
-      Button()
-         : Resolvable {DMeta {}} {}
+      Button() : Resolvable {this} {}
    };
 
    ///                                                                        
@@ -59,8 +54,7 @@ namespace Langulus::A::UI
    struct Text : virtual UI::Unit {
       LANGULUS(PRODUCER) UI::System;
       LANGULUS_BASES(UI::Unit);
-      Text()
-         : Resolvable {DMeta {}} {}
+      Text() : Resolvable {this} {}
    };
 
    ///                                                                        
@@ -69,8 +63,7 @@ namespace Langulus::A::UI
    struct Input : virtual UI::Unit {
       LANGULUS(PRODUCER) UI::System;
       LANGULUS_BASES(UI::Unit);
-      Input()
-         : Resolvable {DMeta {}} {}
+      Input() : Resolvable {this} {}
    };
 
 } // namespace Langulus::A::UI

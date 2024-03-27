@@ -30,9 +30,7 @@ namespace Langulus::A
    ///                                                                        
    struct PlatformModule : virtual Module {
       LANGULUS_BASES(Module);
-      PlatformModule()
-         : Resolvable {DMeta {}}
-         , Module {nullptr} {}
+      PlatformModule() : Resolvable {this}, Module {nullptr} {}
    };
 
    ///                                                                        
@@ -40,8 +38,7 @@ namespace Langulus::A
    ///                                                                        
    struct Platform : virtual Unit {
       LANGULUS_BASES(Unit);
-      Platform()
-         : Resolvable {DMeta {}} {}
+      Platform() : Resolvable {this} {}
    };
    
    ///                                                                        

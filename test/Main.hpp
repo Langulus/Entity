@@ -21,11 +21,10 @@ public:
    LANGULUS_BASES(Unit);
    IF_LANGULUS_MANAGED_MEMORY(LANGULUS(POOL_TACTIC) RTTI::PoolTactic::Type);
 
-   TestUnit1()
-      : Resolvable {MetaOf<TestUnit1>()} {}
+   TestUnit1() : Resolvable {this} {}
 
    TestUnit1(Describe&& describe)
-      : Resolvable {MetaOf<TestUnit1>()} {
+      : Resolvable {this} {
       Couple(*describe);
    }
 
@@ -43,11 +42,10 @@ public:
    LANGULUS_BASES(Unit);
    IF_LANGULUS_MANAGED_MEMORY(LANGULUS(POOL_TACTIC) RTTI::PoolTactic::Type);
 
-   TestUnit2()
-      : Resolvable {MetaOf<TestUnit2>()} {}
+   TestUnit2() : Resolvable {this} {}
 
    TestUnit2(Describe&& describe)
-      : Resolvable {MetaOf<TestUnit2>()} {
+      : Resolvable {this} {
       Couple(*describe);
    }
 

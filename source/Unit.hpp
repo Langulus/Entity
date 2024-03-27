@@ -47,9 +47,7 @@ namespace Langulus::A
       #endif
 
    public:
-      Unit() noexcept
-         : Resolvable {DMeta {}} {}
-
+      Unit() noexcept : Resolvable {this} {}
       Unit(const Unit&) = delete;
       Unit(Unit&&) noexcept;
 

@@ -20,9 +20,7 @@ namespace Langulus::A
    ///                                                                        
    struct AssetModule : virtual Module {
       LANGULUS_BASES(Module);
-      AssetModule()
-         : Resolvable {DMeta {}}
-         , Module {nullptr} {}
+      AssetModule() : Resolvable {this}, Module {nullptr} {}
 
    protected:
       // Data folder, where assets will be saved or loaded from         
@@ -49,9 +47,7 @@ namespace Langulus::A
       mutable DataListMap mDataListMap;
 
    public:
-      Asset()
-         : Resolvable {DMeta {}}
-         , ProducedFrom {nullptr, {}} {}
+      Asset() : Resolvable {this} , ProducedFrom {nullptr, {}} {}
 
       virtual bool Generate(TMeta, Offset = 0) = 0;
 
