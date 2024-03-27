@@ -78,8 +78,8 @@ namespace Langulus::A
       Module(Module&&) = delete;
       virtual ~Module() {}
       
-      Module& operator = (const Module&) noexcept = default;
-      Module& operator = (Module&&) noexcept = default;
+      Module& operator = (const Module&) noexcept = delete;
+      Module& operator = (Module&&) noexcept = delete;
 
       struct Info {
          // Define the order in which module updates, relative to others
