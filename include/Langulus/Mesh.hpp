@@ -56,9 +56,7 @@ namespace Langulus::A
 
    public:
       LANGULUS_BASES(Asset);
-      Mesh()
-         : Resolvable {DMeta {}}
-         , ProducedFrom {nullptr, {}} {}
+      Mesh() : Resolvable {this}, ProducedFrom {nullptr, {}} {}
 
       template<CT::Topology, CT::Topology...>
       NOD() bool CheckTopology() const;

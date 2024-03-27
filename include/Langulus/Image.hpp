@@ -55,7 +55,7 @@ namespace Langulus::A
    public:
       LANGULUS_BASES(Asset);
       Image()
-         : Resolvable {DMeta {}}
+         : Resolvable {this}
          , ProducedFrom {nullptr, {}} {}
 
       NOD() virtual Ref<Image> GetLOD(const Math::LOD&) const = 0;
@@ -136,7 +136,7 @@ namespace Langulus::A
    struct Font : Image {
       LANGULUS_BASES(Image);
       Font()
-         : Resolvable {DMeta {}}
+         : Resolvable {this}
          , ProducedFrom {nullptr, {}} {}
    };
 

@@ -25,9 +25,7 @@ namespace Langulus::A
    ///                                                                        
    struct GraphicsModule : virtual Module {
       LANGULUS_BASES(Module);
-      GraphicsModule()
-         : Resolvable {DMeta {}}
-         , Module {nullptr} {}
+      GraphicsModule() : Resolvable {this}, Module {nullptr} {}
    };
 
    ///                                                                        
@@ -35,8 +33,7 @@ namespace Langulus::A
    ///                                                                        
    struct Graphics : virtual Unit {
       LANGULUS_BASES(Unit);
-      Graphics()
-         : Resolvable {DMeta {}} {}
+      Graphics() : Resolvable {this} {}
    };
 
    ///                                                                        
@@ -45,8 +42,7 @@ namespace Langulus::A
    struct Renderer : virtual Graphics {
       LANGULUS(PRODUCER) GraphicsModule;
       LANGULUS_BASES(Graphics);
-      Renderer()
-         : Resolvable {DMeta {}} {}
+      Renderer() : Resolvable {this} {}
    };
 
    ///                                                                        
@@ -55,8 +51,7 @@ namespace Langulus::A
    struct Layer : virtual Graphics {
       LANGULUS(PRODUCER) Renderer;
       LANGULUS_BASES(Graphics);
-      Layer()
-         : Resolvable {DMeta {}} {}
+      Layer() : Resolvable {this} {}
    };
 
    ///                                                                        
@@ -65,8 +60,7 @@ namespace Langulus::A
    struct Camera : virtual Graphics {
       LANGULUS(PRODUCER) Layer;
       LANGULUS_BASES(Graphics);
-      Camera()
-         : Resolvable {DMeta {}} {}
+      Camera() : Resolvable {this} {}
    };
 
    ///                                                                        
@@ -75,8 +69,7 @@ namespace Langulus::A
    struct Renderable : virtual Graphics {
       LANGULUS(PRODUCER) Layer;
       LANGULUS_BASES(Graphics);
-      Renderable()
-         : Resolvable {DMeta {}} {}
+      Renderable() : Resolvable {this} {}
    };
 
    ///                                                                        
@@ -85,8 +78,7 @@ namespace Langulus::A
    struct Light : virtual Graphics {
       LANGULUS(PRODUCER) Layer;
       LANGULUS_BASES(Graphics);
-      Light()
-         : Resolvable {DMeta {}} {}
+      Light() : Resolvable {this} {}
    };
 
 } // namespace Langulus::A
