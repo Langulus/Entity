@@ -25,6 +25,9 @@ LANGULUS_DEFINE_TRAIT(NativeWindowHandle,
 namespace Langulus::A
 {
 
+   struct Image; // If undefined, include <Langulus/Image.hpp>          
+
+
    ///                                                                        
    ///   Abstract platform module                                             
    ///                                                                        
@@ -53,7 +56,7 @@ namespace Langulus::A
       NOD() virtual void*  GetNativeHandle() const noexcept = 0;
       NOD() virtual Scale2 GetSize() const noexcept = 0;
       NOD() virtual bool   IsMinimized() const noexcept = 0;
-      NOD() virtual bool   Draw(const Any&) const { return false; }
+      NOD() virtual bool   Draw(const Ref<Image>&) const { return false; }
    };
    
    ///                                                                        

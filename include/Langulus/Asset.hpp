@@ -51,24 +51,24 @@ namespace Langulus::A
 
       virtual bool Generate(TMeta, Offset = 0) = 0;
 
-      template<CT::Trait, template<class> class S, CT::Block B>
-      requires CT::Semantic<S<B>>
-      void Commit(S<B>&&) const;
+      template<CT::TraitBased = Langulus::Trait, class B>
+      requires CT::Block<Desem<B>>
+      void Commit(B&&) const;
 
-      template<CT::Trait>
+      template<CT::TraitBased = Langulus::Trait>
       NOD() const Data* GetData(Offset = 0) const noexcept;
       NOD() const Data* GetData(TMeta, Offset = 0) const noexcept;
 
-      template<CT::Trait>
+      template<CT::TraitBased = Langulus::Trait>
       NOD() const DataList* GetDataList() const noexcept;
       NOD() const DataList* GetDataList(TMeta) const noexcept;
 
    protected:
-      template<CT::Trait>
+      template<CT::TraitBased = Langulus::Trait>
       NOD() Data* GetData(Offset = 0) noexcept;
       NOD() Data* GetData(TMeta, Offset = 0) noexcept;
 
-      template<CT::Trait>
+      template<CT::TraitBased = Langulus::Trait>
       NOD() DataList* GetDataList() noexcept;
       NOD() DataList* GetDataList(TMeta) noexcept;
 

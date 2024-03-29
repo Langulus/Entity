@@ -37,25 +37,23 @@ namespace Langulus::A
    ///   @tparam T - the trait to search for                                  
    ///   @param index - the Nth data associated to the trait                  
    ///   @return a pointer to the data entry, or nullptr if none exists       
-   template<CT::Trait T> LANGULUS(INLINED)
-   Asset::Data const* Asset::GetData(Offset index) const noexcept {
-      return GetData(MetaTraitOf<T>(), index);
+   template<CT::TraitBased T> LANGULUS(INLINED)
+   Asset::Data* Asset::GetData(Offset index) noexcept {
+      TMeta trait;
+      if constexpr (CT::Trait<T>)
+         trait = MetaTraitOf<T>();
+      return GetData(trait, index);
    }
 
-   template<CT::Trait T> LANGULUS(INLINED)
-   Asset::Data* Asset::GetData(Offset index) noexcept {
-      return GetData(MetaTraitOf<T>(), index);
+   template<CT::TraitBased T> LANGULUS(INLINED)
+   Asset::Data const* Asset::GetData(Offset index) const noexcept {
+      return const_cast<Asset*>(this)->GetData<T>(index);
    }
 
    /// Get a single data entry from the contents                              
    ///   @param trait - the trait to search for                               
    ///   @param index - the Nth data associated to the trait                  
    ///   @return a pointer to the data entry, or nullptr if none exists       
-   LANGULUS(INLINED)
-   Asset::Data const* Asset::GetData(TMeta trait, Offset index) const noexcept {
-      return const_cast<Asset*>(this)->GetData(trait, index);
-   }
-
    LANGULUS(INLINED)
    Asset::Data* Asset::GetData(TMeta trait, Offset index) noexcept {
       if (not Generate(trait, index))
@@ -67,17 +65,25 @@ namespace Langulus::A
          : nullptr;
    }
 
+   LANGULUS(INLINED)
+   Asset::Data const* Asset::GetData(TMeta trait, Offset index) const noexcept {
+      return const_cast<Asset*>(this)->GetData(trait, index);
+   }
+
    /// Get a data list from the contents                                      
    ///   @tparam T - the trait to search for                                  
    ///   @return a pointer to the data list, or nullptr if none exists        
-   template<CT::Trait T> LANGULUS(INLINED)
-   Asset::DataList const* Asset::GetDataList() const noexcept {
-      return GetDataList(MetaTraitOf<T>());
+   template<CT::TraitBased T> LANGULUS(INLINED)
+   Asset::DataList* Asset::GetDataList() noexcept {
+      TMeta trait;
+      if constexpr (CT::Trait<T>)
+         trait = MetaTraitOf<T>();
+      return GetDataList(trait);
    }
 
-   template<CT::Trait T> LANGULUS(INLINED)
-   Asset::DataList* Asset::GetDataList() noexcept {
-      return GetDataList(MetaTraitOf<T>());
+   template<CT::TraitBased T> LANGULUS(INLINED)
+   Asset::DataList const* Asset::GetDataList() const noexcept {
+      return const_cast<Asset*>(this)->GetDataList<T>();
    }
 
    /// Get a data list from the contents                                      
@@ -98,17 +104,30 @@ namespace Langulus::A
    }
 
    /// Commit data to an asset                                                
-   ///   @attention data is always commited, even if such trait already exists
-   ///   @tparam T - data trait, the intent we're commiting with              
+   ///   @attention data is always comitted, even if trait already exists     
+   ///   @tparam T - trait (a.k.a. the intent we're commiting with)           
+   ///      @attention default value leads all data to the no-trait bucket    
+   ///   @tparam B - block of data to insert (semantically or not)            
+   ///      @attention you can use references to external data, but beware    
+   ///         that asset data is intrinsically paired with the asset         
+   ///         descriptor, and any silent change in contents might cause      
+   ///         disparity and confusion in asset libraries. Still useful when  
+   ///         you don't use factories, and just want some local content      
+   ///         representation.                                                
    ///   @param content - the data and semantic to commit                     
-   template<CT::Trait T, template<class> class S, CT::Block B>
-   requires CT::Semantic<S<B>> LANGULUS(INLINED)
-   void Asset::Commit(S<B>&& content) const {
-      const auto found = mDataListMap.FindIt(MetaTraitOf<T>());
+   template<CT::TraitBased T, class B> 
+   requires CT::Block<Desem<B>> LANGULUS(INLINED)
+   void Asset::Commit(B&& content) const {
+      using S = SemanticOf<B>;
+      TMeta trait;
+      if constexpr (CT::Trait<T>)
+         trait = MetaTraitOf<T>();
+
+      const auto found = mDataListMap.FindIt(trait);
       if (found)
-         *found.mValue << Any {content.Forward()};
+         *found.mValue << Any {S::Nest(content)};
       else
-         mDataListMap.Insert(MetaTraitOf<T>(), content.Forward());
+         mDataListMap.Insert(trait, S::Nest(content));
    }
 
 } // namespace Langulus::A

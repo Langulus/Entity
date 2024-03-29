@@ -56,7 +56,7 @@ namespace Langulus::A
 
    public:
       LANGULUS_BASES(Asset);
-      Mesh() : Resolvable {this}, ProducedFrom {nullptr, {}} {}
+      Mesh() : Resolvable {this} {}
 
       template<CT::Topology, CT::Topology...>
       NOD() bool CheckTopology() const;
