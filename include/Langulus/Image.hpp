@@ -55,8 +55,7 @@ namespace Langulus::A
    public:
       LANGULUS_BASES(Asset);
       Image()
-         : Resolvable {this}
-         , ProducedFrom {nullptr, {}} {}
+         : Resolvable {this} {}
 
       NOD() virtual Ref<Image> GetLOD(const Math::LOD&) const = 0;
       NOD() virtual void* GetGPUHandle() const noexcept = 0;
@@ -80,7 +79,7 @@ namespace Langulus::A
 
       NOD() Iterator<true>  begin() noexcept;
       NOD() Iterator<false> begin() const noexcept;
-      NOD() A::IteratorEnd end() const noexcept { return {}; }
+      NOD() A::IteratorEnd  end() const noexcept { return {}; }
    };
   
 
