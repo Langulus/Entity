@@ -53,6 +53,7 @@ namespace Langulus::A
       NOD() virtual void*  GetNativeHandle() const noexcept = 0;
       NOD() virtual Scale2 GetSize() const noexcept = 0;
       NOD() virtual bool   IsMinimized() const noexcept = 0;
+      NOD() virtual bool   Draw(const Any&) const { return false; }
    };
    
    ///                                                                        
