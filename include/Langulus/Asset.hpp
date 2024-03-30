@@ -47,7 +47,7 @@ namespace Langulus::A
       mutable DataListMap mDataListMap;
 
    public:
-      Asset() : Resolvable {this} , ProducedFrom {nullptr, {}} {}
+      Asset() : Resolvable {this} {}
 
       virtual bool Generate(TMeta, Offset = 0) = 0;
 
