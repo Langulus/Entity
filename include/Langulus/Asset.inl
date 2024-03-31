@@ -130,4 +130,10 @@ namespace Langulus::A
          mDataListMap.Insert(trait, S::Nest(content));
    }
 
+   /// Detach the asset                                                       
+   inline void Asset::Detach() {
+      mDataListMap.Reset();
+      ProducedFrom::Detach();
+   }
+
 } // namespace Langulus::A
