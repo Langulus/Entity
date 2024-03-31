@@ -49,10 +49,10 @@ namespace Langulus::A
    public:
       Unit() noexcept : Resolvable {this} {}
       Unit(const Unit&) = delete;
-      Unit(Unit&&) noexcept;
+      Unit(Unit&&) noexcept = delete;
 
       Unit& operator = (const Unit&) = delete;
-      Unit& operator = (Unit&&) noexcept;
+      Unit& operator = (Unit&&) noexcept = delete;
 
       void Select(Flow::Verb&);
 

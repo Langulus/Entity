@@ -14,35 +14,11 @@
 using namespace Langulus::A;
 
 
-/// Move unit                                                                 
-///   @param other - the unit to move                                         
-Unit::Unit(Unit&& other) noexcept
-   : Resolvable {Forward<Resolvable>(other)}
-   , mOwners {::std::move(other.mOwners)} {
-   // Replace the owner's unit pointer with the new one                 
-   TODO();
-   /*for (auto owner : mOwners)
-      owner->ReplaceUnit(&other, this);*/
-}
-
 /// Default unit selection simply relays to the owner                         
 ///   @param verb - the selection verb                                        
 void Unit::Select(Flow::Verb& verb) {
    for (auto owner : mOwners)
       owner->Select(verb);
-}
-
-/// Move operator                                                             
-///   @param other - unit to move                                             
-Unit& Unit::operator = (Unit&& other) noexcept {
-   Resolvable::operator = (Forward<Resolvable>(other));
-   mOwners = Move(other.mOwners);
-
-   // Update all coupled owners                                         
-   TODO();
-   /*for (auto owner : mOwners)
-      owner->ReplaceUnit(&other, this);*/
-   return *this;
 }
    
 /// Check if this unit has a given set of properties                          
