@@ -49,6 +49,8 @@ namespace Langulus::A
    public:
       Asset() : Resolvable {this} {}
 
+      void Detach();
+
       virtual bool Generate(TMeta, Offset = 0) = 0;
 
       template<CT::TraitBased = Langulus::Trait, class B>
