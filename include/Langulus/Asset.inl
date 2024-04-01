@@ -115,17 +115,16 @@ namespace Langulus::A
    ///         you don't use factories, and just want some local content      
    ///         representation.                                                
    ///   @param content - the data and semantic to commit                     
-   template<CT::TraitBased T, class B> 
-   requires CT::Block<Desem<B>> LANGULUS(INLINED)
-   void Asset::Commit(B&& content) const {
-      using S = SemanticOf<B>;
+   template<CT::TraitBased T> LANGULUS(INLINED)
+   void Asset::Commit(auto&& content) const {
       TMeta trait;
       if constexpr (CT::Trait<T>)
          trait = MetaTraitOf<T>();
 
+      using S = SemanticOf<decltype(content)>;
       const auto found = mDataListMap.FindIt(trait);
       if (found)
-         *found.mValue << Any {S::Nest(content)};
+         *found.mValue << S::Nest(content);
       else
          mDataListMap.Insert(trait, S::Nest(content));
    }
