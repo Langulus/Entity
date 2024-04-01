@@ -53,9 +53,8 @@ namespace Langulus::A
 
       virtual bool Generate(TMeta, Offset = 0) = 0;
 
-      template<CT::TraitBased = Langulus::Trait, class B>
-      requires CT::Block<Desem<B>>
-      void Commit(B&&) const;
+      template<CT::TraitBased = Langulus::Trait>
+      void Commit(auto&&) const;
 
       template<CT::TraitBased = Langulus::Trait>
       NOD() const Data* GetData(Offset = 0) const noexcept;
