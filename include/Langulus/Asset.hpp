@@ -64,6 +64,8 @@ namespace Langulus::A
       NOD() const DataList* GetDataList() const noexcept;
       NOD() const DataList* GetDataList(TMeta) const noexcept;
 
+      NOD() DataListMap const& GetDataListMap() const noexcept;
+
    protected:
       template<CT::TraitBased = Langulus::Trait>
       NOD() Data* GetData(Offset = 0) noexcept;
@@ -73,7 +75,6 @@ namespace Langulus::A
       NOD() DataList* GetDataList() noexcept;
       NOD() DataList* GetDataList(TMeta) noexcept;
 
-      NOD() DataListMap const& GetDataListMap() const noexcept;
       NOD() DataListMap& GetDataListMap() noexcept;
    };
 
