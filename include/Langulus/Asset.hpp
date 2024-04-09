@@ -51,7 +51,7 @@ namespace Langulus::A
 
       void Detach();
 
-      virtual bool Generate(TMeta, Offset = 0) = 0;
+      virtual bool Generate(TMeta, Offset = 0) { return true; }
 
       template<CT::TraitBased = Langulus::Trait>
       void Commit(auto&&) const;

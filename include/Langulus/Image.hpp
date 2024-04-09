@@ -9,6 +9,7 @@
 #pragma once
 #include "Asset.hpp"
 #include <Math/Color.hpp>
+#include <Math/Scale.hpp>
 
 LANGULUS_DEFINE_TRAIT(Image, "Image unit");
 LANGULUS_EXCEPTION(Image);
@@ -38,6 +39,7 @@ namespace Langulus
       NOD() Size GetBytesize() const noexcept;
       NOD() uint32_t GetChannelCount() const noexcept;
       NOD() Hash GetHash() const noexcept;
+      NOD() Math::Scale3 GetScale() const noexcept;
    };
    
 } // namespace Langulus
@@ -54,11 +56,10 @@ namespace Langulus::A
 
    public:
       LANGULUS_BASES(Asset);
-      Image()
-         : Resolvable {this} {}
+      Image() : Resolvable {this} {}
 
-      NOD() virtual Ref<Image> GetLOD(const Math::LOD&) const = 0;
-      NOD() virtual void* GetGPUHandle() const noexcept = 0;
+      NOD() virtual Ref<Image> GetLOD(const Math::LOD&) const { return {}; }
+      NOD() virtual void* GetGPUHandle() const noexcept { return nullptr; }
 
       NOD() DMeta GetFormat() const noexcept;
       NOD() ImageView const& GetView() const noexcept;

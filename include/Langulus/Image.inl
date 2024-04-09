@@ -70,6 +70,13 @@ namespace Langulus
       );
    }
 
+   /// Get the scale of the image, represented by real numbers                
+   ///   @return the scale                                                    
+   LANGULUS(INLINED)
+   Math::Scale3 ImageView::GetScale() const noexcept {
+      return {mWidth, mHeight, mDepth};
+   }
+
 } // namespace Langulus
 
 namespace Langulus::A
