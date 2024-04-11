@@ -71,11 +71,11 @@ namespace Langulus::Entity
       ///                                                                     
       ///   Construction                                                      
       ///                                                                     
-      Pin() requires CT::Inner::Defaultable<T>;
-      Pin(const Pin&) requires CT::Inner::ReferMakable<T>;
-      Pin(Pin&&) requires CT::Inner::MoveMakable<T>;
+      Pin() requires CT::Defaultable<T>;
+      Pin(const Pin&) requires CT::ReferMakable<T>;
+      Pin(Pin&&) requires CT::MoveMakable<T>;
       template<template<class> class S>
-      Pin(S<Pin>&&) requires CT::Inner::SemanticMakable<S, T>;
+      Pin(S<Pin>&&) requires CT::SemanticMakable<S, T>;
 
       template<CT::NotPinnable...A>
       Pin(A&&...) requires ::std::constructible_from<T, A...>;
@@ -83,11 +83,11 @@ namespace Langulus::Entity
       ///                                                                     
       ///   Assignment                                                        
       ///                                                                     
-      Pin& operator = (const Pin&) requires CT::Inner::ReferAssignable<T>;
-      Pin& operator = (Pin&&) requires CT::Inner::MoveAssignable<T>;
+      Pin& operator = (const Pin&) requires CT::ReferAssignable<T>;
+      Pin& operator = (Pin&&) requires CT::MoveAssignable<T>;
 
       template<template<class> class S>
-      requires CT::Inner::SemanticAssignable<S, T>
+      requires CT::SemanticAssignable<S, T>
       Pin& operator = (S<Pin>&&);
 
       template<CT::NotPinnable A> requires CT::AssignableFrom<T, A>
@@ -107,9 +107,9 @@ namespace Langulus::Entity
       ///                                                                     
       ///   Comparison                                                        
       ///                                                                     
-      bool operator == (const Pin&) const requires CT::Inner::Comparable<T>;
+      bool operator == (const Pin&) const requires CT::Comparable<T, T>;
       template<CT::NotPinnable A>
-      bool operator == (const A&) const requires CT::Inner::Comparable<T, A>;
+      bool operator == (const A&) const requires CT::Comparable<T, A>;
 
       ///                                                                     
       ///   Services                                                          
