@@ -18,7 +18,7 @@ namespace Langulus::Entity
 
    /// Default construction                                                   
    TEMPLATE() LANGULUS(INLINED)
-   PINNED()::Pin() requires CT::Inner::Defaultable<T>
+   PINNED()::Pin() requires CT::Defaultable<T>
       : mValue {} {
       static_assert(not CT::Pinnable<T>, "Can't nest pinnable types");
    }
@@ -26,19 +26,19 @@ namespace Langulus::Entity
    /// Refer construction                                                     
    ///   @param other - the pinned value to refer to                          
    TEMPLATE() LANGULUS(INLINED)
-   PINNED()::Pin(const Pin& other) requires CT::Inner::ReferMakable<T>
+   PINNED()::Pin(const Pin& other) requires CT::ReferMakable<T>
       : Pin {Refer(other)} {}
 
    /// Move construction                                                      
    ///   @param other - the pinned value to move                              
    TEMPLATE() LANGULUS(INLINED)
-   PINNED()::Pin(Pin&& other) requires CT::Inner::MoveMakable<T>
+   PINNED()::Pin(Pin&& other) requires CT::MoveMakable<T>
       : Pin {Move(other)} {}
 
    /// Semantic construction                                                  
    ///   @param other - the value to initialize with                          
    TEMPLATE() template<template<class> class S> LANGULUS(INLINED)
-   PINNED()::Pin(S<Pin>&& other) requires CT::Inner::SemanticMakable<S, T>
+   PINNED()::Pin(S<Pin>&& other) requires CT::SemanticMakable<S, T>
       : mValue {S<T> {other->mValue}}
       , mLocked {other->mLocked} {}
 
@@ -52,7 +52,7 @@ namespace Langulus::Entity
    ///   @attention doesn't change value, if locked                           
    ///   @param rhs - the pinned value to refer to                            
    TEMPLATE() LANGULUS(INLINED)
-   PINNED()& PINNED()::operator = (const Pin& rhs) requires CT::Inner::ReferAssignable<T> {
+   PINNED()& PINNED()::operator = (const Pin& rhs) requires CT::ReferAssignable<T> {
       return operator = (Refer(rhs));
    }
 
@@ -60,7 +60,7 @@ namespace Langulus::Entity
    ///   @attention doesn't change value, if locked                           
    ///   @param rhs - the pinned value to move-assign                         
    TEMPLATE() LANGULUS(INLINED)
-   PINNED()& PINNED()::operator = (Pin&& rhs) requires CT::Inner::MoveAssignable<T> {
+   PINNED()& PINNED()::operator = (Pin&& rhs) requires CT::MoveAssignable<T> {
       return operator = (Move(rhs));
    }
    
@@ -68,7 +68,7 @@ namespace Langulus::Entity
    ///   @attention doesn't change value, if locked                           
    ///   @param rhs - the pinned value to move-assign                         
    TEMPLATE() template<template<class> class S>
-   requires CT::Inner::SemanticAssignable<S, T> LANGULUS(INLINED)
+   requires CT::SemanticAssignable<S, T> LANGULUS(INLINED)
    PINNED()& PINNED()::operator = (S<Pin>&& rhs) {
       if (not mLocked)
          mValue = S<T> {rhs->mValue};
@@ -89,7 +89,7 @@ namespace Langulus::Entity
    ///   @param rhs - the pinned value to compare against                     
    ///   @return true if values match                                         
    TEMPLATE() LANGULUS(INLINED)
-   bool PINNED()::operator == (const Pin& rhs) const requires CT::Inner::Comparable<T> {
+   bool PINNED()::operator == (const Pin& rhs) const requires CT::Comparable<T, T> {
       return mValue == rhs.mValue;
    }
 
@@ -97,7 +97,7 @@ namespace Langulus::Entity
    ///   @param rhs - thing to compare with                                   
    ///   @return true if contained value equals rhs                           
    TEMPLATE() template<CT::NotPinnable A> LANGULUS(INLINED)
-   bool PINNED()::operator == (const A& rhs) const requires CT::Inner::Comparable<T, A> {
+   bool PINNED()::operator == (const A& rhs) const requires CT::Comparable<T, A> {
       return mValue == rhs;
    }
 
