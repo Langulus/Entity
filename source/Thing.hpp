@@ -23,7 +23,7 @@ LANGULUS_DEFINE_TRAIT(Unit,
 namespace Langulus::Entity
 {
 
-   using UnitList = TAny<Ref<A::Unit>>;
+   using UnitList = TMany<Ref<A::Unit>>;
    using UnitMap = TUnorderedMap<DMeta, TUnorderedSet<Ref<A::Unit>>>;
    using TraitMap = TUnorderedMap<TMeta, TraitList>;
 
@@ -45,7 +45,11 @@ namespace Langulus::Entity
    /// and children/owner's units. The Thing is an aggregate of traits,       
    /// units, and subthings.                                                  
    ///                                                                        
-   class Thing final : public Resolvable, public SeekInterface<Thing> {
+   class Thing final
+      : public Resolvable
+      , public Referenced
+      , public SeekInterface<Thing>
+   {
       LANGULUS(ABSTRACT) false;
       LANGULUS(PRODUCER) Thing;
       LANGULUS(UNINSERTABLE) false;
@@ -77,7 +81,7 @@ namespace Langulus::Entity
       Ref<Thing> mOwner;
 
       template<Seek = Seek::HereAndAbove>
-      NOD() Any CreateData(const Construct&);
+      NOD() Many CreateData(const Construct&);
 
       template<class T>
       void CreateInner(Verb&, const T&);
@@ -113,7 +117,7 @@ namespace Langulus::Entity
       template<CT::VerbBased V>
       V& Run(V&);
 
-      LANGULUS_API(ENTITY) Any Run(const Lingua&);
+      LANGULUS_API(ENTITY) Many Run(const Lingua&);
 
       LANGULUS_API(ENTITY) bool Update(Time);
       LANGULUS_API(ENTITY) void Refresh(bool force = false);
@@ -174,11 +178,11 @@ namespace Langulus::Entity
       Count RemoveUnit(A::Unit*);
 
       template<CT::Unit T, class...A>
-      Any CreateUnit(A&&...);
+      Many CreateUnit(A&&...);
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
          template<class... A>
-         Any CreateUnitToken(const Token&, A&&...);
+         Many CreateUnitToken(const Token&, A&&...);
       #endif
 
       template<CT::Unit = A::Unit, bool TWOSIDED = true>
@@ -315,15 +319,15 @@ namespace Langulus::Entity
       using SeekInterface::GatherTraits;
 
       template<Seek = Seek::HereAndAbove>
-      NOD() TAny<A::Unit*> GatherUnits(DMeta);
+      NOD() TMany<A::Unit*> GatherUnits(DMeta);
       template<Seek = Seek::HereAndAbove>
-      NOD() TAny<A::Unit*> GatherUnitsExt(DMeta, const Neat&);
+      NOD() TMany<A::Unit*> GatherUnitsExt(DMeta, const Neat&);
 
       template<Seek = Seek::HereAndAbove>
       NOD() TraitList GatherTraits(TMeta);
 
       template<CT::Data D, Seek = Seek::HereAndAbove>
-      NOD() TAny<D> GatherValues() const;
+      NOD() TMany<D> GatherValues() const;
    };
 
 } // namespace Langulus::Entity

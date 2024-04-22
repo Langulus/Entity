@@ -30,7 +30,7 @@ bool Unit::CompareDescriptor(const Neat& descriptor) const {
    Offset memberOffset {};
    descriptor.ForEach([&](const Anyness::Trait& trait) {
       if (not GetMember(trait.GetTrait(), memberOffset)
-      .Compare(static_cast<const Any&>(trait))) {
+      .Compare(static_cast<const Many&>(trait))) {
          mismatch = true;
          return Loop::Break;
       }

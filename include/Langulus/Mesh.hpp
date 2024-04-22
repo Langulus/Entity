@@ -75,21 +75,21 @@ namespace Langulus::A
       NOD() bool MadeOfPoints() const noexcept;
       NOD() Count GetPointCount() const;
       template<CT::Trait>
-      NOD() Any GetPointTrait(Offset) const;
+      NOD() Many GetPointTrait(Offset) const;
 
       //                                                                
       NOD() bool MadeOfLines() const noexcept;
       NOD() Count GetLineCount() const;
       NOD() Math::Vec2u GetLineIndices(Offset) const;
       template<CT::Trait>
-      NOD() Any GetLineTrait(Offset) const;
+      NOD() Many GetLineTrait(Offset) const;
 
       //                                                                
       NOD() bool MadeOfTriangles() const noexcept;
       NOD() Count GetTriangleCount() const;
       NOD() Math::Vec3u GetTriangleIndices(Offset) const;
       template<CT::Trait>
-      NOD() Any GetTriangleTrait(Offset) const;
+      NOD() Many GetTriangleTrait(Offset) const;
    };
 
 } // namespace Langulus::A

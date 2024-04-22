@@ -38,8 +38,8 @@ namespace Langulus::A
       LANGULUS(PRODUCER) AssetModule;
       LANGULUS_BASES(Unit);
       
-      using Data = Any;
-      using DataList = TAny<Data>;
+      using Data = Many;
+      using DataList = TMany<Data>;
       using DataListMap = TUnorderedMap<TMeta, DataList>;
 
    protected:

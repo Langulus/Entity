@@ -197,7 +197,7 @@ namespace Langulus::A
    }
 
    template<CT::Trait T>
-   Anyness::Any Mesh::GetPointTrait(Offset) const {
+   Anyness::Many Mesh::GetPointTrait(Offset) const {
       TODO();
       return {};
    }
@@ -314,13 +314,13 @@ namespace Langulus::A
    ///   @param lineIndex - the line index                                    
    ///   @return data for the specific line                                   
    template<CT::Trait T>
-   Any Mesh::GetLineTrait(Offset lineIndex) const {
+   Many Mesh::GetLineTrait(Offset lineIndex) const {
       const auto indices = GetLineIndices(lineIndex);
       const auto soughtt = GetData<T>(0);
       if (not soughtt or not *soughtt)
          return {};
 
-      Any soughtDecayed;
+      Many soughtDecayed;
       if (soughtt->template CastsTo<Math::Triangle3>())
          soughtDecayed = soughtt->template ReinterpretAs<Math::Point3>();
       else if (soughtt->template CastsTo<Math::Triangle2>())
@@ -328,7 +328,7 @@ namespace Langulus::A
       else
          soughtDecayed = *soughtt;
 
-      Any result;
+      Many result;
       result.InsertBlock(IndexBack, soughtDecayed.GetElement(indices[0]));
       result.InsertBlock(IndexBack, soughtDecayed.GetElement(indices[1]));
       return result;
@@ -403,13 +403,13 @@ namespace Langulus::A
    ///   @param triangleIndex - the triangle index                            
    ///   @return data for the specific triangle                               
    template<CT::Trait T>
-   Any Mesh::GetTriangleTrait(Offset triangleIndex) const {
+   Many Mesh::GetTriangleTrait(Offset triangleIndex) const {
       const auto indices = GetTriangleIndices(triangleIndex);
       const auto soughtt = GetData<T>(0);
       if (not soughtt or not *soughtt)
          return {};
 
-      Any soughtDecayed;
+      Many soughtDecayed;
       if (soughtt->template CastsTo<Math::Triangle3>())
          soughtDecayed = soughtt->template ReinterpretAs<Math::Point3>();
       else if (soughtt->template CastsTo<Math::Triangle2>())
@@ -417,7 +417,7 @@ namespace Langulus::A
       else
          soughtDecayed = *soughtt;
 
-      Any result;
+      Many result;
       result.InsertBlock(IndexBack, soughtDecayed.GetElement(indices[0]));
       result.InsertBlock(IndexBack, soughtDecayed.GetElement(indices[1]));
       result.InsertBlock(IndexBack, soughtDecayed.GetElement(indices[2]));

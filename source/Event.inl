@@ -127,7 +127,7 @@ namespace Langulus
    /// This constructor also generates the timestamp                          
    ///   @param a... - any number of arguments to carry in the event          
    template<class... T> LANGULUS(INLINED)
-   Event::Event(T&&...a) requires (::std::constructible_from<Anyness::Any, T&&...>)
+   Event::Event(T&&...a) requires (::std::constructible_from<Anyness::Many, T&&...>)
       : Event {} {
       if constexpr (CT::Semantic<T...>) {
          using S = FirstOf<T...>;
@@ -144,12 +144,12 @@ namespace Langulus
          else {
             // Semantic-construction from anything else - just forward  
             // it to the payload                                        
-            mPayload = Anyness::Any {Forward<T>(a)...};
+            mPayload = Anyness::Many {Forward<T>(a)...};
          }
       }
       else {
          // Whatever arguments are there, forward them to payload       
-         mPayload = Anyness::Any {Forward<T>(a)...};
+         mPayload = Anyness::Many {Forward<T>(a)...};
       }
    }
 

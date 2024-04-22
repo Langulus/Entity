@@ -62,7 +62,7 @@ namespace Langulus::Entity
       Trait* found {};
       if (index.IsArithmetic()) {
          auto offset = index.GetOffsetUnsafe();
-         mTraits.ForEachValue([&](TAny<Trait>& list) noexcept {
+         mTraits.ForEachValue([&](TMany<Trait>& list) noexcept {
             if (offset < list.GetCount()) {
                found = &list[offset];
                return Loop::Break;
