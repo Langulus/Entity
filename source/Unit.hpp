@@ -28,6 +28,7 @@ namespace Langulus::A
    ///                                                                        
    struct LANGULUS_API(ENTITY) Unit
       : virtual Resolvable
+      , virtual Referenced
       , Entity::SeekInterface<Unit>
    {
       LANGULUS(UNINSERTABLE) false;
@@ -108,15 +109,15 @@ namespace Langulus::A
       using SeekInterface::GatherTraits;
 
       template<Seek = Seek::HereAndAbove>
-      NOD() TAny<Unit*> GatherUnits(DMeta);
+      NOD() TMany<Unit*> GatherUnits(DMeta);
       template<Seek = Seek::HereAndAbove>
-      NOD() TAny<Unit*> GatherUnitsExt(DMeta, const Neat&);
+      NOD() TMany<Unit*> GatherUnitsExt(DMeta, const Neat&);
 
       template<Seek = Seek::HereAndAbove>
       NOD() TraitList GatherTraits(TMeta);
 
       template<CT::Data D, Seek = Seek::HereAndAbove>
-      NOD() TAny<D> GatherValues() const;
+      NOD() TMany<D> GatherValues() const;
 
    protected:
       void Couple(const Neat&);

@@ -29,8 +29,8 @@ namespace Langulus::Entity
    ///   @param meta - the units to seek for                                  
    ///   @return the gathered units that match the type                       
    template<Seek SEEK>
-   TAny<A::Unit*> Thing::GatherUnits(DMeta meta) {
-      TAny<A::Unit*> result;
+   TMany<A::Unit*> Thing::GatherUnits(DMeta meta) {
+      TMany<A::Unit*> result;
 
       if constexpr (SEEK & Seek::Here) {
          // Seek here if requested                                      
@@ -68,8 +68,8 @@ namespace Langulus::Entity
    ///   @param trait - the trait to seek for                                 
    ///   @return the gathered traits that match the type                      
    template<Seek SEEK>
-   TAny<Trait> Thing::GatherTraits(TMeta trait) {
-      TAny<Trait> results;
+   TMany<Trait> Thing::GatherTraits(TMeta trait) {
+      TMany<Trait> results;
 
       if constexpr (SEEK & Seek::Here) {
          // Handle some predefined traits here                          
@@ -132,8 +132,8 @@ namespace Langulus::Entity
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @return the gathered values                                          
    template<CT::Data D, Seek SEEK>
-   TAny<D> Thing::GatherValues() const {
-      TAny<D> results;
+   TMany<D> Thing::GatherValues() const {
+      TMany<D> results;
 
       if constexpr (SEEK & Seek::Here) {
          // Check dynamic traits in the entity                          

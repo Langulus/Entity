@@ -403,7 +403,7 @@ namespace Langulus::Entity
    ///   @param arguments... - the arguments to provide for construct         
    ///   @return the created unit(s)                                          
    template<CT::Unit T, class... A> LANGULUS(INLINED)
-   Any Thing::CreateUnit(A&&...arguments) {
+   Many Thing::CreateUnit(A&&...arguments) {
       return CreateData(
          Construct::From<Decay<T>>(Forward<A>(arguments)...)
       );
@@ -417,7 +417,7 @@ namespace Langulus::Entity
    ///   @param arguments... - the arguments to provide for construct         
    ///   @return the created unit(s)                                          
    template<class... A> LANGULUS(INLINED)
-   Any Thing::CreateUnitToken(const Token& token, A&&...arguments) {
+   Many Thing::CreateUnitToken(const Token& token, A&&...arguments) {
       return CreateData(
          Construct::FromToken(token, Forward<A>(arguments)...)
       );
@@ -512,7 +512,7 @@ namespace Langulus::Entity
    ///   @param construct - instructions for the creation of the data         
    ///   @return created data                                                 
    template<Seek SEEK>
-   Any Thing::CreateData(const Construct& construct) {
+   Many Thing::CreateData(const Construct& construct) {
       LANGULUS_ASSUME(UserAssumes, construct.GetType(),
          "Invalid construct type");
 

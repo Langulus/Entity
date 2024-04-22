@@ -21,8 +21,8 @@ namespace Langulus
 
 
    using MetaList = TUnorderedSet<AMeta>;
-   using TraitList = TAny<Trait>;
-   using ModuleList = TAny<A::Module*>;
+   using TraitList = TMany<Trait>;
+   using ModuleList = TMany<A::Module*>;
 
    /// Helper function, that reflects and registers a list of any reflection  
    /// primitives, like data, verbs, and traits.                              

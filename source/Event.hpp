@@ -75,14 +75,14 @@ namespace Langulus
       // Event timestamp                                                
       TimePoint mTimestamp;
       // Payload, for additional data                                   
-      Anyness::Any mPayload;
+      Anyness::Many mPayload;
 
       Event();
       Event(const Event&);
       Event(Event&&);
 
       template<class...T>
-      Event(T&&...) requires (::std::constructible_from<Anyness::Any, T&&...>);
+      Event(T&&...) requires (::std::constructible_from<Anyness::Many, T&&...>);
    };
 
 
@@ -109,7 +109,7 @@ namespace Langulus
             LANGULUS(INFO) INFOSTRING; \
             LANGULUS_BASES(Event); \
             template<class... T_> \
-            EVENT(T_&&...a) requires (::std::constructible_from<Anyness::Any, T_&&...>) \
+            EVENT(T_&&...a) requires (::std::constructible_from<Anyness::Many, T_&&...>) \
                : Event {Forward<T_>(a)...} { \
                mType = MetaOf<EVENT>(); \
             } \
@@ -125,7 +125,7 @@ namespace Langulus
             LANGULUS(INFO) INFOSTRING; \
             LANGULUS_BASES(Event); \
             template<class... T_> \
-            EVENT(EventState state, T_&&...a) requires (::std::constructible_from<Anyness::Any, T_&&...>) \
+            EVENT(EventState state, T_&&...a) requires (::std::constructible_from<Anyness::Many, T_&&...>) \
                : Event {Forward<T_>(a)...} { \
                mType = MetaOf<EVENT>(); \
                mState = state; \

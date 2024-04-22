@@ -38,7 +38,7 @@ namespace Langulus::Entity
    /// This function completely relies on external modules                    
    ///   @param text - text to execute                                        
    ///   @return the results of the execution                                 
-   Any Thing::Run(const Lingua& text) {
+   Many Thing::Run(const Lingua& text) {
       if (not text)
          return {};
 
@@ -57,7 +57,7 @@ namespace Langulus::Entity
       }
 
       // Execute the resulting scopes                                   
-      Any results;
+      Many results;
       interpreter->ForEach([&](const Flow::Temporal& scope) {
          results << Resolvable::Run(scope);
       });
@@ -87,9 +87,9 @@ namespace Langulus::Entity
    ///   @param verb - the selection verb                                     
    void Thing::Select(Verb& verb) {
       // Probe every part of the argument and check if it matches       
-      TAny<Trait>    selectedTraits;
-      TAny<A::Unit*> selectedUnits;
-      TAny<Thing*>   selectedEntities;
+      TMany<Trait>    selectedTraits;
+      TMany<A::Unit*> selectedUnits;
+      TMany<Thing*>   selectedEntities;
       bool mismatch = false;
 
       const auto selectTrait = [&](const TMeta& trait) {
@@ -135,7 +135,7 @@ namespace Langulus::Entity
 
             // selectedComponents has been populated with results       
             // Filter them additionally by construct arguments          
-            TAny<A::Unit*> filteredSelectedComponents;
+            TMany<A::Unit*> filteredSelectedComponents;
             for (auto& unit : selectedUnits) {
                bool localMismatch = false;
                auto unitBlock = unit->GetBlock();

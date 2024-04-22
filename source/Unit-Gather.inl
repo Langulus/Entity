@@ -19,7 +19,7 @@ namespace Langulus::A
    ///   @param meta - the units to seek for                                  
    ///   @return the gathered units that match the type                       
    template<Seek SEEK> LANGULUS(INLINED)
-   TAny<Unit*> Unit::GatherUnits(DMeta meta) {
+   TMany<Unit*> Unit::GatherUnits(DMeta meta) {
       return mOwners.template GatherUnits<SEEK>(meta);
    }
    
@@ -37,7 +37,7 @@ namespace Langulus::A
    ///   @tparam SEEK - where in the hierarchy are we seeking in?             
    ///   @return the gathered values                                          
    template<CT::Data D, Seek SEEK> LANGULUS(INLINED)
-   TAny<D> Unit::GatherValues() const {
+   TMany<D> Unit::GatherValues() const {
       return mOwners.template GatherValues<SEEK, D>();
    }
 

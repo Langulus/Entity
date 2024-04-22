@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
    static_assert(CT::Complete<Runtime>, "Oops5");
 
    // For reflection of all verbs                                       
-   (void)MetaOf<TAny<Thing*>>();
+   (void)MetaOf<TMany<Thing*>>();
    (void)MetaOf<Entity::Hierarchy>();
    (void)MetaOf<Index>();
    (void)MetaOf<Thing>();

@@ -61,7 +61,7 @@ namespace Langulus::A
       NOD() DMeta GetFormat() const noexcept;
       NOD() Size GetBytesize() const noexcept;
 
-      NOD() virtual Any ReadAs(DMeta) const = 0;
+      NOD() virtual Many ReadAs(DMeta) const = 0;
 
       NOD() virtual Ref<File>    RelativeFile  (const Path&) const = 0;
       NOD() virtual Ref<Folder>  RelativeFolder(const Path&) const = 0;
@@ -82,7 +82,7 @@ namespace Langulus::A
 
          File* GetFile() const noexcept { return mFile; }
 
-         virtual Offset Read(Any&) = 0;
+         virtual Offset Read(Many&) = 0;
       };
 
       /// Abstract file writer stream                                         
@@ -99,7 +99,7 @@ namespace Langulus::A
 
          File* GetFile() const noexcept { return mFile; }
 
-         virtual Offset Write(const Any&) = 0;
+         virtual Offset Write(const Many&) = 0;
       };
 
       NOD() virtual Ref<Reader> NewReader() const = 0;

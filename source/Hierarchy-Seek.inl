@@ -508,7 +508,7 @@ namespace Langulus::Entity
                   // Found match                                        
                   try {
                      if constexpr (CT::DescriptorMakable<D>)
-                        output = D {Describe(static_cast<const Any&>(trait))};
+                        output = D {Describe(static_cast<const Many&>(trait))};
                      else if constexpr (CT::Pinnable<D>)
                         output = trait.template AsCast<TypeOf<D>>();
                      else

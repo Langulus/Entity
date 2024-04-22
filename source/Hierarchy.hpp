@@ -57,15 +57,15 @@ namespace Langulus::Entity
 
 
       template<Seek = Seek::HereAndAbove>
-      NOD() TAny<Unit*> GatherUnits(DMeta) = delete;
+      NOD() TMany<Unit*> GatherUnits(DMeta) = delete;
       template<Seek = Seek::HereAndAbove>
-      NOD() TAny<Unit*> GatherUnitsExt(DMeta, const Neat&) = delete;
+      NOD() TMany<Unit*> GatherUnitsExt(DMeta, const Neat&) = delete;
 
       template<Seek = Seek::HereAndAbove>
       NOD() TraitList GatherTraits(TMeta) = delete;
       
       template<CT::Data D, Seek = Seek::HereAndAbove>
-      NOD() TAny<D> GatherValues() const = delete;*/
+      NOD() TMany<D> GatherValues() const = delete;*/
 
 
       ///                                                                     
@@ -128,18 +128,18 @@ namespace Langulus::Entity
 
 
       template<Seek = Seek::HereAndAbove>
-      NOD() TAny<const A::Unit*> GatherUnits(DMeta) const;
+      NOD() TMany<const A::Unit*> GatherUnits(DMeta) const;
       template<CT::Data T = A::Unit, Seek = Seek::HereAndAbove>
-      NOD() TAny<T*> GatherUnits();
+      NOD() TMany<T*> GatherUnits();
       template<CT::Data T = A::Unit, Seek = Seek::HereAndAbove>
-      NOD() TAny<const T*> GatherUnits() const;
+      NOD() TMany<const T*> GatherUnits() const;
 
       template<Seek = Seek::HereAndAbove>
-      NOD() TAny<const A::Unit*> GatherUnitsExt(DMeta, const Neat&) const;
+      NOD() TMany<const A::Unit*> GatherUnitsExt(DMeta, const Neat&) const;
       template<CT::Data T = A::Unit, Seek = Seek::HereAndAbove>
-      NOD() TAny<T*> GatherUnitsExt(const Neat&);
+      NOD() TMany<T*> GatherUnitsExt(const Neat&);
       template<CT::Data T = A::Unit, Seek = Seek::HereAndAbove>
-      NOD() TAny<const T*> GatherUnitsExt(const Neat&) const;
+      NOD() TMany<const T*> GatherUnitsExt(const Neat&) const;
 
 
       template<Seek = Seek::HereAndAbove>
@@ -182,9 +182,9 @@ namespace Langulus::Entity
 
 
       template<Seek = Seek::HereAndAbove>
-      NOD() TAny<A::Unit*> GatherUnits(const Token&);
+      NOD() TMany<A::Unit*> GatherUnits(const Token&);
       template<Seek = Seek::HereAndAbove>
-      NOD() TAny<const A::Unit*> GatherUnits(const Token&) const;
+      NOD() TMany<const A::Unit*> GatherUnits(const Token&) const;
       
       template<Seek = Seek::HereAndAbove>
       NOD() TraitList GatherTraits(const Token&);
@@ -200,10 +200,10 @@ namespace Langulus::Entity
    /// Simply a container of Things, with various quality-of-life             
    /// functions related to hierarchical retrieval of things, units & traits  
    ///                                                                        
-   struct Hierarchy : TAny<Ref<Thing>>, SeekInterface<Hierarchy> {
-      using TAny::TAny;
-      using TAny::operator =;
-      using TAny::operator ==;
+   struct Hierarchy : TMany<Ref<Thing>>, SeekInterface<Hierarchy> {
+      using TMany::TMany;
+      using TMany::operator =;
+      using TMany::operator ==;
 
       ///                                                                     
       ///   Seek                                                              
@@ -244,15 +244,15 @@ namespace Langulus::Entity
       using SeekInterface::GatherTraits;
 
       template<Seek = Seek::HereAndAbove>
-      NOD() TAny<A::Unit*> GatherUnitsExt(DMeta, const Neat&);
+      NOD() TMany<A::Unit*> GatherUnitsExt(DMeta, const Neat&);
       template<Seek = Seek::HereAndAbove>
-      NOD() TAny<A::Unit*> GatherUnits(DMeta);
+      NOD() TMany<A::Unit*> GatherUnits(DMeta);
 
       template<Seek = Seek::HereAndAbove>
       NOD() TraitList GatherTraits(TMeta);
 
       template<CT::Data D, Seek = Seek::HereAndAbove>
-      NOD() TAny<D> GatherValues() const;
+      NOD() TMany<D> GatherValues() const;
    };
 
 } // namespace Langulus::Entity
