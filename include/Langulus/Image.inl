@@ -265,7 +265,7 @@ namespace Langulus::A
       // Get the values (and normalize them if we have to)              
       // Missing RGB channels are defaulted to 0, while missing Alpha   
       // channel is defaulted to 255 (or 1, if normalized)              
-      const Anyness::Block pixel {{}, from, 1, mValue, nullptr};
+      const Anyness::Block<> pixel {{}, from, 1, mValue, nullptr};
       T result;
       using TT = TypeOf<T>;
 

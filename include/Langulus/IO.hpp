@@ -33,12 +33,13 @@ namespace Langulus::A
    public:
       LANGULUS_BASES(Module);
 
-      NOD() virtual Ref<File>   GetFile  (const Path&) = 0;
-      NOD() virtual Ref<Folder> GetFolder(const Path&) = 0;
+      NOD() virtual auto GetFile  (const Path&) -> Ref<File>   = 0;
+      NOD() virtual auto GetFolder(const Path&) -> Ref<Folder> = 0;
 
-      NOD() const Path& GetWorkingPath() const noexcept;
-      NOD() const Path& GetDataPath() const noexcept;
+      NOD() auto GetWorkingPath() const noexcept -> const Path&;
+      NOD() auto GetDataPath()    const noexcept -> const Path&;
    };
+
 
    ///                                                                        
    ///   Abstract file interface                                              
@@ -55,56 +56,54 @@ namespace Langulus::A
       LANGULUS(PRODUCER) FileSystem;
       LANGULUS_BASES(Unit);
 
-      NOD() bool Exists() const noexcept;
-      NOD() bool IsReadOnly() const noexcept;
-      NOD() const Path& GetFilePath() const noexcept;
-      NOD() DMeta GetFormat() const noexcept;
-      NOD() Size GetBytesize() const noexcept;
-
-      NOD() virtual Many ReadAs(DMeta) const = 0;
-
-      NOD() virtual Ref<File>    RelativeFile  (const Path&) const = 0;
-      NOD() virtual Ref<Folder>  RelativeFolder(const Path&) const = 0;
+      NOD() virtual auto ReadAs        (DMeta)       const -> Many = 0;
+      NOD() virtual auto RelativeFile  (const Path&) const -> Ref<File> = 0;
+      NOD() virtual auto RelativeFolder(const Path&) const -> Ref<Folder> = 0;
       
+      NOD() auto Exists()      const noexcept -> bool;
+      NOD() auto IsReadOnly()  const noexcept -> bool;
+      NOD() auto GetFilePath() const noexcept -> const Path&;
+      NOD() auto GetFormat()   const noexcept -> DMeta;
+      NOD() auto GetBytesize() const noexcept -> Size;
+
       template<class T>
       NOD() T ReadAs() const;
 
       /// Abstract file reader stream                                         
       struct Reader {
       protected:
-         File* mFile;
+         File*  mFile;
          Offset mProgress {};
 
       public:
          Reader() = delete;
-         Reader(File* f)
-            : mFile {f} {}
+         Reader(File* f) : mFile {f} {}
 
-         File* GetFile() const noexcept { return mFile; }
+         virtual auto Read(Many&) -> Offset = 0;
 
-         virtual Offset Read(Many&) = 0;
+         auto GetFile() const noexcept { return mFile; }
       };
 
       /// Abstract file writer stream                                         
       struct Writer {
       protected:
-         File* mFile;
+         File*  mFile;
          Offset mProgress {};
-         bool mAppend = false;
+         bool   mAppend = false;
 
       public:
          Writer() = delete;
-         Writer(File* f, bool append)
-            : mFile {f}, mAppend {append} {}
+         Writer(File* f, bool append) : mFile {f}, mAppend {append} {}
 
-         File* GetFile() const noexcept { return mFile; }
+         virtual auto Write(const Many&) -> Offset = 0;
 
-         virtual Offset Write(const Many&) = 0;
+         auto GetFile() const noexcept { return mFile; }
       };
 
-      NOD() virtual Ref<Reader> NewReader() const = 0;
-      NOD() virtual Ref<Writer> NewWriter(bool append) const = 0;
+      NOD() virtual auto NewReader() const -> Ref<Reader> = 0;
+      NOD() virtual auto NewWriter(bool append) const -> Ref<Writer> = 0;
    };
+
 
    ///                                                                        
    ///   Abstract folder interface                                            
@@ -119,12 +118,12 @@ namespace Langulus::A
       LANGULUS(PRODUCER) FileSystem;
       LANGULUS_BASES(Unit);
 
-      NOD() bool Exists() const noexcept;
-      NOD() bool IsReadOnly() const noexcept;
-      NOD() const Path& GetFolderPath() const noexcept;
+      NOD() virtual auto RelativeFile  (const Path&) const -> Ref<File> = 0;
+      NOD() virtual auto RelativeFolder(const Path&) const -> Ref<Folder> = 0;
 
-      NOD() virtual Ref<File>   RelativeFile  (const Path&) const = 0;
-      NOD() virtual Ref<Folder> RelativeFolder(const Path&) const = 0;
+      NOD() auto Exists()        const noexcept -> bool;
+      NOD() auto IsReadOnly()    const noexcept -> bool;
+      NOD() auto GetFolderPath() const noexcept -> const Path&;
    };
 
 } // namespace Langulus::A

@@ -527,7 +527,7 @@ namespace Langulus::Entity
             });
          }
          else {
-            aux.ForEachDeep([&](const Block& group) -> LoopControl {
+            aux.ForEachDeep([&](const Block<>& group) -> LoopControl {
                try {
                   // Found match if these don't throw                   
                   if constexpr (CT::DescriptorMakable<D>)
