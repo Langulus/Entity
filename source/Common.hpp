@@ -9,7 +9,7 @@
 #pragma once
 #include <Anyness/TSet.hpp>
 #include <Anyness/TMap.hpp>
-#include <Anyness/TMany.hpp>
+#include <Anyness/Many.hpp>
 #include <Anyness/Ref.hpp>
 #include <Anyness/Trait.hpp>
 #include <Anyness/Path.hpp>
