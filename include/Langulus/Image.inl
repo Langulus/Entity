@@ -132,8 +132,8 @@ namespace Langulus::A
       // Iterate using the desired color type                           
       UNUSED() Count counter = 0;
       auto data = pixels->CastsTo<Bytes>()
-         ? pixels->Get<Bytes>().GetRawAs<A>()
-         : pixels->GetRawAs<A>();
+         ? pixels->Get<Bytes>().GetRaw<A>()
+         : pixels->GetRaw<A>();
       const auto dataEnd = data + mView.GetPixelCount();
 
       while (data != dataEnd) {
