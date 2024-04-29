@@ -42,7 +42,7 @@ bool Unit::CompareDescriptor(const Neat& descriptor) const {
    // Then we run another check, based on data types, again, all        
    // of them must be present, either in trait, or in other form        
    memberOffset = {};
-   descriptor.ForEachTail([&](const Anyness::Block& anythingElse) {
+   descriptor.ForEachTail([&](const Anyness::Block<>& anythingElse) {
       if (not GetMember(TMeta {}, memberOffset).Compare(anythingElse)) {
          mismatch = true;
          return Loop::Break;

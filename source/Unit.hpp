@@ -28,7 +28,12 @@ namespace Langulus::A
    ///                                                                        
    struct LANGULUS_API(ENTITY) Unit
       : virtual Resolvable
+      #if LANGULUS_COMPILER(MSVC)
+      #pragma warning(suppress: 4275)
       , virtual Referenced
+      #else
+      , virtual Referenced
+      #endif
       , Entity::SeekInterface<Unit>
    {
       LANGULUS(UNINSERTABLE) false;
