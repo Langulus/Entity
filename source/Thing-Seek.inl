@@ -294,7 +294,9 @@ namespace Langulus::Entity
    ///   @param offset - the number of the matching trait to use              
    ///   @return true if value has been found and rewritten                   
    template<Seek SEEK> LANGULUS(INLINED)
-   bool Thing::SeekValueAux(TMeta meta, const Neat& aux, CT::Data auto& output, Index offset) const {
+   bool Thing::SeekValueAux(
+      TMeta meta, const Neat& aux, CT::Data auto& output, Index offset
+   ) const {
       using D = Deref<decltype(output)>;
 
       if constexpr (CT::Pinnable<D>) {
@@ -327,7 +329,7 @@ namespace Langulus::Entity
          });
       }
       else {
-         aux.ForEachDeep([&](const Block& group) {
+         aux.ForEachDeep([&](const Block<>& group) {
             try {
                // Found match if these don't throw                      
                if constexpr (CT::Pinnable<D>)
