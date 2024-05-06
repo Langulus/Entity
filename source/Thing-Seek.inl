@@ -254,10 +254,21 @@ namespace Langulus::Entity
          // Seek here if requested                                      
          auto temp = GetTrait(meta, offset);
          try {
-            if constexpr (CT::Pinnable<D>)
+            if (CT::Pinnable<D> and temp.Is<TypeOf<D>>())
+               output = temp.As<TypeOf<D>>();
+            else if (not CT::Pinnable<D> and temp.Is<D>())
+               output = temp.As<D>();
+            else if constexpr (CT::DescriptorMakable<D>)
+               output = D {Describe(static_cast<const Many&>(temp))};
+            else if constexpr (CT::Pinnable<D>)
                output = temp.template AsCast<TypeOf<D>>();
             else
                output = temp.template AsCast<D>();
+
+            /*if constexpr (CT::Pinnable<D>)
+               output = temp.template AsCast<TypeOf<D>>();
+            else
+               output = temp.template AsCast<D>();*/
             return true;
          }
          catch (...) { }

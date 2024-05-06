@@ -11,6 +11,7 @@
 #include <Math/LOD.hpp>
 #include <Math/Level.hpp>
 #include <Math/Matrix.hpp>
+#include <Math/Color.hpp>
 
 
 namespace Langulus::A
@@ -55,6 +56,7 @@ namespace Langulus::A
       NOD() virtual Math::Mat4  GetModelTransform(const Math::Level& = {}) const noexcept = 0;
       NOD() virtual Math::Mat4  GetViewTransform(const Math::LOD&) const noexcept = 0;
       NOD() virtual Math::Mat4  GetViewTransform(const Math::Level& = {}) const noexcept = 0;
+      NOD() virtual auto GetColor() const noexcept -> Math::RGBA = 0;
    };
 
 } // namespace Langulus::A

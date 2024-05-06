@@ -507,7 +507,11 @@ namespace Langulus::Entity
                if (trait.IsTrait(meta)) {
                   // Found match                                        
                   try {
-                     if constexpr (CT::DescriptorMakable<D>)
+                     if (CT::Pinnable<D> and trait.Is<TypeOf<D>>())
+                        output = trait.As<TypeOf<D>>();
+                     else if (not CT::Pinnable<D> and trait.Is<D>())
+                        output = trait.As<D>();
+                     else if constexpr (CT::DescriptorMakable<D>)
                         output = D {Describe(static_cast<const Many&>(trait))};
                      else if constexpr (CT::Pinnable<D>)
                         output = trait.template AsCast<TypeOf<D>>();
@@ -530,7 +534,11 @@ namespace Langulus::Entity
             aux.ForEachDeep([&](const Block<>& group) -> LoopControl {
                try {
                   // Found match if these don't throw                   
-                  if constexpr (CT::DescriptorMakable<D>)
+                  if (CT::Pinnable<D> and group.Is<TypeOf<D>>())
+                     output = group.As<TypeOf<D>>();
+                  else if (not CT::Pinnable<D> and group.Is<D>())
+                     output = group.As<D>();
+                  else if constexpr (CT::DescriptorMakable<D>)
                      output = D {Describe(group)};
                   else if constexpr (CT::Pinnable<D>)
                      output = group.template AsCast<TypeOf<D>>();
