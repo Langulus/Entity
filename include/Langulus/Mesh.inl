@@ -206,7 +206,7 @@ namespace Langulus::A
    ///   @return true if geometry is made of lines                            
    LANGULUS(INLINED)
    bool Mesh::MadeOfLines() const noexcept {
-      return CheckTopology<A::Line>();
+      return CheckTopology<A::Line, A::LineStrip, A::LineLoop>();
    }
 
    /// Get the number of lines inside the geometry                            
@@ -338,11 +338,12 @@ namespace Langulus::A
    ///   @return true if geometry is made of triangles                        
    LANGULUS(INLINED)
    bool Mesh::MadeOfTriangles() const noexcept {
-      return CheckTopology<A::Triangle>();
+      return CheckTopology<A::Triangle, A::TriangleStrip, A::TriangleFan>();
    }
    
-   /// Get the number of triangles inside the geometry                        
-   ///   @return the number of points                                         
+   /// Get the number of triangles inside the geometry, after indexing and    
+   /// topology considerations                                                
+   ///   @return the number of triangles                                      
    inline Count Mesh::GetTriangleCount() const {
       if (MadeOfPoints() or MadeOfLines())
          return 0;
@@ -367,6 +368,7 @@ namespace Langulus::A
    }
 
    /// Get the indices of a given triangle                                    
+   ///   @attention not optimized for iteration                               
    ///   @param index - triangle index                                        
    ///   @return the indices as a 32bit unsigned 3D vector                    
    inline Math::Vec3u Mesh::GetTriangleIndices(Offset index) const {
@@ -399,6 +401,7 @@ namespace Langulus::A
    }
 
    /// Get a specific property of a specific triangle                         
+   ///   @attention not optimized for iteration                               
    ///   @tparam T - the trait to retrieve                                    
    ///   @param triangleIndex - the triangle index                            
    ///   @return data for the specific triangle                               
@@ -424,4 +427,308 @@ namespace Langulus::A
       return result;
    }
    
+   /// Optimized for cycling through the data of all triangles                
+   /// Will generate triangles based on indices and topology                  
+   ///   @param call - lambda with the desired triangle traits as arguments   
+   ///   @return the number of iterated triangles                             
+   Count Mesh::ForEachVertex(auto&& call) const {
+      using F = Deref<decltype(call)>;
+      using A = ArgumentsOf<F>;
+
+      const auto indices = GetDataList<Traits::Index>();
+      if (not indices or not *indices)
+         return ForEachVertexInner<false>(A {}, Forward<F>(call));
+      else
+         return ForEachVertexInner<true> (A {}, Forward<F>(call));
+   }
+
+   /// Inner vertex iteration                                                 
+   ///   @tparam ...T - the decomposed list of call arguments                 
+   ///   @param call - the call to execute on each iteration                  
+   ///   @return the number of executions of 'call'                           
+   template<bool INDEXED, class...T>
+   Count Mesh::ForEachVertexInner(Types<T...>, auto&& call) const {
+      static_assert(CT::Trait<Decay<T>...>,
+         "All iterator arguments must be traits, like Traits::Place, "
+         "Traits::Aim, Traits::Color, etc.");
+
+      // Represent iterator arguments as a tuple of disowned Blocks     
+      using Tuple = std::tuple<Decay<T>...>;
+      const Tuple data_streams {ForEachVertex_PrepareStream<Decay<T>>()...};
+      Count counter = 0;
+
+      if constexpr (not INDEXED) {
+         // Unindexed triangles                                         
+         // Apply the tuple to the call on each iteration               
+         TODO();
+         std::apply(call, data_streams);
+      }
+      else {
+         // Indexed triangles                                           
+         // There could be separate index streams for each data stream  
+         // If that's not the case, then each data stream will reuse    
+         // the same index stream                                       
+         const Tuple index_streams {ForEachVertex_PrepareIndexStream<Decay<T>>()...};
+         using Sequence = std::make_index_sequence<sizeof...(T)>;
+
+         if (CheckTopology<A::Triangle>()) {
+            // Triangle list                                            
+            for (uint32_t i = 0; i < mView.mIndexCount; ++i) {
+               std::apply(call, GenerateVertex<A::Triangle>(
+                  i, data_streams, index_streams, Sequence {}));
+            }
+            counter = mView.mIndexCount;
+         }
+         else if (CheckTopology<A::TriangleStrip>()) {
+            // Triangle strip                                           
+            // (two of the vertices are reused for each triangle)       
+            uint32_t marker = 0;
+            Tuple reuse[3] {
+               GenerateVertex<A::TriangleStrip>(
+                  0, data_streams, index_streams, Sequence {}),
+               GenerateVertex<A::TriangleStrip>(
+                  1, data_streams, index_streams, Sequence {}),
+               GenerateVertex<A::TriangleStrip>(
+                  2, data_streams, index_streams, Sequence {})
+            };
+
+            std::apply(call, reuse[0]);
+            std::apply(call, reuse[1]);
+            std::apply(call, reuse[2]);
+
+            for (uint32_t i = 3; i < mView.mIndexCount; ++i) {
+               // Apply the tuple to the call on each triangle vertex   
+               reuse[marker] = GenerateVertex<A::TriangleStrip>(
+                  i, data_streams, index_streams, Sequence {});
+
+               switch (marker) {
+               case 0:
+                  std::apply(call, reuse[1]);
+                  std::apply(call, reuse[2]);
+                  std::apply(call, reuse[0]);
+                  marker = 1;
+                  break;
+               case 1:
+                  std::apply(call, reuse[2]);
+                  std::apply(call, reuse[0]);
+                  std::apply(call, reuse[1]);
+                  marker = 2;
+                  break;
+               case 2:
+                  std::apply(call, reuse[0]);
+                  std::apply(call, reuse[1]);
+                  std::apply(call, reuse[2]);
+                  marker = 0;
+                  break;
+               }
+            }
+            counter = (mView.mIndexCount - 3) * 3;
+         }
+         else if (CheckTopology<A::TriangleFan>()) {
+            // Triangle fan                                             
+            // (first vertex in a fan is constantly reused)             
+            uint32_t marker = 1;
+            Tuple reuse[3] {
+               GenerateVertex<A::TriangleFan>(
+                  0, data_streams, index_streams, Sequence {}),
+               GenerateVertex<A::TriangleFan>(
+                  1, data_streams, index_streams, Sequence {}),
+               GenerateVertex<A::TriangleFan>(
+                  2, data_streams, index_streams, Sequence {})
+            };
+
+            std::apply(call, reuse[0]);
+            std::apply(call, reuse[1]);
+            std::apply(call, reuse[2]);
+
+            for (uint32_t i = 3; i < mView.mIndexCount; ++i) {
+               // Apply the tuple to the call on each triangle vertex   
+               reuse[marker] = GenerateVertex<A::TriangleFan>(
+                  i, data_streams, index_streams, Sequence {});
+
+               switch (marker) {
+               case 2:
+                  std::apply(call, reuse[0]);
+                  std::apply(call, reuse[1]);
+                  std::apply(call, reuse[2]);
+                  marker = 1;
+                  break;
+               case 1:
+                  std::apply(call, reuse[0]);
+                  std::apply(call, reuse[2]);
+                  std::apply(call, reuse[1]);
+                  marker = 2;
+                  break;
+               }
+            }
+            counter = (mView.mIndexCount - 3) * 3;
+         }
+         else LANGULUS_OOPS(Access, "Unsupported topology");
+      }
+
+      return counter;
+   }
+
+   /// Prepare a trait block, that will be offsetted while iterating          
+   ///   @tparam T - the trait to interface                                   
+   ///   @return a disowned trait block                                       
+   template<CT::Trait T>
+   T Mesh::ForEachVertex_PrepareStream() const {
+      const auto found = GetData<T>(0);
+      if (not found or not *found) {
+         // No such data was found, no iteration will be performed      
+         // on that trait                                               
+         return {};
+      }
+
+      // Data was found, always decay it down to a vector type to       
+      // simplify things a bit on the other end                         
+      //TODO this can be made more elegant by CastsTo<float/double, true>(count)
+      if (found->template CastsTo<Math::Triangle3, true>())
+         return Disown(found->template ReinterpretAs<Math::Vec3>());
+      else if (found->template CastsTo<Math::Triangle2, true>())
+         return Disown(found->template ReinterpretAs<Math::Vec2>());
+      else if (found->template CastsTo<Math::Vec3, true>())
+         return Disown(found->template ReinterpretAs<Math::Vec3>());
+      else if (found->template CastsTo<Math::Vec2, true>())
+         return Disown(found->template ReinterpretAs<Math::Vec2>());
+
+      LANGULUS_OOPS(Access, "Unsupported trait format");
+      return {};
+   }
+
+   /// Prepare an index block, that will be offsetted while iterating         
+   ///   @tparam T - the trait to interface                                   
+   ///   @return a disowned trait block                                       
+   template<CT::Trait T>
+   T Mesh::ForEachVertex_PrepareIndexStream() const {
+      const auto indices = GetDataList<Traits::Index>();
+      if (not indices or not *indices)
+         return {};
+
+      if (indices->GetCount() == 1) {
+         // Single index source will be used for all Ts                 
+         return Disown((*indices)[0]);
+      }
+
+      // Multiple index sequences for different streams                 
+      // Each sequence should be kept in a corresponding trait          
+      for (auto& group : *indices) {
+         if (group.IsSimilar<T>())
+            return group.Get<T>();
+      }
+
+      // No indices for T found                                         
+      return {};
+   }
+
+   /// Invoke 'call' with the required arguments                              
+   ///   @tparam T - the topology                                             
+   ///   @param i - the vertex index to dispatch                              
+   ///   @param data - the data stream tuple                                  
+   ///   @param indices - the index stream tuple                              
+   ///   @return the tuple of arguments for a vertex                          
+   template<CT::Topology T, size_t...STREAM_ID>
+   auto Mesh::GenerateVertex(Offset i,
+      const auto& data, const auto& indices,
+      std::index_sequence<STREAM_ID...>&&
+   ) const {
+      return ::std::make_tuple(PickVertex<T>(i,
+         ::std::get<STREAM_ID>(data),
+         ::std::get<STREAM_ID>(indices)
+      )...);
+   }
+
+   /// Each data stream can be indexed differently, for example a box         
+   /// can have a position for each vertex, but only one normal for all       
+   ///   @param stream - the data stream                                      
+   ///   @param indices - the index stream                                    
+   ///   @return the selected element                                         
+   template<CT::Topology T>
+   auto Mesh::PickVertex(Offset i, const CT::Trait auto& stream, const CT::Trait auto& indices) const {
+      LANGULUS_ASSUME(DevAssumes, mView.mIndexCount,
+         "PickVertex can be used only on indexed geometry");
+
+      if (stream.GetCount() <= 1) {
+         // Stream is invalid, or has only one element                  
+         return stream;
+      }
+      else if (indices.IsEmpty()) {
+         // No indices, so forward 'i' directly                         
+         return stream.Select(i, 1);
+      }
+      else if (indices.GetCount() == mView.mIndexCount) {
+         // Per-vertex indexing strategy                                
+         if (indices.IsExact<uint32_t>())
+            return stream.Select(indices.GetRaw<uint32_t>()[i], 1);
+         else if (indices.IsExact<uint64_t>())
+            return stream.Select(indices.GetRaw<uint64_t>()[i], 1);
+         else if (indices.IsExact<uint16_t>())
+            return stream.Select(indices.GetRaw<uint16_t>()[i], 1);
+         else if (indices.IsExact<uint8_t>())
+            return stream.Select(indices.GetRaw<uint8_t> ()[i], 1);
+         else
+            LANGULUS_OOPS(Access, "Unsupported index format");
+      }
+      else if (indices.GetCount() < mView.mIndexCount) {
+         // Per-primitive indexing strategy                             
+         if constexpr (CT::Triangle<T>) {
+            const auto p_i = i / 3;
+            if (indices.IsExact<uint32_t>())
+               return stream.Select(indices.GetRaw<uint32_t>()[p_i], 1);
+            else if (indices.IsExact<uint64_t>())
+               return stream.Select(indices.GetRaw<uint64_t>()[p_i], 1);
+            else if (indices.IsExact<uint16_t>())
+               return stream.Select(indices.GetRaw<uint16_t>()[p_i], 1);
+            else if (indices.IsExact<uint8_t>())
+               return stream.Select(indices.GetRaw<uint8_t >()[p_i], 1);
+            else
+               LANGULUS_OOPS(Access, "Unsupported index format");
+         }
+         else if constexpr (CT::TriangleStrip<T> or CT::TriangleFan<T>) {
+            const auto p_i = i < 2 ? 0 : i - 2;
+            if (indices.IsExact<uint32_t>())
+               return stream.Select(indices.GetRaw<uint32_t>()[p_i], 1);
+            else if (indices.IsExact<uint64_t>())
+               return stream.Select(indices.GetRaw<uint64_t>()[p_i], 1);
+            else if (indices.IsExact<uint16_t>())
+               return stream.Select(indices.GetRaw<uint16_t>()[p_i], 1);
+            else if (indices.IsExact<uint8_t>())
+               return stream.Select(indices.GetRaw<uint8_t >()[p_i], 1);
+            else
+               LANGULUS_OOPS(Access, "Unsupported index format");
+         }
+         else if constexpr (CT::Line<T>) {
+            const auto p_i = i / 2;
+            if (indices.IsExact<uint32_t>())
+               return stream.Select(indices.GetRaw<uint32_t>()[p_i], 1);
+            else if (indices.IsExact<uint64_t>())
+               return stream.Select(indices.GetRaw<uint64_t>()[p_i], 1);
+            else if (indices.IsExact<uint16_t>())
+               return stream.Select(indices.GetRaw<uint16_t>()[p_i], 1);
+            else if (indices.IsExact<uint8_t>())
+               return stream.Select(indices.GetRaw<uint8_t >()[p_i], 1);
+            else
+               LANGULUS_OOPS(Access, "Unsupported index format");
+         }
+         else if constexpr (CT::LineStrip<T> or CT::LineLoop<T>) {
+            const auto p_i = i < 1 ? 0 : i - 1;
+            if (indices.IsExact<uint32_t>())
+               return stream.Select(indices.GetRaw<uint32_t>()[p_i], 1);
+            else if (indices.IsExact<uint64_t>())
+               return stream.Select(indices.GetRaw<uint64_t>()[p_i], 1);
+            else if (indices.IsExact<uint16_t>())
+               return stream.Select(indices.GetRaw<uint16_t>()[p_i], 1);
+            else if (indices.IsExact<uint8_t>())
+               return stream.Select(indices.GetRaw<uint8_t >()[p_i], 1);
+            else
+               LANGULUS_OOPS(Access, "Unsupported index format");
+         }
+         else LANGULUS_ERROR("Unsupported topology");
+      }
+      else LANGULUS_OOPS(Access, "Unsupported indexing strategy");
+
+      return stream;
+   }
+
 } // namespace Langulus::A
