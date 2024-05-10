@@ -22,19 +22,19 @@ namespace Langulus
    ///                                                                        
    struct MeshView {
       // Number of primitives                                           
-      uint32_t mPrimitiveCount {};
+      uint32_t mPrimitiveCount = 0;
       // Starting primitive                                             
-      uint32_t mPrimitiveStart {};
+      uint32_t mPrimitiveStart = 0;
       // Number of indices                                              
-      uint32_t mIndexCount {};
+      uint32_t mIndexCount = 0;
       // Starting index                                                 
-      uint32_t mIndexStart {};
+      uint32_t mIndexStart = 0;
       // Data topology                                                  
-      DMeta mTopology {};
+      DMeta mTopology;
       // Double-sidedness                                               
-      bool mBilateral {};
+      bool mBilateral = false;
       // Texture mapping mode                                           
-      Math::MapModeType mTextureMapping {};
+      Math::MapModeType mTextureMapping = Math::MapModeType::Auto;
 
       bool operator == (const MeshView&) const noexcept;
 
@@ -68,28 +68,49 @@ namespace Langulus::A
 
       NOD() virtual Ref<Mesh> GetLOD(const Math::LOD&) const = 0;
 
-      NOD() Math::Vec2u InnerGetIndices(const Data*, const Math::Vec2u&) const;
-      NOD() Math::Vec3u InnerGetIndices(const Data*, const Math::Vec3u&) const;
-
-      //                                                                
+      // Point utilities                                                
       NOD() bool MadeOfPoints() const noexcept;
       NOD() Count GetPointCount() const;
       template<CT::Trait>
       NOD() Many GetPointTrait(Offset) const;
 
-      //                                                                
+      // Line utilities                                                 
       NOD() bool MadeOfLines() const noexcept;
       NOD() Count GetLineCount() const;
       NOD() Math::Vec2u GetLineIndices(Offset) const;
       template<CT::Trait>
       NOD() Many GetLineTrait(Offset) const;
 
-      //                                                                
+      // Triangle utilities                                             
       NOD() bool MadeOfTriangles() const noexcept;
       NOD() Count GetTriangleCount() const;
       NOD() Math::Vec3u GetTriangleIndices(Offset) const;
       template<CT::Trait>
       NOD() Many GetTriangleTrait(Offset) const;
+
+      ///                                                                     
+      ///   Iteration                                                         
+      ///                                                                     
+      Count ForEachVertex(auto&&) const;
+
+   protected:
+      NOD() Math::Vec2u InnerGetIndices(const Data*, const Math::Vec2u&) const;
+      NOD() Math::Vec3u InnerGetIndices(const Data*, const Math::Vec3u&) const;
+
+      template<bool INDEXED, class...T>
+      Count ForEachVertexInner(Types<T...>, auto&& call) const;
+
+      template<CT::Trait T>
+      T ForEachVertex_PrepareStream() const;
+
+      template<CT::Trait T>
+      T ForEachVertex_PrepareIndexStream() const;
+
+      template<CT::Topology T>
+      auto PickVertex(Offset i, const CT::Trait auto& data, const CT::Trait auto& indices) const;
+
+      template<CT::Topology T, size_t...STREAM_ID>
+      auto GenerateVertex(Offset i, const auto& data, const auto& indices, std::index_sequence<STREAM_ID...>&&) const;
    };
 
 } // namespace Langulus::A
