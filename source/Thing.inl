@@ -223,7 +223,14 @@ namespace Langulus::Entity
       for (auto& unit : mUnitsList) {
          V local = verb;
          local.ShortCircuit(false);
-         verb << Abandon(unit->Run(local).GetOutput());
+         unit->Run(local);
+
+         if (local.IsDone()) {
+            // The local verb may or may not have an output, but a      
+            // success should always be carried over                    
+            verb.Done();
+            verb << Abandon(local.GetOutput());
+         }
       }
 
       return verb;
