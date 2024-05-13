@@ -8,6 +8,7 @@
 ///                                                                           
 #include "Thing.hpp"
 #include "Thing.inl"
+#include <Flow/Verbs/Conjunct.hpp>
 
 #if 0
    #define ENTITY_VERBOSE_ENABLED() 1
@@ -63,6 +64,38 @@ namespace Langulus::Entity
       });
 
       return Abandon(results);
+   }
+   
+   /// Executes a piece of code in the current context                        
+   ///   @param code - code to execute                                        
+   ///   @return the results of the execution, if any                         
+   Many Thing::Run(const Code& code) {
+      if (not code)
+         return {};
+
+      // Parse the code                                                 
+      auto parsed = ("? "_code + code).Parse();
+      if (not parsed)
+         return {};
+
+      // Push in the active flow                                        
+      auto flow = GetFlow();
+      if (not flow->Push(this, Abandon(parsed))) {
+         // Couldn't push verbs - the flow probably has no future link  
+         // points, or we're out of memory?                             
+         Logger::Error(this, ": Couldn't execute code: ", code);
+         return {};
+      }
+      
+      // Flow has changed, update it as if no time has passed, in order 
+      // to execute any newly added parts, if in the proper time        
+      // context. Anything produced as a side-effect will be returned.  
+      // @attention, if you push a command that has time context before 
+      // the current flow time, you'll be technically rewriting this    
+      // thing's history - the entire timeline will be reverted back,   
+      // and recomputed up to now (if that's possible).                 
+      flow->Update(Time::zero());
+      return {};
    }
 
    /// Custom dispatcher, reflected via CT::Dispatcher                        

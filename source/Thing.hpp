@@ -118,6 +118,7 @@ namespace Langulus::Entity
       V& Run(V&);
 
       LANGULUS_API(ENTITY) Many Run(const Lingua&);
+      LANGULUS_API(ENTITY) Many Run(const Code&);
 
       LANGULUS_API(ENTITY) bool Update(Time);
       LANGULUS_API(ENTITY) void Refresh(bool force = false);
