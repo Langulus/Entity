@@ -659,14 +659,14 @@ namespace Langulus::A
       }
       else if (indices.GetCount() == mView.mIndexCount) {
          // Per-vertex indexing strategy                                
-         if (indices.IsExact<uint32_t>())
-            return stream.Select(indices.GetRaw<uint32_t>()[i], 1);
-         else if (indices.IsExact<uint64_t>())
-            return stream.Select(indices.GetRaw<uint64_t>()[i], 1);
-         else if (indices.IsExact<uint16_t>())
-            return stream.Select(indices.GetRaw<uint16_t>()[i], 1);
-         else if (indices.IsExact<uint8_t>())
-            return stream.Select(indices.GetRaw<uint8_t> ()[i], 1);
+         if (indices.template IsExact<uint32_t>())
+            return stream.Select(indices.template GetRaw<uint32_t>()[i], 1);
+         else if (indices.template IsExact<uint64_t>())
+            return stream.Select(indices.template GetRaw<uint64_t>()[i], 1);
+         else if (indices.template IsExact<uint16_t>())
+            return stream.Select(indices.template GetRaw<uint16_t>()[i], 1);
+         else if (indices.template IsExact<uint8_t>())
+            return stream.Select(indices.template GetRaw<uint8_t> ()[i], 1);
          else
             LANGULUS_OOPS(Access, "Unsupported index format");
       }
@@ -674,53 +674,53 @@ namespace Langulus::A
          // Per-primitive indexing strategy                             
          if constexpr (CT::Triangle<T>) {
             const auto p_i = i / 3;
-            if (indices.IsExact<uint32_t>())
-               return stream.Select(indices.GetRaw<uint32_t>()[p_i], 1);
-            else if (indices.IsExact<uint64_t>())
-               return stream.Select(indices.GetRaw<uint64_t>()[p_i], 1);
-            else if (indices.IsExact<uint16_t>())
-               return stream.Select(indices.GetRaw<uint16_t>()[p_i], 1);
-            else if (indices.IsExact<uint8_t>())
-               return stream.Select(indices.GetRaw<uint8_t >()[p_i], 1);
+            if (indices.template IsExact<uint32_t>())
+               return stream.Select(indices.template GetRaw<uint32_t>()[p_i], 1);
+            else if (indices.template IsExact<uint64_t>())
+               return stream.Select(indices.template GetRaw<uint64_t>()[p_i], 1);
+            else if (indices.template IsExact<uint16_t>())
+               return stream.Select(indices.template GetRaw<uint16_t>()[p_i], 1);
+            else if (indices.template IsExact<uint8_t>())
+               return stream.Select(indices.template GetRaw<uint8_t >()[p_i], 1);
             else
                LANGULUS_OOPS(Access, "Unsupported index format");
          }
          else if constexpr (CT::TriangleStrip<T> or CT::TriangleFan<T>) {
             const auto p_i = i < 2 ? 0 : i - 2;
-            if (indices.IsExact<uint32_t>())
-               return stream.Select(indices.GetRaw<uint32_t>()[p_i], 1);
-            else if (indices.IsExact<uint64_t>())
-               return stream.Select(indices.GetRaw<uint64_t>()[p_i], 1);
-            else if (indices.IsExact<uint16_t>())
-               return stream.Select(indices.GetRaw<uint16_t>()[p_i], 1);
-            else if (indices.IsExact<uint8_t>())
-               return stream.Select(indices.GetRaw<uint8_t >()[p_i], 1);
+            if (indices.template IsExact<uint32_t>())
+               return stream.Select(indices.template GetRaw<uint32_t>()[p_i], 1);
+            else if (indices.template IsExact<uint64_t>())
+               return stream.Select(indices.template GetRaw<uint64_t>()[p_i], 1);
+            else if (indices.template IsExact<uint16_t>())
+               return stream.Select(indices.template GetRaw<uint16_t>()[p_i], 1);
+            else if (indices.template IsExact<uint8_t>())
+               return stream.Select(indices.template GetRaw<uint8_t >()[p_i], 1);
             else
                LANGULUS_OOPS(Access, "Unsupported index format");
          }
          else if constexpr (CT::Line<T>) {
             const auto p_i = i / 2;
-            if (indices.IsExact<uint32_t>())
-               return stream.Select(indices.GetRaw<uint32_t>()[p_i], 1);
-            else if (indices.IsExact<uint64_t>())
-               return stream.Select(indices.GetRaw<uint64_t>()[p_i], 1);
-            else if (indices.IsExact<uint16_t>())
-               return stream.Select(indices.GetRaw<uint16_t>()[p_i], 1);
-            else if (indices.IsExact<uint8_t>())
-               return stream.Select(indices.GetRaw<uint8_t >()[p_i], 1);
+            if (indices.template IsExact<uint32_t>())
+               return stream.Select(indices.template GetRaw<uint32_t>()[p_i], 1);
+            else if (indices.template IsExact<uint64_t>())
+               return stream.Select(indices.template GetRaw<uint64_t>()[p_i], 1);
+            else if (indices.template IsExact<uint16_t>())
+               return stream.Select(indices.template GetRaw<uint16_t>()[p_i], 1);
+            else if (indices.template IsExact<uint8_t>())
+               return stream.Select(indices.template GetRaw<uint8_t >()[p_i], 1);
             else
                LANGULUS_OOPS(Access, "Unsupported index format");
          }
          else if constexpr (CT::LineStrip<T> or CT::LineLoop<T>) {
             const auto p_i = i < 1 ? 0 : i - 1;
-            if (indices.IsExact<uint32_t>())
-               return stream.Select(indices.GetRaw<uint32_t>()[p_i], 1);
-            else if (indices.IsExact<uint64_t>())
-               return stream.Select(indices.GetRaw<uint64_t>()[p_i], 1);
-            else if (indices.IsExact<uint16_t>())
-               return stream.Select(indices.GetRaw<uint16_t>()[p_i], 1);
-            else if (indices.IsExact<uint8_t>())
-               return stream.Select(indices.GetRaw<uint8_t >()[p_i], 1);
+            if (indices.template IsExact<uint32_t>())
+               return stream.Select(indices.template GetRaw<uint32_t>()[p_i], 1);
+            else if (indices.template IsExact<uint64_t>())
+               return stream.Select(indices.template GetRaw<uint64_t>()[p_i], 1);
+            else if (indices.template IsExact<uint16_t>())
+               return stream.Select(indices.template GetRaw<uint16_t>()[p_i], 1);
+            else if (indices.template IsExact<uint8_t>())
+               return stream.Select(indices.template GetRaw<uint8_t >()[p_i], 1);
             else
                LANGULUS_OOPS(Access, "Unsupported index format");
          }
