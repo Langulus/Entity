@@ -74,13 +74,13 @@ namespace Langulus::Entity
          return {};
 
       // Parse the code                                                 
-      auto parsed = ("? "_code + code).Parse();
+      auto parsed = code.Parse();
       if (not parsed)
          return {};
 
       // Push in the active flow                                        
       auto flow = GetFlow();
-      if (not flow->Push(this, Abandon(parsed))) {
+      if (not flow->Push(Verbs::Do::In(this, Abandon(parsed)))) {
          // Couldn't push verbs - the flow probably has no future link  
          // points, or we're out of memory?                             
          Logger::Error(this, ": Couldn't execute code: ", code);
