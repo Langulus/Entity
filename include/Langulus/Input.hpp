@@ -44,7 +44,23 @@ namespace Langulus::A
    public:
       InputGatherer() : Resolvable {this} {}
 
-      void PushEvent(const Event& e) { mEventQueue << e; }
+      void PushEvent(const Event& e) {
+         const auto foundEvent = mEventQueue.FindIt(e.mType);
+         if (foundEvent) {
+            const auto foundState = foundEvent.mValue->FindIt(e.mState);
+            if (foundState) {
+               // Event already exists, merge payload                   
+               foundState.mValue->mPayload += e.mPayload;
+               return;
+            }
+            foundEvent.mValue->Insert(e.mState, e);
+         }
+         else {
+            mEventQueue.Insert(e.mType);
+            auto& newGroup = mEventQueue[e.mType];
+            newGroup.Insert(e.mState, e);
+         }
+      }
    };
 
    ///                                                                        
