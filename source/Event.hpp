@@ -85,6 +85,7 @@ namespace Langulus
       Event(Event&&);
       template<class T1, class...TN> requires CT::UnfoldInsertable<T1, TN...>
       Event(T1&&, TN&&...);
+      Event(Describe&&);
 
       ///                                                                     
       ///   Assignment                                                        
@@ -128,7 +129,11 @@ namespace Langulus
             LANGULUS(INFO) INFOSTRING; \
             LANGULUS_BASES(Event); \
             static constexpr Token CTTI_Event = #EVENT; \
+            using Event::Event; \
             EVENT() : Event {} { \
+               mType = MetaOf<EVENT>(); \
+            } \
+            EVENT(Describe&& desc) : Event {Forward<Describe>(desc)} { \
                mType = MetaOf<EVENT>(); \
             } \
             template<class... T_> \
@@ -147,7 +152,11 @@ namespace Langulus
             LANGULUS(INFO) INFOSTRING; \
             LANGULUS_BASES(Event); \
             static constexpr Token CTTI_Event = #EVENT; \
+            using Event::Event; \
             EVENT() : Event {} { \
+               mType = MetaOf<EVENT>(); \
+            } \
+            EVENT(Describe&& desc) : Event {Forward<Describe>(desc)} { \
                mType = MetaOf<EVENT>(); \
             } \
             template<class... T_> \

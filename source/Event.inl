@@ -116,6 +116,13 @@ namespace Langulus
    Event::Event(Event&& other)
       : Event {Move(other)} {}
 
+   /// Descriptor-construction                                                
+   ///   @param other - event properties and payload to move                  
+   LANGULUS(INLINED)
+   Event::Event(Describe&& desc) : Event {} {
+      TODO();
+   }
+
    /// Instantiate an event of a specific type, manually                      
    /// This constructor also generates a new timestamp if not absorbing       
    ///   @param a... - any number of arguments to carry in the event          
@@ -167,7 +174,7 @@ namespace Langulus
       if constexpr (CT::EventBased<T>) {
          mType = DesemCast(rhs).mType;
          mState = DesemCast(rhs).mState;
-         mTimestamp = DesemCast(t1).mTimestamp;
+         mTimestamp = DesemCast(rhs).mTimestamp;
          mPayload = S::Nest(DesemCast(rhs).mPayload);
       }
       else mPayload = Anyness::Many {S::Nest(rhs)};
