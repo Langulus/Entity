@@ -99,61 +99,83 @@ namespace Langulus
    }
 
 
-   /// Default event construction creates a timestamp                         
+   /// Default event construction creates a new timestamp                     
    LANGULUS(INLINED)
    Event::Event()
       : mTimestamp {SteadyClock::Now()} {}
 
-   /// Copy-construction creates a new timestamp                              
-   ///   @attention creates a new timestamp                                   
+   /// Refer-construction                                                     
    ///   @param other - event properties and payload to refer to              
    LANGULUS(INLINED)
    Event::Event(const Event& other)
-      : mType      {other.mType}
-      , mState     {other.mState}
-      , mTimestamp {SteadyClock::Now()}
-      , mPayload   {Refer(other.mPayload)} {}
+      : Event {Refer(other)} {}
 
    /// Move-construction                                                      
    ///   @param other - event properties and payload to move                  
    LANGULUS(INLINED)
    Event::Event(Event&& other)
-      : mType      {other.mType}
-      , mState     {other.mState}
-      , mTimestamp {other.mTimestamp}
-      , mPayload   {Move(other.mPayload)} {}
+      : Event {Move(other)} {}
 
    /// Instantiate an event of a specific type, manually                      
-   /// This constructor also generates the timestamp                          
+   /// This constructor also generates a new timestamp if not absorbing       
    ///   @param a... - any number of arguments to carry in the event          
-   template<class... T> LANGULUS(INLINED)
-   Event::Event(T&&...a) requires (::std::constructible_from<Anyness::Many, T&&...>)
-      : Event {} {
-      if constexpr (CT::Semantic<T...>) {
-         using S = FirstOf<T...>;
-         using ST = TypeOf<S>;
+   template<class T1, class...TN> requires CT::UnfoldInsertable<T1, TN...>
+   Event::Event(T1&& t1, TN&&...tn) : Event {} {
+      if constexpr (sizeof...(TN) == 0 and not CT::Array<T1>) {
+         using S = SemanticOf<decltype(t1)>;
+         using T = TypeOf<S>;
 
-         if constexpr (CT::Event<ST> and sizeof...(T) == 1) {
-            // Semantic-construction from Event                         
-            ((mType = a->mType), ...);
-            ((mState = a->mState), ...);
-            if constexpr (S::Move)
-               ((mTimestamp = a->mTimestamp), ...);
-            ((mPayload = S::Nest(a->mPayload)), ...);
+         if constexpr (CT::EventBased<T>) {
+            mType = DesemCast(t1).mType;
+            mState = DesemCast(t1).mState;
+            mTimestamp = DesemCast(t1).mTimestamp;
+            mPayload = S::Nest(DesemCast(t1).mPayload);
          }
-         else {
-            // Semantic-construction from anything else - just forward  
-            // it to the payload                                        
-            mPayload = Anyness::Many {Forward<T>(a)...};
-         }
+         else mPayload = Anyness::Many {Forward<T1>(t1)};
       }
-      else {
-         // Whatever arguments are there, forward them to payload       
-         mPayload = Anyness::Many {Forward<T>(a)...};
+      else mPayload = Anyness::Many {Forward<T1>(t1), Forward<TN>(tn)...};
+   }
+
+   /// Refer-assignment                                                       
+   ///   @attention will not overwrite timestamp                              
+   ///   @param other - the event to refer to                                 
+   ///   @return a reference to this event                                    
+   LANGULUS(INLINED)
+   Event& Event::operator = (const Event& rhs) {
+      return operator = (Refer(rhs));
+   }
+
+   /// Move-assignment                                                        
+   ///   @attention will not overwrite timestamp                              
+   ///   @param other - the event to move                                     
+   ///   @return a reference to this event                                    
+   LANGULUS(INLINED)
+   Event& Event::operator = (Event&& rhs) noexcept {
+      return operator = (Move(rhs));
+   }
+
+   /// Unfold assignment, semantic or not                                     
+   /// If argument is event, it will be absorbed                              
+   ///   @attention will not overwrite timestamp, unless absorbing            
+   ///   @param rhs - right hand side                                         
+   ///   @return a reference to this event                                    
+   LANGULUS(INLINED)
+   Event& Event::operator = (CT::UnfoldInsertable auto&& rhs) {
+      using S = SemanticOf<decltype(rhs)>;
+      using T = TypeOf<S>;
+
+      if constexpr (CT::EventBased<T>) {
+         mType = DesemCast(rhs).mType;
+         mState = DesemCast(rhs).mState;
+         mTimestamp = DesemCast(t1).mTimestamp;
+         mPayload = S::Nest(DesemCast(rhs).mPayload);
       }
+      else mPayload = Anyness::Many {S::Nest(rhs)};
+      return *this;
    }
 
    /// Compare two events                                                     
+   ///   @attention will not compare timestamps                               
    ///   @param rhs - the event to compare against                            
    ///   @return true if events are the same                                  
    inline bool Event::operator == (const Event& rhs) const {
