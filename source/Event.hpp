@@ -77,28 +77,44 @@ namespace Langulus
       // Payload, for additional data                                   
       Anyness::Many mPayload;
 
+      ///                                                                     
+      ///   Construction                                                      
+      ///                                                                     
       Event();
       Event(const Event&);
       Event(Event&&);
+      template<class T1, class...TN> requires CT::UnfoldInsertable<T1, TN...>
+      Event(T1&&, TN&&...);
 
-      template<class...T>
-      Event(T&&...) requires (::std::constructible_from<Anyness::Many, T&&...>);
+      ///                                                                     
+      ///   Assignment                                                        
+      ///                                                                     
+      Event& operator = (const Event&);
+      Event& operator = (Event&&) noexcept;
+      Event& operator = (CT::UnfoldInsertable auto&&);
 
+      ///                                                                     
+      ///   Comparison                                                        
+      ///                                                                     
       bool operator == (const Event&) const;
    };
 
-   using EventList = TMany<Event>;
+   using EventList = TUnorderedMap<DMeta, TUnorderedMap<EventState, Event>>;
 
    namespace CT
    {
 
-      /// Concept for detecting any Event type specialization                 
+      /// A EventBased type is any type that inherits Event                   
       template<class...T>
-      concept Event = ((DerivedFrom<T, ::Langulus::Event> 
-          and sizeof(T) == sizeof(::Langulus::Event)) and ...);
+      concept EventBased = (DerivedFrom<T, ::Langulus::Event> and ...);
 
+      /// A reflected event type is any type that inherits Event, is not      
+      /// Event itself, and is binary compatible to an Event                  
       template<class...T>
-      concept NotEvent = ((not Event<T>) and ...);
+      concept Event = EventBased<T...> and ((
+            sizeof(T) == sizeof(::Langulus::Event)
+            and requires { {Decay<T>::CTTI_Event} -> Similar<Token>; }
+         ) and ...);
 
    } // namespace Langulus::CT
 
@@ -111,9 +127,12 @@ namespace Langulus
          struct EVENT : Event { \
             LANGULUS(INFO) INFOSTRING; \
             LANGULUS_BASES(Event); \
+            static constexpr Token CTTI_Event = #EVENT; \
+            EVENT() : Event {} { \
+               mType = MetaOf<EVENT>(); \
+            } \
             template<class... T_> \
-            EVENT(T_&&...a) requires (::std::constructible_from<Anyness::Many, T_&&...>) \
-               : Event {Forward<T_>(a)...} { \
+            EVENT(T_&&...a) : Event {Forward<T_>(a)...} { \
                mType = MetaOf<EVENT>(); \
             } \
          }; \
@@ -127,9 +146,12 @@ namespace Langulus
          struct EVENT : Event { \
             LANGULUS(INFO) INFOSTRING; \
             LANGULUS_BASES(Event); \
+            static constexpr Token CTTI_Event = #EVENT; \
+            EVENT() : Event {} { \
+               mType = MetaOf<EVENT>(); \
+            } \
             template<class... T_> \
-            EVENT(EventState state, T_&&...a) requires (::std::constructible_from<Anyness::Many, T_&&...>) \
-               : Event {Forward<T_>(a)...} { \
+            EVENT(EventState state, T_&&...a) : Event {Forward<T_>(a)...} { \
                mType = MetaOf<EVENT>(); \
                mState = state; \
             } \
