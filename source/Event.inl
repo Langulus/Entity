@@ -109,19 +109,19 @@ namespace Langulus
    ///   @param other - event properties and payload to refer to              
    LANGULUS(INLINED)
    Event::Event(const Event& other)
-      : mType {other.mType}
-      , mState {other.mState}
+      : mType      {other.mType}
+      , mState     {other.mState}
       , mTimestamp {SteadyClock::Now()}
-      , mPayload {Refer(other.mPayload)} {}
+      , mPayload   {Refer(other.mPayload)} {}
 
    /// Move-construction                                                      
    ///   @param other - event properties and payload to move                  
    LANGULUS(INLINED)
    Event::Event(Event&& other)
-      : mType {other.mType}
-      , mState {other.mState}
+      : mType      {other.mType}
+      , mState     {other.mState}
       , mTimestamp {other.mTimestamp}
-      , mPayload {Move(other.mPayload)} {}
+      , mPayload   {Move(other.mPayload)} {}
 
    /// Instantiate an event of a specific type, manually                      
    /// This constructor also generates the timestamp                          
@@ -151,6 +151,14 @@ namespace Langulus
          // Whatever arguments are there, forward them to payload       
          mPayload = Anyness::Many {Forward<T>(a)...};
       }
+   }
+
+   /// Compare two events                                                     
+   ///   @param rhs - the event to compare against                            
+   ///   @return true if events are the same                                  
+   inline bool Event::operator == (const Event& rhs) const {
+      return mType == rhs.mType and mState == rhs.mState
+         and mPayload == rhs.mPayload;
    }
 
 } // namespace Langulus

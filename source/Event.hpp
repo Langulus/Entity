@@ -83,8 +83,11 @@ namespace Langulus
 
       template<class...T>
       Event(T&&...) requires (::std::constructible_from<Anyness::Many, T&&...>);
+
+      bool operator == (const Event&) const;
    };
 
+   using EventList = TMany<Event>;
 
    namespace CT
    {
