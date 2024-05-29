@@ -1,9 +1,9 @@
 ///                                                                           
-/// Langulus::Module::GLFW                                                    
-/// Copyright(C) 2015 Dimo Markov <langulusteam@gmail.com>                    
+/// Langulus::Entity                                                          
+/// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
+/// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
-/// Distributed under GNU General Public License v3+                          
-/// See LICENSE file, or https://www.gnu.org/licenses                         
+/// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
 #include "Common.hpp"
@@ -21,16 +21,14 @@ namespace Langulus
       LANGULUS(NULLIFIABLE) true;
 
       enum Enum {
-         // Default event state - a point event, that does not have a   
-         // beginning or end, it happens once, immediately              
-         Point = 0,
-
-         // The beginning of an event, such as a key press              
-         Begin = 1,
-
-         // The end of an event, such as key release                    
-         End = 2,
+         Point = 0,  // Default event state - a point event, that       
+                     // does not have a beginning or end, it happens    
+                     // once, immediately                               
+         Begin = 1,  // The beginning of an event, such as key press    
+         End   = 2,  // The end of an event, such as key release        
       };
+
+      LANGULUS_NAMED_VALUES(Point, Begin, End);
 
       using Type = TypeOf<Enum>;
 
@@ -68,6 +66,8 @@ namespace Langulus
    ///   Events are often used as arguments for Verbs::Interact               
    ///                                                                        
    struct Event {
+      LANGULUS_CONVERTS_TO(Anyness::Text);
+
       // Event type                                                     
       RTTI::DMeta mType {};
       // Event state                                                    
@@ -98,7 +98,11 @@ namespace Langulus
       ///   Comparison                                                        
       ///                                                                     
       bool operator == (const Event&) const;
+
+      LANGULUS_API(ENTITY) explicit operator Anyness::Text() const;
    };
+
+   LANGULUS_API(ENTITY) void RegisterEvents();
 
    using EventList = TUnorderedMap<DMeta, TUnorderedMap<EventState, Event>>;
 

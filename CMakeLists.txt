@@ -25,6 +25,12 @@ if(PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
 	fetch_langulus_module(Math	  GIT_TAG 8b5dd5b2ea752baf21e5fa9195f9b8a7ed5741ca)
 endif()
 
+file(GLOB_RECURSE
+	LANGULUS_ENTITY_SOURCES 
+	LIST_DIRECTORIES FALSE CONFIGURE_DEPENDS
+	source/*.cpp
+)
+
 # Build and install Entity library                                          
 add_library(LangulusEntity ${LANGULUS_LIBRARY_TYPE}
     $<TARGET_OBJECTS:LangulusLogger>
@@ -32,11 +38,7 @@ add_library(LangulusEntity ${LANGULUS_LIBRARY_TYPE}
     $<$<BOOL:${LANGULUS_FEATURE_MANAGED_MEMORY}>:$<TARGET_OBJECTS:LangulusFractalloc>>
     $<TARGET_OBJECTS:LangulusAnyness>
     $<TARGET_OBJECTS:LangulusFlow>
-    source/Thing.cpp
-    source/Thing-Traits.cpp
-    source/Thing-Verbs.cpp
-    source/Runtime.cpp
-    source/Unit.cpp
+	${LANGULUS_ENTITY_SOURCES}
 )
 
 target_include_directories(LangulusEntity PUBLIC include
