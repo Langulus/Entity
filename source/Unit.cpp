@@ -3,8 +3,7 @@
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
-/// Distributed under GNU General Public License v3+                          
-/// See LICENSE file, or https://www.gnu.org/licenses                         
+/// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "Unit.hpp"
 #include "Thing.inl"
@@ -77,12 +76,12 @@ Runtime* Unit::GetRuntime() const noexcept {
 /// Couple the component with an entity, extracted from a descriptor's        
 /// Traits::Parent, if any was defined (always two-sided)                     
 /// This will call refresh to all units in that entity on next tick           
-///   @param descriptor - the descriptor to scan for parents                  
-void Unit::Couple(const Neat& descriptor) {
+///   @param desc - the descriptor to scan for parents                        
+void Unit::Couple(const Neat& desc) {
    // Couple any Thing provided in the descriptor                       
    const Thing* owner = nullptr;
-   if (not descriptor.ExtractTrait<Traits::Parent>(owner))
-      descriptor.ExtractData(owner);
+   if (not desc.ExtractTrait<Traits::Parent>(owner))
+      desc.ExtractData(owner);
 
    if (owner and mOwners.Merge(IndexBack, const_cast<Thing*>(owner)))
       const_cast<Thing*>(owner)->AddUnit<false>(this);

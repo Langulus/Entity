@@ -1,9 +1,9 @@
 ///                                                                           
-/// Langulus::Module::GLFW                                                    
-/// Copyright(C) 2015 Dimo Markov <langulusteam@gmail.com>                    
+/// Langulus::Entity                                                          
+/// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
+/// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
-/// Distributed under GNU General Public License v3+                          
-/// See LICENSE file, or https://www.gnu.org/licenses                         
+/// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
 #include "Event.hpp"
@@ -120,7 +120,9 @@ namespace Langulus
    ///   @param other - event properties and payload to move                  
    LANGULUS(INLINED)
    Event::Event(Describe&& desc) : Event {} {
-      TODO();
+      LANGULUS_ASSERT(desc->ExtractData(mType), Construct, "Invalid event");
+      desc->ExtractData(mState);
+      desc->ExtractTrait<Traits::Data>(mPayload);
    }
 
    /// Instantiate an event of a specific type, manually                      
