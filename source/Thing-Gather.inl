@@ -10,13 +10,13 @@
 #include "Hierarchy-Gather.inl"
 
 #if 0
-   #define ENTITY_VERBOSE_ENABLED() 1
+   #define ENTITY_VERBOSE_ENABLED()    1
    #define ENTITY_VERBOSE_SELF(...)    Logger::Verbose(Self(), __VA_ARGS__)
    #define ENTITY_VERBOSE(...)         Logger::Append(__VA_ARGS__)
 #else
-   #define ENTITY_VERBOSE_ENABLED() 0
-   #define ENTITY_VERBOSE_SELF(...)
-   #define ENTITY_VERBOSE(...)
+   #define ENTITY_VERBOSE_ENABLED()    0
+   #define ENTITY_VERBOSE_SELF(...)    LANGULUS(NOOP)
+   #define ENTITY_VERBOSE(...)         LANGULUS(NOOP)
 #endif
 
 
