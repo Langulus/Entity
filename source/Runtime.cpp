@@ -41,7 +41,11 @@
    //TODO
 #endif
 
-#define VERBOSE(...) //Logger::Verbose(__VA_ARGS__)
+#if 0
+   #define VERBOSE(...) Logger::Verbose(__VA_ARGS__)
+#else
+   #define VERBOSE(...) LANGULUS(NOOP)
+#endif
 
 
 namespace Langulus::Entity
