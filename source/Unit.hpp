@@ -38,7 +38,7 @@ namespace Langulus::A
       LANGULUS(UNINSERTABLE) false;
       LANGULUS_BASES(Resolvable);
 
-   protected: IF_LANGULUS_TESTING(public:)
+   protected:
       friend class Thing;
 
       // Things that are coupled with this unit                         
@@ -61,7 +61,6 @@ namespace Langulus::A
 
       void Select(Flow::Verb&);
 
-   public:
       virtual void Refresh();
 
       Runtime* GetRuntime() const noexcept;
