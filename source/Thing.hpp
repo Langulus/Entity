@@ -56,7 +56,7 @@ namespace Langulus::Entity
       LANGULUS_VERBS(Verbs::Create, Verbs::Select);
       IF_LANGULUS_MANAGED_MEMORY(LANGULUS(POOL_TACTIC) RTTI::PoolTactic::Type);
 
-   protected: IF_LANGULUS_TESTING(public:)
+   protected:
       LANGULUS_API(ENTITY) void ResetRuntime(Runtime*);
       LANGULUS_API(ENTITY) void ResetFlow(Temporal*);
 
