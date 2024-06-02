@@ -21,16 +21,16 @@ SCENARIO("Testing Thing", "[thing]") {
    WHEN("Creating a default Thing") {
       Thing root;
 
-      REQUIRE(root.mOwner == nullptr);
-      REQUIRE(root.mRuntime == nullptr);
-      REQUIRE(root.mRuntime.IsLocked() == false);
-      REQUIRE(root.mFlow == nullptr);
-      REQUIRE(root.mFlow.IsLocked() == false);
-      REQUIRE(root.mRefreshRequired == false);
-      REQUIRE(not root.mChildren);
-      REQUIRE(not root.mUnitsList);
-      REQUIRE(not root.mUnitsAmbiguous);
-      REQUIRE(not root.mTraits);
+      REQUIRE(root.GetOwner() == nullptr);
+      REQUIRE(root.GetRuntime() == nullptr);
+      REQUIRE(root.GetRuntime().IsLocked() == false);
+      REQUIRE(root.GetFlow() == nullptr);
+      REQUIRE(root.GetFlow().IsLocked() == false);
+      REQUIRE(root.RequiresRefresh() == false);
+      REQUIRE(not root.GetChildren());
+      REQUIRE(not root.GetUnits());
+      REQUIRE(not root.GetUnitsMap());
+      REQUIRE(not root.GetTraits());
       REQUIRE(root.Reference(0) == 1);
    }
 
@@ -38,29 +38,29 @@ SCENARIO("Testing Thing", "[thing]") {
       Thing root;
       Thing child {&root};
 
-      REQUIRE(root.mOwner == nullptr);
-      REQUIRE(root.mRuntime == nullptr);
-      REQUIRE(root.mRuntime.IsLocked() == false);
-      REQUIRE(root.mFlow == nullptr);
-      REQUIRE(root.mFlow.IsLocked() == false);
-      REQUIRE(root.mRefreshRequired == false);
-      REQUIRE(root.mChildren.GetCount() == 1);
-      REQUIRE(root.mChildren[0] == &child);
-      REQUIRE(not root.mUnitsList);
-      REQUIRE(not root.mUnitsAmbiguous);
-      REQUIRE(not root.mTraits);
+      REQUIRE(root.GetOwner() == nullptr);
+      REQUIRE(root.GetRuntime() == nullptr);
+      REQUIRE(root.GetRuntime().IsLocked() == false);
+      REQUIRE(root.GetFlow() == nullptr);
+      REQUIRE(root.GetFlow().IsLocked() == false);
+      REQUIRE(root.RequiresRefresh() == false);
+      REQUIRE(root.GetChildren().GetCount() == 1);
+      REQUIRE(root.GetChildren()[0] == &child);
+      REQUIRE(not root.GetUnits());
+      REQUIRE(not root.GetUnitsMap());
+      REQUIRE(not root.GetTraits());
       REQUIRE(root.Reference(0) == 1);
 
-      REQUIRE(child.mOwner == &root);
-      REQUIRE(child.mRuntime == nullptr);
-      REQUIRE(child.mRuntime.IsLocked() == false);
-      REQUIRE(child.mFlow == nullptr);
-      REQUIRE(child.mFlow.IsLocked() == false);
-      REQUIRE(child.mRefreshRequired == false);
-      REQUIRE(not child.mChildren);
-      REQUIRE(not child.mUnitsList);
-      REQUIRE(not child.mUnitsAmbiguous);
-      REQUIRE(not child.mTraits);
+      REQUIRE(child.GetOwner() == &root);
+      REQUIRE(child.GetRuntime() == nullptr);
+      REQUIRE(child.GetRuntime().IsLocked() == false);
+      REQUIRE(child.GetFlow() == nullptr);
+      REQUIRE(child.GetFlow().IsLocked() == false);
+      REQUIRE(child.RequiresRefresh() == false);
+      REQUIRE(not child.GetChildren());
+      REQUIRE(not child.GetUnits());
+      REQUIRE(not child.GetUnitsMap());
+      REQUIRE(not child.GetTraits());
       REQUIRE(child.Reference(0) == 1);
    }
    
@@ -70,42 +70,42 @@ SCENARIO("Testing Thing", "[thing]") {
       WHEN("Creating a runtime") {
          auto runtime = root.CreateRuntime();
 
-         REQUIRE(root.mRuntime == runtime);
-         REQUIRE(root.mRuntime.IsLocked() == true);
+         REQUIRE(root.GetRuntime() == runtime);
+         REQUIRE(root.GetRuntime().IsLocked() == true);
       }
 
       WHEN("Creating a temporal flow") {
          auto flow = root.CreateFlow();
 
-         REQUIRE(root.mFlow == flow);
-         REQUIRE(root.mFlow.IsLocked() == true);
+         REQUIRE(root.GetFlow() == flow);
+         REQUIRE(root.GetFlow().IsLocked() == true);
       }
 
       WHEN("Creating an empty child") {
          auto child = root.CreateChild();
 
-         REQUIRE(root.mOwner == nullptr);
-         REQUIRE(root.mRuntime == nullptr);
-         REQUIRE(root.mRuntime.IsLocked() == false);
-         REQUIRE(root.mFlow == nullptr);
-         REQUIRE(root.mFlow.IsLocked() == false);
-         REQUIRE(root.mRefreshRequired == false);
-         REQUIRE(root.mChildren.GetCount() == 1);
-         REQUIRE(not root.mUnitsList);
-         REQUIRE(not root.mTraits);
+         REQUIRE(root.GetOwner() == nullptr);
+         REQUIRE(root.GetRuntime() == nullptr);
+         REQUIRE(root.GetRuntime().IsLocked() == false);
+         REQUIRE(root.GetFlow() == nullptr);
+         REQUIRE(root.GetFlow().IsLocked() == false);
+         REQUIRE(root.RequiresRefresh() == false);
+         REQUIRE(root.GetChildren().GetCount() == 1);
+         REQUIRE(not root.GetUnits());
+         REQUIRE(not root.GetTraits());
          REQUIRE(root.Reference(0) == 1);
 
-         auto child1 = root.mChildren[0];
+         auto child1 = root.GetChildren()[0];
          REQUIRE(child1 == child);
-         REQUIRE(child1->mOwner == &root);
-         REQUIRE(child1->mRuntime == root.mRuntime);
-         REQUIRE(child1->mRuntime.IsLocked() == false);
-         REQUIRE(child1->mFlow == root.mFlow);
-         REQUIRE(child1->mFlow.IsLocked() == false);
-         REQUIRE(child1->mRefreshRequired == false);
-         REQUIRE(not child1->mChildren);
-         REQUIRE(not child1->mUnitsList);
-         REQUIRE(not child1->mTraits);
+         REQUIRE(child1->GetOwner() == &root);
+         REQUIRE(child1->GetRuntime() == root.GetRuntime());
+         REQUIRE(child1->GetRuntime().IsLocked() == false);
+         REQUIRE(child1->GetFlow() == root.GetFlow());
+         REQUIRE(child1->GetFlow().IsLocked() == false);
+         REQUIRE(child1->RequiresRefresh() == false);
+         REQUIRE(not child1->GetChildren());
+         REQUIRE(not child1->GetUnits());
+         REQUIRE(not child1->GetTraits());
          REQUIRE(child1->Reference(0) == 3);
       }
 
@@ -115,22 +115,22 @@ SCENARIO("Testing Thing", "[thing]") {
 
          THEN("Properties should match") {
             REQUIRE(added == 1);
-            REQUIRE(root.mOwner == nullptr);
-            REQUIRE(root.mRuntime == nullptr);
-            REQUIRE(root.mRuntime.IsLocked() == false);
-            REQUIRE(root.mFlow == nullptr);
-            REQUIRE(root.mFlow.IsLocked() == false);
-            REQUIRE(root.mRefreshRequired == true);
-            REQUIRE(root.mChildren.IsEmpty());
-            REQUIRE(root.mUnitsList.GetCount() == 1);
-            REQUIRE(root.mTraits.IsEmpty());
+            REQUIRE(root.GetOwner() == nullptr);
+            REQUIRE(root.GetRuntime() == nullptr);
+            REQUIRE(root.GetRuntime().IsLocked() == false);
+            REQUIRE(root.GetFlow() == nullptr);
+            REQUIRE(root.GetFlow().IsLocked() == false);
+            REQUIRE(root.RequiresRefresh() == true);
+            REQUIRE(root.GetChildren().IsEmpty());
+            REQUIRE(root.GetUnits().GetCount() == 1);
+            REQUIRE(root.GetTraits().IsEmpty());
             REQUIRE(root.Reference(0) == 1);
 
-            auto it = root.mUnitsList.begin();
+            auto it = root.GetUnits().begin();
             REQUIRE(it->GetType() == MetaOf<TestUnit1>());
             REQUIRE(*it == &testUnit);
-            REQUIRE(it->mOwners.GetCount() == 1);
-            REQUIRE(it->mOwners[0] == &root);
+            REQUIRE(it->GetOwners().GetCount() == 1);
+            REQUIRE(it->GetOwners()[0] == &root);
             REQUIRE(it->Reference(0) == 1);
          }
       }
@@ -139,26 +139,26 @@ SCENARIO("Testing Thing", "[thing]") {
          auto unit = root.CreateUnit<TestUnit1>();
 
          THEN("Properties should match") {
-            REQUIRE(root.mOwner == nullptr);
-            REQUIRE(root.mRuntime == nullptr);
-            REQUIRE(root.mRuntime.IsLocked() == false);
-            REQUIRE(root.mFlow == nullptr);
-            REQUIRE(root.mFlow.IsLocked() == false);
-            REQUIRE(root.mRefreshRequired == true);
-            REQUIRE(root.mChildren.IsEmpty());
-            REQUIRE(root.mUnitsList.GetCount() == 1);
-            REQUIRE(root.mTraits.IsEmpty());
+            REQUIRE(root.GetOwner() == nullptr);
+            REQUIRE(root.GetRuntime() == nullptr);
+            REQUIRE(root.GetRuntime().IsLocked() == false);
+            REQUIRE(root.GetFlow() == nullptr);
+            REQUIRE(root.GetFlow().IsLocked() == false);
+            REQUIRE(root.RequiresRefresh() == true);
+            REQUIRE(root.GetChildren().IsEmpty());
+            REQUIRE(root.GetUnits().GetCount() == 1);
+            REQUIRE(root.GetTraits().IsEmpty());
             REQUIRE(root.Reference(0) == 1);
 
-            auto it = root.mUnitsList.begin();
+            auto it = root.GetUnits().begin();
             REQUIRE(it->GetType() == MetaOf<TestUnit1>());
             REQUIRE(*it == unit.As<TestUnit1*>());
             REQUIRE(unit.GetUses() == 3);
             REQUIRE(Fractalloc::Instance.Find({}, unit.As<TestUnit1*>())->GetUses() == 3);
             REQUIRE(unit.As<TestUnit1*>()->Reference(0) == 3);
             REQUIRE(Fractalloc::Instance.Find({}, unit.As<TestUnit1*>())->GetUses() == 3);
-            REQUIRE(it->mOwners.GetCount() == 1);
-            REQUIRE(it->mOwners[0] == &root);
+            REQUIRE(it->GetOwners().GetCount() == 1);
+            REQUIRE(it->GetOwners()[0] == &root);
             REQUIRE(it->Reference(0) == 3);
          }
       }
@@ -168,19 +168,19 @@ SCENARIO("Testing Thing", "[thing]") {
 
          REQUIRE(trait != nullptr);
 
-         REQUIRE(root.mOwner == nullptr);
-         REQUIRE(root.mRuntime == nullptr);
-         REQUIRE(root.mRuntime.IsLocked() == false);
-         REQUIRE(root.mFlow == nullptr);
-         REQUIRE(root.mFlow.IsLocked() == false);
-         REQUIRE(root.mRefreshRequired == true);
-         REQUIRE(not root.mChildren);
-         REQUIRE(not root.mUnitsList);
-         REQUIRE(not root.mUnitsAmbiguous);
-         REQUIRE(root.mTraits.GetCount() == 1);
+         REQUIRE(root.GetOwner() == nullptr);
+         REQUIRE(root.GetRuntime() == nullptr);
+         REQUIRE(root.GetRuntime().IsLocked() == false);
+         REQUIRE(root.GetFlow() == nullptr);
+         REQUIRE(root.GetFlow().IsLocked() == false);
+         REQUIRE(root.RequiresRefresh() == true);
+         REQUIRE(not root.GetChildren());
+         REQUIRE(not root.GetUnits());
+         REQUIRE(not root.GetUnitsMap());
+         REQUIRE(root.GetTraits().GetCount() == 1);
          REQUIRE(root.Reference(0) == 1);
 
-         auto it = root.mTraits.begin();
+         auto it = root.GetTraits().begin();
          REQUIRE(*it.mKey == MetaOf<Traits::Count>());
          REQUIRE(it.mValue->GetCount() == 1);
          REQUIRE((*it.mValue)[0] == Traits::Count {666});
@@ -192,20 +192,20 @@ SCENARIO("Testing Thing", "[thing]") {
 
          REQUIRE(trait != nullptr);
 
-         REQUIRE(root.mOwner == nullptr);
-         REQUIRE(root.mRuntime == nullptr);
-         REQUIRE(root.mRuntime.IsLocked() == false);
-         REQUIRE(root.mFlow == nullptr);
-         REQUIRE(root.mFlow.IsLocked() == false);
-         REQUIRE(root.mRefreshRequired == true);
-         REQUIRE(not root.mChildren);
-         REQUIRE(not root.mUnitsList);
-         REQUIRE(not root.mUnitsAmbiguous);
-         REQUIRE(root.mTraits.GetCount() == 1);
+         REQUIRE(root.GetOwner() == nullptr);
+         REQUIRE(root.GetRuntime() == nullptr);
+         REQUIRE(root.GetRuntime().IsLocked() == false);
+         REQUIRE(root.GetFlow() == nullptr);
+         REQUIRE(root.GetFlow().IsLocked() == false);
+         REQUIRE(root.RequiresRefresh() == true);
+         REQUIRE(not root.GetChildren());
+         REQUIRE(not root.GetUnits());
+         REQUIRE(not root.GetUnitsMap());
+         REQUIRE(root.GetTraits().GetCount() == 1);
          REQUIRE(root.GetName() == "Dimo");
          REQUIRE(root.Reference(0) == 1);
 
-         auto it = root.mTraits.begin();
+         auto it = root.GetTraits().begin();
          REQUIRE(*it.mKey == MetaOf<Traits::Name>());
          REQUIRE(it.mValue->GetCount() == 1);
          REQUIRE((*it.mValue)[0] == Traits::Name {"Dimo"});
@@ -234,28 +234,28 @@ SCENARIO("Testing Thing", "[thing]") {
 
          Thing root {Describe(descriptor)};
 
-         REQUIRE(root.mOwner == nullptr);
-         REQUIRE(root.mRuntime != nullptr);
-         REQUIRE(root.mRuntime.IsLocked() == true);
-         REQUIRE(root.mFlow != nullptr);
-         REQUIRE(root.mFlow.IsLocked() == true);
-         REQUIRE(root.mRefreshRequired == true);
-         REQUIRE(root.mChildren.GetCount() == 2);
-         REQUIRE(root.mUnitsList.GetCount() == 2);
-         REQUIRE(root.mTraits.GetCount() == 1);
+         REQUIRE(root.GetOwner() == nullptr);
+         REQUIRE(root.GetRuntime() != nullptr);
+         REQUIRE(root.GetRuntime().IsLocked() == true);
+         REQUIRE(root.GetFlow() != nullptr);
+         REQUIRE(root.GetFlow().IsLocked() == true);
+         REQUIRE(root.RequiresRefresh() == true);
+         REQUIRE(root.GetChildren().GetCount() == 2);
+         REQUIRE(root.GetUnits().GetCount() == 2);
+         REQUIRE(root.GetTraits().GetCount() == 1);
          REQUIRE(root.GetName() == "Root");
          REQUIRE(root.Reference(0) == 1);
 
-         auto child1 = root.mChildren[0];
-         REQUIRE(child1->mOwner == &root);
-         REQUIRE(child1->mRuntime == root.mRuntime);
-         REQUIRE(child1->mRuntime.IsLocked() == false);
-         REQUIRE(child1->mFlow == root.mFlow);
-         REQUIRE(child1->mFlow.IsLocked() == false);
-         REQUIRE(child1->mRefreshRequired == true);
-         REQUIRE(child1->mChildren.GetCount() == 2);
-         REQUIRE(child1->mUnitsList.GetCount() == 2);
-         REQUIRE(child1->mTraits.GetCount() == 1);
+         auto child1 = root.GetChildren()[0];
+         REQUIRE(child1->GetOwner() == &root);
+         REQUIRE(child1->GetRuntime() == root.GetRuntime());
+         REQUIRE(child1->GetRuntime().IsLocked() == false);
+         REQUIRE(child1->GetFlow() == root.GetFlow());
+         REQUIRE(child1->GetFlow().IsLocked() == false);
+         REQUIRE(child1->RequiresRefresh() == true);
+         REQUIRE(child1->GetChildren().GetCount() == 2);
+         REQUIRE(child1->GetUnits().GetCount() == 2);
+         REQUIRE(child1->GetTraits().GetCount() == 1);
          REQUIRE(child1->GetName() == "Child1");
 
          // the child1 container has 1 reference
@@ -268,42 +268,42 @@ SCENARIO("Testing Thing", "[thing]") {
          // total: 8 references confirmed
          REQUIRE(child1->Reference(0) == 6);
 
-         auto child2 = root.mChildren[1];
-         REQUIRE(child2->mOwner == &root);
-         REQUIRE(child2->mRuntime == root.mRuntime);
-         REQUIRE(child2->mRuntime.IsLocked() == false);
-         REQUIRE(child2->mFlow == root.mFlow);
-         REQUIRE(child2->mFlow.IsLocked() == false);
-         REQUIRE(child2->mRefreshRequired == true);
-         REQUIRE(not child2->mChildren);
-         REQUIRE(not child2->mUnitsList);
-         REQUIRE(child2->mTraits.GetCount() == 1);
+         auto child2 = root.GetChildren()[1];
+         REQUIRE(child2->GetOwner() == &root);
+         REQUIRE(child2->GetRuntime() == root.GetRuntime());
+         REQUIRE(child2->GetRuntime().IsLocked() == false);
+         REQUIRE(child2->GetFlow() == root.GetFlow());
+         REQUIRE(child2->GetFlow().IsLocked() == false);
+         REQUIRE(child2->RequiresRefresh() == true);
+         REQUIRE(not child2->GetChildren());
+         REQUIRE(not child2->GetUnits());
+         REQUIRE(child2->GetTraits().GetCount() == 1);
          REQUIRE(child2->GetName() == "Child2");
          REQUIRE(child2->Reference(0) == 2);
 
-         auto grandchild1 = child1->mChildren[0];
-         REQUIRE(grandchild1->mOwner == child1);
-         REQUIRE(grandchild1->mRuntime == root.mRuntime);
-         REQUIRE(grandchild1->mRuntime.IsLocked() == false);
-         REQUIRE(grandchild1->mFlow == root.mFlow);
-         REQUIRE(grandchild1->mFlow.IsLocked() == false);
-         REQUIRE(grandchild1->mRefreshRequired == true);
-         REQUIRE(not grandchild1->mChildren);
-         REQUIRE(not grandchild1->mUnitsList);
-         REQUIRE(grandchild1->mTraits.GetCount() == 1);
+         auto grandchild1 = child1->GetChildren()[0];
+         REQUIRE(grandchild1->GetOwner() == child1);
+         REQUIRE(grandchild1->GetRuntime() == root.GetRuntime());
+         REQUIRE(grandchild1->GetRuntime().IsLocked() == false);
+         REQUIRE(grandchild1->GetFlow() == root.GetFlow());
+         REQUIRE(grandchild1->GetFlow().IsLocked() == false);
+         REQUIRE(grandchild1->RequiresRefresh() == true);
+         REQUIRE(not grandchild1->GetChildren());
+         REQUIRE(not grandchild1->GetUnits());
+         REQUIRE(grandchild1->GetTraits().GetCount() == 1);
          REQUIRE(grandchild1->GetName() == "GrandChild1");
          REQUIRE(grandchild1->Reference(0) == 2);
 
-         auto grandchild2 = child1->mChildren[1];
-         REQUIRE(grandchild2->mOwner == child1);
-         REQUIRE(grandchild2->mRuntime == root.mRuntime);
-         REQUIRE(grandchild2->mRuntime.IsLocked() == false);
-         REQUIRE(grandchild2->mFlow == root.mFlow);
-         REQUIRE(grandchild2->mFlow.IsLocked() == false);
-         REQUIRE(grandchild2->mRefreshRequired == true);
-         REQUIRE(not grandchild2->mChildren);
-         REQUIRE(not grandchild2->mUnitsList);
-         REQUIRE(grandchild2->mTraits.GetCount() == 1);
+         auto grandchild2 = child1->GetChildren()[1];
+         REQUIRE(grandchild2->GetOwner() == child1);
+         REQUIRE(grandchild2->GetRuntime() == root.GetRuntime());
+         REQUIRE(grandchild2->GetRuntime().IsLocked() == false);
+         REQUIRE(grandchild2->GetFlow() == root.GetFlow());
+         REQUIRE(grandchild2->GetFlow().IsLocked() == false);
+         REQUIRE(grandchild2->RequiresRefresh() == true);
+         REQUIRE(not grandchild2->GetChildren());
+         REQUIRE(not grandchild2->GetUnits());
+         REQUIRE(grandchild2->GetTraits().GetCount() == 1);
          REQUIRE(grandchild2->GetName() == "GrandChild2");
          REQUIRE(grandchild2->Reference(0) == 2);
 
@@ -341,19 +341,19 @@ SCENARIO("Testing Thing", "[thing]") {
 
       WHEN("Getting a local child by index") {
          auto child = root.GetChild(0);
-         auto child1 = root.mChildren[0];
+         auto child1 = root.GetChildren()[0];
          REQUIRE(child1 == child);
       }
 
       WHEN("Getting a local child by name trait") {
          auto child = root.GetNamedChild("Child2");
-         auto child2 = root.mChildren[1];
+         auto child2 = root.GetChildren()[1];
          REQUIRE(child2 == child);
       }
 
       WHEN("Getting a local child by index and name trait") {
          auto child = root.GetNamedChild("Child2", 1);
-         auto child3 = root.mChildren[2];
+         auto child3 = root.GetChildren()[2];
          REQUIRE(child3 == child);
       }
 
@@ -364,10 +364,10 @@ SCENARIO("Testing Thing", "[thing]") {
 
          REQUIRE(unit0);
          REQUIRE(unit0->Is<TestUnit1>());
-         REQUIRE(unit0 == root.mUnitsAmbiguous[MetaOf<TestUnit1>()][0]);
+         REQUIRE(unit0 == root.GetUnitsMap()[MetaOf<TestUnit1>()][0]);
          REQUIRE(unit1);
          REQUIRE(unit1->Is<TestUnit2>());
-         REQUIRE(unit1 == root.mUnitsAmbiguous[MetaOf<TestUnit2>()][0]);
+         REQUIRE(unit1 == root.GetUnitsMap()[MetaOf<TestUnit2>()][0]);
       }
 
       WHEN("Get a local unit by type and index") {
@@ -375,7 +375,7 @@ SCENARIO("Testing Thing", "[thing]") {
 
          REQUIRE(unit);
          REQUIRE(unit->Is<TestUnit1>());
-         REQUIRE(unit == root.mUnitsAmbiguous[MetaOf<TestUnit1>()][0]);
+         REQUIRE(unit == root.GetUnitsMap()[MetaOf<TestUnit1>()][0]);
       }
 
       WHEN("Removing a specific local unit") {
@@ -383,7 +383,7 @@ SCENARIO("Testing Thing", "[thing]") {
          auto removed = root.RemoveUnit(root.GetUnit(0));
 
          REQUIRE(removed == 1);
-         REQUIRE(root.mUnitsList.GetCount() == 1);
+         REQUIRE(root.GetUnits().GetCount() == 1);
          REQUIRE(nullptr == Allocator::Find(MetaOf<TestUnit1>(), unitmemory));
       }
 
@@ -393,7 +393,7 @@ SCENARIO("Testing Thing", "[thing]") {
          auto removed = root.RemoveUnits();
 
          REQUIRE(removed == 2);
-         REQUIRE(!root.mUnitsList);
+         REQUIRE(not root.GetUnits());
          REQUIRE(nullptr == Allocator::Find(MetaOf<TestUnit1>(), unitmemory1));
          REQUIRE(nullptr == Allocator::Find(MetaOf<TestUnit2>(), unitmemory2));
       }

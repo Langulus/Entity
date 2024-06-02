@@ -102,10 +102,13 @@ namespace Langulus::Entity
       auto operator = (auto) = delete;
 
       NOD() LANGULUS_API(ENTITY)
-      Runtime*  GetRuntime() const noexcept;
+      bool RequiresRefresh() const noexcept;
 
       NOD() LANGULUS_API(ENTITY)
-      Temporal* GetFlow() const noexcept;
+      const Pin<Ref<Runtime>>& GetRuntime() const noexcept;
+
+      NOD() LANGULUS_API(ENTITY)
+      const Pin<Ref<Temporal>>& GetFlow() const noexcept;
 
       LANGULUS_API(ENTITY) void Do(Verb&);
       LANGULUS_API(ENTITY) void Select(Verb&);
@@ -151,6 +154,9 @@ namespace Langulus::Entity
       A::Module* LoadMod(const Token&, const Neat& = {});
 
       NOD() LANGULUS_API(ENTITY)
+      const Ref<Thing>& GetOwner() const noexcept;
+
+      NOD() LANGULUS_API(ENTITY)
       const Hierarchy& GetChildren() const noexcept;
 
       NOD() LANGULUS_API(ENTITY)
@@ -188,9 +194,6 @@ namespace Langulus::Entity
       template<CT::Unit = A::Unit, bool TWOSIDED = true>
       Count RemoveUnits();
 
-      /*LANGULUS_API(ENTITY)
-      Count ReplaceUnit(Unit*, Unit*);*/
-
       NOD() LANGULUS_API(ENTITY)
       Count HasUnits(DMeta) const;
 
@@ -199,6 +202,8 @@ namespace Langulus::Entity
 
       NOD() LANGULUS_API(ENTITY)
       const UnitList& GetUnits() const noexcept;
+      NOD() LANGULUS_API(ENTITY)
+      const UnitMap& GetUnitsMap() const noexcept;
 
       NOD() LANGULUS_API(ENTITY)
             A::Unit* GetUnitMeta(DMeta, Index = 0);

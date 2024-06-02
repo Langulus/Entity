@@ -70,7 +70,7 @@ void Unit::Refresh() {}
 Runtime* Unit::GetRuntime() const noexcept {
    if (not mOwners)
       return nullptr;
-   return mOwners[0]->GetRuntime();
+   return &*mOwners[0]->GetRuntime();
 }
 
 /// Couple the component with an entity, extracted from a descriptor's        

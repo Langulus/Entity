@@ -166,9 +166,9 @@ namespace Langulus::Entity
       ENTITY_VERBOSE_SELF_TAB("Destroying (", Reference(0), " uses):");
 
       if (not mRuntime.IsLocked())
-         mRuntime->Reset();
+         mRuntime.Reset();
       if (not mFlow.IsLocked())
-         mFlow->Reset();
+         mFlow.Reset();
 
       mTraits.Reset();
 
@@ -251,7 +251,7 @@ namespace Langulus::Entity
          // This thing owns its flow, so we need to update it here      
          // This will execute any temporally based verbs and scripts    
          // Game logic basically happens in this flow                   
-         if (not (*mFlow)->Update(deltaTime))
+         if (not mFlow->Update(deltaTime))
             return false;
       }
 
@@ -259,7 +259,7 @@ namespace Langulus::Entity
          // This thing owns its runtime, so we need to update it here   
          // This is where modules are updated in parallel, physical     
          // simulations happen, images get rendered, etc.               
-         if (not (*mRuntime)->Update(deltaTime))
+         if (not mRuntime->Update(deltaTime))
             return false;
       }
 
@@ -384,6 +384,12 @@ namespace Langulus::Entity
    }
 #endif
 
+   /// Get the owner                                                          
+   ///   @return the owner                                                    
+   const Ref<Thing>& Thing::GetOwner() const noexcept {
+      return mOwner;
+   }
+
    /// Get children hierarchy                                                 
    ///   @return the hierarchy                                                
    const Hierarchy& Thing::GetChildren() const noexcept {
@@ -446,15 +452,6 @@ namespace Langulus::Entity
          child->ResetFlow(newflow);
    }
 
-   /// Replace one unit instance with another - used when moving units        
-   ///   @attention assumes both units are different and not nullptr          
-   ///   @param replaceThis - the unit to replace                             
-   ///   @param withThis - the unit to replace with                           
-   /*Count Thing::ReplaceUnit(Unit* replaceThis, Unit* withThis) {
-      RemoveUnit(replaceThis);
-      return AddUnit(withThis);
-   }*/
-
    /// Count the number of matching units in this entity                      
    ///   @param type - the type of units to search for                        
    ///   @return the number of matching units                                 
@@ -463,50 +460,56 @@ namespace Langulus::Entity
       return found ? found.mValue->GetCount() : 0;
    }
 
+   /// Check if all units in the hierarchy require a Refresh() call           
+   ///   @return true if the thing is dirty                                   
+   bool Thing::RequiresRefresh() const noexcept {
+      return mRefreshRequired;
+   }
+
    /// Get the current runtime                                                
    ///   @return the pointer to the runtime                                   
-   Runtime* Thing::GetRuntime() const noexcept {
-      return const_cast<Runtime*>(mRuntime->Get());
+   const Pin<Ref<Runtime>>& Thing::GetRuntime() const noexcept {
+      return mRuntime;
    }
 
    /// Get the current temporal flow                                          
    ///   @return the pointer to the flow                                      
-   Temporal* Thing::GetFlow() const noexcept {
-      return const_cast<Temporal*>(mFlow->Get());
+   const Pin<Ref<Temporal>>& Thing::GetFlow() const noexcept {
+      return mFlow;
    }
 
    /// Create a local runtime for this thing                                  
    ///   @return the new runtime instance, or the old one if already created  
    Runtime* Thing::CreateRuntime() {
       if (mRuntime.IsLocked())
-         return mRuntime->Get();
+         return &*mRuntime;
 
-      mRuntime->New(this);
+      mRuntime.Get().New(this);
       mRuntime.Lock();
 
       // Dispatch the change to all children                            
       for (auto& child : mChildren)
-         child->ResetRuntime(mRuntime->Get());
+         child->ResetRuntime(&*mRuntime);
 
-      ENTITY_VERBOSE_SELF("New runtime: ", *mRuntime);
-      return mRuntime->Get();
+      ENTITY_VERBOSE_SELF("New runtime: ", &*mRuntime);
+      return &*mRuntime;
    }
 
    /// Create a local flow for this thing                                     
    ///   @return the new flow instance, or the old one, if already created    
    Temporal* Thing::CreateFlow() {
       if (mFlow.IsLocked())
-         return mFlow->Get();
+         return &*mFlow;
 
-      mFlow->New();//this
+      mFlow.Get().New();
       mFlow.Lock();
 
       // Dispatch the change to all children                            
       for (auto& child : mChildren)
-         child->ResetFlow(mFlow->Get());
+         child->ResetFlow(&*mFlow);
 
-      ENTITY_VERBOSE_SELF("New flow: ", *mFlow);
-      return mFlow->Get();
+      ENTITY_VERBOSE_SELF("New flow: ", &*mFlow);
+      return &*mFlow;
    }
 
    /// Create a child thing                                                   
