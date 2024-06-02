@@ -8,7 +8,7 @@
 #pragma once
 #include "Pin.hpp"
 
-#define TEMPLATE()   template<class T>
+#define TEMPLATE()   template<CT::NotSemantic T>
 #define PINNED()     Pin<T>
 
 
@@ -38,8 +38,8 @@ namespace Langulus::Entity
    ///   @param other - the value to initialize with                          
    TEMPLATE() template<template<class> class S> LANGULUS(INLINED)
    PINNED()::Pin(S<Pin>&& other) requires CT::SemanticMakable<S, T>
-      : mValue {S<T> {other->mValue}}
-      , mLocked {other->mLocked} {}
+      : mValue {other.Nest(DesemCast(other).mValue)}
+      , mLocked {DesemCast(other).mLocked} {}
 
    /// Forward any compatible arguments towards contained value constructor   
    ///   @param arguments... - the arguments to forward                       
@@ -70,7 +70,7 @@ namespace Langulus::Entity
    requires CT::SemanticAssignable<S, T> LANGULUS(INLINED)
    PINNED()& PINNED()::operator = (S<Pin>&& rhs) {
       if (not mLocked)
-         mValue = S<T> {rhs->mValue};
+         mValue = rhs.Nest(DesemCast(rhs).mValue);
       return *this;
    }
 
@@ -107,6 +107,23 @@ namespace Langulus::Entity
       return mLocked;
    }
 
+   /// Get the contained data                                                 
+   ///   @return a reference to the contained data                            
+   TEMPLATE() LANGULUS(INLINED)
+   const T& PINNED()::Get() const noexcept {
+      return mValue;
+   }
+
+   /// Get the contained data (mutable)                                       
+   ///   @attention will throw if pin was locked when accessed                
+   ///   @return a mutable reference to the contained data                    
+   TEMPLATE() LANGULUS(INLINED)
+   T& PINNED()::Get() {
+      LANGULUS_ASSERT(not IsLocked(), Access,
+         "Accessing mutable data in a locked pin");
+      return mValue;
+   }
+
    /// Pin the value, it will no longer be overwritable by assignment         
    TEMPLATE() LANGULUS(INLINED)
    void PINNED()::Lock() noexcept {
@@ -119,31 +136,64 @@ namespace Langulus::Entity
       mLocked = false;
    }
 
-   /// Get a reference to the contained value                                 
-   ///   @return constant reference to the contained value                    
+   /// Unpin the value and reset contents, if possible                        
    TEMPLATE() LANGULUS(INLINED)
-   const T& PINNED()::operator * () const noexcept {
+   void PINNED()::Reset() noexcept {
+      mLocked = false;
+      if constexpr (requires { mValue.Reset(); })
+         mValue.Reset();
+   }
+
+   /// Explicit cast to any type supported by the pinned value                
+   TEMPLATE() template<class ALT> LANGULUS(INLINED)
+   PINNED()::operator ALT () const noexcept requires CT::Convertible<T, ALT> {
+      return static_cast<ALT>(mValue);
+   }
+
+   /// Implicit cast to the contained value                                   
+   TEMPLATE() LANGULUS(INLINED)
+   PINNED()::operator T const& () const noexcept {
       return mValue;
    }
 
-   /// Get a reference to the contained value                                 
-   ///   @return constant reference to the contained value                    
+   /// Get the most inner pointer of the contained item (nested & operator)   
    TEMPLATE() LANGULUS(INLINED)
-   const T* PINNED()::operator -> () const noexcept {
-      if constexpr (CT::Sparse<T>)
-         return mValue;
+   constexpr decltype(auto) PINNED()::operator & () const noexcept {
+      if constexpr (requires { mValue.operator & (); })
+         return mValue.operator & ();
       else
          return &mValue;
    }
 
-   /// Get a reference to the contained value                                 
-   ///   @return mutable reference to the contained value                     
+   /// Get the most inner reference of the contained item (nested * operator) 
    TEMPLATE() LANGULUS(INLINED)
-   T* PINNED()::operator -> () noexcept {
-      if constexpr (CT::Sparse<T>)
-         return mValue;
+   constexpr decltype(auto) PINNED()::operator * () const noexcept {
+      if constexpr (requires { mValue.operator * (); })
+         return mValue.operator * ();
       else
+         return (mValue);
+   }
+
+   /// Get the most inner pointer of the contained item (nested -> operator)  
+   TEMPLATE() LANGULUS(INLINED)
+   constexpr decltype(auto) PINNED()::operator -> () noexcept {
+      if constexpr (requires { mValue.operator -> (); })
+         return mValue.operator -> ();
+      else if constexpr (CT::Dense<T>)
          return &mValue;
+      else
+         return mValue;
+   }
+
+   /// Get the most inner pointer of the contained item (nested -> operator)  
+   TEMPLATE() LANGULUS(INLINED)
+   constexpr decltype(auto) PINNED()::operator -> () const noexcept {
+      if constexpr (requires { mValue.operator -> (); })
+         return mValue.operator -> ();
+      else if constexpr (CT::Dense<T>)
+         return &mValue;
+      else
+         return mValue;
    }
 
 } // namespace namespace Langulus::Entity

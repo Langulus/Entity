@@ -397,6 +397,13 @@ namespace Langulus::Entity
       return mUnitsList;
    }
 
+   /// Get the ambiguous map of units                                         
+   ///   @return a reference to the map of units                              
+   LANGULUS(INLINED)
+   const UnitMap& Thing::GetUnitsMap() const noexcept {
+      return mUnitsAmbiguous;
+   }
+
    /// Create a unit by static type and arguments, relying on producers       
    /// in the hierarchy                                                       
    ///   @tparam T - the unit to create                                       

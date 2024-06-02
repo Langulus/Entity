@@ -48,7 +48,7 @@ namespace Langulus::Entity
    /// hierarchy. Otherwise, unpinned values may change on Unit::Refresh()    
    /// When cloning, only the pinned values will be cloned                    
    ///                                                                        
-   template<class T>
+   template<CT::NotSemantic T>
    struct Pin : A::Pinnable {
    protected:
       // Hierarchies are allowed to pin pinnables                       
@@ -97,11 +97,17 @@ namespace Langulus::Entity
       ///                                                                     
       NOD() bool IsLocked() const noexcept;
 
-      operator T const& () const noexcept { return mValue; }
+      T&       Get();
+      T const& Get() const noexcept;
+      
+      template<class ALT>
+      explicit operator ALT () const noexcept requires CT::Convertible<T, ALT>;
+      operator T const& () const noexcept;
 
-      T const& operator *  () const noexcept;
-      T const* operator -> () const noexcept;
-      T*       operator -> ()       noexcept;
+      constexpr decltype(auto) operator &  () const noexcept;
+      constexpr decltype(auto) operator *  () const noexcept;
+      constexpr decltype(auto) operator -> () noexcept;
+      constexpr decltype(auto) operator -> () const noexcept;
 
       ///                                                                     
       ///   Comparison                                                        
@@ -115,6 +121,7 @@ namespace Langulus::Entity
       ///                                                                     
       void Lock() noexcept;
       void Unlock() noexcept;
+      void Reset() noexcept;
    };
 
 } // namespace Langulus::Entity
