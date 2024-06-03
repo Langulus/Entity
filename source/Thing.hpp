@@ -94,6 +94,10 @@ namespace Langulus::Entity
       LANGULUS_API(ENTITY) Thing(Abandoned<Thing>&&);
 
       LANGULUS_API(ENTITY) ~Thing() IF_UNSAFE(noexcept);
+
+      template<bool CREATE_FLOW = true>
+      NOD() static Thing Root(CT::String auto&&...);
+
       void Detach();
 
       // Shallow copy is disabled, you should be able only to clone,    
@@ -142,8 +146,8 @@ namespace Langulus::Entity
       LANGULUS_API(ENTITY)
       Temporal* CreateFlow();
 
-      LANGULUS_API(ENTITY)
-      Ref<Thing> CreateChild(const Neat& = {});
+      template<class...T>
+      Ref<Thing> CreateChild(T&&...);
 
       template<bool TWOSIDED = true>
       Count AddChild(Thing*);
@@ -185,6 +189,8 @@ namespace Langulus::Entity
 
       template<CT::Unit T, class...A>
       Many CreateUnit(A&&...);
+      template<CT::Unit...T>
+      Many CreateUnits();
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
          template<class... A>

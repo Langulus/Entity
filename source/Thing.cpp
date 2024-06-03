@@ -160,7 +160,7 @@ namespace Langulus::Entity
    Thing::~Thing() IF_UNSAFE(noexcept) {
       Detach();
    }
-
+   
    /// A nested call to detach all parents of all children                    
    void Thing::Detach() {
       ENTITY_VERBOSE_SELF_TAB("Destroying (", Reference(0), " uses):");
@@ -510,17 +510,6 @@ namespace Langulus::Entity
 
       ENTITY_VERBOSE_SELF("New flow: ", &*mFlow);
       return &*mFlow;
-   }
-
-   /// Create a child thing                                                   
-   ///   @param descriptor - instructions for the entity's creation           
-   ///   @return the new child instance                                       
-   Ref<Thing> Thing::CreateChild(const Neat& descriptor) {
-      ENTITY_VERBOSE_SELF_TAB(
-         "Producing child (at ", Reference(0), " references): ");
-      Ref<Thing> newThing;
-      newThing.New(this, descriptor);
-      return Abandon(newThing);
    }
 
    /// Uses the current runtime to load a shared library module, and          

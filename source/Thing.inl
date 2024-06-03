@@ -30,6 +30,33 @@
 namespace Langulus::Entity
 {
    
+   /// Create a root thing (convenience function)                             
+   ///   @tparam CREATE_FLOW - should a temporal flow be created in the root? 
+   ///   @param modules... - names of modules to load                         
+   ///   @return a root thing, with a runtime, a flow, and a name "ROOT"      
+   template<bool CREATE_FLOW>
+   Thing Thing::Root(CT::String auto&&...modules) {
+      Thing root;
+      root.SetName("ROOT");
+      root.CreateRuntime();
+      if constexpr (CREATE_FLOW)
+         root.CreateFlow();
+      (root.LoadMod(modules), ...);
+      return Abandon(root);
+   }
+
+   /// Create a child Thing with the provided arguments                       
+   ///   @param arguments - instructions for the entity's creation            
+   ///   @return the new child instance                                       
+   template<class...T>
+   Ref<Thing> Thing::CreateChild(T&&...arguments) {
+      ENTITY_VERBOSE_SELF_TAB(
+         "Producing child (at ", Reference(0), " references): ");
+      Ref<Thing> newThing;
+      newThing.New(this, Neat {Forward<T>(arguments)...});
+      return Abandon(newThing);
+   }
+
    /// Inner creation routine                                                 
    ///   @tparam T - type of instructions for creation                        
    ///   @param verb - original create verb to output to                      
@@ -410,11 +437,21 @@ namespace Langulus::Entity
    ///   @tparam A... - arguments for the unit's creation                     
    ///   @param arguments... - the arguments to provide for construct         
    ///   @return the created unit(s)                                          
-   template<CT::Unit T, class... A> LANGULUS(INLINED)
+   template<CT::Unit T, class...A> LANGULUS(INLINED)
    Many Thing::CreateUnit(A&&...arguments) {
       return CreateData(
          Construct::From<Decay<T>>(Forward<A>(arguments)...)
       );
+   }
+
+   /// Create default-initialized instances of each unit type                 
+   ///   @tparam T... - the unit types to instantiate                         
+   ///   @return the created unit(s)                                          
+   template<CT::Unit...T> LANGULUS(INLINED)
+   Many Thing::CreateUnits() {
+      Many result;
+      (result.SmartPush(IndexBack, CreateUnit<T>()), ...);
+      return result;
    }
 
 #if LANGULUS_FEATURE(MANAGED_REFLECTION)
