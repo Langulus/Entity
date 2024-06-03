@@ -10,8 +10,6 @@
 
 using namespace Langulus;
 
-#define CATCH_CONFIG_ENABLE_BENCHMARKING
-
 
 /// A unit implementation for testing                                         
 class TestUnit1 final : public A::Unit {
@@ -54,3 +52,14 @@ public:
 
    void Refresh() {}
 };
+
+/// Dump parse results and requirements                                       
+template<class INPUT, class OUTPUT, class REQUIRED>
+void DumpResults(const INPUT& in, const OUTPUT& out, const REQUIRED& required) {
+   Logger::Special("-------------");
+   Logger::Special("Script:   ", in);
+   Logger::Special("Parsed:   ", out);
+   Logger::Special("Required: ", required);
+   Logger::Special("-------------");
+}
+
