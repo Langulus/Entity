@@ -133,12 +133,13 @@ namespace Langulus
             LANGULUS(INFO) INFOSTRING; \
             LANGULUS_BASES(Event); \
             static constexpr Token CTTI_Event = #EVENT; \
-            using Event::Event; \
             EVENT() : Event {} { \
                mType = MetaOf<EVENT>(); \
             } \
-            EVENT(Describe&& desc) : Event {Forward<Describe>(desc)} { \
+            EVENT(Describe&& desc) { \
                mType = MetaOf<EVENT>(); \
+               desc->ExtractData(mState); \
+               desc->ExtractTrait<Traits::Data>(mPayload); \
             } \
             template<class... T_> \
             EVENT(T_&&...a) : Event {Forward<T_>(a)...} { \
@@ -156,12 +157,13 @@ namespace Langulus
             LANGULUS(INFO) INFOSTRING; \
             LANGULUS_BASES(Event); \
             static constexpr Token CTTI_Event = #EVENT; \
-            using Event::Event; \
             EVENT() : Event {} { \
                mType = MetaOf<EVENT>(); \
             } \
-            EVENT(Describe&& desc) : Event {Forward<Describe>(desc)} { \
+            EVENT(Describe&& desc) { \
                mType = MetaOf<EVENT>(); \
+               desc->ExtractData(mState); \
+               desc->ExtractTrait<Traits::Data>(mPayload); \
             } \
             template<class... T_> \
             EVENT(EventState state, T_&&...a) : Event {Forward<T_>(a)...} { \
