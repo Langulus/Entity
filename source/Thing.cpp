@@ -400,7 +400,7 @@ namespace Langulus::Entity
    ///   @param id - the index to pick                                        
    ///   @return the child entity, or nullptr of none was found               
    Thing* Thing::GetChild(Index offset) {
-      return mChildren[offset].Get();
+      return mChildren[offset];
    }
 
    const Thing* Thing::GetChild(Index offset) const {
@@ -416,7 +416,7 @@ namespace Langulus::Entity
       for (auto& child : mChildren) {
          if (child->GetName() == name) {
             if (matches == offset)
-               return child.Get();
+               return child;
             ++matches;
          }
       }

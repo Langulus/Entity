@@ -28,9 +28,9 @@ namespace Langulus
          End   = 2,  // The end of an event, such as key release        
       };
 
-      LANGULUS_NAMED_VALUES(Point, Begin, End);
-
       using Type = TypeOf<Enum>;
+      LANGULUS_NAMED_VALUES(Point, Begin, End);
+      LANGULUS(TYPED) Type;
 
       Type mState {Point};
 
@@ -99,7 +99,7 @@ namespace Langulus
       ///                                                                     
       bool operator == (const Event&) const;
 
-      LANGULUS_API(ENTITY) explicit operator Anyness::Text() const;
+      LANGULUS_API(ENTITY) operator Anyness::Text() const;
    };
 
    LANGULUS_API(ENTITY) void RegisterEvents();
@@ -142,8 +142,9 @@ namespace Langulus
                desc->ExtractTrait<Traits::Data>(mPayload); \
             } \
             template<class... T_> \
-            EVENT(T_&&...a) : Event {Forward<T_>(a)...} { \
+            EVENT(EventState state, T_&&...a) : Event {Forward<T_>(a)...} { \
                mType = MetaOf<EVENT>(); \
+               mState = state; \
             } \
          }; \
       }
@@ -201,16 +202,8 @@ LANGULUS_DEFINE_EVENT(WindowMove,
 LANGULUS_DEFINE_EVENT(WindowText,
    "An event that occurs when a text input is queried for a window")
 
-LANGULUS_DEFINE_EVENT(MouseMoveHorizontal,
-   "An event that occurs when mouse moves horizontally inside the window")
-LANGULUS_DEFINE_EVENT(MouseMoveVertical,
-   "An event that occurs when mouse moves vertically inside the window")
 LANGULUS_DEFINE_EVENT(MouseMove,
    "An event that occurs when mouse moves in any direction inside the window")
-LANGULUS_DEFINE_EVENT(MouseScrollHorizontal,
-   "An event that occurs when mouse scrolls horizontally inside the window")
-LANGULUS_DEFINE_EVENT(MouseScrollVertical,
-   "An event that occurs when mouse scrolls vertically inside the window")
 LANGULUS_DEFINE_EVENT(MouseScroll,
    "An event that occurs when mouse scrolls in any direction inside the window")
 
