@@ -10,6 +10,8 @@
 
 SCENARIO("Testing Thing", "[thing]") {
    static Allocator::State memoryState;
+   static_assert(CT::Deep<Entity::Hierarchy>,
+      "Hierarchy must be reflected as deep");
 
    WHEN("Creating a default Thing") {
       Thing root;
@@ -99,7 +101,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(not child1->GetChildren());
          REQUIRE(not child1->GetUnits());
          REQUIRE(not child1->GetTraits());
-         REQUIRE(child1->Reference(0) == 3);
+         REQUIRE(child1->Reference(0) == 2);
       }
 
       WHEN("Adding an existing unit") {
@@ -259,7 +261,7 @@ SCENARIO("Testing Thing", "[thing]") {
          // child1's GrandChild2 owner contains 1 reference
          //---------------------------------------------------
          // total: 8 references confirmed
-         REQUIRE(child1->Reference(0) == 6);
+         REQUIRE(child1->Reference(0) == 5);
 
          auto child2 = root.GetChildren()[1];
          REQUIRE(child2->GetOwner() == &root);
@@ -272,7 +274,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(not child2->GetUnits());
          REQUIRE(child2->GetTraits().GetCount() == 1);
          REQUIRE(child2->GetName() == "Child2");
-         REQUIRE(child2->Reference(0) == 2);
+         REQUIRE(child2->Reference(0) == 1);
 
          auto grandchild1 = child1->GetChildren()[0];
          REQUIRE(grandchild1->GetOwner() == child1);
@@ -285,7 +287,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(not grandchild1->GetUnits());
          REQUIRE(grandchild1->GetTraits().GetCount() == 1);
          REQUIRE(grandchild1->GetName() == "GrandChild1");
-         REQUIRE(grandchild1->Reference(0) == 2);
+         REQUIRE(grandchild1->Reference(0) == 1);
 
          auto grandchild2 = child1->GetChildren()[1];
          REQUIRE(grandchild2->GetOwner() == child1);
@@ -298,7 +300,7 @@ SCENARIO("Testing Thing", "[thing]") {
          REQUIRE(not grandchild2->GetUnits());
          REQUIRE(grandchild2->GetTraits().GetCount() == 1);
          REQUIRE(grandchild2->GetName() == "GrandChild2");
-         REQUIRE(grandchild2->Reference(0) == 2);
+         REQUIRE(grandchild2->Reference(0) == 1);
 
          Logger::Special("End: Creating a Thing by descriptor");
       }

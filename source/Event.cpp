@@ -19,7 +19,12 @@ namespace Langulus
          else
             return Text::TemplateRt("{}({})", mType, mState);
       }
-      else return Text::TemplateRt("{}()", mType);
+      else {
+         if (mPayload)
+            return Text::TemplateRt("{}({})", mType, Traits::Data {mPayload});
+         else
+            return Text::TemplateRt("{}()", mType);
+      }
    }
 
    /// Register all commonly used event types                                 
@@ -37,11 +42,7 @@ namespace Langulus
       (void) MetaDataOf<Events::WindowMove>();
       (void) MetaDataOf<Events::WindowText>();
 
-      (void) MetaDataOf<Events::MouseMoveHorizontal>();
-      (void) MetaDataOf<Events::MouseMoveVertical>();
       (void) MetaDataOf<Events::MouseMove>();
-      (void) MetaDataOf<Events::MouseScrollHorizontal>();
-      (void) MetaDataOf<Events::MouseScrollVertical>();
       (void) MetaDataOf<Events::MouseScroll>();
 
       (void) MetaDataOf<Keys::Space>();

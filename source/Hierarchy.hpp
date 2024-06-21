@@ -199,10 +199,13 @@ namespace Langulus::Entity
    /// Simply a container of Things, with various quality-of-life             
    /// functions related to hierarchical retrieval of things, units & traits  
    ///                                                                        
-   struct Hierarchy : TMany<Ref<Thing>>, SeekInterface<Hierarchy> {
-      using TMany::TMany;
-      using TMany::operator =;
-      using TMany::operator ==;
+   struct Hierarchy : TMany<Thing*>, SeekInterface<Hierarchy> {
+      using Base = TMany<Thing*>;
+      LANGULUS_BASES(Base);
+
+      using Base::TMany;
+      using Base::operator =;
+      using Base::operator ==;
 
       ///                                                                     
       ///   Seek                                                              
