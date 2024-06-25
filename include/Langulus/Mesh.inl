@@ -321,9 +321,9 @@ namespace Langulus::A
 
       Many soughtDecayed;
       if (soughtt->template CastsTo<Math::Triangle3>())
-         soughtDecayed = soughtt->template ReinterpretAs<Math::Point3>();
+         soughtDecayed = soughtt->template ReinterpretAs<Math::Vec3>();
       else if (soughtt->template CastsTo<Math::Triangle2>())
-         soughtDecayed = soughtt->template ReinterpretAs<Math::Point2>();
+         soughtDecayed = soughtt->template ReinterpretAs<Math::Vec2>();
       else
          soughtDecayed = *soughtt;
 
@@ -413,9 +413,9 @@ namespace Langulus::A
 
       Many soughtDecayed;
       if (soughtt->template CastsTo<Math::Triangle3>())
-         soughtDecayed = soughtt->template ReinterpretAs<Math::Point3>();
+         soughtDecayed = soughtt->template ReinterpretAs<Math::Vec3>();
       else if (soughtt->template CastsTo<Math::Triangle2>())
-         soughtDecayed = soughtt->template ReinterpretAs<Math::Point2>();
+         soughtDecayed = soughtt->template ReinterpretAs<Math::Vec2>();
       else
          soughtDecayed = *soughtt;
 
