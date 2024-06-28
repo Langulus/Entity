@@ -530,7 +530,7 @@ namespace Langulus::Entity
             });
          }
          else {
-            aux.ForEachDeep([&](const Block<>& group) -> LoopControl {
+            aux.ForEachDeep([&](const Many& group) -> LoopControl {
                try {
                   // Found match if these don't throw                   
                   if (CT::Pinnable<D> and group.Is<TypeOf<D>>())

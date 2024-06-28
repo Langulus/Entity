@@ -339,7 +339,7 @@ namespace Langulus::Entity
          });
       }
       else {
-         aux.ForEachDeep([&](const Block<>& group) {
+         aux.ForEachDeep([&](const Many& group) {
             try {
                // Found match if these don't throw                      
                if constexpr (CT::Pinnable<D>)

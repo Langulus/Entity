@@ -166,19 +166,21 @@ namespace Langulus::Entity
             for (auto& unit : selectedUnits) {
                bool localMismatch = false;
                auto unitBlock = unit->GetBlock();
-               construct.GetDescriptor().ForEach([&](const Block<>& part) {
-                  for (Offset i = 0; i < part.GetCount(); ++i) {
-                     auto element = part.GetElementResolved(i);
-                     Verbs::Select selector {element};
-                     if (not Flow::DispatchFlat(unitBlock, selector)) {
-                        // Abort on first failure                       
-                        localMismatch = true;
-                        return Loop::Break;
+               construct.GetDescriptor().ForEach(
+                  [&](const Many& part) {
+                     for (Offset i = 0; i < part.GetCount(); ++i) {
+                        auto element = part.GetElementResolved(i);
+                        Verbs::Select selector {element};
+                        if (not Flow::DispatchFlat(unitBlock, selector)) {
+                           // Abort on first failure                       
+                           localMismatch = true;
+                           return Loop::Break;
+                        }
                      }
-                  }
 
-                  return Loop::Continue;
-               });
+                     return Loop::Continue;
+                  }
+               );
 
                if (not localMismatch) {
                   // The unit passes the test                           
