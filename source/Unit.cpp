@@ -25,8 +25,8 @@ void Unit::Select(Flow::Verb& verb) {
 ///   @return true if the unit has the given properties                       
 bool Unit::CompareDescriptor(const Neat& descriptor) const {
    // First we compare traits only, all of them must be present         
-   bool mismatch {};
-   Offset memberOffset {};
+   bool mismatch = false;
+   Offset memberOffset = 0;
    descriptor.ForEach([&](const Anyness::Trait& trait) {
       if (not GetMember(trait.GetTrait(), memberOffset)
       .Compare(static_cast<const Many&>(trait))) {
@@ -40,8 +40,8 @@ bool Unit::CompareDescriptor(const Neat& descriptor) const {
 
    // Then we run another check, based on data types, again, all        
    // of them must be present, either in trait, or in other form        
-   memberOffset = {};
-   descriptor.ForEachTail([&](const Anyness::Block<>& anythingElse) {
+   memberOffset = 0;
+   descriptor.ForEachTail([&](const Many& anythingElse) {
       if (not GetMember(TMeta {}, memberOffset).Compare(anythingElse)) {
          mismatch = true;
          return Loop::Break;
