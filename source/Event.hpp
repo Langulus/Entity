@@ -13,6 +13,9 @@
 namespace Langulus
 {
 
+   LANGULUS_API(ENTITY) extern void RegisterEvents();
+
+
    ///                                                                        
    ///   Event state                                                          
    ///                                                                        
@@ -101,8 +104,6 @@ namespace Langulus
 
       LANGULUS_API(ENTITY) operator Anyness::Text() const;
    };
-
-   LANGULUS_API(ENTITY) void RegisterEvents();
 
    using EventList = TUnorderedMap<DMeta, TUnorderedMap<EventState, Event>>;
 

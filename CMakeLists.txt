@@ -38,6 +38,7 @@ add_library(LangulusEntity ${LANGULUS_LIBRARY_TYPE}
     $<$<BOOL:${LANGULUS_FEATURE_MANAGED_MEMORY}>:$<TARGET_OBJECTS:LangulusFractalloc>>
     $<TARGET_OBJECTS:LangulusAnyness>
     $<TARGET_OBJECTS:LangulusFlow>
+    $<TARGET_OBJECTS:LangulusMath>
 	${LANGULUS_ENTITY_SOURCES}
 )
 
