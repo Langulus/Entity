@@ -11,7 +11,7 @@
 #if 0
    #define ENTITY_VERBOSE_ENABLED()       1
    #define ENTITY_VERBOSE_SELF(...)       Logger::Verbose(this, ": ", __VA_ARGS__)
-   #define ENTITY_VERBOSE_SELF_TAB(...)   const auto scoped = Logger::Verbose(this, ": ", __VA_ARGS__, Logger::Tabs {})
+   #define ENTITY_VERBOSE_SELF_TAB(...)   const auto scoped = Logger::VerboseTab(this, ": ", __VA_ARGS__)
    #define ENTITY_VERBOSE(...)            Logger::Append(__VA_ARGS__)
 #else
    #define ENTITY_VERBOSE_ENABLED()       0
@@ -215,7 +215,7 @@ namespace Langulus::Entity
 
    /// Dump the entity's hierarchy in log                                     
    void Thing::DumpHierarchy() const {
-      const auto tab = Logger::Verbose("** ", *this, Logger::Tabs {});
+      const auto tab = Logger::VerboseTab("** ", *this);
 
       if (mTraits) {
          Logger::Verbose(".. contains ", mTraits.GetCount(), " traits:");
