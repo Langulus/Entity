@@ -67,8 +67,7 @@ namespace Langulus::A
       template<class F>
       auto ForEachPixel(F&&) const;
 
-      template<template<class> class S, CT::Block B>
-      requires CT::Semantic<S<B>>
+      template<template<class> class S, CT::Block B> requires CT::Intent<S<B>>
       void Upload(S<B>&&) const;
 
       ///                                                                     
@@ -77,9 +76,9 @@ namespace Langulus::A
       template<bool MUTABLE>
       struct Iterator;
 
-      NOD() Iterator<true>  begin() noexcept;
-      NOD() Iterator<false> begin() const noexcept;
-      NOD() A::IteratorEnd  end() const noexcept { return {}; }
+      NOD() auto begin() noexcept -> Iterator<true>;
+      NOD() auto begin() const noexcept -> Iterator<false>;
+      NOD() auto end() const noexcept -> A::IteratorEnd { return {}; }
    };
   
 
@@ -134,6 +133,7 @@ namespace Langulus::A
    ///                                                                        
    struct Font : Image {
       LANGULUS_BASES(Image);
+
       Font()
          : Resolvable {this}
          , ProducedFrom {nullptr, {}} {}

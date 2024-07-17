@@ -8,7 +8,7 @@
 #pragma once
 #include "Pin.hpp"
 
-#define TEMPLATE()   template<CT::NotSemantic T>
+#define TEMPLATE()   template<CT::NoIntent T>
 #define PINNED()     Pin<T>
 
 
@@ -34,12 +34,12 @@ namespace Langulus::Entity
    PINNED()::Pin(Pin&& other) requires CT::MoveMakable<T>
       : Pin {Move(other)} {}
 
-   /// Semantic construction                                                  
+   /// Generic construction                                                   
    ///   @param other - the value to initialize with                          
    TEMPLATE() template<template<class> class S> LANGULUS(INLINED)
-   PINNED()::Pin(S<Pin>&& other) requires CT::SemanticMakable<S, T>
-      : mValue {other.Nest(DesemCast(other).mValue)}
-      , mLocked {DesemCast(other).mLocked} {}
+   PINNED()::Pin(S<Pin>&& other) requires CT::IntentMakable<S, T>
+      : mValue {other.Nest(DeintCast(other).mValue)}
+      , mLocked {DeintCast(other).mLocked} {}
 
    /// Forward any compatible arguments towards contained value constructor   
    ///   @param arguments... - the arguments to forward                       
@@ -63,14 +63,14 @@ namespace Langulus::Entity
       return operator = (Move(rhs));
    }
    
-   /// Semantic assignment                                                    
+   /// Generic assignment                                                     
    ///   @attention doesn't change value, if locked                           
    ///   @param rhs - the pinned value to move-assign                         
    TEMPLATE() template<template<class> class S>
-   requires CT::SemanticAssignable<S, T> LANGULUS(INLINED)
+   requires CT::IntentAssignable<S, T> LANGULUS(INLINED)
    PINNED()& PINNED()::operator = (S<Pin>&& rhs) {
       if (not mLocked)
-         mValue = rhs.Nest(DesemCast(rhs).mValue);
+         mValue = rhs.Nest(DeintCast(rhs).mValue);
       return *this;
    }
 

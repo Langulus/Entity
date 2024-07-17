@@ -152,11 +152,11 @@ namespace Langulus::A
       //TODO map other kinds of pixel iterators?
    }
 
-   /// Upload raw data to the image by a semantic                             
+   /// Upload raw data to the image with intent                               
    ///   @attention deletes any data previously commited                      
    ///   @param data - the block of data                                      
    template<template<class> class S, CT::Block B>
-   requires CT::Semantic<S<B>> LANGULUS(INLINED)
+   requires CT::Intent<S<B>> LANGULUS(INLINED)
    void Image::Upload(S<B>&& data) const {
       // Check if provided data matches the view requirements           
       LANGULUS_ASSERT(mView.GetBytesize() == data->GetBytesize(), Image,
@@ -168,7 +168,7 @@ namespace Langulus::A
    }
 
    LANGULUS(INLINED)
-   Image::Iterator<true> Image::begin() noexcept {
+   auto Image::begin() noexcept -> Iterator<true> {
       return {
          this,
          reinterpret_cast<const Byte*>(GetData<Traits::Color>()->GetRaw()),
@@ -177,7 +177,7 @@ namespace Langulus::A
    }
 
    LANGULUS(INLINED)
-   Image::Iterator<false> Image::begin() const noexcept {
+   auto Image::begin() const noexcept -> Iterator<false> {
       return {
          const_cast<Image*>(this),
          reinterpret_cast<const Byte*>(GetData<Traits::Color>()->GetRaw()),
@@ -191,14 +191,14 @@ namespace Langulus::A
    template<bool M> LANGULUS(INLINED)
    constexpr Image::Iterator<M>::Iterator(Image* image, Byte const* it, Byte const* end) noexcept
       : mValue {it}
-      , mEnd {end}
+      , mEnd   {end}
       , mImage {image} {}
 
    /// Construct an end iterator                                              
    template<bool M> LANGULUS(INLINED)
    constexpr Image::Iterator<M>::Iterator(const A::IteratorEnd&) noexcept
       : mValue {nullptr}
-      , mEnd {nullptr}
+      , mEnd   {nullptr}
       , mImage {nullptr} {}
 
    /// Compare two iterators                                                  

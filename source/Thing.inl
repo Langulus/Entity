@@ -599,9 +599,8 @@ namespace Langulus::Entity
                return Abandon(creator.GetOutput());
 
             Logger::Error(
-               "Failed to create `", Logger::Push, Logger::DarkYellow, 
-               type, Logger::Pop, "` in unit(s) ", Logger::Push, 
-               Logger::DarkYellow, producers, Logger::Pop,
+               "Failed to create `", Logger::PushDarkYellow, type, Logger::Pop,
+               "` in unit(s) ", Logger::PushDarkYellow, producers, Logger::Pop,
                ": ", descriptor
             );
          }
@@ -620,9 +619,8 @@ namespace Langulus::Entity
                return Abandon(creator.GetOutput());
 
             Logger::Error(
-               "Failed to create `", Logger::Push, Logger::DarkYellow,
-               type, Logger::Pop, "` in module(s) ", Logger::Push,
-               Logger::DarkYellow, producers, Logger::Pop,
+               "Failed to create `", Logger::PushDarkYellow, type, Logger::Pop,
+               "` in module(s) ", Logger::PushDarkYellow, producers, Logger::Pop,
                ": ", descriptor
             );
          }
@@ -644,9 +642,8 @@ namespace Langulus::Entity
                return Abandon(creator.GetOutput());
 
             Logger::Error(
-               "Failed to create abstract `", Logger::Push, Logger::DarkYellow,
-               type, Logger::Pop, "` in unit(s) ", Logger::Push,
-               Logger::DarkYellow, producers, Logger::Pop,
+               "Failed to create abstract `", Logger::PushDarkYellow, type, Logger::Pop,
+               "` in unit(s) ", Logger::PushDarkYellow, producers, Logger::Pop,
                ": ", descriptor
             );
          }
@@ -665,7 +662,7 @@ namespace Langulus::Entity
             return Abandon(creator.GetOutput());
          
          Logger::Error(
-            "Failed to create `", Logger::Push, Logger::DarkYellow,
+            "Failed to create `", Logger::PushDarkYellow,
             type, Logger::Pop, "` statelessly: ", descriptor
          );
       }

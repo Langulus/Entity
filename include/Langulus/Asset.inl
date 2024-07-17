@@ -104,23 +104,22 @@ namespace Langulus::A
 
    /// Commit data to an asset                                                
    ///   @attention data is always comitted, even if trait already exists     
-   ///   @tparam T - trait (a.k.a. the intent we're commiting with)           
+   ///   @tparam T - an optional trait type                                   
    ///      @attention default value leads all data to the no-trait bucket    
-   ///   @tparam B - block of data to insert (semantically or not)            
+   ///   @param content - block of data to insert (with intents or not)       
    ///      @attention you can use references to external data, but beware    
    ///         that asset data is intrinsically paired with the asset         
    ///         descriptor, and any silent change in contents might cause      
    ///         disparity and confusion in asset libraries. Still useful when  
    ///         you don't use factories, and just want some local content      
    ///         representation.                                                
-   ///   @param content - the data and semantic to commit                     
    template<CT::TraitBased T> LANGULUS(INLINED)
    void Asset::Commit(auto&& content) const {
       TMeta trait;
       if constexpr (CT::Trait<T>)
          trait = MetaTraitOf<T>();
 
-      using S = SemanticOf<decltype(content)>;
+      using S = IntentOf<decltype(content)>;
       const auto found = mDataListMap.FindIt(trait);
       if (found)
          *found.mValue << S::Nest(content);

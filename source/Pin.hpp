@@ -48,7 +48,7 @@ namespace Langulus::Entity
    /// hierarchy. Otherwise, unpinned values may change on Unit::Refresh()    
    /// When cloning, only the pinned values will be cloned                    
    ///                                                                        
-   template<CT::NotSemantic T>
+   template<CT::NoIntent T>
    struct Pin : A::Pinnable {
    protected:
       // Hierarchies are allowed to pin pinnables                       
@@ -74,10 +74,10 @@ namespace Langulus::Entity
       Pin(const Pin&) requires CT::ReferMakable<T>;
       Pin(Pin&&) requires CT::MoveMakable<T>;
       template<template<class> class S>
-      Pin(S<Pin>&&) requires CT::SemanticMakable<S, T>;
+      Pin(S<Pin>&&) requires CT::IntentMakable<S, T>;
 
-      template<CT::NotPinnable...A>
-      Pin(A&&...) requires ::std::constructible_from<T, A...>;
+      template<CT::NotPinnable...TN>
+      Pin(TN&&...) requires ::std::constructible_from<T, TN...>;
 
       ///                                                                     
       ///   Assignment                                                        
@@ -85,8 +85,7 @@ namespace Langulus::Entity
       Pin& operator = (const Pin&) requires CT::ReferAssignable<T>;
       Pin& operator = (Pin&&) requires CT::MoveAssignable<T>;
 
-      template<template<class> class S>
-      requires CT::SemanticAssignable<S, T>
+      template<template<class> class S> requires CT::IntentAssignable<S, T>
       Pin& operator = (S<Pin>&&);
 
       template<CT::NotPinnable A> requires CT::AssignableFrom<T, A>
@@ -97,8 +96,8 @@ namespace Langulus::Entity
       ///                                                                     
       NOD() bool IsLocked() const noexcept;
 
-      T&       Get();
-      T const& Get() const noexcept;
+      auto Get() -> T&;
+      auto Get() const noexcept -> T const&;
       
       template<class ALT>
       explicit operator ALT () const noexcept requires CT::Convertible<T, ALT>;
@@ -113,8 +112,8 @@ namespace Langulus::Entity
       ///   Comparison                                                        
       ///                                                                     
       bool operator == (const Pin&) const requires CT::Comparable<T, T>;
-      template<CT::NotPinnable A>
-      bool operator == (const A&) const requires CT::Comparable<T, A>;
+      template<CT::NotPinnable T1>
+      bool operator == (const T1&) const requires CT::Comparable<T, T1>;
 
       ///                                                                     
       ///   Services                                                          
