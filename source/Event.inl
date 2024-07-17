@@ -131,14 +131,14 @@ namespace Langulus
    template<class T1, class...TN> requires CT::UnfoldInsertable<T1, TN...>
    Event::Event(T1&& t1, TN&&...tn) : Event {} {
       if constexpr (sizeof...(TN) == 0 and not CT::Array<T1>) {
-         using S = SemanticOf<decltype(t1)>;
+         using S = IntentOf<decltype(t1)>;
          using T = TypeOf<S>;
 
          if constexpr (CT::EventBased<T>) {
-            mType = DesemCast(t1).mType;
-            mState = DesemCast(t1).mState;
-            mTimestamp = DesemCast(t1).mTimestamp;
-            mPayload = S::Nest(DesemCast(t1).mPayload);
+            mType = DeintCast(t1).mType;
+            mState = DeintCast(t1).mState;
+            mTimestamp = DeintCast(t1).mTimestamp;
+            mPayload = S::Nest(DeintCast(t1).mPayload);
          }
          else mPayload = Anyness::Many {Forward<T1>(t1)};
       }
@@ -163,21 +163,20 @@ namespace Langulus
       return operator = (Move(rhs));
    }
 
-   /// Unfold assignment, semantic or not                                     
-   /// If argument is event, it will be absorbed                              
+   /// Generic assignment. If argument is event, it will be absorbed          
    ///   @attention will not overwrite timestamp, unless absorbing            
-   ///   @param rhs - right hand side                                         
+   ///   @param rhs - right hand side and intent                              
    ///   @return a reference to this event                                    
    LANGULUS(INLINED)
    Event& Event::operator = (CT::UnfoldInsertable auto&& rhs) {
-      using S = SemanticOf<decltype(rhs)>;
+      using S = IntentOf<decltype(rhs)>;
       using T = TypeOf<S>;
 
       if constexpr (CT::EventBased<T>) {
-         mType = DesemCast(rhs).mType;
-         mState = DesemCast(rhs).mState;
-         mTimestamp = DesemCast(rhs).mTimestamp;
-         mPayload = S::Nest(DesemCast(rhs).mPayload);
+         mType = DeintCast(rhs).mType;
+         mState = DeintCast(rhs).mState;
+         mTimestamp = DeintCast(rhs).mTimestamp;
+         mPayload = S::Nest(DeintCast(rhs).mPayload);
       }
       else mPayload = Anyness::Many {S::Nest(rhs)};
       return *this;
