@@ -14,28 +14,37 @@ namespace Langulus::A
 {
 
    ///                                                                        
-   ///   Abstract artificial intelligence module                              
+   ///   Abstract life module                                                 
    ///                                                                        
-   struct AIModule : virtual Module {
+   struct Life : virtual Module {
       LANGULUS_BASES(Module);
-      AIModule() : Resolvable {this}, Module {nullptr} {}
+      Life() : Resolvable {this}, Module {nullptr} {}
    };
 
    ///                                                                        
-   ///   Abstract artificial intelligence unit                                
+   ///   Abstract life unit                                                   
    ///                                                                        
-   struct AIUnit : virtual Unit {
-      LANGULUS(PRODUCER) AIModule;
+   struct LifeUnit : virtual Unit {
+      LANGULUS(PRODUCER) Life;
       LANGULUS_BASES(Unit);
-      AIUnit() : Resolvable {this} {}
+      LifeUnit() : Resolvable {this} {}
    };
 
    ///                                                                        
-   ///   Abstract mind                                                        
+   ///   Abstract ecosystem                                                   
    ///                                                                        
-   struct Mind : virtual AIUnit {
-      LANGULUS_BASES(AIUnit);
-      Mind() : Resolvable {this} {}
+   struct Ecosystem : virtual LifeUnit {
+      LANGULUS_BASES(LifeUnit);
+      Ecosystem() : Resolvable {this} {}
+   };
+   
+   ///                                                                        
+   ///   Abstract organism                                                    
+   ///                                                                        
+   struct Organism : virtual LifeUnit {
+      LANGULUS(PRODUCER) Ecosystem;
+      LANGULUS_BASES(LifeUnit);
+      Organism() : Resolvable {this} {}
    };
 
 } // namespace Langulus::A
