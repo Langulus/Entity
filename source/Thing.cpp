@@ -251,7 +251,8 @@ namespace Langulus::Entity
          // This thing owns its flow, so we need to update it here      
          // This will execute any temporally based verbs and scripts    
          // Game logic basically happens in this flow                   
-         if (not mFlow->Update(deltaTime))
+         Many unsusedSideeffects;
+         if (not mFlow->Update(deltaTime, unsusedSideeffects))
             return false;
       }
 

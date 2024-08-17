@@ -72,12 +72,19 @@ namespace Langulus::Entity
       if (not parsed)
          return {};
 
-      // Push in the active flow                                        
+      // Push and execute in the active flow                            
       auto flow = GetFlow();
-      if (not flow->Push(Verbs::Do::In(this, Abandon(parsed)))) {
+      if (not flow) {
+         Logger::Error(this, ": No flow - can't Run code: ", code);
+         return {};
+      }
+
+      return flow->Push(Verbs::Do::In(this, Abandon(parsed)));
+
+      /*if (not flow->Push(Verbs::Do::In(this, Abandon(parsed)))) {
          // Couldn't push verbs - the flow probably has no future link  
          // points, or we're out of memory?                             
-         Logger::Error(this, ": Couldn't execute code: ", code);
+         Logger::Error(this, ": Flow ", *flow, " couldn't Run code: ", code);
          return {};
       }
       
@@ -88,8 +95,8 @@ namespace Langulus::Entity
       // the current flow time, you'll be technically rewriting this    
       // thing's history - the entire timeline will be reverted back,   
       // and recomputed up to now (if that's possible).                 
-      flow->Update(Time::zero());
-      return {};
+      flow->Update({});
+      return {};*/
    }
 
    /// Custom dispatcher, reflected via CT::Dispatcher                        
