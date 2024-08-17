@@ -234,24 +234,32 @@ namespace Langulus::Entity
    ///   @return verb output                                                  
    template<CT::VerbBased V>
    V& Thing::Run(V& verb) {
-      // Dispatch to entity first, using reflected and default verbs,   
-      // but disallowing custom dispatch, because we're currently in it 
-      // and there's a potential for infinite regress                   
-      if (Resolvable::Run<false>(verb).IsDone())
+      try {
+         // Dispatch to entity first, using reflected and default verbs,
+         // but disallowing custom dispatch, because we're currently in 
+         // it and there's a potential for infinite regress             
+         Resolvable::Run<false>(verb);
+      }
+      catch (...) {}
+
+      if (verb.IsDone())
          return verb;
 
       // If verb is still not satisfied, dispatch to ALL units          
       for (auto& unit : mUnitsList) {
-         V local = verb;
-         local.ShortCircuit(false);
-         unit->Run(local);
+         try {
+            V local = verb;
+            local.ShortCircuit(false);
+            unit->Run(local);
 
-         if (local.IsDone()) {
-            // The local verb may or may not have an output, but a      
-            // success should always be carried over                    
-            verb.Done();
-            verb << Abandon(local.GetOutput());
+            if (local.IsDone()) {
+               // The local verb may or may not have an output, but a   
+               // success should always be carried over                 
+               verb.Done();
+               verb << Abandon(local.GetOutput());
+            }
          }
+         catch (...) {}
       }
 
       return verb;
@@ -661,10 +669,10 @@ namespace Langulus::Entity
          if (Verbs::Create::ExecuteStateless(creator))
             return Abandon(creator.GetOutput());
          
-         Logger::Error(
+         /*Logger::Error(
             "Failed to create `", Logger::PushDarkYellow,
             type, Logger::Pop, "` statelessly: ", descriptor
-         );
+         );*/
       }
 
       LANGULUS_THROW(Construct, "Unable to create data");
