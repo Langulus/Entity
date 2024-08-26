@@ -22,8 +22,8 @@ LANGULUS_DEFINE_TRAIT(Unit,
 namespace Langulus::Entity
 {
 
-   using UnitList = TMany<Ref<A::Unit>>;
-   using UnitMap = TUnorderedMap<DMeta, TUnorderedSet<Ref<A::Unit>>>;
+   using UnitList = TMany<A::Unit*>;// Ref<A::Unit >> ;
+   using UnitMap = TUnorderedMap<DMeta, TUnorderedSet<A::Unit*>>;// Ref<A::Unit >> > ;
    using TraitMap = TUnorderedMap<TMeta, TraitList>;
 
    /// A text specialization, dedicated for natural language text             
