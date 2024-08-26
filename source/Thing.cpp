@@ -8,10 +8,10 @@
 #include "Thing.hpp"
 #include "Thing.inl"
 
-#if 0
+#if 1
    #define ENTITY_VERBOSE_ENABLED()       1
-   #define ENTITY_VERBOSE_SELF(...)       Logger::Verbose(this, ": ", __VA_ARGS__)
-   #define ENTITY_VERBOSE_SELF_TAB(...)   const auto scoped = Logger::VerboseTab(this, ": ", __VA_ARGS__)
+   #define ENTITY_VERBOSE_SELF(...)       Logger::Info(this, ": ", __VA_ARGS__)
+   #define ENTITY_VERBOSE_SELF_TAB(...)   const auto scoped = Logger::InfoTab(this, ": ", __VA_ARGS__)
    #define ENTITY_VERBOSE(...)            Logger::Append(__VA_ARGS__)
 #else
    #define ENTITY_VERBOSE_ENABLED()       0
