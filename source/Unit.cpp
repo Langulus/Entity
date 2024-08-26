@@ -12,6 +12,10 @@
 
 using namespace Langulus::A;
 
+Unit::~Unit() {
+   for (auto entity : mOwners)
+      Decouple(entity);
+}
 
 /// Default unit selection simply relays to the owner                         
 ///   @param verb - the selection verb                                        

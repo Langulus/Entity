@@ -55,6 +55,7 @@ namespace Langulus::A
       Unit() noexcept : Resolvable {this} {}
       Unit(const Unit&) = delete;
       Unit(Unit&&) noexcept = delete;
+      ~Unit();
 
       Unit& operator = (const Unit&) = delete;
       Unit& operator = (Unit&&) noexcept = delete;
