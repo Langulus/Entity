@@ -50,7 +50,7 @@ namespace Langulus::Entity
          // Search a typed trait                                        
          const auto found = mTraits.FindIt(id);
          if (found)
-            return &(*found.mValue)[index];
+            return &(found.GetValue()[index]);
          return nullptr;
       }
 
@@ -135,8 +135,8 @@ namespace Langulus::Entity
       const auto tmeta = trait.GetTrait();
       auto found = mTraits.FindIt(tmeta);
       if (found) {
-         *found.mValue << trait;
-         return &found.mValue->Last();
+         found.GetValue() << trait;
+         return &found.GetValue().Last();
       }
 
       mTraits.Insert(tmeta, trait);
@@ -151,7 +151,7 @@ namespace Langulus::Entity
    Count Thing::RemoveTrait(TMeta trait) {
       const auto found = mTraits.FindIt(trait);
       if (found) {
-         const auto removed = found.mValue->GetCount();
+         const auto removed = found.GetValue().GetCount();
          mTraits.RemoveIt(found);
          ENTITY_VERBOSE_SELF(trait, " removed");
          mRefreshRequired = true;
@@ -167,7 +167,7 @@ namespace Langulus::Entity
    Count Thing::RemoveTrait(Trait trait) {
       const auto found = mTraits.FindIt(trait.GetTrait());
       if (found) {
-         const auto removed = found.mValue->Remove(trait);
+         const auto removed = found.GetValue().Remove(trait);
          if (removed) {
             ENTITY_VERBOSE_SELF(trait, " removed");
             mRefreshRequired = true;
@@ -183,7 +183,7 @@ namespace Langulus::Entity
    ///   @return the number of matching traits                                
    Count Thing::HasTraits(TMeta trait) const {
       const auto found = mTraits.FindIt(trait);
-      return found ? found.mValue->GetCount() : 0;
+      return found ? found.GetValue().GetCount() : 0;
    }
 
    /// A fast check whether traits of the given type and value are inside     
@@ -195,7 +195,7 @@ namespace Langulus::Entity
          return 0;
 
       Count counter = 0;
-      for (auto& trait : *found.mValue) {
+      for (auto& trait : found.GetValue()) {
          if (trait == trait)
             ++counter;
       }

@@ -94,7 +94,7 @@ namespace Langulus::Entity
       auto attempts = mLibraries.GetCount();
       while (attempts) {
          for (auto library : KeepIterator(mLibraries)) {
-            if (UnloadSharedLibrary(*library.mValue))
+            if (UnloadSharedLibrary(library.GetValue()))
                library = mLibraries.RemoveIt(library);
          }
 
@@ -148,7 +148,7 @@ namespace Langulus::Entity
       VERBOSE("Registering `", type, '`');
       auto found = map.FindIt(type);
       if (found)
-         *found.mValue << module;
+         found.GetValue() << module;
       else {
          // We always prefer 'type' definition that is in the main      
          // boundary, to avoid segfaults when unloading libraries from  
@@ -180,7 +180,7 @@ namespace Langulus::Entity
 
       const auto found = map.FindIt(type);
       if (found) {
-         auto& list = *found.mValue;
+         auto& list = found.GetValue();
          if (list.Remove(module) and not list) {
             VERBOSE("Unregistering `", type, '`');
             map.RemoveIt(found);
@@ -219,7 +219,7 @@ namespace Langulus::Entity
       try {
          auto found = mModules.FindIt(info->mPriority);
          if (found)
-            *found.mValue << module;
+            found.GetValue() << module;
          else
             mModules.Insert(info->mPriority, ModuleList {module});
 
@@ -231,10 +231,11 @@ namespace Langulus::Entity
          // Make sure we end up in an invariant state                   
          auto found = mModules.FindIt(info->mPriority);
          if (found) {
-            found.mValue->Remove(module);
-            if (not *found.mValue)
+            found.GetValue().Remove(module);
+            if (not found.GetValue())
                mModules.RemoveIt(found);
          }
+
          if (not mModules)
             mModules.Reset();
 
@@ -260,7 +261,7 @@ namespace Langulus::Entity
       // Check if this library is already loaded                        
       const auto preloaded = mLibraries.FindIt(name);
       if (preloaded)
-         return *preloaded.mValue;
+         return preloaded.GetValue();
 
       // File prefix                                                    
       Path path;
@@ -432,17 +433,17 @@ namespace Langulus::Entity
       Logger::Info("Unloading module `", library.mInfo()->mName, "`...");
 
       for (auto list : KeepIterator(mModules)) {
-         for (auto mod : KeepIterator(*list.mValue)) {
+         for (auto mod : KeepIterator(list.GetValue())) {
             if (mod->Is(library.mModuleType)) {
                // Delete module instance                                
                const auto modType = mod->GetType();
                UnregisterAllBases(mModulesByType, *mod, modType);
                delete *mod;
-               mod = list.mValue->RemoveIt(mod);
+               mod = list.GetValue().RemoveIt(mod);
             }
          }
 
-         if (not *list.mValue)
+         if (not list.GetValue())
             list = mModules.RemoveIt(list);
       }
 
@@ -518,7 +519,7 @@ namespace Langulus::Entity
    const ModuleList& Runtime::GetModules(DMeta type) const noexcept {
       auto found = mModulesByType.FindIt(type);
       if (found)
-         return *found.mValue;
+         return found.GetValue();
 
       static const ModuleList emptyFallback {};
       return emptyFallback;

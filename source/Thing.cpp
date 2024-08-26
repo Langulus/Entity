@@ -316,11 +316,11 @@ namespace Langulus::Entity
       if (id) {
          // Search a typed trait                                        
          const auto found = mUnitsAmbiguous.FindIt(id);
-         return found ? (*found.mValue)[index]/*.Get()*/ : nullptr;
+         return found ? found.GetValue()[index] : nullptr;
       }
 
       // Get unit by index only                                         
-      return mUnitsList[index]/*.Get()*/;
+      return mUnitsList[index];
    }
 
    const A::Unit* Thing::GetUnitMeta(DMeta type, Index offset) const {
@@ -339,18 +339,16 @@ namespace Langulus::Entity
          // Search a typed unit                                         
          const auto found = mUnitsAmbiguous.FindIt(meta);
          if (found) {
-            auto& bucket = *found.mValue;
+            auto& bucket = found.GetValue();
             if (not what)
-               return bucket[index]/*.Get()*/;
+               return bucket[index];
 
             // Check all units in that bucket for required properties   
             for (auto& unit : bucket) {
                if (unit->CompareDescriptor(what)) {
                   // Match found                                        
-                  if (index == 0)
-                     return unit/*.Get()*/;
-                  else
-                     --index;
+                  if (index == 0) return unit;
+                  else --index;
                }
             }
          }
@@ -360,10 +358,8 @@ namespace Langulus::Entity
          for (auto& unit : mUnitsList) {
             if (unit->CompareDescriptor(what)) {
                // Match found                                           
-               if (index == 0)
-                  return unit/*.Get()*/;
-               else
-                  --index;
+               if (index == 0) return unit;
+               else --index;
             }
          }
       }
@@ -458,7 +454,7 @@ namespace Langulus::Entity
    ///   @return the number of matching units                                 
    Count Thing::HasUnits(DMeta type) const {
       const auto found = mUnitsAmbiguous.FindIt(type);
-      return found ? found.mValue->GetCount() : 0;
+      return found ? found.GetValue().GetCount() : 0;
    }
 
    /// Check if all units in the hierarchy require a Refresh() call           

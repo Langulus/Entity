@@ -94,7 +94,7 @@ namespace Langulus::A
          return nullptr;
 
       const auto found = mDataListMap.FindIt(trait);
-      return found ? found.mValue : nullptr;
+      return found ? &found.GetValue() : nullptr;
    }
 
    LANGULUS(INLINED)
@@ -122,7 +122,7 @@ namespace Langulus::A
       using S = IntentOf<decltype(content)>;
       const auto found = mDataListMap.FindIt(trait);
       if (found)
-         *found.mValue << S::Nest(content);
+         found.GetValue() << S::Nest(content);
       else
          mDataListMap.Insert(trait, S::Nest(content));
    }
