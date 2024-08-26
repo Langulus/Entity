@@ -37,7 +37,7 @@ namespace Langulus::Entity
          if (found) {
             auto& list = mUnitsAmbiguous.GetValue(found);
             for (auto& unit : list)
-               result << unit.Get();
+               result << unit/*.Get()*/;
          }
       }
 

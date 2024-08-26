@@ -316,11 +316,11 @@ namespace Langulus::Entity
       if (id) {
          // Search a typed trait                                        
          const auto found = mUnitsAmbiguous.FindIt(id);
-         return found ? (*found.mValue)[index].Get() : nullptr;
+         return found ? (*found.mValue)[index]/*.Get()*/ : nullptr;
       }
 
       // Get unit by index only                                         
-      return mUnitsList[index].Get();
+      return mUnitsList[index]/*.Get()*/;
    }
 
    const A::Unit* Thing::GetUnitMeta(DMeta type, Index offset) const {
@@ -341,14 +341,14 @@ namespace Langulus::Entity
          if (found) {
             auto& bucket = *found.mValue;
             if (not what)
-               return bucket[index].Get();
+               return bucket[index]/*.Get()*/;
 
             // Check all units in that bucket for required properties   
             for (auto& unit : bucket) {
                if (unit->CompareDescriptor(what)) {
                   // Match found                                        
                   if (index == 0)
-                     return unit.Get();
+                     return unit/*.Get()*/;
                   else
                      --index;
                }
@@ -361,7 +361,7 @@ namespace Langulus::Entity
             if (unit->CompareDescriptor(what)) {
                // Match found                                           
                if (index == 0)
-                  return unit.Get();
+                  return unit/*.Get()*/;
                else
                   --index;
             }
