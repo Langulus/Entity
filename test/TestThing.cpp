@@ -148,7 +148,12 @@ SCENARIO("Testing Thing", "[thing]") {
             auto it = root.GetUnits().begin();
             REQUIRE(it->GetType() == MetaOf<TestUnit1>());
             REQUIRE(*it == unit.As<TestUnit1*>());
+
+            // Kept once in `unit`                                      
+            // Kept once in root.mUnitsList                             
+            // Kept once in root.mUnitsAmbiguous                        
             REQUIRE(unit.GetUses() == 3);
+
             REQUIRE(Fractalloc::Instance.Find({}, unit.As<TestUnit1*>())->GetUses() == 3);
             REQUIRE(unit.As<TestUnit1*>()->Reference(0) == 3);
             REQUIRE(Fractalloc::Instance.Find({}, unit.As<TestUnit1*>())->GetUses() == 3);
