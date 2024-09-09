@@ -16,6 +16,10 @@
 #include "../include/Langulus/Physical.hpp"
 #include "../include/Langulus/Platform.hpp"
 #include "../include/Langulus/UI.hpp"
+#include "../include/Langulus/AI.hpp"
+#include "../include/Langulus/Input.hpp"
+#include "../include/Langulus/Life.hpp"
+#include "../include/Langulus/Network.hpp"
 
 #if LANGULUS_OS(WINDOWS)
    #include <Windows.h>
@@ -76,12 +80,24 @@ namespace Langulus::Entity
       // boundary, to avoid segfaults when unloading libraries from     
       // mModulesByType - it is indexed by a DMeta                      
       // So we make sure that the base modules are defined here         
-      (void)MetaDataOf<A::PlatformModule>();
+      /*(void)MetaDataOf<A::PlatformModule>();
       (void)MetaDataOf<A::PhysicalModule>();
       (void)MetaDataOf<A::UI::Module>();
       (void)MetaDataOf<A::FileSystem>();
       (void)MetaDataOf<A::GraphicsModule>();
       (void)MetaDataOf<A::AssetModule>();
+      (void)MetaDataOf<A::AIModule>();
+      (void)MetaDataOf<A::Mind>();
+      (void)MetaDataOf<A::InputModule>();
+      (void)MetaDataOf<A::InputGatherer>();
+      (void)MetaDataOf<A::InputListener>();
+      (void)MetaDataOf<A::Life>();
+      (void)MetaDataOf<A::Ecosystem>();
+      (void)MetaDataOf<A::Organism>();
+      (void)MetaDataOf<A::Network>();
+      (void)MetaDataOf<A::Client>();
+      (void)MetaDataOf<A::Server>();
+      (void)MetaDataOf<A::Shared>();*/
       VERBOSE(this, ": Initialized");
    }
 
