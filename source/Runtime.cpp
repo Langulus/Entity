@@ -80,7 +80,7 @@ namespace Langulus::Entity
       // boundary, to avoid segfaults when unloading libraries from     
       // mModulesByType - it is indexed by a DMeta                      
       // So we make sure that the base modules are defined here         
-      /*(void)MetaDataOf<A::PlatformModule>();
+      (void)MetaDataOf<A::PlatformModule>();
       (void)MetaDataOf<A::PhysicalModule>();
       (void)MetaDataOf<A::UI::Module>();
       (void)MetaDataOf<A::FileSystem>();
@@ -97,7 +97,7 @@ namespace Langulus::Entity
       (void)MetaDataOf<A::Network>();
       (void)MetaDataOf<A::Client>();
       (void)MetaDataOf<A::Server>();
-      (void)MetaDataOf<A::Shared>();*/
+      (void)MetaDataOf<A::Shared>();
       VERBOSE(this, ": Initialized");
    }
 
