@@ -16,7 +16,7 @@ class TestUnit1 final : public A::Unit {
 public:
    LANGULUS(ABSTRACT) false;
    LANGULUS_BASES(Unit);
-   IF_LANGULUS_MANAGED_MEMORY(LANGULUS(POOL_TACTIC) RTTI::PoolTactic::Type);
+   LANGULUS(POOL_TACTIC) RTTI::PoolTactic::Type;
 
    TestUnit1() : Resolvable {this} {}
 
@@ -37,7 +37,7 @@ class TestUnit2 final : public A::Unit {
 public:
    LANGULUS(ABSTRACT) false;
    LANGULUS_BASES(Unit);
-   IF_LANGULUS_MANAGED_MEMORY(LANGULUS(POOL_TACTIC) RTTI::PoolTactic::Type);
+   LANGULUS(POOL_TACTIC) RTTI::PoolTactic::Type;
 
    TestUnit2() : Resolvable {this} {}
 

@@ -54,7 +54,7 @@ namespace Langulus::Entity
       LANGULUS(UNINSERTABLE) false;
       LANGULUS_BASES(Resolvable);
       LANGULUS_VERBS(Verbs::Create, Verbs::Select);
-      IF_LANGULUS_MANAGED_MEMORY(LANGULUS(POOL_TACTIC) RTTI::PoolTactic::Type);
+      LANGULUS(POOL_TACTIC) RTTI::PoolTactic::Type;
 
    protected:
       LANGULUS_API(ENTITY) void ResetRuntime(Runtime*);
