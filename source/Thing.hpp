@@ -22,19 +22,9 @@ LANGULUS_DEFINE_TRAIT(Unit,
 namespace Langulus::Entity
 {
 
-   using UnitList = TMany<A::Unit*>;// Ref<A::Unit >> ;
-   using UnitMap = TUnorderedMap<DMeta, TUnorderedSet<A::Unit*>>;// Ref<A::Unit >> > ;
+   using UnitList = TMany<A::Unit*>;
+   using UnitMap = TUnorderedMap<DMeta, TUnorderedSet<A::Unit*>>;
    using TraitMap = TUnorderedMap<TMeta, TraitList>;
-
-   /// A text specialization, dedicated for natural language text             
-   /// It is a placeholder type, that can be extended by external modules     
-   struct Lingua : Text {
-      LANGULUS(ABSTRACT) true;
-      LANGULUS_CONVERTS_FROM();
-
-   private:
-      using Text::SerializationRules;
-   };
 
 
    ///                                                                        
@@ -123,7 +113,7 @@ namespace Langulus::Entity
       template<CT::VerbBased V>
       V& Run(V&);
 
-      LANGULUS_API(ENTITY) Many Run(const Lingua&);
+      LANGULUS_API(ENTITY) Many Say(const Text&);
       LANGULUS_API(ENTITY) Many Run(const Code&);
 
       LANGULUS_API(ENTITY) bool Update(Time);
