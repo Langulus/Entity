@@ -10,54 +10,31 @@
 #include <Flow/Verbs/Conjunct.hpp>
 
 #if 0
-   #define ENTITY_VERBOSE_ENABLED()             1
-   #define ENTITY_VERBOSE_SELF(...)             Logger::Verbose(this, ": ", __VA_ARGS__)
-   #define ENTITY_VERBOSE_SELF_TAB(...)         const auto scoped = Logger::VerboseTab(this, ": ", __VA_ARGS__)
-   #define ENTITY_VERBOSE(...)                  Logger::Append(__VA_ARGS__)
-   #define ENTITY_CREATION_VERBOSE_SELF(...)    Logger::Verbose(Self(), __VA_ARGS__)
-   #define ENTITY_SELECTION_VERBOSE_SELF(...)   Logger::Verbose(Self(), __VA_ARGS__)
+   #define SELECT_VERBOSE_SELF(...)   Logger::Verbose(Self(), __VA_ARGS__)
 #else
-   #define ENTITY_VERBOSE_ENABLED()             0
-   #define ENTITY_VERBOSE_SELF(...)             LANGULUS(NOOP)
-   #define ENTITY_VERBOSE_SELF_TAB(...)         LANGULUS(NOOP)
-   #define ENTITY_VERBOSE(...)                  LANGULUS(NOOP)
-   #define ENTITY_CREATION_VERBOSE_SELF(...)    LANGULUS(NOOP)
-   #define ENTITY_SELECTION_VERBOSE_SELF(...)   LANGULUS(NOOP)
+   #define SELECT_VERBOSE_SELF(...)   LANGULUS(NOOP)
 #endif
 
 
 namespace Langulus::Entity
 {
 
-   /// Find an AIAD component that can process speech and interpret using it  
-   /// This function completely relies on external modules                    
+   /// Interpret and execute a natural message wherever possible in the       
+   /// current context                                                        
    ///   @param text - text to execute                                        
    ///   @return the results of the execution                                 
-   Many Thing::Run(const Lingua& text) {
+   Many Thing::Say(const Text& text) {
       if (not text)
          return {};
 
-      // Message is still contextless, we don't know where exactly to   
-      // interpret it, so create message objects from the hierarchy,    
-      // and try interpreting those to executable temporals             
-      // Each trained AI in the hierarchy will produce its own          
-      // interpretation                                                 
-      auto messages = CreateData(
-         Construct::From<Lingua>(static_cast<const Text&>(text)));
-
-      Verbs::InterpretAs<Flow::Temporal> interpreter;
-      if (not Flow::DispatchFlat(messages, interpreter)) {  
-         Logger::Error("Messages failed to interpret to temporal: ", messages);
+      // Push and execute in the active flow                            
+      auto flow = GetFlow();
+      if (not flow) {
+         Logger::Error(this, ": No flow - can't execute message: ", text);
          return {};
       }
 
-      // Execute the resulting scopes                                   
-      Many results;
-      interpreter->ForEach([&](const Flow::Temporal& scope) {
-         results << Resolvable::Run(scope);
-      });
-
-      return Abandon(results);
+      return flow->Push(Verbs::Do::In(this, text));
    }
    
    /// Executes a piece of code in the current context                        
@@ -80,23 +57,6 @@ namespace Langulus::Entity
       }
 
       return flow->Push(Verbs::Do::In(this, Abandon(parsed)));
-
-      /*if (not flow->Push(Verbs::Do::In(this, Abandon(parsed)))) {
-         // Couldn't push verbs - the flow probably has no future link  
-         // points, or we're out of memory?                             
-         Logger::Error(this, ": Flow ", *flow, " couldn't Run code: ", code);
-         return {};
-      }
-      
-      // Flow has changed, update it as if no time has passed, in order 
-      // to execute any newly added parts, if in the proper time        
-      // context. Anything produced as a side-effect will be returned.  
-      // @attention, if you push a command that has time context before 
-      // the current flow time, you'll be technically rewriting this    
-      // thing's history - the entire timeline will be reverted back,   
-      // and recomputed up to now (if that's possible).                 
-      flow->Update({});
-      return {};*/
    }
 
    /// Custom dispatcher, reflected via CT::Dispatcher                        
@@ -179,7 +139,7 @@ namespace Langulus::Entity
                         auto element = part.GetElementResolved(i);
                         Verbs::Select selector {element};
                         if (not Flow::DispatchFlat(unitBlock, selector)) {
-                           // Abort on first failure                       
+                           // Abort on first failure                    
                            localMismatch = true;
                            return Loop::Break;
                         }
@@ -220,19 +180,19 @@ namespace Langulus::Entity
       if (not mismatch) {
          // We're not seeking an entity, but components/traits          
          if (selectedTraits) {
-            ENTITY_SELECTION_VERBOSE_SELF(Logger::Green,
+            SELECT_VERBOSE_SELF(Logger::Green,
                "Trait(s) selected: ", selectedTraits);
             verb << selectedTraits;
          }
 
          if (selectedUnits) {
-            ENTITY_SELECTION_VERBOSE_SELF(Logger::Green,
+            SELECT_VERBOSE_SELF(Logger::Green,
                "Unit(s) selected: ", selectedUnits);
             verb << selectedUnits;
          }
 
          if (selectedEntities) {
-            ENTITY_SELECTION_VERBOSE_SELF(Logger::Green,
+            SELECT_VERBOSE_SELF(Logger::Green,
                "Entity(s) selected: ", selectedEntities);
             verb << selectedEntities;
          }
