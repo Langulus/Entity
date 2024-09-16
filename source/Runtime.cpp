@@ -20,6 +20,7 @@
 #include "../include/Langulus/Input.hpp"
 #include "../include/Langulus/Life.hpp"
 #include "../include/Langulus/Network.hpp"
+#include "../include/Langulus/User.hpp"
 
 #if LANGULUS_OS(WINDOWS)
    #include <Windows.h>
@@ -98,6 +99,8 @@ namespace Langulus::Entity
       (void)MetaDataOf<A::Client>();
       (void)MetaDataOf<A::Server>();
       (void)MetaDataOf<A::Shared>();
+      (void)MetaDataOf<A::UserModule>();
+      (void)MetaDataOf<A::User>();
       VERBOSE(this, ": Initialized");
    }
 
