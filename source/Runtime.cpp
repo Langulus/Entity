@@ -77,6 +77,18 @@ namespace Langulus::Entity
    Runtime::Runtime(Thing* owner) noexcept
       : mOwner {owner} {
       VERBOSE(this, ": Initializing...");
+
+      // Reflect fundamentals                                           
+      (void) MetaDataOf<A::Number>();
+      (void) MetaDataOf<A::Integer>();
+      (void) MetaDataOf<A::Signed>();
+      (void) MetaDataOf<A::Unsigned>();
+      (void) MetaDataOf<A::UnsignedInteger>();
+      (void) MetaDataOf<A::Real>();
+      (void) MetaDataOf<A::SignedInteger>();
+      (void) MetaDataOf<A::Char>();
+      (void) MetaDataOf<A::Bool>();
+
       // We always prefer 'type' definitions that are in the main       
       // boundary, to avoid segfaults when unloading libraries from     
       // mModulesByType - it is indexed by a DMeta                      
