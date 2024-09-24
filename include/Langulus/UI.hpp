@@ -10,59 +10,59 @@
 #include "../Entity/Module.hpp"
 
 
-namespace Langulus::A::UI
+namespace Langulus::A
 {
 
    ///                                                                        
    ///   Abstract UI module                                                   
    ///                                                                        
-   struct Module : virtual A::Module {
+   struct UIModule : virtual A::Module {
       LANGULUS_BASES(A::Module);
-      Module() : Resolvable {this}, A::Module {nullptr} {}
+      UIModule() : Resolvable {this}, A::Module {nullptr} {}
    };
 
    ///                                                                        
    ///   Abstract UI unit                                                     
    ///                                                                        
-   struct Unit : virtual A::Unit {
-      LANGULUS(PRODUCER) UI::Module;
+   struct UIUnit : virtual A::Unit {
+      LANGULUS(PRODUCER) UIModule;
       LANGULUS_BASES(A::Unit);
-      Unit() : Resolvable {this} {}
+      UIUnit() : Resolvable {this} {}
    };
 
    ///                                                                        
    ///   Abstract UI system                                                   
    ///                                                                        
-   struct System : virtual UI::Unit {
-      LANGULUS_BASES(UI::Unit);
-      System() : Resolvable {this} {}
+   struct UISystem : virtual UIUnit {
+      LANGULUS_BASES(UIUnit);
+      UISystem() : Resolvable {this} {}
    };
 
    ///                                                                        
    ///   Abstract UI button                                                   
    ///                                                                        
-   struct Button : virtual UI::Unit {
-      LANGULUS(PRODUCER) UI::System;
-      LANGULUS_BASES(UI::Unit);
-      Button() : Resolvable {this} {}
+   struct UIButton : virtual UIUnit {
+      LANGULUS(PRODUCER) UISystem;
+      LANGULUS_BASES(UIUnit);
+      UIButton() : Resolvable {this} {}
    };
 
    ///                                                                        
    ///   Abstract UI text field                                               
    ///                                                                        
-   struct Text : virtual UI::Unit {
-      LANGULUS(PRODUCER) UI::System;
-      LANGULUS_BASES(UI::Unit);
-      Text() : Resolvable {this} {}
+   struct UILabel : virtual UIUnit {
+      LANGULUS(PRODUCER) UISystem;
+      LANGULUS_BASES(UIUnit);
+      UILabel() : Resolvable {this} {}
    };
 
    ///                                                                        
    ///   Abstract UI input field                                              
    ///                                                                        
-   struct Input : virtual UI::Unit {
-      LANGULUS(PRODUCER) UI::System;
-      LANGULUS_BASES(UI::Unit);
-      Input() : Resolvable {this} {}
+   struct UIInput : virtual UIUnit {
+      LANGULUS(PRODUCER) UISystem;
+      LANGULUS_BASES(UIUnit);
+      UIInput() : Resolvable {this} {}
    };
 
-} // namespace Langulus::A::UI
+} // namespace Langulus::A
