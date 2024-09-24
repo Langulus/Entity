@@ -82,25 +82,64 @@ namespace Langulus::Entity
       // mModulesByType - it is indexed by a DMeta                      
       // So we make sure that the base modules are defined here         
       (void)MetaDataOf<A::PlatformModule>();
+      (void)MetaDataOf<A::Platform>();
+      (void)MetaDataOf<A::Window>();
+      (void)MetaDataOf<A::Cursor>();
+
       (void)MetaDataOf<A::PhysicalModule>();
-      (void)MetaDataOf<A::UI::Module>();
+      (void)MetaDataOf<A::Physical>();
+      (void)MetaDataOf<A::World>();
+      (void)MetaDataOf<A::Instance>();
+
+      (void)MetaDataOf<A::UIModule>();
+      (void)MetaDataOf<A::UIUnit>();
+      (void)MetaDataOf<A::UISystem>();
+      (void)MetaDataOf<A::UIButton>();
+      (void)MetaDataOf<A::UILabel>();
+      (void)MetaDataOf<A::UIInput>();
+
       (void)MetaDataOf<A::FileSystem>();
+      (void)MetaDataOf<A::File>();
+      (void)MetaDataOf<A::Folder>();
+
       (void)MetaDataOf<A::GraphicsModule>();
+      (void)MetaDataOf<A::Graphics>();
+      (void)MetaDataOf<A::Renderer>();
+      (void)MetaDataOf<A::Layer>();
+      (void)MetaDataOf<A::Camera>();
+      (void)MetaDataOf<A::Renderable>();
+      (void)MetaDataOf<A::Light>();
+
       (void)MetaDataOf<A::AssetModule>();
+      (void)MetaDataOf<A::Asset>();
+      (void)MetaDataOf<A::Image>();
+      (void)MetaDataOf<A::Font>();
+      (void)MetaDataOf<A::Material>();
+      (void)MetaDataOf<A::Mesh>();
+
       (void)MetaDataOf<A::AIModule>();
+      (void)MetaDataOf<A::AIUnit>();
       (void)MetaDataOf<A::Mind>();
+
       (void)MetaDataOf<A::InputModule>();
+      (void)MetaDataOf<A::Input>();
       (void)MetaDataOf<A::InputGatherer>();
       (void)MetaDataOf<A::InputListener>();
+
       (void)MetaDataOf<A::Life>();
+      (void)MetaDataOf<A::LifeUnit>();
       (void)MetaDataOf<A::Ecosystem>();
       (void)MetaDataOf<A::Organism>();
+
       (void)MetaDataOf<A::Network>();
+      (void)MetaDataOf<A::NetworkUnit>();
       (void)MetaDataOf<A::Client>();
       (void)MetaDataOf<A::Server>();
       (void)MetaDataOf<A::Shared>();
+
       (void)MetaDataOf<A::UserModule>();
       (void)MetaDataOf<A::User>();
+
       VERBOSE(this, ": Initialized");
    }
 
