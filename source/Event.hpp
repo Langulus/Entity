@@ -137,10 +137,10 @@ namespace Langulus
             EVENT() : Event {} { \
                mType = MetaOf<EVENT>(); \
             } \
-            EVENT(Describe&& desc) { \
+            EVENT(Describe descriptor) { \
                mType = MetaOf<EVENT>(); \
-               desc->ExtractData(mState); \
-               desc->ExtractTrait<Traits::Data>(mPayload); \
+               descriptor->ExtractData(mState); \
+               descriptor->ExtractTrait<Traits::Data>(mPayload); \
             } \
             template<class... T_> \
             EVENT(EventState state, T_&&...a) : Event {Forward<T_>(a)...} { \
@@ -162,10 +162,10 @@ namespace Langulus
             EVENT() : Event {} { \
                mType = MetaOf<EVENT>(); \
             } \
-            EVENT(Describe&& desc) { \
+            EVENT(Describe descriptor) { \
                mType = MetaOf<EVENT>(); \
-               desc->ExtractData(mState); \
-               desc->ExtractTrait<Traits::Data>(mPayload); \
+               descriptor->ExtractData(mState); \
+               descriptor->ExtractTrait<Traits::Data>(mPayload); \
             } \
             template<class... T_> \
             EVENT(EventState state, T_&&...a) : Event {Forward<T_>(a)...} { \
