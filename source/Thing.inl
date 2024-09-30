@@ -572,6 +572,7 @@ namespace Langulus::Entity
       const auto type = construct.GetType();
       const auto producer = type and type->mProducerRetriever
          ? type->mProducerRetriever() : nullptr;
+
       ENTITY_VERBOSE_SELF(
          "Acting as producer context for making `", 
          type, "` (at ", Reference(0), " references)"
@@ -581,13 +582,17 @@ namespace Langulus::Entity
       // already added - it will be stripped later, when normalizing    
       // the descriptor when producing the item from a factory          
       Construct descriptor {construct};
-      if (not descriptor.GetDescriptor().Get<Traits::Parent>()) {
-         descriptor << Traits::Parent {this};
+      Traits::Parent parent;
+      if (not descriptor->ExtractTrait<Traits::Parent>(parent)) {
+         parent = this;
+         parent.MakeMissing();
+         descriptor << parent;
          ENTITY_VERBOSE_SELF(
-            "Referenced as Traits::Parent (now at ", Reference(0),
-            " references)"
+            "Referenced as Traits::Parent (now at ",
+            Reference(0), " references)"
          );
       }
+      else parent << this;
 
       if (producer) {
          // Data has a specific producer, we can narrow the required    
