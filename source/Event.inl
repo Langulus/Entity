@@ -119,7 +119,7 @@ namespace Langulus
    /// Descriptor-construction                                                
    ///   @param other - event properties and payload to move                  
    LANGULUS(INLINED)
-   Event::Event(Describe&& desc) : Event {} {
+   Event::Event(Describe desc) : Event {} {
       LANGULUS_ASSERT(desc->ExtractData(mType), Construct, "Invalid event");
       desc->ExtractData(mState);
       desc->ExtractTrait<Traits::Data>(mPayload);
@@ -140,9 +140,9 @@ namespace Langulus
             mTimestamp = DeintCast(t1).mTimestamp;
             mPayload = S::Nest(DeintCast(t1).mPayload);
          }
-         else mPayload = Anyness::Many {Forward<T1>(t1)};
+         else mPayload = Many {Forward<T1>(t1)};
       }
-      else mPayload = Anyness::Many {Forward<T1>(t1), Forward<TN>(tn)...};
+      else mPayload = Many {Forward<T1>(t1), Forward<TN>(tn)...};
    }
 
    /// Refer-assignment                                                       
@@ -178,7 +178,7 @@ namespace Langulus
          mTimestamp = DeintCast(rhs).mTimestamp;
          mPayload = S::Nest(DeintCast(rhs).mPayload);
       }
-      else mPayload = Anyness::Many {S::Nest(rhs)};
+      else mPayload = Many {S::Nest(rhs)};
       return *this;
    }
 

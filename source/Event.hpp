@@ -69,6 +69,8 @@ namespace Langulus
    ///   Events are often used as arguments for Verbs::Interact               
    ///                                                                        
    struct Event {
+      using Many = Anyness::Many;
+
       LANGULUS_CONVERTS_TO(Anyness::Text);
 
       // Event type                                                     
@@ -88,7 +90,7 @@ namespace Langulus
       Event(Event&&);
       template<class T1, class...TN> requires CT::UnfoldInsertable<T1, TN...>
       Event(T1&&, TN&&...);
-      Event(Describe&&);
+      Event(Describe);
 
       ///                                                                     
       ///   Assignment                                                        
