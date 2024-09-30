@@ -133,7 +133,7 @@ namespace Langulus::Entity
             for (auto& unit : selectedUnits) {
                bool localMismatch = false;
                auto unitBlock = unit->GetBlock();
-               construct.GetDescriptor().ForEach(
+               construct->ForEach(
                   [&](const Many& part) {
                      for (Offset i = 0; i < part.GetCount(); ++i) {
                         auto element = part.GetElementResolved(i);
