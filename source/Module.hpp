@@ -60,7 +60,6 @@ namespace Langulus::A
    ///                                                                        
    class Module : public virtual Resolvable {
       LANGULUS(PRODUCER) Entity::Runtime;
-      LANGULUS(UNINSERTABLE) false;
       LANGULUS_BASES(Resolvable);
 
    private:
