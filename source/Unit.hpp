@@ -35,7 +35,6 @@ namespace Langulus::A
       #endif
       , Entity::SeekInterface<Unit>
    {
-      LANGULUS(UNINSERTABLE) false;
       LANGULUS_BASES(Resolvable);
 
    protected:

@@ -41,10 +41,9 @@ namespace Langulus::Entity
    {
       LANGULUS(ABSTRACT) false;
       LANGULUS(PRODUCER) Thing;
-      LANGULUS(UNINSERTABLE) false;
+      LANGULUS(POOL_TACTIC) RTTI::PoolTactic::Type;
       LANGULUS_BASES(Resolvable);
       LANGULUS_VERBS(Verbs::Create, Verbs::Select);
-      LANGULUS(POOL_TACTIC) RTTI::PoolTactic::Type;
 
    protected:
       LANGULUS_API(ENTITY) void ResetRuntime(Runtime*);
