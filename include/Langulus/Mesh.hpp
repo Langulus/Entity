@@ -20,6 +20,8 @@ namespace Langulus
    ///   Vertex/index buffer view                                             
    ///                                                                        
    struct MeshView {
+      using MapModeType = Math::MapModeType;
+
       // Number of primitives                                           
       uint32_t mPrimitiveCount = 0;
       // Starting primitive                                             
@@ -33,11 +35,11 @@ namespace Langulus
       // Double-sidedness                                               
       bool mBilateral = false;
       // Texture mapping mode                                           
-      Math::MapModeType mTextureMapping = Math::MapModeType::Auto;
+      MapModeType mTextureMapping = MapModeType::Auto;
 
       bool operator == (const MeshView&) const noexcept;
 
-      NOD() MeshView Decay() const;
+      NOD() auto Decay() const -> MeshView;
       NOD() Hash GetHash() const noexcept;
    };
    
@@ -51,6 +53,9 @@ namespace Langulus::A
    ///                                                                        
    struct Mesh : Asset {
    protected:
+      using MapModeType = Math::MapModeType;
+      using Vec2u = Math::Vec2u;
+      using Vec3u = Math::Vec3u;
       MeshView mView;
 
    public:
@@ -58,32 +63,32 @@ namespace Langulus::A
       Mesh() : Resolvable {this} {}
 
       template<CT::Topology, CT::Topology...>
-      NOD() bool CheckTopology() const;
-      NOD() DMeta GetTopology() const noexcept;
-      NOD() Math::MapModeType GetTextureMapper() const noexcept;
+      NOD() bool CheckTopology()    const;
+      NOD() auto GetTopology()      const noexcept -> DMeta;
+      NOD() auto GetTextureMapper() const noexcept -> MapModeType;
 
-      NOD() MeshView const& GetView() const noexcept;
-      NOD() MeshView&       GetView() noexcept;
+      NOD() auto GetView() const noexcept -> MeshView const&;
+      NOD() auto GetView()       noexcept -> MeshView&;
 
       NOD() virtual Ref<Mesh> GetLOD(const Math::LOD&) const = 0;
 
       // Point utilities                                                
       NOD() bool MadeOfPoints() const noexcept;
-      NOD() Count GetPointCount() const;
+      NOD() auto GetPointCount() const -> Count;
       template<CT::Trait>
       NOD() Many GetPointTrait(Offset) const;
 
       // Line utilities                                                 
       NOD() bool MadeOfLines() const noexcept;
-      NOD() Count GetLineCount() const;
-      NOD() Math::Vec2u GetLineIndices(Offset) const;
+      NOD() auto GetLineCount() const -> Count;
+      NOD() auto GetLineIndices(Offset) const -> Vec2u;
       template<CT::Trait>
       NOD() Many GetLineTrait(Offset) const;
 
       // Triangle utilities                                             
       NOD() bool MadeOfTriangles() const noexcept;
-      NOD() Count GetTriangleCount() const;
-      NOD() Math::Vec3u GetTriangleIndices(Offset) const;
+      NOD() auto GetTriangleCount() const -> Count;
+      NOD() auto GetTriangleIndices(Offset) const -> Vec3u;
       template<CT::Trait>
       NOD() Many GetTriangleTrait(Offset) const;
 
@@ -93,8 +98,8 @@ namespace Langulus::A
       Count ForEachVertex(auto&&) const;
 
    protected:
-      NOD() Math::Vec2u InnerGetIndices(const Data*, const Math::Vec2u&) const;
-      NOD() Math::Vec3u InnerGetIndices(const Data*, const Math::Vec3u&) const;
+      NOD() Vec2u InnerGetIndices(const Data*, const Vec2u&) const;
+      NOD() Vec3u InnerGetIndices(const Data*, const Vec3u&) const;
 
       template<bool INDEXED, class...T>
       Count ForEachVertexInner(Types<T...>, auto&& call) const;
@@ -105,10 +110,10 @@ namespace Langulus::A
       template<CT::Trait T>
       T ForEachVertex_PrepareIndexStream() const;
 
-      template<CT::Topology T>
+      template<CT::Topology>
       auto PickVertex(Offset i, const CT::Trait auto& data, const CT::Trait auto& indices) const;
 
-      template<CT::Topology T, size_t...STREAM_ID>
+      template<CT::Topology, size_t...STREAM_ID>
       auto GenerateVertex(Offset i, const auto& data, const auto& indices, std::index_sequence<STREAM_ID...>&&) const;
    };
 

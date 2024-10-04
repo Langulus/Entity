@@ -30,7 +30,7 @@ namespace Langulus
    /// Decay the geometry view to a list of points                            
    ///   @return the decayed view                                             
    LANGULUS(INLINED)
-   MeshView MeshView::Decay() const {
+   auto MeshView::Decay() const -> MeshView {
       LANGULUS_ASSERT(mPrimitiveCount and mTopology, Convert, "Bad vertex view");
       if (mTopology->template Is<A::Point>())
          return *this;
@@ -77,14 +77,14 @@ namespace Langulus::A
    /// Get the topology of the geometry                                       
    ///   @return the topology type                                            
    LANGULUS(INLINED)
-   DMeta Mesh::GetTopology() const noexcept {
+   auto Mesh::GetTopology() const noexcept -> DMeta {
       return mView.mTopology;
    }
    
    /// Get the texture mapping mode                                           
    ///   @return the texture mapping mode                                     
    LANGULUS(INLINED)
-   Math::MapModeType Mesh::GetTextureMapper() const noexcept {
+   auto Mesh::GetTextureMapper() const noexcept -> MapModeType {
       return mView.mTextureMapping;
    }
 
@@ -100,14 +100,14 @@ namespace Langulus::A
    /// Get the geometry view (const)                                          
    ///   @return the geometry view                                            
    LANGULUS(INLINED)
-   const MeshView& Mesh::GetView() const noexcept {
+   auto Mesh::GetView() const noexcept -> const MeshView& {
       return mView;
    }
 
    /// Get the geometry view                                                  
    ///   @return the geometry view                                            
    LANGULUS(INLINED)
-      MeshView& Mesh::GetView() noexcept {
+   auto Mesh::GetView() noexcept -> MeshView& {
       return mView;
    }
 
@@ -115,7 +115,7 @@ namespace Langulus::A
    ///   @param indices - index buffer                                        
    ///   @param where - line indices                                          
    ///   @return the (eventually indirected) line indices                     
-   inline Math::Vec2u Mesh::InnerGetIndices(const Data* indices, const Math::Vec2u& where) const {
+   inline auto Mesh::InnerGetIndices(const Data* indices, const Vec2u& where) const -> Vec2u {
       if (not indices or not *indices)
          return where;
 
@@ -142,14 +142,15 @@ namespace Langulus::A
          };
       }
 
-      LANGULUS_THROW(Access, "Trying to get index from incompatible index buffer");
+      LANGULUS_THROW(Access,
+         "Trying to get index from incompatible index buffer");
    }
 
    /// Helper that indirects in case there is an index buffer                 
    ///   @param indices - index buffer                                        
    ///   @param where - triangle indices                                      
    ///   @return the (eventually indirected) triangle indices                 
-   inline Math::Vec3u Mesh::InnerGetIndices(const Data* indices, const Math::Vec3u& where) const {
+   inline auto Mesh::InnerGetIndices(const Data* indices, const Vec3u& where) const -> Vec3u {
       if (not indices or not *indices)
          return where;
 
@@ -177,7 +178,8 @@ namespace Langulus::A
          };
       }
 
-      LANGULUS_THROW(Access, "Trying to get index from incompatible index buffer");
+      LANGULUS_THROW(Access,
+         "Trying to get index from incompatible index buffer");
    }
 
    /// Is topology a point list?                                              
@@ -196,7 +198,7 @@ namespace Langulus::A
    }
 
    template<CT::Trait T>
-   Anyness::Many Mesh::GetPointTrait(Offset) const {
+   Many Mesh::GetPointTrait(Offset) const {
       TODO();
       return {};
    }
@@ -262,8 +264,7 @@ namespace Langulus::A
    /// Get the point indices of a given line                                  
    ///   @param index - line index                                            
    ///   @return the point indices as a 32bit unsigned 2D vector              
-   inline Math::Vec2u Mesh::GetLineIndices(Offset index) const {
-      using Math::Vec2u;
+   inline auto Mesh::GetLineIndices(Offset index) const -> Vec2u {
       const auto indices = GetData<Traits::Index>();
 
       if (CheckTopology<A::Line>())
@@ -370,8 +371,7 @@ namespace Langulus::A
    ///   @attention not optimized for iteration                               
    ///   @param index - triangle index                                        
    ///   @return the indices as a 32bit unsigned 3D vector                    
-   inline Math::Vec3u Mesh::GetTriangleIndices(Offset index) const {
-      using Math::Vec3u;
+   inline auto Mesh::GetTriangleIndices(Offset index) const -> Vec3u {
       const auto indices = GetData<Traits::Index>(0);
 
       if (CheckTopology<A::Triangle>()) {
@@ -606,19 +606,18 @@ namespace Langulus::A
          return {};
 
       if (indices->GetCount() == 1) {
-         // Single index source will be used for all Ts                 
+         // Single index source will be used for all vertex traits      
          return Disown((*indices)[0]);
       }
 
       // Multiple index sequences for different streams                 
       // Each sequence should be kept in a corresponding trait          
-      for (auto& group : *indices) {
-         if (group.IsSimilar<T>())
-            return group.Get<T>();
-      }
-
-      // No indices for T found                                         
-      return {};
+      T result;
+      indices->ForEachDeep([&result](const T& trait) noexcept {
+         result = trait;
+         return Loop::Break;
+      });
+      return result;
    }
 
    /// Invoke 'call' with the required arguments                              
