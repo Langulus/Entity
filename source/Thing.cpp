@@ -215,24 +215,29 @@ namespace Langulus::Entity
 
    /// Dump the entity's hierarchy in log                                     
    void Thing::DumpHierarchy() const {
-      const auto tab = Logger::VerboseTab("** ", *this);
+      const auto tab = Logger::Section(Logger::Intent::Verbose,
+         Logger::White, Logger::Underline, *this
+      );
 
       if (mTraits) {
-         Logger::Verbose(".. contains ", mTraits.GetCount(), " traits:");
+         const auto tab2 = Logger::Section(Logger::White, Logger::Underline,
+            "Traits (", mTraits.GetCount(), "):");
          for (auto traitpair : mTraits) {
             for (auto& trait : traitpair.mValue)
-               Logger::Verbose(". ", trait);
+               Logger::Verbose(trait);
          }
       }
 
       if (mUnitsList) {
-         Logger::Verbose("++ contains ", mUnitsList.GetCount(), " units:");
+         const auto tab2 = Logger::Section(Logger::White, Logger::Underline,
+            "Units (", mUnitsList.GetCount(), "):");
          for (auto& unit : mUnitsList)
-            Logger::Verbose("+ ", *unit);
+            Logger::Verbose(*unit);
       }
 
       if (mChildren) {
-         Logger::Verbose("** contains ", mChildren.GetCount(), " child entities:");
+         const auto tab2 = Logger::Section(Logger::White, Logger::Underline,
+            "Children (", mChildren.GetCount(), "):");
          for (auto& child : mChildren)
             child->DumpHierarchy();
       }
