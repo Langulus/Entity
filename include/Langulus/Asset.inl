@@ -15,7 +15,7 @@ namespace Langulus::A
    /// Retrieve the asset module's repository folder                          
    ///   @return a reference to the folder interface                          
    LANGULUS(INLINED)
-   const Ref<A::Folder>& AssetModule::GetFolder() const noexcept {
+   auto AssetModule::GetFolder() const noexcept -> const Ref<A::Folder>& {
       return mFolder;
    }
 
@@ -23,12 +23,12 @@ namespace Langulus::A
    ///   @attention this doesn't generate any data                            
    ///   @return a reference to the contents                                  
    LANGULUS(INLINED)
-   Asset::DataListMap const& Asset::GetDataListMap() const noexcept {
+   auto Asset::GetDataListMap() const noexcept -> DataListMap const& {
       return mDataListMap;
    }
 
    LANGULUS(INLINED)
-   Asset::DataListMap& Asset::GetDataListMap() noexcept {
+   auto Asset::GetDataListMap() noexcept -> DataListMap& {
       return mDataListMap;
    }
 
@@ -37,7 +37,7 @@ namespace Langulus::A
    ///   @param index - the Nth data associated to the trait                  
    ///   @return a pointer to the data entry, or nullptr if none exists       
    template<CT::TraitBased T> LANGULUS(INLINED)
-   Asset::Data* Asset::GetData(Offset index) noexcept {
+   auto Asset::GetData(Offset index) noexcept -> Data* {
       TMeta trait;
       if constexpr (CT::Trait<T>)
          trait = MetaTraitOf<T>();
@@ -45,7 +45,7 @@ namespace Langulus::A
    }
 
    template<CT::TraitBased T> LANGULUS(INLINED)
-   Asset::Data const* Asset::GetData(Offset index) const noexcept {
+   auto Asset::GetData(Offset index) const noexcept -> Data const* {
       return const_cast<Asset*>(this)->GetData<T>(index);
    }
 
@@ -54,7 +54,7 @@ namespace Langulus::A
    ///   @param index - the Nth data associated to the trait                  
    ///   @return a pointer to the data entry, or nullptr if none exists       
    LANGULUS(INLINED)
-   Asset::Data* Asset::GetData(TMeta trait, Offset index) noexcept {
+   auto Asset::GetData(TMeta trait, Offset index) noexcept -> Data* {
       if (not Generate(trait, index))
          return nullptr;
 
@@ -65,7 +65,7 @@ namespace Langulus::A
    }
 
    LANGULUS(INLINED)
-   Asset::Data const* Asset::GetData(TMeta trait, Offset index) const noexcept {
+   auto Asset::GetData(TMeta trait, Offset index) const noexcept -> Data const* {
       return const_cast<Asset*>(this)->GetData(trait, index);
    }
 
@@ -73,7 +73,7 @@ namespace Langulus::A
    ///   @tparam T - the trait to search for                                  
    ///   @return a pointer to the data list, or nullptr if none exists        
    template<CT::TraitBased T> LANGULUS(INLINED)
-   Asset::DataList* Asset::GetDataList() noexcept {
+   auto Asset::GetDataList() noexcept -> DataList* {
       TMeta trait;
       if constexpr (CT::Trait<T>)
          trait = MetaTraitOf<T>();
@@ -81,7 +81,7 @@ namespace Langulus::A
    }
 
    template<CT::TraitBased T> LANGULUS(INLINED)
-   Asset::DataList const* Asset::GetDataList() const noexcept {
+   auto Asset::GetDataList() const noexcept -> DataList const* {
       return const_cast<Asset*>(this)->GetDataList<T>();
    }
 
@@ -89,7 +89,7 @@ namespace Langulus::A
    ///   @param trait - the trait to search for                               
    ///   @return a pointer to the data list, or nullptr if none exists        
    LANGULUS(INLINED)
-   Asset::DataList* Asset::GetDataList(TMeta trait) noexcept {
+   auto Asset::GetDataList(TMeta trait) noexcept -> DataList* {
       if (not const_cast<Asset*>(this)->Generate(trait))
          return nullptr;
 
@@ -98,7 +98,7 @@ namespace Langulus::A
    }
 
    LANGULUS(INLINED)
-   const Asset::DataList* Asset::GetDataList(TMeta trait) const noexcept {
+   auto Asset::GetDataList(TMeta trait) const noexcept -> const DataList* {
       return const_cast<Asset*>(this)->GetDataList(trait);
    }
 

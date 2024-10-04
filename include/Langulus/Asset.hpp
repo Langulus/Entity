@@ -26,7 +26,7 @@ namespace Langulus::A
       Ref<A::Folder> mFolder;
 
    public:
-      const Ref<A::Folder>& GetFolder() const noexcept;
+      auto GetFolder() const noexcept -> const Ref<A::Folder>&;
    };
 
 
@@ -56,25 +56,25 @@ namespace Langulus::A
       void Commit(auto&&) const;
 
       template<CT::TraitBased = Langulus::Trait>
-      NOD() const Data* GetData(Offset = 0) const noexcept;
-      NOD() const Data* GetData(TMeta, Offset = 0) const noexcept;
+      NOD() auto GetData(Offset = 0) const noexcept -> const Data*;
+      NOD() auto GetData(TMeta, Offset = 0) const noexcept -> const Data*;
 
       template<CT::TraitBased = Langulus::Trait>
-      NOD() const DataList* GetDataList() const noexcept;
-      NOD() const DataList* GetDataList(TMeta) const noexcept;
+      NOD() auto GetDataList() const noexcept -> const DataList*;
+      NOD() auto GetDataList(TMeta) const noexcept -> const DataList*;
 
-      NOD() DataListMap const& GetDataListMap() const noexcept;
+      NOD() auto GetDataListMap() const noexcept -> DataListMap const&;
 
    protected:
       template<CT::TraitBased = Langulus::Trait>
-      NOD() Data* GetData(Offset = 0) noexcept;
-      NOD() Data* GetData(TMeta, Offset = 0) noexcept;
+      NOD() auto GetData(Offset = 0) noexcept -> Data*;
+      NOD() auto GetData(TMeta, Offset = 0) noexcept -> Data*;
 
       template<CT::TraitBased = Langulus::Trait>
-      NOD() DataList* GetDataList() noexcept;
-      NOD() DataList* GetDataList(TMeta) noexcept;
+      NOD() auto GetDataList() noexcept -> DataList*;
+      NOD() auto GetDataList(TMeta) noexcept -> DataList*;
 
-      NOD() DataListMap& GetDataListMap() noexcept;
+      NOD() auto GetDataListMap() noexcept -> DataListMap&;
    };
 
 } // namespace Langulus::A

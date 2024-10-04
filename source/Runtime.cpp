@@ -428,8 +428,7 @@ namespace Langulus::Entity
          MetaList types;
          library.mEntry(library.mModuleType, types);
          if (types.IsEmpty()) {
-            Logger::Error(
-               "A module must register at least one type"
+            Logger::Error("A module must register at least one type"
                " - the module instantiation type");
             (void)UnloadSharedLibrary(library);
             return {};
@@ -470,8 +469,7 @@ namespace Langulus::Entity
          mLibraries.Insert(name, library);
 
          // Do some info logging                                        
-         Logger::Info(
-            "Module `", library.mInfo()->mName, 
+         Logger::Info("Module `", library.mInfo()->mName, 
             "` exposed the following types: ", Logger::DarkGreen);
          bool first = true;
          for (auto& t : types) {
