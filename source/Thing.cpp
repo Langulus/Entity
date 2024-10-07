@@ -215,9 +215,8 @@ namespace Langulus::Entity
 
    /// Dump the entity's hierarchy in log                                     
    void Thing::DumpHierarchy() const {
-      const auto tab = Logger::Section(Logger::Intent::Verbose,
-         Logger::White, Logger::Underline, *this
-      );
+      const auto tab = Logger::Verbose(
+         Logger::White, Logger::Underline, *this, Logger::Tabs {});
 
       if (mTraits) {
          const auto tab2 = Logger::Section(Logger::White, Logger::Underline,
