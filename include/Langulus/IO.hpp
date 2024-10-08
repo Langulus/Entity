@@ -74,18 +74,20 @@ namespace Langulus::A
       struct Reader {
       protected:
          Ref<File> mFile;
-         Offset    mProgress {};
+         Offset    mProgress = 0;
 
       public:
          Reader() = delete;
-         virtual ~Reader() {};
+         virtual ~Reader() {}
 
          Reader(File* f)
             : mFile {f} {}
 
          virtual auto Read(Many&) -> Offset = 0;
 
-         auto GetFile() const noexcept { return mFile; }
+         auto GetFile() const noexcept -> const Ref<File>& {
+            return mFile;
+         }
       };
 
 
@@ -94,12 +96,12 @@ namespace Langulus::A
       struct Writer {
       protected:
          Ref<File> mFile;
-         Offset    mProgress {};
+         Offset    mProgress = 0;
          bool      mAppend = false;
 
       public:
          Writer() = delete;
-         virtual ~Writer() {};
+         virtual ~Writer() {}
 
          Writer(File* f, bool append)
             : mFile  {f}
@@ -107,7 +109,9 @@ namespace Langulus::A
 
          virtual auto Write(const Many&) -> Offset = 0;
 
-         auto GetFile() const noexcept { return mFile; }
+         auto GetFile() const noexcept -> const Ref<File>& {
+            return mFile;
+         }
       };
 
       NOD() virtual auto NewReader() const -> Ref<Reader> = 0;
