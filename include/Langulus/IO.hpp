@@ -81,11 +81,7 @@ namespace Langulus::A
          virtual ~Reader() {};
 
          Reader(File* f)
-            : mFile     {f} {}
-
-         Reader(Langulus::Abandoned<Reader>&& rhs)
-            : mFile     {rhs.Nest(rhs->mFile)}
-            , mProgress {rhs->mProgress} {}
+            : mFile {f} {}
 
          virtual auto Read(Many&) -> Offset = 0;
 
@@ -106,13 +102,8 @@ namespace Langulus::A
          virtual ~Writer() {};
 
          Writer(File* f, bool append)
-            : mFile     {f}
-            , mAppend   {append} {}
-
-         Writer(Langulus::Abandoned<Writer>&& rhs)
-            : mFile     {rhs.Nest(rhs->mFile)}
-            , mProgress {rhs->mProgress}
-            , mAppend   {rhs->mAppend} {}
+            : mFile  {f}
+            , mAppend{append} {}
 
          virtual auto Write(const Many&) -> Offset = 0;
 
