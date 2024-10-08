@@ -68,31 +68,51 @@ namespace Langulus::A
       template<class T>
       NOD() T ReadAs() const;
 
+
+      ///                                                                     
       /// Abstract file reader stream                                         
       struct Reader {
       protected:
-         File*  mFile;
-         Offset mProgress {};
+         Ref<File> mFile;
+         Offset    mProgress {};
 
       public:
          Reader() = delete;
-         Reader(File* f) : mFile {f} {}
+         virtual ~Reader() {};
+
+         Reader(File* f)
+            : mFile     {f} {}
+
+         Reader(Langulus::Abandoned<Reader>&& rhs)
+            : mFile     {rhs.Nest(rhs->mFile)}
+            , mProgress {rhs->mProgress} {}
 
          virtual auto Read(Many&) -> Offset = 0;
 
          auto GetFile() const noexcept { return mFile; }
       };
 
+
+      ///                                                                     
       /// Abstract file writer stream                                         
       struct Writer {
       protected:
-         File*  mFile;
-         Offset mProgress {};
-         bool   mAppend = false;
+         Ref<File> mFile;
+         Offset    mProgress {};
+         bool      mAppend = false;
 
       public:
          Writer() = delete;
-         Writer(File* f, bool append) : mFile {f}, mAppend {append} {}
+         virtual ~Writer() {};
+
+         Writer(File* f, bool append)
+            : mFile     {f}
+            , mAppend   {append} {}
+
+         Writer(Langulus::Abandoned<Writer>&& rhs)
+            : mFile     {rhs.Nest(rhs->mFile)}
+            , mProgress {rhs->mProgress}
+            , mAppend   {rhs->mAppend} {}
 
          virtual auto Write(const Many&) -> Offset = 0;
 
