@@ -581,8 +581,8 @@ namespace Langulus::Entity
       // Implicitly add a parent trait to descriptor, if one isn't      
       // already added - it will be stripped later, when normalizing    
       // the descriptor when producing the item from a factory          
-      Construct descriptor {construct};
-      Traits::Parent parent;
+      Construct descriptor = construct;
+      /*Traits::Parent parent;
       if (not descriptor->ExtractTrait<Traits::Parent>(parent)) {
          parent = this;
          parent.MakeMissing();
@@ -592,7 +592,7 @@ namespace Langulus::Entity
             Reference(0), " references)"
          );
       }
-      else parent << this;
+      else parent << this;*/
 
       if (producer) {
          // Data has a specific producer, we can narrow the required    

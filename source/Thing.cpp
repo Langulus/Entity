@@ -54,9 +54,10 @@ namespace Langulus::Entity
    /// Construct as a child of another thing                                  
    ///   @param parent - the thing that owns this thing                       
    ///   @param descriptor - instructions for creating the thing              
-   Thing::Thing(Thing* parent, const Neat& descriptor)
+   Thing::Thing(Thing* parent, const Many& descriptor)
       : Resolvable {this}
-      , mOwner {parent} {
+      , mOwner     {parent}
+   {
       if (parent) {
          parent->AddChild<false>(this);
          mRuntime = parent->GetRuntime();
@@ -89,14 +90,15 @@ namespace Langulus::Entity
    ///      because 'other' is removed from its children                      
    ///   @param other - move that entity                                      
    Thing::Thing(Thing&& other) noexcept
-      : Resolvable {this}
-      , mChildren {Move(other.mChildren)}
-      , mRuntime {Move(other.mRuntime)}
-      , mFlow {Move(other.mFlow)}
+      : Resolvable      {this}
+      , mChildren       {Move(other.mChildren)}
+      , mRuntime        {Move(other.mRuntime)}
+      , mFlow           {Move(other.mFlow)}
       , mUnitsAmbiguous {Move(other.mUnitsAmbiguous)}
-      , mUnitsList {Move(other.mUnitsList)}
-      , mTraits {Move(other.mTraits)}
-      , mRefreshRequired {true} {
+      , mUnitsList      {Move(other.mUnitsList)}
+      , mTraits         {Move(other.mTraits)}
+      , mRefreshRequired{true}
+   {
       // Remap children                                                 
       for (auto& child : mChildren)
          child->mOwner = this;
@@ -118,14 +120,15 @@ namespace Langulus::Entity
    ///      because 'other' is duplicated in its children                     
    ///   @param other - clone that entity                                     
    Thing::Thing(Abandoned<Thing>&& other)
-      : Resolvable {this}
-      , mChildren {Abandon(other->mChildren)}
-      , mRuntime {Abandon(other->mRuntime)}
-      , mFlow {Abandon(other->mFlow)}
+      : Resolvable      {this}
+      , mChildren       {Abandon(other->mChildren)}
+      , mRuntime        {Abandon(other->mRuntime)}
+      , mFlow           {Abandon(other->mFlow)}
       , mUnitsAmbiguous {Abandon(other->mUnitsAmbiguous)}
-      , mUnitsList {Abandon(other->mUnitsList)}
-      , mTraits {Abandon(other->mTraits)}
-      , mRefreshRequired {true} {
+      , mUnitsList      {Abandon(other->mUnitsList)}
+      , mTraits         {Abandon(other->mTraits)}
+      , mRefreshRequired{true}
+   {
       // Remap children                                                 
       for (auto& child : mChildren)
          child->mOwner = this;
@@ -147,9 +150,10 @@ namespace Langulus::Entity
    ///      because 'other' is duplicated in its children                     
    ///   @param other - clone that entity                                     
    Thing::Thing(Cloned<Thing>&& other)
-      : Resolvable {this}
-      , mChildren {Clone(other->mChildren)}
-      , mRefreshRequired {true} {
+      : Resolvable      {this}
+      , mChildren       {Clone(other->mChildren)}
+      , mRefreshRequired{true}
+   {
       TODO();
       //TODO clone flow and runtime if pinned, recreate modules if new runtime, 
       // recreate units and traits, then recreate children
@@ -316,7 +320,7 @@ namespace Langulus::Entity
    ///   @param id - the type of the unit                                     
    ///   @param index - the unit index to seek                                
    ///   @return the unit if found, or nullptr if not                         
-   A::Unit* Thing::GetUnitMeta(DMeta id, Index index) {
+   auto Thing::GetUnitMeta(DMeta id, Index index) -> A::Unit* {
       if (id) {
          // Search a typed trait                                        
          const auto found = mUnitsAmbiguous.FindIt(id);
@@ -327,7 +331,7 @@ namespace Langulus::Entity
       return mUnitsList[index];
    }
 
-   const A::Unit* Thing::GetUnitMeta(DMeta type, Index offset) const {
+   auto Thing::GetUnitMeta(DMeta type, Index offset) const -> const A::Unit* {
       return const_cast<Thing*>(this)->GetUnitMeta(type, offset);
    }
    
@@ -338,7 +342,7 @@ namespace Langulus::Entity
    ///   @param what - the desired properties of the unit                     
    ///   @param index - the unit index to seek                                
    ///   @return the unit if found, or nullptr if not                         
-   A::Unit* Thing::GetUnitExt(DMeta meta, const Neat& what, Index index) {
+   auto Thing::GetUnitExt(DMeta meta, const Many& what, Index index) -> A::Unit* {
       if (meta) {
          // Search a typed unit                                         
          const auto found = mUnitsAmbiguous.FindIt(meta);
@@ -371,7 +375,7 @@ namespace Langulus::Entity
       return nullptr;
    }
 
-   const A::Unit* Thing::GetUnitExt(DMeta meta, const Neat& what, Index index) const {
+   auto Thing::GetUnitExt(DMeta meta, const Many& what, Index index) const -> const A::Unit* {
       return const_cast<Thing*>(this)->GetUnitExt(meta, what, index);
    }
 
@@ -380,31 +384,31 @@ namespace Langulus::Entity
    ///   @param token - the type name of the unit                             
    ///   @param offset - the unit index                                       
    ///   @return the unit if found, or nullptr if not                         
-   A::Unit* Thing::GetUnitMeta(const Token& token, Index offset) {
+   auto Thing::GetUnitMeta(const Token& token, Index offset) -> A::Unit* {
       return GetUnitMeta(RTTI::DisambiguateMeta(token), offset);
    }
 #endif
 
    /// Get the owner                                                          
    ///   @return the owner                                                    
-   const Ref<Thing>& Thing::GetOwner() const noexcept {
+   auto Thing::GetOwner() const noexcept -> const Ref<Thing>& {
       return mOwner;
    }
 
    /// Get children hierarchy                                                 
    ///   @return the hierarchy                                                
-   const Hierarchy& Thing::GetChildren() const noexcept {
+   auto Thing::GetChildren() const noexcept -> const Hierarchy& {
       return mChildren;
    }
 
    /// Get a child by index                                                   
    ///   @param id - the index to pick                                        
    ///   @return the child entity, or nullptr of none was found               
-   Thing* Thing::GetChild(Index offset) {
+   auto Thing::GetChild(Index offset) -> Thing* {
       return mChildren[offset];
    }
 
-   const Thing* Thing::GetChild(Index offset) const {
+   auto Thing::GetChild(Index offset) const -> const Thing* {
       return const_cast<Thing*>(this)->GetChild(offset);
    }
 
@@ -412,7 +416,7 @@ namespace Langulus::Entity
    ///   @param name - name to seek                                           
    ///   @param offset - offset to seek                                       
    ///   @return the child entity, or nullptr of none was found               
-   Thing* Thing::GetNamedChild(const Token& name, Index offset) {
+   auto Thing::GetNamedChild(const Token& name, Index offset) -> Thing* {
       Index matches = 0;
       for (auto& child : mChildren) {
          if (child->GetName() == name) {
@@ -425,7 +429,7 @@ namespace Langulus::Entity
       return nullptr;
    }
 
-   const Thing* Thing::GetNamedChild(const Token& name, Index offset) const {
+   auto Thing::GetNamedChild(const Token& name, Index offset) const -> const Thing* {
       return const_cast<Thing*>(this)->GetNamedChild(name, offset);
    }
 
@@ -456,7 +460,7 @@ namespace Langulus::Entity
    /// Count the number of matching units in this entity                      
    ///   @param type - the type of units to search for                        
    ///   @return the number of matching units                                 
-   Count Thing::HasUnits(DMeta type) const {
+   auto Thing::HasUnits(DMeta type) const -> Count {
       const auto found = mUnitsAmbiguous.FindIt(type);
       return found ? found.GetValue().GetCount() : 0;
    }
@@ -469,19 +473,19 @@ namespace Langulus::Entity
 
    /// Get the current runtime                                                
    ///   @return the pointer to the runtime                                   
-   const Pin<Ref<Runtime>>& Thing::GetRuntime() const noexcept {
+   auto Thing::GetRuntime() const noexcept -> const Pin<Ref<Runtime>>& {
       return mRuntime;
    }
 
    /// Get the current temporal flow                                          
    ///   @return the pointer to the flow                                      
-   const Pin<Ref<Temporal>>& Thing::GetFlow() const noexcept {
+   auto Thing::GetFlow() const noexcept -> const Pin<Ref<Temporal>>& {
       return mFlow;
    }
 
    /// Create a local runtime for this thing                                  
    ///   @return the new runtime instance, or the old one if already created  
-   Runtime* Thing::CreateRuntime() {
+   auto Thing::CreateRuntime() -> Runtime* {
       if (mRuntime.IsLocked())
          return &*mRuntime;
 
@@ -498,7 +502,7 @@ namespace Langulus::Entity
 
    /// Create a local flow for this thing                                     
    ///   @return the new flow instance, or the old one, if already created    
-   Temporal* Thing::CreateFlow() {
+   auto Thing::CreateFlow() -> Temporal* {
       if (mFlow.IsLocked())
          return &*mFlow;
 
@@ -517,13 +521,13 @@ namespace Langulus::Entity
    /// instantiate it for use, if not yet instantiated                        
    ///   @attention assumes a runtime is available in the hierarchy           
    ///   @param module - name of the module                                   
-   ///   @param descriptor - instructions for module setup                    
+   ///   @param desc - instructions for module setup                          
    ///   @return the instantiated module interface                            
-   A::Module* Thing::LoadMod(const Token& module, const Neat& descriptor) {
+   auto Thing::LoadMod(const Token& module, const Many& desc) -> A::Module* {
       const auto runtime = GetRuntime();
       LANGULUS_ASSUME(UserAssumes, runtime,
          "No runtime available for loading a module");
-      const auto instance = runtime->InstantiateModule(module, descriptor);
+      const auto instance = runtime->InstantiateModule(module, desc);
       LANGULUS_ASSERT(instance, Module, "Missing module");
       return instance;
    }
