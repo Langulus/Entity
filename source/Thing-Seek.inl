@@ -29,7 +29,7 @@ namespace Langulus::Entity
    ///   @param offset - which of the matches to return                       
    ///   @return the found unit, or nullptr if no such unit was found         
    template<Seek SEEK>
-   A::Unit* Thing::SeekUnit(DMeta meta, Index offset) {
+   auto Thing::SeekUnit(DMeta meta, Index offset) -> A::Unit* {
       A::Unit* result = nullptr;
       if constexpr (SEEK & Seek::Here) {
          // Seek here if requested                                      
@@ -69,7 +69,7 @@ namespace Langulus::Entity
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
    template<Seek SEEK> LANGULUS(INLINED)
-   A::Unit* Thing::SeekUnitAux(const Neat& aux, DMeta meta, Index offset) {
+   auto Thing::SeekUnitAux(const Many& aux, DMeta meta, Index offset) -> A::Unit* {
       A::Unit* result {};
       aux.ForEachDeep([&](const A::Unit* unit) {
          if (unit->CastsTo(meta)) {
@@ -99,7 +99,7 @@ namespace Langulus::Entity
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
    template<Seek SEEK> LANGULUS(INLINED)
-   A::Unit* Thing::SeekUnitExt(DMeta type, const Neat& ext, Index offset) {
+   auto Thing::SeekUnitExt(DMeta type, const Many& ext, Index offset) -> A::Unit* {
       A::Unit* result = nullptr;
       if constexpr (SEEK & Seek::Here) {
          // Seek here if requested                                      
@@ -139,7 +139,7 @@ namespace Langulus::Entity
    ///   @param offset - the Nth match to return                              
    ///   @return a pointer to the found unit, or nullptr if not found         
    template<Seek SEEK> LANGULUS(INLINED)
-   A::Unit* Thing::SeekUnitAuxExt(DMeta type, const Neat& aux, const Neat& ext, Index offset) {
+   auto Thing::SeekUnitAuxExt(DMeta type, const Many& aux, const Many& ext, Index offset) -> A::Unit* {
       // Scan descriptor even if hierarchy is empty                     
       A::Unit* result {};
       aux.ForEachDeep([&](const A::Unit* unit) {
@@ -170,7 +170,7 @@ namespace Langulus::Entity
    ///   @param offset - the offset to apply                                  
    ///   @return the trait, which is not empty, if trait was found            
    template<Seek SEEK>
-   Trait Thing::SeekTrait(TMeta meta, Index offset) {
+   auto Thing::SeekTrait(TMeta meta, Index offset) -> Trait {
       if constexpr (SEEK & Seek::Here) {
          // Seek here if requested                                      
          auto output = GetTrait(meta, offset);
@@ -209,7 +209,7 @@ namespace Langulus::Entity
    ///   @param offset - the number of the matching trait to use              
    ///   @return the trait, which is not empty, if trait was found            
    template<Seek SEEK> LANGULUS(INLINED)
-   Trait Thing::SeekTraitAux(const Neat& aux, TMeta meta, Index offset) {
+   auto Thing::SeekTraitAux(const Many& aux, TMeta meta, Index offset) -> Trait {
       // Scan descriptor                                                
       Trait result;
       aux.ForEachDeep([&](const Trait& trait) {
@@ -264,10 +264,6 @@ namespace Langulus::Entity
             else
                output = temp.template AsCast<D>();
 
-            /*if constexpr (CT::Pinnable<D>)
-               output = temp.template AsCast<TypeOf<D>>();
-            else
-               output = temp.template AsCast<D>();*/
             return true;
          }
          catch (...) { }
@@ -305,7 +301,7 @@ namespace Langulus::Entity
    ///   @return true if value has been found and rewritten                   
    template<Seek SEEK> LANGULUS(INLINED)
    bool Thing::SeekValueAux(
-      TMeta meta, const Neat& aux, CT::Data auto& output, Index offset
+      TMeta meta, const Many& aux, CT::Data auto& output, Index offset
    ) const {
       using D = Deref<decltype(output)>;
 
@@ -330,7 +326,7 @@ namespace Langulus::Entity
                   // Didn't throw, but we're done only if offset matches
                   done = offset == 0;
                   --offset;
-                  return not done;
+                  return done ? Loop::Break : Loop::Continue;
                }
                catch (...) {}
             }
@@ -350,9 +346,9 @@ namespace Langulus::Entity
                // Didn't throw, but we're done only if offset matches   
                done = offset == 0;
                --offset;
-               return not done;
+               return done ? Loop::Break : Loop::Continue;
             }
-            catch(...) { }
+            catch(...) {}
 
             return Loop::Continue;
          });
