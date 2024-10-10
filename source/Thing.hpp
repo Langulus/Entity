@@ -77,7 +77,7 @@ namespace Langulus::Entity
    public:
       LANGULUS_API(ENTITY) Thing();
       LANGULUS_API(ENTITY) Thing(Describe&&);
-      LANGULUS_API(ENTITY) Thing(Thing*, const Many& = {});
+      LANGULUS_API(ENTITY) Thing(Thing*, const Neat& = {});
       LANGULUS_API(ENTITY) Thing(Thing&&) noexcept;
       LANGULUS_API(ENTITY) Thing(Cloned<Thing>&&);
       LANGULUS_API(ENTITY) Thing(Abandoned<Thing>&&);
@@ -98,10 +98,10 @@ namespace Langulus::Entity
       bool RequiresRefresh() const noexcept;
 
       NOD() LANGULUS_API(ENTITY)
-      auto GetRuntime() const noexcept -> const Pin<Ref<Runtime>>&;
+      const Pin<Ref<Runtime>>& GetRuntime() const noexcept;
 
       NOD() LANGULUS_API(ENTITY)
-      auto GetFlow() const noexcept -> const Pin<Ref<Temporal>>&;
+      const Pin<Ref<Temporal>>& GetFlow() const noexcept;
 
       LANGULUS_API(ENTITY) void Do(Verb&);
       LANGULUS_API(ENTITY) void Select(Verb&);
@@ -130,39 +130,39 @@ namespace Langulus::Entity
       ///   Hierarchy management                                              
       ///                                                                     
       LANGULUS_API(ENTITY)
-      auto CreateRuntime() -> Runtime*;
+      Runtime* CreateRuntime();
 
       LANGULUS_API(ENTITY)
-      auto CreateFlow() -> Temporal*;
+      Temporal* CreateFlow();
 
       template<class...T>
-      auto CreateChild(T&&...) -> Ref<Thing>;
+      Ref<Thing> CreateChild(T&&...);
 
       template<bool TWOSIDED = true>
-      auto AddChild(Thing*) -> Count;
+      Count AddChild(Thing*);
       template<bool TWOSIDED = true>
-      auto RemoveChild(Thing*) -> Count;
+      Count RemoveChild(Thing*);
 
       LANGULUS_API(ENTITY)
-      auto LoadMod(const Token&, const Many& = {}) -> A::Module*;
+      A::Module* LoadMod(const Token&, const Neat& = {});
 
       NOD() LANGULUS_API(ENTITY)
-      auto GetOwner() const noexcept -> const Ref<Thing>&;
+      const Ref<Thing>& GetOwner() const noexcept;
 
       NOD() LANGULUS_API(ENTITY)
-      auto GetChildren() const noexcept -> const Hierarchy&;
+      const Hierarchy& GetChildren() const noexcept;
 
       NOD() LANGULUS_API(ENTITY)
-      auto GetChild(Index = 0) -> Thing*;
+      Thing* GetChild(Index = 0);
 
       NOD() LANGULUS_API(ENTITY)
-      auto GetChild(Index = 0) const -> const Thing*;
+      const Thing* GetChild(Index = 0) const;
 
       NOD() LANGULUS_API(ENTITY)
-      auto GetNamedChild(const Token&, Index = 0) -> Thing*;
+      Thing* GetNamedChild(const Token&, Index = 0);
 
       NOD() LANGULUS_API(ENTITY)
-      auto GetNamedChild(const Token&, Index = 0) const -> const Thing*;
+      const Thing* GetNamedChild(const Token&, Index = 0) const;
 
       LANGULUS_API(ENTITY)
       void DumpHierarchy() const;
@@ -172,9 +172,9 @@ namespace Langulus::Entity
       ///   Unit management                                                   
       ///                                                                     
       template<bool TWOSIDED = true>
-      auto AddUnit(A::Unit*) -> Count;
+      Count AddUnit(A::Unit*);
       template<bool TWOSIDED = true>
-      auto RemoveUnit(A::Unit*) -> Count;
+      Count RemoveUnit(A::Unit*);
 
       template<CT::Unit T, class...A>
       Many CreateUnit(A&&...);
@@ -192,38 +192,38 @@ namespace Langulus::Entity
       NOD() LANGULUS_API(ENTITY)
       Count HasUnits(DMeta) const;
 
-      template<CT::Unit> NOD()
-      Count HasUnits() const;
+      template<CT::Unit T>
+      NOD() Count HasUnits() const;
 
       NOD() LANGULUS_API(ENTITY)
-      auto GetUnits() const noexcept -> const UnitList&;
+      const UnitList& GetUnits() const noexcept;
       NOD() LANGULUS_API(ENTITY)
-      auto GetUnitsMap() const noexcept -> const UnitMap&;
+      const UnitMap& GetUnitsMap() const noexcept;
 
       NOD() LANGULUS_API(ENTITY)
-      auto GetUnitMeta(DMeta, Index = 0) -> A::Unit*;
+            A::Unit* GetUnitMeta(DMeta, Index = 0);
       NOD() LANGULUS_API(ENTITY)
-      auto GetUnitMeta(DMeta, Index = 0) const -> const A::Unit*;
+      const A::Unit* GetUnitMeta(DMeta, Index = 0) const;
 
       NOD() LANGULUS_API(ENTITY)
-      auto GetUnitExt(DMeta, const Many&, Index = 0) -> A::Unit*;
+            A::Unit* GetUnitExt(DMeta, const Neat&, Index = 0);
       NOD() LANGULUS_API(ENTITY)
-      auto GetUnitExt(DMeta, const Many&, Index = 0) const -> const A::Unit*;
+      const A::Unit* GetUnitExt(DMeta, const Neat&, Index = 0) const;
 
-      template<CT::Unit T = A::Unit> NOD()
-      auto GetUnit(Index = 0) -> Decay<T>*;
-      template<CT::Unit T = A::Unit> NOD()
-      auto GetUnit(Index = 0) const -> const Decay<T>*;
+      template<CT::Unit T = A::Unit>
+      NOD()       Decay<T>* GetUnit(Index = 0);
+      template<CT::Unit T = A::Unit>
+      NOD() const Decay<T>* GetUnit(Index = 0) const;
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
          NOD() LANGULUS_API(ENTITY)
-         auto GetUnitMeta(const Token&, Index = 0) const -> A::Unit const*;
+         A::Unit const* GetUnitMeta(const Token&, Index = 0) const;
 
          NOD() LANGULUS_API(ENTITY)
-         auto GetUnitMeta(const Token&, Index = 0) -> A::Unit*;
+         A::Unit* GetUnitMeta(const Token&, Index = 0);
 
-         template<CT::Unit T> NOD()
-         auto GetUnitAs(const Token&, Index = 0) -> Decay<T>*;
+         template<CT::Unit T>
+         NOD() Decay<T>* GetUnitAs(const Token&, Index = 0);
       #endif
 
    private:
@@ -234,38 +234,45 @@ namespace Langulus::Entity
       ///                                                                     
       ///   Trait management                                                  
       ///                                                                     
-      LANGULUS_API(ENTITY) auto AddTrait(Trait) -> Trait*;
+      LANGULUS_API(ENTITY) Trait* AddTrait(Trait);
 
-      LANGULUS_API(ENTITY) auto RemoveTrait(TMeta) -> Count;
-      LANGULUS_API(ENTITY) auto RemoveTrait(Trait) -> Count;
-
-      NOD() LANGULUS_API(ENTITY)
-      auto HasTraits(TMeta) const -> Count;
-      NOD() LANGULUS_API(ENTITY)
-      auto HasTraits(const Trait&) const -> Count;
+      LANGULUS_API(ENTITY) Count RemoveTrait(TMeta);
+      LANGULUS_API(ENTITY) Count RemoveTrait(Trait);
 
       NOD() LANGULUS_API(ENTITY)
-      auto GetTraits() const noexcept -> const TraitMap&;
+      Count HasTraits(TMeta) const;
 
       NOD() LANGULUS_API(ENTITY)
-      auto GetTrait(TMeta, Index = 0) const -> Trait;
-      NOD() LANGULUS_API(ENTITY)
-      auto GetTrait(TMeta, Index = 0) -> Trait;
-      NOD() LANGULUS_API(ENTITY)
-      auto GetTrait(const Trait&, Index = 0) const -> Trait;
-      NOD() LANGULUS_API(ENTITY)
-      auto GetTrait(const Trait&, Index = 0) -> Trait;
-      template<CT::TraitBased = Trait> NOD()
-      auto GetTrait(Index = 0) -> Trait;
+      Count HasTraits(const Trait&) const;
 
       NOD() LANGULUS_API(ENTITY)
-      auto GetLocalTrait(TMeta, Index = 0) const -> const Trait*;
+      const TraitMap& GetTraits() const noexcept;
+
       NOD() LANGULUS_API(ENTITY)
-      auto GetLocalTrait(TMeta, Index = 0) -> Trait*;
-      template<CT::TraitBased = Trait> NOD()
-      auto GetLocalTrait(Index = 0) -> Trait*;
-      template<CT::TraitBased = Trait> NOD()
-      auto GetLocalTrait(Index = 0) const -> Trait const*;
+      Trait GetTrait(TMeta, Index = 0) const;
+
+      NOD() LANGULUS_API(ENTITY)
+      Trait GetTrait(TMeta, Index = 0);
+
+      NOD() LANGULUS_API(ENTITY)
+      Trait GetTrait(const Trait&, Index = 0) const;
+
+      NOD() LANGULUS_API(ENTITY)
+      Trait GetTrait(const Trait&, Index = 0);
+
+      template<CT::TraitBased = Trait>
+      NOD() Trait GetTrait(Index = 0);
+
+      NOD() LANGULUS_API(ENTITY)
+      const Trait* GetLocalTrait(TMeta, Index = 0) const;
+
+      NOD() LANGULUS_API(ENTITY)
+      Trait* GetLocalTrait(TMeta, Index = 0);
+
+      template<CT::TraitBased = Trait>
+      NOD() Trait* GetLocalTrait(Index = 0);
+      template<CT::TraitBased = Trait>
+      NOD() Trait const* GetLocalTrait(Index = 0) const;
 
       LANGULUS_API(ENTITY)
       void SetName(const Text&);
@@ -276,24 +283,33 @@ namespace Langulus::Entity
       ///                                                                     
       ///   Seek                                                              
       ///                                                                     
+      using SeekInterface::SeekUnit;
       using SeekInterface::SeekUnitAux;
       using SeekInterface::SeekUnitExt;
       using SeekInterface::SeekUnitAuxExt;
+      using SeekInterface::SeekTrait;
       using SeekInterface::SeekTraitAux;
+      using SeekInterface::SeekValue;
       using SeekInterface::SeekValueAux;
 
-      template<Seek = Seek::HereAndAbove> NOD()
-      auto SeekUnitAux(const Many&, DMeta, Index = 0) -> A::Unit*;
-      template<Seek = Seek::HereAndAbove> NOD()
-      auto SeekUnitExt(DMeta, const Many&, Index = 0) -> A::Unit*;
-      template<Seek = Seek::HereAndAbove> NOD()
-      auto SeekUnitAuxExt(DMeta, const Many&, const Many&, Index = 0) -> A::Unit*;
-
-      template<Seek = Seek::HereAndAbove> NOD()
-      auto SeekTraitAux(const Many&, TMeta, Index = 0) -> Trait;
+      template<Seek = Seek::HereAndAbove>
+      NOD() A::Unit* SeekUnit(DMeta, Index = 0);
+      template<Seek = Seek::HereAndAbove>
+      NOD() A::Unit* SeekUnitAux(const Neat&, DMeta, Index = 0);
+      template<Seek = Seek::HereAndAbove>
+      NOD() A::Unit* SeekUnitExt(DMeta, const Neat&, Index = 0);
+      template<Seek = Seek::HereAndAbove>
+      NOD() A::Unit* SeekUnitAuxExt(DMeta, const Neat&, const Neat&, Index = 0);
 
       template<Seek = Seek::HereAndAbove>
-      bool SeekValueAux(TMeta, const Many&, CT::Data auto&, Index = 0) const;
+      NOD() Trait SeekTrait(TMeta, Index = 0);
+      template<Seek = Seek::HereAndAbove>
+      NOD() Trait SeekTraitAux(const Neat&, TMeta, Index = 0);
+
+      template<Seek = Seek::HereAndAbove>
+      bool SeekValue(TMeta, CT::Data auto&, Index = 0) const;
+      template<Seek = Seek::HereAndAbove>
+      bool SeekValueAux(TMeta, const Neat&, CT::Data auto&, Index = 0) const;
 
       ///                                                                     
       ///   Gather                                                            
@@ -302,16 +318,16 @@ namespace Langulus::Entity
       using SeekInterface::GatherUnitsExt;
       using SeekInterface::GatherTraits;
 
-      template<Seek = Seek::HereAndAbove> NOD()
-      auto GatherUnits(DMeta) -> TMany<A::Unit*>;
-      template<Seek = Seek::HereAndAbove> NOD()
-      auto GatherUnitsExt(DMeta, const Many&) -> TMany<A::Unit*>;
+      template<Seek = Seek::HereAndAbove>
+      NOD() TMany<A::Unit*> GatherUnits(DMeta);
+      template<Seek = Seek::HereAndAbove>
+      NOD() TMany<A::Unit*> GatherUnitsExt(DMeta, const Neat&);
 
-      template<Seek = Seek::HereAndAbove> NOD()
-      auto GatherTraits(TMeta) -> TraitList;
+      template<Seek = Seek::HereAndAbove>
+      NOD() TraitList GatherTraits(TMeta);
 
-      template<CT::Data D, Seek = Seek::HereAndAbove> NOD()
-      auto GatherValues() const -> TMany<D>;
+      template<CT::Data D, Seek = Seek::HereAndAbove>
+      NOD() TMany<D> GatherValues() const;
    };
 
 } // namespace Langulus::Entity

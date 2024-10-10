@@ -29,7 +29,7 @@ namespace Langulus::Entity
    ///   @param trait - trait id                                              
    ///   @param offset - offset of result to use                              
    ///   @return a filled trait if fount, empty if not                        
-   auto Thing::GetTrait(TMeta trait, Index offset) const -> Trait {
+   Trait Thing::GetTrait(TMeta trait, Index offset) const {
       return GetTrait(Trait::FromMeta(trait, nullptr), offset);
    }
 
@@ -37,7 +37,7 @@ namespace Langulus::Entity
    ///   @param trait - trait id                                              
    ///   @param offset - offset of result to use                              
    ///   @return a filled trait if fount, empty if not                        
-   auto Thing::GetTrait(TMeta trait, Index offset) -> Trait {
+   Trait Thing::GetTrait(TMeta trait, Index offset) {
       return GetTrait(Trait::FromMeta(trait, nullptr), offset);
    }
 
@@ -45,7 +45,7 @@ namespace Langulus::Entity
    ///   @param id - the trait to search for                                  
    ///   @param index - the index of the trait we seek                        
    ///   @return a pointer to the trait, or nullptr if not found              
-   auto Thing::GetLocalTrait(TMeta id, Index index) -> Trait* {
+   Trait* Thing::GetLocalTrait(TMeta id, Index index) {
       if (id) {
          // Search a typed trait                                        
          const auto found = mTraits.FindIt(id);
@@ -76,7 +76,7 @@ namespace Langulus::Entity
    ///   @param id - the trait to search for                                  
    ///   @param offset - the index of the trait we seek                       
    ///   @return a pointer to the trait, or nullptr if not found              
-   auto Thing::GetLocalTrait(TMeta id, Index offset) const -> const Trait* {
+   const Trait* Thing::GetLocalTrait(TMeta id, Index offset) const {
       return const_cast<Thing&>(*this).GetLocalTrait(id, offset);
    }
 
@@ -84,7 +84,7 @@ namespace Langulus::Entity
    ///   @param id - trait to match                                           
    ///   @param index - offset of result to use                               
    ///   @return a non-empty trait, if found                                  
-   auto Thing::GetTrait(const Trait& id, Index index) -> Trait {
+   Trait Thing::GetTrait(const Trait& id, Index index) {
       if (id.GetTrait()) {
          // Handle some predefined traits here                          
          if (id.template IsTrait<Traits::Unit>()) {
@@ -124,14 +124,14 @@ namespace Langulus::Entity
    ///   @param id - trait to match                                           
    ///   @param index - offset of result to use                               
    ///   @return a non-empty trait, if found                                  
-   auto Thing::GetTrait(const Trait& id, Index index) const -> Trait {
+   Trait Thing::GetTrait(const Trait& id, Index index) const {
       return const_cast<Thing*>(this)->GetTrait(id, index);
    }
 
    /// Add a new trait to the thing                                           
    ///   @param trait - trait to shallow copy                                 
    ///   @return the new trait instance                                       
-   auto Thing::AddTrait(Trait trait) -> Trait* {
+   Trait* Thing::AddTrait(Trait trait) {
       const auto tmeta = trait.GetTrait();
       auto found = mTraits.FindIt(tmeta);
       if (found) {
@@ -148,7 +148,7 @@ namespace Langulus::Entity
    /// Remove a trait from the universal entity                               
    ///   @param trait - type of trait to remove                               
    ///   @return the number of removed traits                                 
-   auto Thing::RemoveTrait(TMeta trait) -> Count {
+   Count Thing::RemoveTrait(TMeta trait) {
       const auto found = mTraits.FindIt(trait);
       if (found) {
          const auto removed = found.GetValue().GetCount();
@@ -164,7 +164,7 @@ namespace Langulus::Entity
    /// Remove an exact-matching trait from this entity                        
    ///   @param trait - type and value to remove                              
    ///   @return the number of removed traits                                 
-   auto Thing::RemoveTrait(Trait trait) -> Count {
+   Count Thing::RemoveTrait(Trait trait) {
       const auto found = mTraits.FindIt(trait.GetTrait());
       if (found) {
          const auto removed = found.GetValue().Remove(trait);
@@ -181,7 +181,7 @@ namespace Langulus::Entity
    /// A fast check whether traits of the given type are inside this entity   
    ///   @param trait - type of trait to check                                
    ///   @return the number of matching traits                                
-   auto Thing::HasTraits(TMeta trait) const -> Count {
+   Count Thing::HasTraits(TMeta trait) const {
       const auto found = mTraits.FindIt(trait);
       return found ? found.GetValue().GetCount() : 0;
    }
@@ -189,7 +189,7 @@ namespace Langulus::Entity
    /// A fast check whether traits of the given type and value are inside     
    ///   @param trait - trait to search for                                   
    ///   @return the number of matching traits                                
-   auto Thing::HasTraits(const Trait& trait) const -> Count {
+   Count Thing::HasTraits(const Trait& trait) const {
       const auto found = mTraits.FindIt(trait.GetTrait());
       if (not found)
          return 0;
@@ -205,7 +205,7 @@ namespace Langulus::Entity
    /// Get traits                                                             
    ///   @return the map of traits                                            
    LANGULUS_API(ENTITY)
-   auto Thing::GetTraits() const noexcept -> const TraitMap& {
+   const TraitMap& Thing::GetTraits() const noexcept {
       return mTraits;
    }
 
@@ -223,9 +223,8 @@ namespace Langulus::Entity
    /// It can reside in one of the units                                      
    ///   @return the name, or empty string if no such trait was found here    
    Text Thing::GetName() const {
-      Many unused;
       Text name;
-      SeekValueAux<Traits::Name, Seek::Here>(name, unused);
+      SeekValue<Traits::Name, Seek::Here>(name);
       return name;
    }
    

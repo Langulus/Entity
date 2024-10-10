@@ -12,8 +12,6 @@
 
 using namespace Langulus::A;
 
-
-/// Unit destructor decouples from any owners                                 
 Unit::~Unit() {
    for (auto entity : mOwners)
       Decouple(entity);
@@ -29,11 +27,11 @@ void Unit::Select(Flow::Verb& verb) {
 /// Check if this unit has a given set of properties                          
 ///   @param descriptor - descriptor with required properties                 
 ///   @return true if the unit has the given properties                       
-bool Unit::CompareDescriptor(const Many& descriptor) const {
+bool Unit::CompareDescriptor(const Neat& descriptor) const {
    // First we compare traits only, all of them must be present         
    bool mismatch = false;
    Offset memberOffset = 0;
-   descriptor.ForEachDeep([&](const Anyness::Trait& trait) {
+   descriptor.ForEach([&](const Anyness::Trait& trait) {
       if (not GetMember(trait.GetTrait(), memberOffset)
       .Compare(static_cast<const Many&>(trait))) {
          mismatch = true;
@@ -45,9 +43,9 @@ bool Unit::CompareDescriptor(const Many& descriptor) const {
    });
 
    // Then we run another check, based on data types, again, all        
-   // of them must be present, either as trait, or in other form        
+   // of them must be present, either in trait, or in other form        
    memberOffset = 0;
-   descriptor.ForEachDeep([&](const Many& anythingElse) {
+   descriptor.ForEachTail([&](const Many& anythingElse) {
       if (not GetMember(TMeta {}, memberOffset).Compare(anythingElse)) {
          mismatch = true;
          return Loop::Break;
@@ -62,7 +60,7 @@ bool Unit::CompareDescriptor(const Many& descriptor) const {
    
 /// Get the list of unit owners                                               
 ///   @return the owners                                                      
-auto Unit::GetOwners() const noexcept -> const Hierarchy& {
+const Hierarchy& Unit::GetOwners() const noexcept {
    return mOwners;
 }
      
@@ -73,29 +71,24 @@ void Unit::Refresh() {}
 ///   @attention assumes units are correctly coupled and coupling to          
 ///              different runtimes should be explicitly disallowed           
 ///   @return a pointer to the runtime, if available                          
-auto Unit::GetRuntime() const noexcept -> Runtime* {
+Runtime* Unit::GetRuntime() const noexcept {
    if (not mOwners)
       return nullptr;
    return &*mOwners[0]->GetRuntime();
 }
 
-/// Couple the component with an entity extracted from a descriptor's         
+/// Couple the component with an entity, extracted from a descriptor's        
 /// Traits::Parent, if any was defined (always two-sided)                     
 /// This will call refresh to all units in that entity on next tick           
 ///   @param desc - the descriptor to scan for parents                        
-///   @param fallback - a fallback Thing to couple to (optional)              
-///      This usually comes from the producer's context. For example, if you  
-///      don't provide a parent for the renderer, it will be instantiated as  
-///      a child to the graphics module owner (i.e. the runtime owner)        
-void Unit::Couple(const Many& desc, const Thing* fallback) {
+void Unit::Couple(const Neat& desc) {
+   // Couple any Thing provided in the descriptor                       
    const Thing* owner = nullptr;
    if (not desc.ExtractTrait<Traits::Parent>(owner))
       desc.ExtractData(owner);
 
    if (owner and mOwners.Merge(IndexBack, const_cast<Thing*>(owner)))
       const_cast<Thing*>(owner)->AddUnit<false>(this);
-   else if (fallback)
-      const_cast<Thing*>(fallback)->AddUnit<false>(this);
 }
 
 /// Decouple the component from an entity (always two-sided)                  
