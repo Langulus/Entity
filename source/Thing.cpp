@@ -91,9 +91,9 @@ namespace Langulus::Entity
    ///   @param other - move that entity                                      
    Thing::Thing(Thing&& other) noexcept
       : Resolvable      {this}
-      , mChildren       {Move(other.mChildren)}
       , mRuntime        {Move(other.mRuntime)}
       , mFlow           {Move(other.mFlow)}
+      , mChildren       {Move(other.mChildren)}
       , mUnitsAmbiguous {Move(other.mUnitsAmbiguous)}
       , mUnitsList      {Move(other.mUnitsList)}
       , mTraits         {Move(other.mTraits)}
@@ -121,9 +121,9 @@ namespace Langulus::Entity
    ///   @param other - clone that entity                                     
    Thing::Thing(Abandoned<Thing>&& other)
       : Resolvable      {this}
-      , mChildren       {Abandon(other->mChildren)}
       , mRuntime        {Abandon(other->mRuntime)}
       , mFlow           {Abandon(other->mFlow)}
+      , mChildren       {Abandon(other->mChildren)}
       , mUnitsAmbiguous {Abandon(other->mUnitsAmbiguous)}
       , mUnitsList      {Abandon(other->mUnitsList)}
       , mTraits         {Abandon(other->mTraits)}
@@ -169,12 +169,20 @@ namespace Langulus::Entity
    void Thing::Detach() {
       ENTITY_VERBOSE_SELF_TAB("Destroying (", Reference(0), " uses):");
 
-      if (not mRuntime.IsLocked())
-         mRuntime.Reset();
+      mTraits.Reset();
+
+      // Decouple all units from this owner                             
+      for (auto& unit : mUnitsList) {
+         ENTITY_VERBOSE_SELF("Decoupling unit: ", unit);
+         unit->mOwners.Reset();
+         ENTITY_VERBOSE_SELF("...", Reference(0), " uses remain");
+      }
+
+      mUnitsList.Reset();
+      mUnitsAmbiguous.Reset();
+
       if (not mFlow.IsLocked())
          mFlow.Reset();
-
-      mTraits.Reset();
 
       // Decouple all children from this                                
       for (auto& child : mChildren) {
@@ -188,15 +196,10 @@ namespace Langulus::Entity
          }
       }
 
-      // Decouple all units from this owner                             
-      for (auto& unit : mUnitsList) {
-         ENTITY_VERBOSE_SELF("Decoupling unit: ", unit);
-         unit->mOwners.Reset();
-         ENTITY_VERBOSE_SELF("...", Reference(0), " uses remain");
-      }
+      mChildren.Reset();
 
-      mUnitsAmbiguous.Reset();
-      mUnitsList.Reset();
+      if (not mRuntime.IsLocked())
+         mRuntime.Reset();
    }
 
    /// Compare two entities                                                   

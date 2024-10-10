@@ -93,7 +93,7 @@ namespace Langulus::A
       };
 
       using EntryFunction  = void(*)(DMeta&, MetaList&);
-      using CreateFunction = Module*(*)(Entity::Runtime*, const Neat&);
+      using CreateFunction = Module*(*)(Entity::Runtime*, const Many&);
       using InfoFunction   = const Info*(*)();
 
       NOD() Entity::Runtime* GetRuntime() const noexcept {
@@ -150,7 +150,7 @@ namespace Langulus::CT
       \
       LANGULUS_EXPORT() \
       ::Langulus::A::Module* LANGULUS_MODULE_CREATE() ( \
-         ::Langulus::Entity::Runtime* rt, const ::Langulus::Anyness::Neat& desc) { \
+         ::Langulus::Entity::Runtime* rt, const ::Langulus::Anyness::Many& desc) { \
          static_assert(::Langulus::CT::DerivedFrom<m, ::Langulus::A::Module>, \
             "Langulus module class interface " \
             #m " doesn't inherit ::Langulus::A::Module"); \

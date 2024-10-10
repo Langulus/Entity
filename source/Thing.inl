@@ -53,7 +53,7 @@ namespace Langulus::Entity
       ENTITY_VERBOSE_SELF_TAB(
          "Producing child (at ", Reference(0), " references): ");
       Ref<Thing> newThing;
-      newThing.New(this, Neat {Forward<T>(arguments)...});
+      newThing.New(this, Many {Forward<T>(arguments)...});
       return Abandon(newThing);
    }
 

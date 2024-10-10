@@ -113,10 +113,10 @@ namespace Langulus::Entity
       NOD() auto GetOwner() const noexcept { return mOwner; }
 
       NOD() LANGULUS_API(ENTITY)
-      A::Module* InstantiateModule(const Token&, const Neat& = {});
+      A::Module* InstantiateModule(const Token&, const Many& = {});
 
       NOD() LANGULUS_API(ENTITY)
-      A::Module* InstantiateModule(const SharedLibrary&, const Neat& = {});
+      A::Module* InstantiateModule(const SharedLibrary&, const Many& = {});
 
       NOD() LANGULUS_API(ENTITY)
       SharedLibrary GetDependency(DMeta) const noexcept;

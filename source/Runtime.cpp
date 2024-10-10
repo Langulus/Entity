@@ -195,7 +195,7 @@ namespace Langulus::Entity
    ///   @param name - module name                                            
    ///   @param descriptor - module initialization descriptor                 
    ///   @return the new module instance                                      
-   A::Module* Runtime::InstantiateModule(const Token& name, const Neat& descriptor) {
+   A::Module* Runtime::InstantiateModule(const Token& name, const Many& descriptor) {
       // Load the library if not loaded yet                             
       const auto library = LoadSharedLibrary(name);
 
@@ -267,7 +267,7 @@ namespace Langulus::Entity
    ///   @param library - the library handle                                  
    ///   @param descriptor - module initialization descriptor                 
    ///   @return the new module instance                                      
-   A::Module* Runtime::InstantiateModule(const SharedLibrary& library, const Neat& descriptor) {
+   A::Module* Runtime::InstantiateModule(const SharedLibrary& library, const Many& descriptor) {
       if (not library.IsValid())
          return nullptr;
 
