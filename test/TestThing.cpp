@@ -8,7 +8,10 @@
 #include "Common.hpp"
 
 
-SCENARIO("Testing Thing", "[thing]") {
+TEMPLATE_TEST_CASE("Testing Thing with different kidns of descriptors",
+   "[thing]",
+   Many, Neat
+) {
    static Allocator::State memoryState;
    static_assert(CT::Deep<Entity::Hierarchy>,
       "Hierarchy must be reflected as deep");
@@ -216,7 +219,7 @@ SCENARIO("Testing Thing", "[thing]") {
    for (int repeat = 0; repeat != 10; ++repeat) {
       WHEN(std::string("Creating a Thing by descriptor #") + std::to_string(repeat)) {
          Logger::Special("Start: Creating a Thing by descriptor");
-         Neat descriptor {
+         TestType descriptor {
             Traits::Name {"Root"},
             Construct::From<Runtime>(),
             Construct::From<Temporal>(),
@@ -312,7 +315,7 @@ SCENARIO("Testing Thing", "[thing]") {
    }
 
    GIVEN("A complex hierarchy with runtime, flow, units, and traits") {
-      Neat descriptor {
+      TestType descriptor {
          Traits::Name {"Root"},
          Construct::From<Runtime>(),
          Construct::From<Temporal>(),
