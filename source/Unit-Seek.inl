@@ -19,7 +19,7 @@ namespace Langulus::A
    ///   @param offset - which of the matches to return                       
    ///   @return the found unit, or nullptr if no such unit was found         
    template<Seek SEEK> LANGULUS(INLINED)
-   Unit* Unit::SeekUnit(DMeta meta, Index offset) {
+   auto Unit::SeekUnit(DMeta meta, Index offset) -> Unit* {
       return mOwners.template SeekUnit<SEEK>(meta, offset);
    }
 
@@ -30,7 +30,7 @@ namespace Langulus::A
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
    template<Seek SEEK> LANGULUS(INLINED)
-   Unit* Unit::SeekUnitAux(const Neat& aux, DMeta meta, Index offset) {
+   auto Unit::SeekUnitAux(const Many& aux, DMeta meta, Index offset) -> Unit* {
       return mOwners.template SeekUnitAux<SEEK>(aux, meta, offset);
    }
       
@@ -41,7 +41,7 @@ namespace Langulus::A
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
    template<Seek SEEK> LANGULUS(INLINED)
-   Unit* Unit::SeekUnitExt(DMeta type, const Neat& ext, Index offset) {
+   auto Unit::SeekUnitExt(DMeta type, const Many& ext, Index offset) -> Unit* {
       return mOwners.template SeekUnitExt<SEEK>(type, ext, offset);
    }
 
@@ -54,7 +54,7 @@ namespace Langulus::A
    ///   @param offset - the index of the unit to return                      
    ///   @return a pointer to the found unit, or nullptr if not found         
    template<Seek SEEK> LANGULUS(INLINED)
-   Unit* Unit::SeekUnitAuxExt(DMeta type, const Neat& aux, const Neat& ext, Index offset) {
+   auto Unit::SeekUnitAuxExt(DMeta type, const Many& aux, const Many& ext, Index offset) -> Unit* {
       return mOwners.template SeekUnitAuxExt<SEEK>(type, aux, ext, offset);
    }
 
@@ -64,7 +64,7 @@ namespace Langulus::A
    ///   @param offset - the offset to apply                                  
    ///   @return the trait, which is not empty, if trait was found            
    template<Seek SEEK> LANGULUS(INLINED)
-   Langulus::Trait Unit::SeekTrait(TMeta meta, Index offset) {
+   auto Unit::SeekTrait(TMeta meta, Index offset) -> Langulus::Trait {
       return mOwners.template SeekTrait<SEEK>(meta, offset);
    }
    
@@ -75,7 +75,7 @@ namespace Langulus::A
    ///   @param offset - the number of the matching trait to use              
    ///   @return the trait, which is not empty, if trait was found            
    template<Seek SEEK> LANGULUS(INLINED)
-   Langulus::Trait Unit::SeekTraitAux(const Neat& aux, TMeta meta, Index offset) {
+   auto Unit::SeekTraitAux(const Many& aux, TMeta meta, Index offset) -> Langulus::Trait {
       return mOwners.template SeekTraitAux<SEEK>(aux, meta, offset);
    }
     
@@ -103,7 +103,7 @@ namespace Langulus::A
    ///   @param offset - the number of the matching trait to use              
    ///   @return the trait, which is not empty, if trait was found            
    template<Seek SEEK> LANGULUS(INLINED)
-   bool Unit::SeekValueAux(TMeta meta, const Neat& aux, CT::Data auto& output, Index offset) const {
+   bool Unit::SeekValueAux(TMeta meta, const Many& aux, CT::Data auto& output, Index offset) const {
       return mOwners.template SeekValueAux<SEEK>(meta, aux, output, offset);
    }
 

@@ -24,19 +24,19 @@ namespace Langulus::Entity
    ///   @param offset - the match to return                                  
    ///   @return a pointer to the found unit, or nullptr if not found         
    TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-   const A::Unit* TME()::SeekUnit(DMeta type, Index offset) const {
+   auto TME()::SeekUnit(DMeta type, Index offset) const -> const A::Unit* {
       return const_cast<THIS*>(static_cast<const THIS*>(this))
          ->template SeekUnit<SEEK>(type, offset);
    }
 
    TEMPLATE() template<CT::Data T, Seek SEEK> LANGULUS(INLINED)
-   Decay<T>* TME()::SeekUnit(Index offset) {
+   auto TME()::SeekUnit(Index offset) -> Decay<T>* {
       return dynamic_cast<Decay<T>*>(static_cast<THIS*>(this)
          ->template SeekUnit<SEEK>(MetaDataOf<Decay<T>>(), offset));
    }
 
    TEMPLATE() template<CT::Data T, Seek SEEK> LANGULUS(INLINED)
-   const Decay<T>* TME()::SeekUnit(Index offset) const {
+   auto TME()::SeekUnit(Index offset) const -> const Decay<T>* {
       return const_cast<TME()*>(this)
          ->template SeekUnit<T, SEEK>(offset);
    }
@@ -49,19 +49,19 @@ namespace Langulus::Entity
    ///   @param offset - the match to return                                  
    ///   @return a pointer to the found unit, or nullptr if not found         
    TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-   const A::Unit* TME()::SeekUnitAux(const Neat& aux, DMeta type, Index offset) const {
+   auto TME()::SeekUnitAux(const Many& aux, DMeta type, Index offset) const -> const A::Unit* {
       return const_cast<THIS*>(static_cast<const THIS*>(this))
          ->template SeekUnitAux<SEEK>(aux, type, offset);
    }
 
    TEMPLATE() template<CT::Data T, Seek SEEK> LANGULUS(INLINED)
-   Decay<T>* TME()::SeekUnitAux(const Neat& aux, Index offset) {
+   auto TME()::SeekUnitAux(const Many& aux, Index offset) -> Decay<T>* {
       return dynamic_cast<Decay<T>*>(static_cast<THIS*>(this)
          ->template SeekUnitAux<SEEK>(aux, MetaDataOf<Decay<T>>(), offset));
    }
 
    TEMPLATE() template<CT::Data T, Seek SEEK> LANGULUS(INLINED)
-   const Decay<T>* TME()::SeekUnitAux(const Neat& aux, Index offset) const {
+   auto TME()::SeekUnitAux(const Many& aux, Index offset) const -> const Decay<T>* {
       return const_cast<TME()*>(this)
          ->template SeekUnitAux<T, SEEK>(aux, offset);
    }
@@ -73,19 +73,19 @@ namespace Langulus::Entity
    ///   @param offset - the match to return                                  
    ///   @return a pointer to the found unit, or nullptr if not found         
    TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-   const A::Unit* TME()::SeekUnitExt(DMeta type, const Neat& ext, Index offset) const {
+   auto TME()::SeekUnitExt(DMeta type, const Many& ext, Index offset) const -> const A::Unit* {
       return const_cast<THIS*>(static_cast<const THIS*>(this))
          ->template SeekUnitExt<SEEK>(type, ext, offset);
    }
 
    TEMPLATE() template<CT::Data T, Seek SEEK> LANGULUS(INLINED)
-   Decay<T>* TME()::SeekUnitExt(const Neat& ext, Index offset) {
+   auto TME()::SeekUnitExt(const Many& ext, Index offset) -> Decay<T>* {
       return dynamic_cast<Decay<T>*>(static_cast<THIS*>(this)
          ->template SeekUnitExt<SEEK>(MetaDataOf<Decay<T>>(), ext, offset));
    }
 
    TEMPLATE() template<CT::Data T, Seek SEEK> LANGULUS(INLINED)
-   const Decay<T>* TME()::SeekUnitExt(const Neat& ext, Index offset) const {
+   auto TME()::SeekUnitExt(const Many& ext, Index offset) const -> const Decay<T>* {
       return const_cast<TME()*>(this)
          ->template SeekUnitExt<T, SEEK>(ext, offset);
    }
@@ -99,19 +99,19 @@ namespace Langulus::Entity
    ///   @param offset - the match to return                                  
    ///   @return a pointer to the found unit, or nullptr if not found         
    TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-   const A::Unit* TME()::SeekUnitAuxExt(DMeta type, const Neat& aux, const Neat& ext, Index offset) const {
+   auto TME()::SeekUnitAuxExt(DMeta type, const Many& aux, const Many& ext, Index offset) const -> const A::Unit* {
       return const_cast<THIS*>(static_cast<const THIS*>(this))
          ->template SeekUnitAuxExt<SEEK>(type, aux, ext, offset);
    }
 
    TEMPLATE() template<CT::Data T, Seek SEEK> LANGULUS(INLINED)
-   Decay<T>* TME()::SeekUnitAuxExt(const Neat& aux, const Neat& ext, Index offset) {
+   auto TME()::SeekUnitAuxExt(const Many& aux, const Many& ext, Index offset) -> Decay<T>* {
       return dynamic_cast<Decay<T>*>(static_cast<THIS*>(this)
          ->template SeekUnitAuxExt<SEEK>(MetaDataOf<Decay<T>>(), aux, ext, offset));
    }
 
    TEMPLATE() template<CT::Data T, Seek SEEK> LANGULUS(INLINED)
-   const Decay<T>* TME()::SeekUnitAuxExt(const Neat& aux, const Neat& ext, Index offset) const {
+   auto TME()::SeekUnitAuxExt(const Many& aux, const Many& ext, Index offset) const -> const Decay<T>* {
       return const_cast<TME()*>(this)
          ->template SeekUnitAuxExt<T, SEEK>(aux, ext, offset);
    }
@@ -122,19 +122,19 @@ namespace Langulus::Entity
    ///   @param offset - the match to return                                  
    ///   @return a pointer to the found unit, or nullptr if not found         
    TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-   Trait TME()::SeekTrait(TMeta type, Index offset) const {
+   auto TME()::SeekTrait(TMeta type, Index offset) const -> Trait {
       return const_cast<THIS*>(static_cast<const THIS*>(this))
          ->template SeekTrait<SEEK>(type, offset);
    }
 
    TEMPLATE() template<CT::Trait T, Seek SEEK> LANGULUS(INLINED)
-   Trait TME()::SeekTrait(Index offset) {
+   auto TME()::SeekTrait(Index offset) -> Trait {
       return static_cast<THIS*>(this)
          ->template SeekTrait<SEEK>(MetaTraitOf<T>(), offset);
    }
 
    TEMPLATE() template<CT::Trait T, Seek SEEK> LANGULUS(INLINED)
-   Trait TME()::SeekTrait(Index offset) const {
+   auto TME()::SeekTrait(Index offset) const -> Trait {
       return const_cast<TME()*>(this)
          ->template SeekTrait<T, SEEK>(offset);
    }
@@ -146,19 +146,19 @@ namespace Langulus::Entity
    ///   @param offset - the match to return                                  
    ///   @return a pointer to the found unit, or nullptr if not found         
    TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-   Trait TME()::SeekTraitAux(const Neat& aux, TMeta type, Index offset) const {
+   auto TME()::SeekTraitAux(const Many& aux, TMeta type, Index offset) const -> Trait {
       return const_cast<THIS*>(static_cast<const THIS*>(this))
          ->template SeekTraitAux<SEEK>(aux, type, offset);
    }
 
    TEMPLATE() template<CT::Trait T, Seek SEEK> LANGULUS(INLINED)
-   Trait TME()::SeekTraitAux(const Neat& aux, Index offset) {
+   auto TME()::SeekTraitAux(const Many& aux, Index offset) -> Trait {
       return static_cast<THIS*>(this)
          ->template SeekTraitAux<SEEK>(aux, MetaTraitOf<T>(), offset);
    }
 
    TEMPLATE() template<CT::Trait T, Seek SEEK> LANGULUS(INLINED)
-   Trait TME()::SeekTraitAux(const Neat& aux, Index offset) const {
+   auto TME()::SeekTraitAux(const Many& aux, Index offset) const -> Trait {
       return const_cast<TME()*>(this)
          ->template SeekTraitAux<T, SEEK>(aux, offset);
    }
@@ -172,7 +172,7 @@ namespace Langulus::Entity
    }
 
    TEMPLATE() template<CT::Trait T, Seek SEEK> LANGULUS(INLINED)
-   bool TME()::SeekValueAux(const Neat& aux, CT::NotTagged auto& output, Index offset) const {
+   bool TME()::SeekValueAux(const Many& aux, CT::NotTagged auto& output, Index offset) const {
       return static_cast<const THIS*>(this)
          ->template SeekValueAux<SEEK>(MetaTraitOf<T>(), aux, output, offset);
    }
@@ -190,7 +190,7 @@ namespace Langulus::Entity
    }
 
    TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-   bool TME()::SeekValueAux(const Neat& aux, CT::Tagged auto& output, Index offset) const {
+   bool TME()::SeekValueAux(const Many& aux, CT::Tagged auto& output, Index offset) const {
       using T = Deref<decltype(output)>;
       auto lambda = [&]<class T>() {
          return static_cast<const THIS*>(this)->template
@@ -207,43 +207,43 @@ namespace Langulus::Entity
       /// Available only when managed reflection is enabled                   
       ///                                                                     
       TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-      A::Unit* TME()::SeekUnit(const Token& dataToken, Index offset) {
+      auto TME()::SeekUnit(const Token& dataToken, Index offset) -> A::Unit* {
          return static_cast<THIS*>(this)
             ->template SeekUnit<SEEK>(RTTI::GetMetaData(dataToken), offset);
       }
 
       TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-      const A::Unit* TME()::SeekUnit(const Token& dataToken, Index offset) const {
+      auto TME()::SeekUnit(const Token& dataToken, Index offset) const -> const A::Unit* {
          return static_cast<THIS*>(this)
             ->template SeekUnit<SEEK>(RTTI::GetMetaData(dataToken), offset);
       }
 
       TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-      A::Unit* TME()::SeekUnitAux(const Neat& aux, const Token& dataToken, Index offset) {
+      auto TME()::SeekUnitAux(const Many& aux, const Token& dataToken, Index offset) -> A::Unit* {
          return static_cast<THIS*>(this)
             ->template SeekUnitAux<SEEK>(aux, RTTI::GetMetaData(dataToken), offset);
       }
 
       TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-      const A::Unit* TME()::SeekUnitAux(const Neat& aux, const Token& dataToken, Index offset) const {
+      auto TME()::SeekUnitAux(const Many& aux, const Token& dataToken, Index offset) const -> const A::Unit* {
          return static_cast<THIS*>(this)
             ->template SeekUnitAux<SEEK>(aux, RTTI::GetMetaData(dataToken), offset);
       }
       
       TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-      Trait TME()::SeekTrait(const Token& traitToken, Index offset) {
+      auto TME()::SeekTrait(const Token& traitToken, Index offset) -> Trait {
          return static_cast<THIS*>(this)
             ->template SeekTrait<SEEK>(RTTI::GetMetaTrait(traitToken), offset);
       }
 
       TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-      Trait TME()::SeekTrait(const Token& traitToken, Index offset) const {
+      auto TME()::SeekTrait(const Token& traitToken, Index offset) const -> Trait {
          return static_cast<THIS*>(this)
             ->template SeekTrait<SEEK>(RTTI::GetMetaTrait(traitToken), offset);
       }
 
       TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-      Trait TME()::SeekTraitAux(const Neat& aux, const Token& traitToken, Index offset) const {
+      auto TME()::SeekTraitAux(const Many& aux, const Token& traitToken, Index offset) const -> Trait {
          return static_cast<THIS*>(this)
             ->template SeekTraitAux<SEEK>(aux, RTTI::GetMetaTrait(traitToken), offset);
       }
@@ -255,7 +255,7 @@ namespace Langulus::Entity
       }
      
       TEMPLATE() template<Seek SEEK> LANGULUS(INLINED)
-      bool TME()::SeekValueAux(const Token& traitToken, const Neat& aux, CT::Data auto& output, Index offset) const {
+      bool TME()::SeekValueAux(const Token& traitToken, const Many& aux, CT::Data auto& output, Index offset) const {
          return static_cast<THIS*>(this)
             ->template SeekValueAux<SEEK>(RTTI::GetMetaTrait(traitToken), aux, output, offset);
       }
@@ -276,7 +276,7 @@ namespace Langulus::Entity
    ///   @param offset - which of the matches to return                       
    ///   @return the found unit, or nullptr if no such unit was found         
    template<Seek SEEK> LANGULUS(INLINED)
-   A::Unit* Hierarchy::SeekUnit(DMeta meta, Index offset) {
+   auto Hierarchy::SeekUnit(DMeta meta, Index offset) -> A::Unit* {
       for (auto owner : *this) {
          A::Unit* result = owner->template SeekUnit<SEEK>(meta, offset);
          if (result)
@@ -294,8 +294,8 @@ namespace Langulus::Entity
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
    template<Seek SEEK> LANGULUS(INLINED)
-   A::Unit* Hierarchy::SeekUnitAux(const Neat& aux, DMeta meta, Index offset) {
-      const A::Unit* result {};
+   auto Hierarchy::SeekUnitAux(const Many& aux, DMeta meta, Index offset) -> A::Unit* {
+      const A::Unit* result = nullptr;
 
       // Scan descriptor even if hierarchy is empty                     
       if constexpr (SEEK & Seek::Here) {
@@ -320,9 +320,8 @@ namespace Langulus::Entity
       // If reached, then no unit was found in the descriptor           
       // Let's delve into the hierarchy, by scanning for Traits::Parent 
       // and Traits::Child inside the 'aux'                             
-      //return SeekValue<SEEK>(meta, output, offset);
       if constexpr (SEEK & Seek::Above) {
-         aux.ForEachTrait([&](const Traits::Parent& trait) -> LoopControl {
+         aux.ForEachDeep([&](const Traits::Parent& trait) -> LoopControl {
             trait.ForEach([&](const Thing& parent) {
                if (nullptr != (result = parent.SeekUnit<Seek::HereAndAbove>(meta, offset)))
                   // Value was found                                    
@@ -334,7 +333,7 @@ namespace Langulus::Entity
       }
 
       if constexpr (SEEK & Seek::Below) {
-         aux.ForEachTrait([&](const Traits::Child& trait) -> LoopControl {
+         aux.ForEachDeep([&](const Traits::Child& trait) -> LoopControl {
             trait.ForEach([&](const Thing& child) {
                if (nullptr != (result = child.SeekUnit<Seek::HereAndBelow>(meta, offset)))
                   // Value was found                                    
@@ -355,7 +354,7 @@ namespace Langulus::Entity
    ///   @param offset - the index of the unit to return                      
    ///   @return the unit if found, or nullptr otherwise                      
    template<Seek SEEK> LANGULUS(INLINED)
-   A::Unit* Hierarchy::SeekUnitExt(DMeta type, const Neat& ext, Index offset) {
+   auto Hierarchy::SeekUnitExt(DMeta type, const Many& ext, Index offset) -> A::Unit* {
       for (auto owner : *this) {
          A::Unit* result = owner->template SeekUnitExt<SEEK>(type, ext, offset);
          if (result)
@@ -374,9 +373,9 @@ namespace Langulus::Entity
    ///   @param offset - the index of the unit to return                      
    ///   @return a pointer to the found unit, or nullptr if not found         
    template<Seek SEEK> LANGULUS(INLINED)
-   A::Unit* Hierarchy::SeekUnitAuxExt(DMeta type, const Neat& aux, const Neat& ext, Index offset) {
+   auto Hierarchy::SeekUnitAuxExt(DMeta type, const Many& aux, const Many& ext, Index offset) -> A::Unit* {
       // Scan descriptor even if hierarchy is empty                     
-      A::Unit* result {};
+      A::Unit* result = nullptr;
       aux.ForEachDeep([&](const A::Unit* u) {
          if (u->CastsTo(type)) {
             //TODO check construct arguments
@@ -406,7 +405,7 @@ namespace Langulus::Entity
    ///   @param offset - the offset to apply                                  
    ///   @return the trait, which is not empty, if trait was found            
    template<Seek SEEK> LANGULUS(INLINED)
-   Trait Hierarchy::SeekTrait(TMeta meta, Index offset) {
+   auto Hierarchy::SeekTrait(TMeta meta, Index offset) -> Trait {
       for (auto owner : *this) {
          auto result = owner->template SeekTrait<SEEK>(meta, offset);
          if (result)
@@ -423,7 +422,7 @@ namespace Langulus::Entity
    ///   @param offset - the number of the matching trait to use              
    ///   @return the trait, which is not empty, if trait was found            
    template<Seek SEEK> LANGULUS(INLINED)
-   Trait Hierarchy::SeekTraitAux(const Neat& aux, TMeta meta, Index offset) {
+   auto Hierarchy::SeekTraitAux(const Many& aux, TMeta meta, Index offset) -> Trait {
       // Scan descriptor                                                
       Trait result;
       aux.ForEachDeep([&](const Trait& trait) {
@@ -489,7 +488,7 @@ namespace Langulus::Entity
    ///   @param offset - the number of the matching trait to use              
    ///   @return the trait, which is not empty, if trait was found            
    template<Seek SEEK> LANGULUS(INLINED)
-   bool Hierarchy::SeekValueAux(TMeta meta, const Neat& aux, CT::Data auto& output, Index offset) const {
+   bool Hierarchy::SeekValueAux(TMeta meta, const Many& aux, CT::Data auto& output, Index offset) const {
       using D = Deref<decltype(output)>;
 
       if constexpr (CT::Pinnable<D>) {
@@ -502,7 +501,7 @@ namespace Langulus::Entity
       if constexpr (SEEK & Seek::Here) {
          bool done = false;
          if (meta) {
-            aux.ForEachTrait([&](const Trait& trait) -> LoopControl {
+            aux.ForEachDeep([&](const Trait& trait) -> LoopControl {
                if (trait.IsTrait(meta)) {
                   // Found match                                        
                   try {
@@ -568,10 +567,9 @@ namespace Langulus::Entity
       // If reached, then no trait was found in the descriptor          
       // Let's delve into the hierarchy, by scanning for Traits::Parent 
       // and Traits::Child inside the 'aux'                             
-      //return SeekValue<SEEK>(meta, output, offset);
       bool done = false;
       if constexpr (SEEK & Seek::Above) {
-         aux.ForEachTrait([&](const Traits::Parent& trait) -> LoopControl {
+         aux.ForEachDeep([&](const Traits::Parent& trait) -> LoopControl {
             trait.ForEach([&](const Thing& parent) {
                if (parent.SeekValue<Seek::HereAndAbove>(meta, output, offset)) {
                   // Value was found                                    
@@ -580,12 +578,13 @@ namespace Langulus::Entity
                }
                return Loop::Continue;
             });
+
             return not done;
          });
       }
 
       if constexpr (SEEK & Seek::Below) {
-         aux.ForEachTrait([&](const Traits::Child& trait) -> LoopControl {
+         aux.ForEachDeep([&](const Traits::Child& trait) -> LoopControl {
             trait.ForEach([&](const Thing& child) {
                if (child.SeekValue<Seek::HereAndBelow>(meta, output, offset)) {
                   // Value was found                                    
@@ -594,6 +593,7 @@ namespace Langulus::Entity
                }
                return Loop::Continue;
             });
+
             return not done;
          });
       }

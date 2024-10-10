@@ -63,9 +63,9 @@ namespace Langulus::A
 
       virtual void Refresh();
 
-      Runtime* GetRuntime() const noexcept;
-      const Hierarchy& GetOwners() const noexcept;
-      bool CompareDescriptor(const Neat&) const;
+      auto GetRuntime() const noexcept -> Runtime*;
+      auto GetOwners() const noexcept -> const Hierarchy&;
+      bool CompareDescriptor(const Many&) const;
       
       ///                                                                     
       ///   Flow                                                              
@@ -85,24 +85,24 @@ namespace Langulus::A
       using SeekInterface::SeekValue;
       using SeekInterface::SeekValueAux;
 
-      template<Seek = Seek::HereAndAbove>
-      NOD() Unit* SeekUnit(DMeta, Index = 0);
-      template<Seek = Seek::HereAndAbove>
-      NOD() Unit* SeekUnitAux(const Neat&, DMeta, Index = 0);
-      template<Seek = Seek::HereAndAbove>
-      NOD() Unit* SeekUnitExt(DMeta, const Neat&, Index = 0);
-      template<Seek = Seek::HereAndAbove>
-      NOD() Unit* SeekUnitAuxExt(DMeta, const Neat&, const Neat&, Index = 0);
+      template<Seek = Seek::HereAndAbove> NOD()
+      auto SeekUnit(DMeta, Index = 0) -> Unit*;
+      template<Seek = Seek::HereAndAbove> NOD()
+      auto SeekUnitAux(const Many&, DMeta, Index = 0) -> Unit*;
+      template<Seek = Seek::HereAndAbove> NOD()
+      auto SeekUnitExt(DMeta, const Many&, Index = 0) -> Unit*;
+      template<Seek = Seek::HereAndAbove> NOD()
+      auto SeekUnitAuxExt(DMeta, const Many&, const Many&, Index = 0) -> Unit*;
 
-      template<Seek = Seek::HereAndAbove>
-      NOD() Langulus::Trait SeekTrait(TMeta, Index = 0);
-      template<Seek = Seek::HereAndAbove>
-      NOD() Langulus::Trait SeekTraitAux(const Neat&, TMeta, Index = 0);
+      template<Seek = Seek::HereAndAbove> NOD()
+      auto SeekTrait(TMeta, Index = 0) -> Langulus::Trait;
+      template<Seek = Seek::HereAndAbove> NOD()
+      auto SeekTraitAux(const Many&, TMeta, Index = 0) -> Langulus::Trait;
 
       template<Seek = Seek::HereAndAbove>
       bool SeekValue(TMeta, CT::Data auto&, Index = 0) const;
       template<Seek = Seek::HereAndAbove>
-      bool SeekValueAux(TMeta, const Neat&, CT::Data auto&, Index = 0) const;
+      bool SeekValueAux(TMeta, const Many&, CT::Data auto&, Index = 0) const;
 
       ///                                                                     
       ///   Gather                                                            
@@ -111,19 +111,19 @@ namespace Langulus::A
       using SeekInterface::GatherUnitsExt;
       using SeekInterface::GatherTraits;
 
-      template<Seek = Seek::HereAndAbove>
-      NOD() TMany<Unit*> GatherUnits(DMeta);
-      template<Seek = Seek::HereAndAbove>
-      NOD() TMany<Unit*> GatherUnitsExt(DMeta, const Neat&);
+      template<Seek = Seek::HereAndAbove> NOD()
+      auto GatherUnits(DMeta) -> TMany<Unit*>;
+      template<Seek = Seek::HereAndAbove> NOD()
+      auto GatherUnitsExt(DMeta, const Many&) -> TMany<Unit*>;
 
-      template<Seek = Seek::HereAndAbove>
-      NOD() TraitList GatherTraits(TMeta);
+      template<Seek = Seek::HereAndAbove> NOD()
+      auto GatherTraits(TMeta) -> TraitList;
 
-      template<CT::Data D, Seek = Seek::HereAndAbove>
-      NOD() TMany<D> GatherValues() const;
+      template<CT::Data D, Seek = Seek::HereAndAbove> NOD()
+      auto GatherValues() const -> TMany<D>;
 
    protected:
-      void Couple(const Neat&);
+      void Couple(const Many&, const Thing* = nullptr);
       void Decouple(const Thing*);
       void ReplaceOwner(const Thing*, const Thing*);
    };
