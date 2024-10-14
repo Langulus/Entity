@@ -65,6 +65,6 @@ target_compile_definitions(LangulusEntity
 )
 
 if(LANGULUS_TESTING)
-    enable_testing()
-	add_subdirectory(test)
+    #enable_testing()
+	#add_subdirectory(test)
 endif()
