@@ -66,7 +66,7 @@ namespace Langulus::Entity
 
       if (descriptor) {
          // Create any subthings/traits/unit in this thing              
-         Verbs::Create creator {&descriptor};
+         Verbs::Create creator {descriptor};
          Create(creator);
       }
 

@@ -608,7 +608,7 @@ namespace Langulus::Entity
 
             // Potential unit producers found, attempt creation         
             producers.MakeOr();
-            Verbs::Create creator {&descriptor};
+            Verbs::Create creator {descriptor};
             if (Flow::DispatchFlat(producers, creator))
                return Abandon(creator.GetOutput());
 
@@ -628,7 +628,7 @@ namespace Langulus::Entity
 
             // Potential module producers found, attempt creation       
             producers.MakeOr();
-            Verbs::Create creator {&descriptor};
+            Verbs::Create creator {descriptor};
             if (Flow::DispatchFlat(producers, creator))
                return Abandon(creator.GetOutput());
 
@@ -651,7 +651,7 @@ namespace Langulus::Entity
          if (producers) {
             // Potential unit producers found, attempt creation there   
             producers.MakeOr();
-            Verbs::Create creator {&descriptor};
+            Verbs::Create creator {descriptor};
             if (Flow::DispatchFlat(producers, creator))
                return Abandon(creator.GetOutput());
 
@@ -671,14 +671,9 @@ namespace Langulus::Entity
          // such constructor is reflected. If it's a unit, its          
          // descriptor is resposible for registering it with the parent 
          // via the Traits::Parent trait                                
-         Verbs::Create creator {&descriptor};
+         Verbs::Create creator {descriptor};
          if (Verbs::Create::ExecuteStateless(creator))
             return Abandon(creator.GetOutput());
-         
-         /*Logger::Error(
-            "Failed to create `", Logger::PushDarkYellow,
-            type, Logger::Pop, "` statelessly: ", descriptor
-         );*/
       }
 
       LANGULUS_THROW(Construct, "Unable to create data");
