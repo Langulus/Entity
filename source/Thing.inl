@@ -572,6 +572,7 @@ namespace Langulus::Entity
       const auto type = construct.GetType();
       const auto producer = type and type->mProducerRetriever
          ? type->mProducerRetriever() : nullptr;
+      Construct descriptor = construct;
 
       ENTITY_VERBOSE_SELF(
          "Acting as producer context for making `", 
@@ -581,7 +582,6 @@ namespace Langulus::Entity
       // Implicitly add a parent trait to descriptor, if one isn't      
       // already added - it will be stripped later, when normalizing    
       // the descriptor when producing the item from a factory          
-      Construct descriptor = construct;
       Traits::Parent parent;
       if (not descriptor->ExtractTrait<Traits::Parent>(parent)) {
          parent = this;
