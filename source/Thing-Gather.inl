@@ -9,16 +9,6 @@
 #include "Thing.hpp"
 #include "Hierarchy-Gather.inl"
 
-#if 0
-   #define ENTITY_VERBOSE_ENABLED()    1
-   #define ENTITY_VERBOSE_SELF(...)    Logger::Verbose(Self(), __VA_ARGS__)
-   #define ENTITY_VERBOSE(...)         Logger::Append(__VA_ARGS__)
-#else
-   #define ENTITY_VERBOSE_ENABLED()    0
-   #define ENTITY_VERBOSE_SELF(...)    LANGULUS(NOOP)
-   #define ENTITY_VERBOSE(...)         LANGULUS(NOOP)
-#endif
-
 
 namespace Langulus::Entity
 {
@@ -37,7 +27,7 @@ namespace Langulus::Entity
          if (found) {
             auto& list = mUnitsAmbiguous.GetValue(found);
             for (auto& unit : list)
-               result << unit/*.Get()*/;
+               result << unit;
          }
       }
 
@@ -186,7 +176,3 @@ namespace Langulus::Entity
    }
 
 } // namespace Langulus::Entity
-
-#undef ENTITY_VERBOSE_ENABLED
-#undef ENTITY_VERBOSE_SELF
-#undef ENTITY_VERBOSE
