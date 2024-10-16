@@ -51,7 +51,7 @@ namespace Langulus::Entity
    template<class...T>
    Ref<Thing> Thing::CreateChild(T&&...arguments) {
       ENTITY_VERBOSE_SELF_TAB(
-         "Producing child (at ", Reference(0), " references): ");
+         "Producing child (at ", GetReferences(), " references): ");
       Ref<Thing> newThing;
       newThing.New(this, Many {Forward<T>(arguments)...});
       return Abandon(newThing);
@@ -341,7 +341,7 @@ namespace Langulus::Entity
       mRefreshRequired = true;
 
       ENTITY_VERBOSE(
-         unit, " added as unit (now at ", Reference(0), " references)");
+         unit, " added as unit (now at ", GetReferences(), " references)");
       return 1;
    }
 
@@ -428,14 +428,14 @@ namespace Langulus::Entity
    /// Get the list of units, in order of addition                            
    ///   @return a reference to the list of units                             
    LANGULUS(INLINED)
-   const UnitList& Thing::GetUnits() const noexcept {
+   auto Thing::GetUnits() const noexcept -> const UnitList& {
       return mUnitsList;
    }
 
    /// Get the ambiguous map of units                                         
    ///   @return a reference to the map of units                              
    LANGULUS(INLINED)
-   const UnitMap& Thing::GetUnitsMap() const noexcept {
+   auto Thing::GetUnitsMap() const noexcept -> const UnitMap& {
       return mUnitsAmbiguous;
    }
 
@@ -576,7 +576,7 @@ namespace Langulus::Entity
 
       ENTITY_VERBOSE_SELF(
          "Acting as producer context for making `", 
-         type, "` (at ", Reference(0), " references)"
+         type, "` (at ", GetReferences(), " references)"
       );
 
       // Implicitly add a parent trait to descriptor, if one isn't      
@@ -589,7 +589,7 @@ namespace Langulus::Entity
          descriptor << parent;
          ENTITY_VERBOSE_SELF(
             "Referenced as Traits::Parent (now at ",
-            Reference(0), " references)"
+            GetReferences(), " references)"
          );
       }
       else if (parent.IsMissing())

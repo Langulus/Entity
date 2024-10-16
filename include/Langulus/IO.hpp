@@ -51,6 +51,13 @@ namespace Langulus::A
       Size mByteCount {};
       bool mIsReadOnly {};
 
+      // Parent directory substring, mapped onto mFilePath              
+      Token mParentDirectory;
+      // File name after all directories, mapped onto mFilePath         
+      Token mFileName;
+      // The extension of the filename, mapped onto mFilePath           
+      Token mFileExtension;
+
    public:
       LANGULUS(PRODUCER) FileSystem;
       LANGULUS_BASES(Unit);
