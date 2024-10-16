@@ -29,7 +29,7 @@ TEMPLATE_TEST_CASE("Testing Thing with different kidns of descriptors",
       REQUIRE(not root.GetUnits());
       REQUIRE(not root.GetUnitsMap());
       REQUIRE(not root.GetTraits());
-      REQUIRE(root.Reference(0) == 1);
+      REQUIRE(root.GetReferences() == 1);
    }
 
    WHEN("Creating a Thing with a parent") {
@@ -47,7 +47,7 @@ TEMPLATE_TEST_CASE("Testing Thing with different kidns of descriptors",
       REQUIRE(not root.GetUnits());
       REQUIRE(not root.GetUnitsMap());
       REQUIRE(not root.GetTraits());
-      REQUIRE(root.Reference(0) == 1);
+      REQUIRE(root.GetReferences() == 1);
 
       REQUIRE(child.GetOwner() == &root);
       REQUIRE(child.GetRuntime() == nullptr);
@@ -59,7 +59,7 @@ TEMPLATE_TEST_CASE("Testing Thing with different kidns of descriptors",
       REQUIRE(not child.GetUnits());
       REQUIRE(not child.GetUnitsMap());
       REQUIRE(not child.GetTraits());
-      REQUIRE(child.Reference(0) == 1);
+      REQUIRE(child.GetReferences() == 1);
    }
    
    GIVEN("A root Thing") {
@@ -91,7 +91,7 @@ TEMPLATE_TEST_CASE("Testing Thing with different kidns of descriptors",
          REQUIRE(root.GetChildren().GetCount() == 1);
          REQUIRE(not root.GetUnits());
          REQUIRE(not root.GetTraits());
-         REQUIRE(root.Reference(0) == 1);
+         REQUIRE(root.GetReferences() == 1);
 
          auto child1 = root.GetChildren()[0];
          REQUIRE(child1 == child);
@@ -104,66 +104,62 @@ TEMPLATE_TEST_CASE("Testing Thing with different kidns of descriptors",
          REQUIRE(not child1->GetChildren());
          REQUIRE(not child1->GetUnits());
          REQUIRE(not child1->GetTraits());
-         REQUIRE(child1->Reference(0) == 2);
+         REQUIRE(child1->GetReferences() == 2);
       }
 
       WHEN("Adding an existing unit") {
          TestUnit1 testUnit;
          auto added = root.AddUnit(&testUnit);
 
-         THEN("Properties should match") {
-            REQUIRE(added == 1);
-            REQUIRE(root.GetOwner() == nullptr);
-            REQUIRE(root.GetRuntime() == nullptr);
-            REQUIRE(root.GetRuntime().IsLocked() == false);
-            REQUIRE(root.GetFlow() == nullptr);
-            REQUIRE(root.GetFlow().IsLocked() == false);
-            REQUIRE(root.RequiresRefresh() == true);
-            REQUIRE(root.GetChildren().IsEmpty());
-            REQUIRE(root.GetUnits().GetCount() == 1);
-            REQUIRE(root.GetTraits().IsEmpty());
-            REQUIRE(root.Reference(0) == 1);
+         REQUIRE(added == 1);
+         REQUIRE(root.GetOwner() == nullptr);
+         REQUIRE(root.GetRuntime() == nullptr);
+         REQUIRE(root.GetRuntime().IsLocked() == false);
+         REQUIRE(root.GetFlow() == nullptr);
+         REQUIRE(root.GetFlow().IsLocked() == false);
+         REQUIRE(root.RequiresRefresh() == true);
+         REQUIRE(root.GetChildren().IsEmpty());
+         REQUIRE(root.GetUnits().GetCount() == 1);
+         REQUIRE(root.GetTraits().IsEmpty());
+         REQUIRE(root.GetReferences() == 1);
 
-            auto it = root.GetUnits().begin();
-            REQUIRE(it->GetType() == MetaOf<TestUnit1>());
-            REQUIRE(*it == &testUnit);
-            REQUIRE(it->GetOwners().GetCount() == 1);
-            REQUIRE(it->GetOwners()[0] == &root);
-            REQUIRE(it->Reference(0) == 1);
-         }
+         auto it = root.GetUnits().begin();
+         REQUIRE(it->GetType() == MetaOf<TestUnit1>());
+         REQUIRE(*it == &testUnit);
+         REQUIRE(it->GetOwners().GetCount() == 1);
+         REQUIRE(it->GetOwners()[0] == &root);
+         REQUIRE(it->GetReferences() == 1);
       }
 
       WHEN("Creating a new unit") {
          auto unit = root.CreateUnit<TestUnit1>();
 
-         THEN("Properties should match") {
-            REQUIRE(root.GetOwner() == nullptr);
-            REQUIRE(root.GetRuntime() == nullptr);
-            REQUIRE(root.GetRuntime().IsLocked() == false);
-            REQUIRE(root.GetFlow() == nullptr);
-            REQUIRE(root.GetFlow().IsLocked() == false);
-            REQUIRE(root.RequiresRefresh() == true);
-            REQUIRE(root.GetChildren().IsEmpty());
-            REQUIRE(root.GetUnits().GetCount() == 1);
-            REQUIRE(root.GetTraits().IsEmpty());
-            REQUIRE(root.Reference(0) == 1);
+         REQUIRE(root.GetOwner() == nullptr);
+         REQUIRE(root.GetRuntime() == nullptr);
+         REQUIRE(root.GetRuntime().IsLocked() == false);
+         REQUIRE(root.GetFlow() == nullptr);
+         REQUIRE(root.GetFlow().IsLocked() == false);
+         REQUIRE(root.RequiresRefresh() == true);
+         REQUIRE(root.GetChildren().IsEmpty());
+         REQUIRE(root.GetUnits().GetCount() == 1);
+         REQUIRE(root.GetTraits().IsEmpty());
+         REQUIRE(root.GetReferences() == 1);
 
-            auto it = root.GetUnits().begin();
-            REQUIRE(it->GetType() == MetaOf<TestUnit1>());
-            REQUIRE(*it == unit.As<TestUnit1*>());
+         auto it = root.GetUnits().begin();
+         REQUIRE(it->GetType() == MetaOf<TestUnit1>());
+         REQUIRE(*it == unit.As<TestUnit1*>());
 
-            // Kept once in `unit`                                      
-            // Kept once in root.mUnitsList                             
-            // Kept once in root.mUnitsAmbiguous                        
-            REQUIRE(unit.GetUses() == 3);
+         // Kept once in `unit`                                         
+         // Kept once in root.mUnitsList                                
+         // Kept once in root.mUnitsAmbiguous                           
+         REQUIRE(unit.GetUses() == 3);
 
-            REQUIRE(Fractalloc::Instance.Find({}, unit.As<TestUnit1*>())->GetUses() == 3);
-            REQUIRE(unit.As<TestUnit1*>()->Reference(0) == 3);
-            REQUIRE(Fractalloc::Instance.Find({}, unit.As<TestUnit1*>())->GetUses() == 3);
-            REQUIRE(it->GetOwners().GetCount() == 1);
-            REQUIRE(it->GetOwners()[0] == &root);
-            REQUIRE(it->Reference(0) == 3);
-         }
+         REQUIRE(Fractalloc::Instance.Find({}, unit.As<TestUnit1*>())->GetUses() == 3);
+         REQUIRE(unit.As<TestUnit1*>()->GetReferences() == 3);
+         REQUIRE(Fractalloc::Instance.Find({}, unit.As<TestUnit1*>())->GetUses() == 3);
+         REQUIRE(it->GetOwners().GetCount() == 1);
+         REQUIRE(it->GetOwners()[0] == &root);
+         REQUIRE(it->GetReferences() == 3);
       }
 
       WHEN("Adding a trait") {
@@ -181,7 +177,7 @@ TEMPLATE_TEST_CASE("Testing Thing with different kidns of descriptors",
          REQUIRE(not root.GetUnits());
          REQUIRE(not root.GetUnitsMap());
          REQUIRE(root.GetTraits().GetCount() == 1);
-         REQUIRE(root.Reference(0) == 1);
+         REQUIRE(root.GetReferences() == 1);
 
          auto it = root.GetTraits().begin();
          REQUIRE(it.GetKey() == MetaOf<Traits::Count>());
@@ -206,7 +202,7 @@ TEMPLATE_TEST_CASE("Testing Thing with different kidns of descriptors",
          REQUIRE(not root.GetUnitsMap());
          REQUIRE(root.GetTraits().GetCount() == 1);
          REQUIRE(root.GetName() == "Dimo");
-         REQUIRE(root.Reference(0) == 1);
+         REQUIRE(root.GetReferences() == 1);
 
          auto it = root.GetTraits().begin();
          REQUIRE(it.GetKey() == MetaOf<Traits::Name>());
@@ -247,7 +243,7 @@ TEMPLATE_TEST_CASE("Testing Thing with different kidns of descriptors",
          REQUIRE(root.GetUnits().GetCount() == 2);
          REQUIRE(root.GetTraits().GetCount() == 1);
          REQUIRE(root.GetName() == "Root");
-         REQUIRE(root.Reference(0) == 1);
+         REQUIRE(root.GetReferences() == 1);
 
          auto child1 = root.GetChildren()[0];
          REQUIRE(child1->GetOwner() == &root);
@@ -269,7 +265,7 @@ TEMPLATE_TEST_CASE("Testing Thing with different kidns of descriptors",
          // child1's GrandChild2 owner contains 1 reference
          //---------------------------------------------------
          // total: 8 references confirmed
-         REQUIRE(child1->Reference(0) == 5);
+         REQUIRE(child1->GetReferences() == 5);
 
          auto child2 = root.GetChildren()[1];
          REQUIRE(child2->GetOwner() == &root);
@@ -282,7 +278,7 @@ TEMPLATE_TEST_CASE("Testing Thing with different kidns of descriptors",
          REQUIRE(not child2->GetUnits());
          REQUIRE(child2->GetTraits().GetCount() == 1);
          REQUIRE(child2->GetName() == "Child2");
-         REQUIRE(child2->Reference(0) == 1);
+         REQUIRE(child2->GetReferences() == 1);
 
          auto grandchild1 = child1->GetChildren()[0];
          REQUIRE(grandchild1->GetOwner() == child1);
@@ -295,7 +291,7 @@ TEMPLATE_TEST_CASE("Testing Thing with different kidns of descriptors",
          REQUIRE(not grandchild1->GetUnits());
          REQUIRE(grandchild1->GetTraits().GetCount() == 1);
          REQUIRE(grandchild1->GetName() == "GrandChild1");
-         REQUIRE(grandchild1->Reference(0) == 1);
+         REQUIRE(grandchild1->GetReferences() == 1);
 
          auto grandchild2 = child1->GetChildren()[1];
          REQUIRE(grandchild2->GetOwner() == child1);
@@ -308,7 +304,7 @@ TEMPLATE_TEST_CASE("Testing Thing with different kidns of descriptors",
          REQUIRE(not grandchild2->GetUnits());
          REQUIRE(grandchild2->GetTraits().GetCount() == 1);
          REQUIRE(grandchild2->GetName() == "GrandChild2");
-         REQUIRE(grandchild2->Reference(0) == 1);
+         REQUIRE(grandchild2->GetReferences() == 1);
 
          Logger::Special("End: Creating a Thing by descriptor");
       }

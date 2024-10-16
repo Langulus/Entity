@@ -57,18 +57,18 @@ namespace Langulus::A
       LANGULUS_BASES(Asset);
       Image() : Resolvable {this} {}
 
-      NOD() virtual Ref<Image> GetLOD(const Math::LOD&) const { return {}; }
-      NOD() virtual void* GetGPUHandle() const noexcept { return nullptr; }
+      NOD() virtual auto GetLOD(const Math::LOD&) const -> Ref<Image> { return {}; }
+      NOD() virtual auto GetGPUHandle() const noexcept -> void* { return nullptr; }
 
-      NOD() DMeta GetFormat() const noexcept;
-      NOD() ImageView const& GetView() const noexcept;
-      NOD() ImageView& GetView() noexcept;
+      NOD() auto GetFormat() const noexcept -> DMeta;
+      NOD() auto GetView() const noexcept -> ImageView const&;
+      NOD() auto GetView() noexcept -> ImageView&;
 
       template<class F>
       auto ForEachPixel(F&&) const;
 
       template<template<class> class S, CT::Block B> requires CT::Intent<S<B>>
-      void Upload(S<B>&&) const;
+      void Upload(S<B>&&);
 
       ///                                                                     
       ///   Iteration                                                         
@@ -76,9 +76,9 @@ namespace Langulus::A
       template<bool MUTABLE>
       struct Iterator;
 
-      NOD() auto begin() noexcept -> Iterator<true>;
+      NOD() auto begin()       noexcept -> Iterator<true>;
       NOD() auto begin() const noexcept -> Iterator<false>;
-      NOD() auto end() const noexcept -> A::IteratorEnd { return {}; }
+      NOD() auto end()   const noexcept -> A::IteratorEnd { return {}; }
    };
   
 
@@ -108,17 +108,17 @@ namespace Langulus::A
       constexpr Iterator(Iterator&&) noexcept = default;
       constexpr Iterator(const A::IteratorEnd&) noexcept;
 
-      constexpr Iterator& operator = (const Iterator&) noexcept = default;
-      constexpr Iterator& operator = (Iterator&&) noexcept = default;
+      constexpr auto operator = (const Iterator&) noexcept -> Iterator& = default;
+      constexpr auto operator = (Iterator&&) noexcept -> Iterator& = default;
 
       NOD() constexpr bool operator == (const Iterator&) const noexcept;
       NOD() constexpr bool operator == (const A::IteratorEnd&) const noexcept;
 
       // Prefix operator                                                
-      constexpr Iterator& operator ++ () noexcept;
+      constexpr auto operator ++ () noexcept -> Iterator&;
 
       // Suffix operator                                                
-      NOD() constexpr Iterator operator ++ (int) noexcept;
+      NOD() constexpr auto operator ++ (int) noexcept -> Iterator;
 
       constexpr explicit operator bool() const noexcept;
       constexpr operator Iterator<false>() const noexcept requires Mutable;
@@ -135,7 +135,7 @@ namespace Langulus::A
       LANGULUS_BASES(Image);
 
       Font()
-         : Resolvable {this}
+         : Resolvable   {this}
          , ProducedFrom {nullptr, {}} {}
    };
 

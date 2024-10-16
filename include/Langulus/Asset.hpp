@@ -43,17 +43,17 @@ namespace Langulus::A
 
    protected:
       // Map of lists of generated data                                 
-      mutable DataListMap mDataListMap;
+      DataListMap mDataListMap;
 
    public:
       Asset() : Resolvable {this} {}
 
-      void Detach();
+      Count Reference(int);
 
       virtual bool Generate(TMeta, Offset = 0) { return true; }
 
       template<CT::TraitBased = Langulus::Trait>
-      void Commit(auto&&) const;
+      void Commit(auto&&);
 
       template<CT::TraitBased = Langulus::Trait>
       NOD() auto GetData(Offset = 0) const noexcept -> const Data*;

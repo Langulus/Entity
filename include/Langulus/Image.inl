@@ -84,21 +84,21 @@ namespace Langulus::A
    /// Get the pixel format of the texture                                    
    ///   @return the pixel format type                                        
    LANGULUS(INLINED)
-   DMeta Image::GetFormat() const noexcept {
+   auto Image::GetFormat() const noexcept -> DMeta {
       return mView.mFormat;
    }
 
    /// Get the texture view (const)                                           
    ///   @return the texture view                                             
    LANGULUS(INLINED)
-   const ImageView& Image::GetView() const noexcept {
+   auto Image::GetView() const noexcept -> const ImageView& {
       return mView;
    }
    
    /// Get the texture view                                                   
    ///   @return the texture view                                             
    LANGULUS(INLINED)
-   ImageView& Image::GetView() noexcept {
+   auto Image::GetView() noexcept -> ImageView& {
       return mView;
    }
 
@@ -157,7 +157,7 @@ namespace Langulus::A
    ///   @param data - the block of data                                      
    template<template<class> class S, CT::Block B>
    requires CT::Intent<S<B>> LANGULUS(INLINED)
-   void Image::Upload(S<B>&& data) const {
+   void Image::Upload(S<B>&& data) {
       // Check if provided data matches the view requirements           
       LANGULUS_ASSERT(mView.GetBytesize() == data->GetBytesize(), Image,
          "Data is of the wrong size");
@@ -221,7 +221,7 @@ namespace Langulus::A
    ///   @attention assumes iterator points to a valid element                
    ///   @return the modified iterator                                        
    template<bool M> LANGULUS(INLINED)
-   constexpr Image::Iterator<M>& Image::Iterator<M>::operator ++ () noexcept {
+   constexpr auto Image::Iterator<M>::operator ++ () noexcept -> Iterator& {
       mValue += mImage->GetView().GetPixelBytesize();
       return *this;
    }
@@ -230,7 +230,7 @@ namespace Langulus::A
    ///   @attention assumes iterator points to a valid element                
    ///   @return the previous value of the iterator                           
    template<bool M> LANGULUS(INLINED)
-   constexpr Image::Iterator<M> Image::Iterator<M>::operator ++ (int) noexcept {
+   constexpr auto Image::Iterator<M>::operator ++ (int) noexcept -> Iterator {
       const auto backup = *this;
       operator ++ ();
       return backup;

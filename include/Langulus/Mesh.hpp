@@ -70,7 +70,7 @@ namespace Langulus::A
       NOD() auto GetView() const noexcept -> MeshView const&;
       NOD() auto GetView()       noexcept -> MeshView&;
 
-      NOD() virtual Ref<Mesh> GetLOD(const Math::LOD&) const = 0;
+      NOD() virtual auto GetLOD(const Math::LOD&) const -> Ref<Mesh> = 0;
 
       // Point utilities                                                
       NOD() bool MadeOfPoints() const noexcept;

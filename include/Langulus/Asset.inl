@@ -114,7 +114,7 @@ namespace Langulus::A
    ///         you don't use factories, and just want some local content      
    ///         representation.                                                
    template<CT::TraitBased T> LANGULUS(INLINED)
-   void Asset::Commit(auto&& content) const {
+   void Asset::Commit(auto&& content) {
       TMeta trait;
       if constexpr (CT::Trait<T>)
          trait = MetaTraitOf<T>();
@@ -128,9 +128,14 @@ namespace Langulus::A
    }
 
    /// Detach the asset                                                       
-   inline void Asset::Detach() {
-      mDataListMap.Reset();
-      ProducedFrom::Detach();
+   LANGULUS(INLINED)
+   Count Asset::Reference(int x) {
+      if (Unit::Reference(x) == 1) {
+         mDataListMap.Reset();
+         ProducedFrom::Detach();
+      }
+
+      return GetReferences();
    }
 
 } // namespace Langulus::A
