@@ -8,7 +8,7 @@
 #include "Thing.hpp"
 #include "Thing.inl"
 
-#if 0
+#if 1
    #define ENTITY_VERBOSE_ENABLED()       1
    #define ENTITY_VERBOSE_SELF(...)       Logger::Info(this, ": ", __VA_ARGS__)
    #define ENTITY_VERBOSE_SELF_TAB(...)   const auto scoped = Logger::InfoTab(this, ": ", __VA_ARGS__)
@@ -26,7 +26,7 @@ namespace Langulus::Entity
 
    /// Default-constructor, always creates a parentless root thing            
    Thing::Thing() : Resolvable {this} {
-      ENTITY_VERBOSE_SELF("Created (root, ", Reference(0), " references)");
+      ENTITY_VERBOSE_SELF("Created (root, ", GetReferences(), " references)");
    }
    
    /// Descriptor-constructor                                                 
@@ -40,13 +40,13 @@ namespace Langulus::Entity
       if (mOwner) {
          ENTITY_VERBOSE_SELF(
             "Created as child to ", mOwner,
-            " (", Reference(0), " references; parent now has ",
-            mOwner->Reference(0), " references)"
+            " (", GetReferences(), " references; parent now has ",
+            mOwner->GetReferences(), " references)"
          );
       }
       else {
          ENTITY_VERBOSE_SELF(
-            "Created (root, ", Reference(0), " references)"
+            "Created (root, ", GetReferences(), " references)"
          );
       }
    }
@@ -73,13 +73,13 @@ namespace Langulus::Entity
       if (mOwner) {
          ENTITY_VERBOSE_SELF(
             "Created as child to ", mOwner,
-            " (", Reference(0), " references; parent now has ",
-            mOwner->Reference(0), " references)"
+            " (", GetReferences(), " references; parent now has ",
+            mOwner->GetReferences(), " references)"
          );
       }
       else {
          ENTITY_VERBOSE_SELF(
-            "Created (root, ", Reference(0), " references)"
+            "Created (root, ", GetReferences(), " references)"
          );
       }
    }
@@ -94,8 +94,8 @@ namespace Langulus::Entity
       , mRuntime        {Move(other.mRuntime)}
       , mFlow           {Move(other.mFlow)}
       , mChildren       {Move(other.mChildren)}
-      , mUnitsAmbiguous {Move(other.mUnitsAmbiguous)}
       , mUnitsList      {Move(other.mUnitsList)}
+      , mUnitsAmbiguous {Move(other.mUnitsAmbiguous)}
       , mTraits         {Move(other.mTraits)}
       , mRefreshRequired{true}
    {
@@ -124,8 +124,8 @@ namespace Langulus::Entity
       , mRuntime        {Abandon(other->mRuntime)}
       , mFlow           {Abandon(other->mFlow)}
       , mChildren       {Abandon(other->mChildren)}
-      , mUnitsAmbiguous {Abandon(other->mUnitsAmbiguous)}
       , mUnitsList      {Abandon(other->mUnitsList)}
+      , mUnitsAmbiguous {Abandon(other->mUnitsAmbiguous)}
       , mTraits         {Abandon(other->mTraits)}
       , mRefreshRequired{true}
    {
@@ -160,46 +160,71 @@ namespace Langulus::Entity
       ENTITY_VERBOSE_SELF("cloned from ", *other);
    }
 
-   /// Destructor                                                             
-   Thing::~Thing() IF_UNSAFE(noexcept) {
-      Detach();
+   Thing::~Thing() {
+      if (GetReferences())
+         Reference(-1);
    }
-   
-   /// A nested call to detach all parents of all children                    
-   void Thing::Detach() {
-      ENTITY_VERBOSE_SELF_TAB("Destroying (", Reference(0), " uses):");
 
-      mTraits.Reset();
+   /// Reference and detach all parents of all children                       
+   Count Thing::Reference(int x) {
+      if (Referenced::Reference(x) == 0) {
+         // Traits might be exposing members in units. Make sure we     
+         // dereference those first                                     
+         mTraits.Reset();
 
-      // Decouple all units from this owner                             
-      for (auto& unit : mUnitsList) {
-         ENTITY_VERBOSE_SELF("Decoupling unit: ", unit);
-         unit->mOwners.Reset();
-         ENTITY_VERBOSE_SELF("...", Reference(0), " uses remain");
-      }
-
-      mUnitsList.Reset();
-      mUnitsAmbiguous.Reset();
-
-      if (not mFlow.IsLocked())
-         mFlow.Reset();
-
-      // Decouple all children from this                                
-      for (auto& child : mChildren) {
-         if (child->mOwner) {
-            ENTITY_VERBOSE_SELF("Decoupling child: ", child);
-            LANGULUS_ASSUME(DevAssumes,
-               child->mOwner == this, "Parent mismatch");
-            child->mOwner.Reset();
-            child->Detach();
-            ENTITY_VERBOSE_SELF("...", Reference(0), " uses remain");
+         // Decouple all units from this owner because units might get  
+         // destroyed upon destroying mUnitsList and mUnitsAmbiguous    
+         // If they still have owners, they will attempt to Decouple    
+         // themselves from already destroyed mUnitsList/mUnitsAmbiguous
+         for (auto& unit : mUnitsList) {
+            ENTITY_VERBOSE_SELF("Decoupling unit: ", unit);
+            unit->mOwners.Remove(this);
+            ENTITY_VERBOSE_SELF("...", GetReferences(), " uses remain");
          }
+
+         // The same applies for child things                           
+         for (auto& child : mChildren) {
+            if (child->mOwner) {
+               ENTITY_VERBOSE_SELF("Decoupling child: ", child);
+               LANGULUS_ASSUME(DevAssumes, child->mOwner == this, "Parent mismatch");
+               child->mOwner.Reset();
+               ENTITY_VERBOSE_SELF("...", GetReferences(), " uses remain");
+            }
+         }
+
+         /*ENTITY_VERBOSE_SELF_TAB("Detaching (", GetReferences(), " uses):");
+
+         mTraits.Reset();
+
+         // Decouple all units from this owner                          
+         for (auto& unit : mUnitsList) {
+            ENTITY_VERBOSE_SELF("Decoupling unit: ", unit);
+            unit->mOwners.Reset();
+            ENTITY_VERBOSE_SELF("...", GetReferences(), " uses remain");
+         }
+
+         mUnitsList.Reset();
+         mUnitsAmbiguous.Reset();
+
+         if (not mFlow.IsLocked())
+            mFlow.Reset();
+
+         // Decouple all children from this                             
+         for (auto& child : mChildren) {
+            if (child->mOwner) {
+               ENTITY_VERBOSE_SELF("Decoupling child: ", child);
+               LANGULUS_ASSUME(DevAssumes, child->mOwner == this,
+                  "Parent mismatch");
+               child->mOwner.Reset();
+               child->Reference(x);
+               ENTITY_VERBOSE_SELF("...", GetReferences(), " uses remain");
+            }
+         }
+
+         mChildren.Reset();*/
       }
 
-      mChildren.Reset();
-
-      if (not mRuntime.IsLocked())
-         mRuntime.Reset();
+      return GetReferences();
    }
 
    /// Compare two entities                                                   

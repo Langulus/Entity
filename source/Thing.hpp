@@ -56,10 +56,10 @@ namespace Langulus::Entity
       Pin<Ref<Temporal>> mFlow;
       // Hierarchy                                                      
       Hierarchy mChildren;
-      // Units indexed by all their relevant reflected bases            
-      UnitMap mUnitsAmbiguous;
       // Units indexed by concrete type, in order of addition           
       UnitList mUnitsList;
+      // Units indexed by all their relevant reflected bases            
+      UnitMap mUnitsAmbiguous;
       // Traits                                                         
       TraitMap mTraits;
       // Hierarchy requires an update                                   
@@ -80,13 +80,12 @@ namespace Langulus::Entity
       LANGULUS_API(ENTITY) Thing(Thing&&) noexcept;
       LANGULUS_API(ENTITY) Thing(Cloned<Thing>&&);
       LANGULUS_API(ENTITY) Thing(Abandoned<Thing>&&);
-
-      LANGULUS_API(ENTITY) ~Thing() IF_UNSAFE(noexcept);
+      LANGULUS_API(ENTITY)~Thing();
 
       template<bool CREATE_FLOW = true>
       NOD() static Thing Root(CT::String auto&&...);
 
-      void Detach();
+      LANGULUS_API(ENTITY) Count Reference(int);
 
       // Shallow copy is disabled, you should be able only to clone,    
       // move, or abandon                                               
