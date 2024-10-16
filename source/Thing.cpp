@@ -8,18 +8,6 @@
 #include "Thing.hpp"
 #include "Thing.inl"
 
-#if 1
-   #define ENTITY_VERBOSE_ENABLED()       1
-   #define ENTITY_VERBOSE_SELF(...)       Logger::Info(this, ": ", __VA_ARGS__)
-   #define ENTITY_VERBOSE_SELF_TAB(...)   const auto scoped = Logger::InfoTab(this, ": ", __VA_ARGS__)
-   #define ENTITY_VERBOSE(...)            Logger::Append(__VA_ARGS__)
-#else
-   #define ENTITY_VERBOSE_ENABLED()       0
-   #define ENTITY_VERBOSE_SELF(...)       LANGULUS(NOOP)
-   #define ENTITY_VERBOSE_SELF_TAB(...)   LANGULUS(NOOP)
-   #define ENTITY_VERBOSE(...)            LANGULUS(NOOP)
-#endif
-
 
 namespace Langulus::Entity
 {
@@ -32,6 +20,8 @@ namespace Langulus::Entity
    /// Descriptor-constructor                                                 
    ///   @param describe - instructions for creating the entity               
    Thing::Thing(Describe&& describe) : Resolvable {this} {
+      ENTITY_VERBOSE_SELF_TAB("Created from descriptor: ", *describe);
+
       if (*describe) {
          Verbs::Create creator {&(*describe)};
          Create(creator);
@@ -58,6 +48,8 @@ namespace Langulus::Entity
       : Resolvable {this}
       , mOwner     {parent}
    {
+      ENTITY_VERBOSE_SELF_TAB("Created manually");
+
       if (parent) {
          parent->AddChild<false>(this);
          mRuntime = parent->GetRuntime();
@@ -111,7 +103,7 @@ namespace Langulus::Entity
       if (other.mOwner)
          other.mOwner->RemoveChild(&other);
 
-      ENTITY_VERBOSE_SELF("moved from ", other);
+      ENTITY_VERBOSE_SELF("Moved from ", other);
    }
    
    /// Abandon constructor                                                    
@@ -141,7 +133,7 @@ namespace Langulus::Entity
       if (other->mOwner)
          other->mOwner->RemoveChild(&*other);
 
-      ENTITY_VERBOSE_SELF("abandoned from ", *other);
+      ENTITY_VERBOSE_SELF("Abandoned from ", *other);
    }
 
    /// Clone constructor                                                      
@@ -157,74 +149,81 @@ namespace Langulus::Entity
       TODO();
       //TODO clone flow and runtime if pinned, recreate modules if new runtime, 
       // recreate units and traits, then recreate children
-      ENTITY_VERBOSE_SELF("cloned from ", *other);
+      ENTITY_VERBOSE_SELF("Cloned from ", *other);
    }
 
+   /// Destroy the thing                                                      
    Thing::~Thing() {
-      if (GetReferences())
-         Reference(-1);
+      // First stage destruction that severs all connections            
+      // If Thing was on the stack, this will be the first time it's    
+      // called. If it was on the managed heap, it would've been called 
+      // from the Reference routine                                     
+      Teardown();
+
+      LANGULUS_ASSUME(DevAssumes, GetReferences() <= 1,
+         "Can't teardown while this Thing is still used", " in ",
+         GetReferences(), " places"
+      );
+
+      // Destroy the entire herarchy under this Thing                   
+      ENTITY_VERBOSE_SELF_TAB("Destroying...");
+
+      #if LANGULUS(DEBUG)
+         for (auto& child : mChildren) {
+            if (child->GetReferences() != 1) {
+               Logger::Error(
+                  "Child can't be destroyed - it is still referenced ",
+                  child->GetReferences(), " times instead of once: ", child
+               );
+            }
+         }
+
+         for (auto& unit : mUnitsList) {
+            if (unit->GetReferences() > 3) {
+               Logger::Error(
+                  "Unit can't be destroyed - it is still referenced ",
+                  unit->GetReferences(), " times instead of thrice (or lower): ", unit
+               );
+            }
+         }
+      #endif
    }
 
-   /// Reference and detach all parents of all children                       
-   Count Thing::Reference(int x) {
-      if (Referenced::Reference(x) == 0) {
-         // Traits might be exposing members in units. Make sure we     
-         // dereference those first                                     
-         mTraits.Reset();
+   /// This is used for first-stage destruction, severing ties to avoid       
+   /// circular dependencies. After this runs, there should be only one       
+   /// reference remaining for this Thing                                     
+   void Thing::Teardown() {
+      ENTITY_VERBOSE_SELF_TAB("Teardown initiated...");
+      // Reset owner, so that only one reference to this Thing remains  
+      // in the hierarchy: the owner's mChildren                        
+      mOwner.Reset();
 
-         // Decouple all units from this owner because units might get  
-         // destroyed upon destroying mUnitsList and mUnitsAmbiguous    
-         // If they still have owners, they will attempt to Decouple    
-         // themselves from already destroyed mUnitsList/mUnitsAmbiguous
-         for (auto& unit : mUnitsList) {
-            ENTITY_VERBOSE_SELF("Decoupling unit: ", unit);
-            unit->mOwners.Remove(this);
-            ENTITY_VERBOSE_SELF("...", GetReferences(), " uses remain");
-         }
+      // Traits might be exposing members in units. Make sure we        
+      // dereference those first, so that units have as small number of 
+      // references as possible                                         
+      ENTITY_VERBOSE_SELF("Tearing off traits (name might change)");
+      mTraits.Reset();
 
-         // The same applies for child things                           
-         for (auto& child : mChildren) {
-            if (child->mOwner) {
-               ENTITY_VERBOSE_SELF("Decoupling child: ", child);
-               LANGULUS_ASSUME(DevAssumes, child->mOwner == this, "Parent mismatch");
-               child->mOwner.Reset();
-               ENTITY_VERBOSE_SELF("...", GetReferences(), " uses remain");
-            }
-         }
-
-         /*ENTITY_VERBOSE_SELF_TAB("Detaching (", GetReferences(), " uses):");
-
-         mTraits.Reset();
-
-         // Decouple all units from this owner                          
-         for (auto& unit : mUnitsList) {
-            ENTITY_VERBOSE_SELF("Decoupling unit: ", unit);
-            unit->mOwners.Reset();
-            ENTITY_VERBOSE_SELF("...", GetReferences(), " uses remain");
-         }
-
-         mUnitsList.Reset();
-         mUnitsAmbiguous.Reset();
-
-         if (not mFlow.IsLocked())
-            mFlow.Reset();
-
-         // Decouple all children from this                             
-         for (auto& child : mChildren) {
-            if (child->mOwner) {
-               ENTITY_VERBOSE_SELF("Decoupling child: ", child);
-               LANGULUS_ASSUME(DevAssumes, child->mOwner == this,
-                  "Parent mismatch");
-               child->mOwner.Reset();
-               child->Reference(x);
-               ENTITY_VERBOSE_SELF("...", GetReferences(), " uses remain");
-            }
-         }
-
-         mChildren.Reset();*/
+      // Decouple all units from this owner because units might get     
+      // destroyed upon destroying mUnitsList and mUnitsAmbiguous, if   
+      // the Units were created on the stack.                           
+      // If they still have owners, they will attempt to Decouple in    
+      // A::Unit::~Unit from already destroyed mUnitsList/Ambiguous     
+      for (auto& unit : mUnitsList) {
+         ENTITY_VERBOSE_SELF("Tearing off unit: ", unit);
+         unit->mOwners.Remove(this);
+         ENTITY_VERBOSE_SELF("...", GetReferences(), " uses remain");
       }
 
-      return GetReferences();
+      // Propagate Teardown through the hierarchy of Things             
+      for (auto& child : mChildren)
+         child->Teardown();
+
+      ENTITY_VERBOSE_SELF("Teardown complete: ", GetReferences(), " uses remain");
+      LANGULUS_ASSERT(GetReferences() <= 1, Destruct, "After teardown, "
+         "Thing should have one (or zero) references remaining, from "
+         "its former owner's mChildren container (if not a root)"
+      );
    }
 
    /// Compare two entities                                                   

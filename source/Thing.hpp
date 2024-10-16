@@ -48,6 +48,7 @@ namespace Langulus::Entity
    protected:
       LANGULUS_API(ENTITY) void ResetRuntime(Runtime*);
       LANGULUS_API(ENTITY) void ResetFlow(Temporal*);
+      LANGULUS_API(ENTITY) void Teardown();
 
       // The order of members is critical!                              
       // Runtime should be destroyed last, hence it is the first member 
@@ -84,8 +85,6 @@ namespace Langulus::Entity
 
       template<bool CREATE_FLOW = true>
       NOD() static Thing Root(CT::String auto&&...);
-
-      LANGULUS_API(ENTITY) Count Reference(int);
 
       // Shallow copy is disabled, you should be able only to clone,    
       // move, or abandon                                               

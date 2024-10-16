@@ -9,12 +9,6 @@
 #include "Thing.inl"
 #include <Flow/Verbs/Conjunct.hpp>
 
-#if 0
-   #define SELECT_VERBOSE_SELF(...)   Logger::Verbose(Self(), __VA_ARGS__)
-#else
-   #define SELECT_VERBOSE_SELF(...)   LANGULUS(NOOP)
-#endif
-
 
 namespace Langulus::Entity
 {
@@ -180,19 +174,19 @@ namespace Langulus::Entity
       if (not mismatch) {
          // We're not seeking an entity, but components/traits          
          if (selectedTraits) {
-            SELECT_VERBOSE_SELF(Logger::Green,
+            ENTITY_SELECTION_VERBOSE_SELF(Logger::Green,
                "Trait(s) selected: ", selectedTraits);
             verb << selectedTraits;
          }
 
          if (selectedUnits) {
-            SELECT_VERBOSE_SELF(Logger::Green,
+            ENTITY_SELECTION_VERBOSE_SELF(Logger::Green,
                "Unit(s) selected: ", selectedUnits);
             verb << selectedUnits;
          }
 
          if (selectedEntities) {
-            SELECT_VERBOSE_SELF(Logger::Green,
+            ENTITY_SELECTION_VERBOSE_SELF(Logger::Green,
                "Entity(s) selected: ", selectedEntities);
             verb << selectedEntities;
          }
