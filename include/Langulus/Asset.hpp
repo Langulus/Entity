@@ -26,6 +26,9 @@ namespace Langulus::A
       Ref<A::Folder> mFolder;
 
    public:
+      // @attention never delete stuff from this call! Do it on         
+      // Update() instead                                               
+      virtual void RequestGarbageCollection() = 0;
       auto GetFolder() const noexcept -> const Ref<A::Folder>&;
    };
 
@@ -56,25 +59,23 @@ namespace Langulus::A
       void Commit(auto&&);
 
       template<CT::TraitBased = Langulus::Trait>
-      NOD() auto GetData(Offset = 0) const noexcept -> const Data*;
-      NOD() auto GetData(TMeta, Offset = 0) const noexcept -> const Data*;
+      NOD() auto GetData(Offset = 0)       noexcept -> Data*;
+      template<CT::TraitBased = Langulus::Trait>
+      NOD() auto GetData(Offset = 0) const noexcept -> Data const*;
+
+      NOD() auto GetData(TMeta, Offset = 0)       noexcept -> Data*;
+      NOD() auto GetData(TMeta, Offset = 0) const noexcept -> Data const*;
 
       template<CT::TraitBased = Langulus::Trait>
-      NOD() auto GetDataList() const noexcept -> const DataList*;
-      NOD() auto GetDataList(TMeta) const noexcept -> const DataList*;
+      NOD() auto GetDataList()       noexcept -> DataList*;
+      template<CT::TraitBased = Langulus::Trait>
+      NOD() auto GetDataList() const noexcept -> DataList const*;
 
+      NOD() auto GetDataList(TMeta)       noexcept -> DataList*;
+      NOD() auto GetDataList(TMeta) const noexcept -> DataList const*;
+
+      NOD() auto GetDataListMap()       noexcept -> DataListMap&;
       NOD() auto GetDataListMap() const noexcept -> DataListMap const&;
-
-   protected:
-      template<CT::TraitBased = Langulus::Trait>
-      NOD() auto GetData(Offset = 0) noexcept -> Data*;
-      NOD() auto GetData(TMeta, Offset = 0) noexcept -> Data*;
-
-      template<CT::TraitBased = Langulus::Trait>
-      NOD() auto GetDataList() noexcept -> DataList*;
-      NOD() auto GetDataList(TMeta) noexcept -> DataList*;
-
-      NOD() auto GetDataListMap() noexcept -> DataListMap&;
    };
 
 } // namespace Langulus::A

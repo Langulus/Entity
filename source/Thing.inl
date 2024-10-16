@@ -10,22 +10,6 @@
 #include "Thing-Gather.inl"
 #include "Thing-Seek.inl"
 
-#if 0
-   #define ENTITY_VERBOSE_ENABLED()             1
-   #define ENTITY_VERBOSE_SELF(...)             Logger::Verbose(this, ": ", __VA_ARGS__)
-   #define ENTITY_VERBOSE_SELF_TAB(...)         const auto scoped = Logger::VerboseTab(this, ": ", __VA_ARGS__)
-   #define ENTITY_VERBOSE(...)                  Logger::Append(__VA_ARGS__)
-   #define ENTITY_CREATION_VERBOSE_SELF(...)    Logger::Verbose(Self(), __VA_ARGS__)
-   #define ENTITY_SELECTION_VERBOSE_SELF(...)   Logger::Verbose(Self(), __VA_ARGS__)
-#else
-   #define ENTITY_VERBOSE_ENABLED()             0
-   #define ENTITY_VERBOSE_SELF(...)             LANGULUS(NOOP)
-   #define ENTITY_VERBOSE_SELF_TAB(...)         LANGULUS(NOOP)
-   #define ENTITY_VERBOSE(...)                  LANGULUS(NOOP)
-   #define ENTITY_CREATION_VERBOSE_SELF(...)    LANGULUS(NOOP)
-   #define ENTITY_SELECTION_VERBOSE_SELF(...)   LANGULUS(NOOP)
-#endif
-
 
 namespace Langulus::Entity
 {
@@ -708,10 +692,3 @@ namespace Langulus::A
    }
 
 } // namespace Langulus::A
-
-#undef ENTITY_VERBOSE_ENABLED
-#undef ENTITY_VERBOSE_SELF
-#undef ENTITY_VERBOSE_SELF_TAB
-#undef ENTITY_VERBOSE
-#undef ENTITY_CREATION_VERBOSE_SELF
-#undef ENTITY_SELECTION_VERBOSE_SELF
