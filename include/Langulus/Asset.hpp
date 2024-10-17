@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "../Entity/Thing.hpp"
+#include "IO.hpp"
 #include <Flow/Factory.hpp>
 #include <Math/LOD.hpp>
 

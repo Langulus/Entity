@@ -34,7 +34,7 @@ namespace Langulus
 /// Make the rest of the code aware, that Langulus::Entity has been included  
 #define LANGULUS_LIBRARY_ENTITY() 1
 
-#if 1
+#if 0
    #define ENTITY_VERBOSE_ENABLED()             1
    #define ENTITY_VERBOSE_SELF(...)             Logger::Info(this, ": ", __VA_ARGS__)
    #define ENTITY_VERBOSE_SELF_TAB(...)         const auto scoped = Logger::InfoTab(this, ": ", __VA_ARGS__)
