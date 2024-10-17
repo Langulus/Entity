@@ -51,8 +51,6 @@ namespace Langulus::A
    public:
       Asset() : Resolvable {this} {}
 
-      Count Reference(int);
-
       virtual bool Generate(TMeta, Offset = 0) { return true; }
 
       template<CT::TraitBased = Langulus::Trait>

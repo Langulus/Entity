@@ -20,6 +20,8 @@ namespace Langulus::A
    ///   Abstract file system module                                          
    ///                                                                        
    struct FileSystem : virtual Module {
+      LANGULUS_BASES(Module);
+
    protected:
       // Working directory path                                         
       // This is the only full path that is exposed to the system,      
@@ -30,8 +32,6 @@ namespace Langulus::A
       Path mMainDataPath;
 
    public:
-      LANGULUS_BASES(Module);
-
       NOD() virtual auto GetFile  (const Path&) -> Ref<File>   = 0;
       NOD() virtual auto GetFolder(const Path&) -> Ref<Folder> = 0;
 
@@ -44,6 +44,9 @@ namespace Langulus::A
    ///   Abstract file interface                                              
    ///                                                                        
    struct File : virtual Unit {
+      LANGULUS(PRODUCER) FileSystem;
+      LANGULUS_BASES(Unit);
+
    protected:
       Path mFilePath;
       bool mExists {};
@@ -59,9 +62,6 @@ namespace Langulus::A
       Token mFileExtension;
 
    public:
-      LANGULUS(PRODUCER) FileSystem;
-      LANGULUS_BASES(Unit);
-
       NOD() virtual auto ReadAs        (DMeta)       const -> Many = 0;
       NOD() virtual auto RelativeFile  (const Path&) const -> Ref<File> = 0;
       NOD() virtual auto RelativeFolder(const Path&) const -> Ref<Folder> = 0;
@@ -130,15 +130,15 @@ namespace Langulus::A
    ///   Abstract folder interface                                            
    ///                                                                        
    struct Folder : virtual Unit {
+      LANGULUS(PRODUCER) FileSystem;
+      LANGULUS_BASES(Unit);
+
    protected:
       Path mFolderPath;
       bool mExists = false;
       bool mIsReadOnly = false;
 
    public:
-      LANGULUS(PRODUCER) FileSystem;
-      LANGULUS_BASES(Unit);
-
       NOD() virtual auto RelativeFile  (const Path&) const -> Ref<File> = 0;
       NOD() virtual auto RelativeFolder(const Path&) const -> Ref<Folder> = 0;
 

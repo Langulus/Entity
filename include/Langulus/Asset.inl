@@ -127,23 +127,4 @@ namespace Langulus::A
          mDataListMap.Insert(trait, S::Nest(content));
    }
 
-   /// Reference or dereference the asset                                     
-   ///   @param x - number of references to add/subtract                      
-   ///   @return the number of remaining references                           
-   LANGULUS(INLINED)
-   Count Asset::Reference(int x) {
-      const auto remaining = Unit::Reference(x);
-      if (remaining == 1 and mProducer) {
-         // If there's a producer, notify it when references reach 1    
-         // - it means that the only reference is inside the factory,   
-         // and it's the factory's responsibility to collect garbage,   
-         // most likely on module Update().                             
-         mProducer->RequestGarbageCollection();
-         mDataListMap.Reset();
-         ProducedFrom::Teardown();
-      }
-
-      return remaining;
-   }
-
 } // namespace Langulus::A
