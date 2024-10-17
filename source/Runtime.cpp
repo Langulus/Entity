@@ -183,7 +183,7 @@ namespace Langulus::Entity
             Logger::Append(library.mKey, " ");
 
          Logger::Error(this, ": This likely involves a memory leak, "
-            "that withholds managed data, reflected by the given modules");
+            "that withholds managed data reflected by the given modules");
 
          IF_LANGULUS_MANAGED_MEMORY(Allocator::CollectGarbage());
          IF_LANGULUS_MEMORY_STATISTICS(Allocator::DumpPools());
@@ -195,7 +195,7 @@ namespace Langulus::Entity
    ///   @param name - module name                                            
    ///   @param descriptor - module initialization descriptor                 
    ///   @return the new module instance                                      
-   A::Module* Runtime::InstantiateModule(const Token& name, const Many& descriptor) {
+   auto Runtime::InstantiateModule(const Token& name, const Many& descriptor) -> A::Module* {
       // Load the library if not loaded yet                             
       const auto library = LoadSharedLibrary(name);
 
@@ -267,7 +267,7 @@ namespace Langulus::Entity
    ///   @param library - the library handle                                  
    ///   @param descriptor - module initialization descriptor                 
    ///   @return the new module instance                                      
-   A::Module* Runtime::InstantiateModule(const SharedLibrary& library, const Many& descriptor) {
+   auto Runtime::InstantiateModule(const SharedLibrary& library, const Many& descriptor) -> A::Module* {
       if (not library.IsValid())
          return nullptr;
 
@@ -330,7 +330,7 @@ namespace Langulus::Entity
    ///      the RTTI::Boundary                                                
    ///   @return the module handle (OS dependent)                             
    LANGULUS(NOINLINE)
-   Runtime::SharedLibrary Runtime::LoadSharedLibrary(const Token& name) {
+   auto Runtime::LoadSharedLibrary(const Token& name) -> SharedLibrary {
       // Check if this library is already loaded                        
       const auto preloaded = mLibraries.FindIt(name);
       if (preloaded)
@@ -573,7 +573,7 @@ namespace Langulus::Entity
    /// Get the dependency module of a given type                              
    ///   @param type - the type to search for                                 
    ///   @return the shared library handle, you should check if it's valid    
-   Runtime::SharedLibrary Runtime::GetDependency(DMeta type) const noexcept {
+   auto Runtime::GetDependency(DMeta type) const noexcept -> SharedLibrary {
       if (type->mLibraryName == RTTI::MainBoundary)
          return {};
 
@@ -587,7 +587,7 @@ namespace Langulus::Entity
    /// Get a module instance by type                                          
    ///   @param type - the type to search for                                 
    ///   @return the module instance                                          
-   const ModuleList& Runtime::GetModules(DMeta type) const noexcept {
+   auto Runtime::GetModules(DMeta type) const noexcept -> const ModuleList& {
       auto found = mModulesByType.FindIt(type);
       if (found)
          return found.GetValue();
@@ -600,14 +600,14 @@ namespace Langulus::Entity
    /// Get the dependency module of a given type by token                     
    ///   @param token - type token                                            
    ///   @return the shared library handle, you should check if it's valid    
-   Runtime::SharedLibrary Runtime::GetDependencyToken(const Token& token) const noexcept {
+   auto Runtime::GetDependencyToken(const Token& token) const noexcept -> SharedLibrary {
       return GetDependency(RTTI::GetMetaData(token));
    }
 
    /// Get a module instance by type token                                    
    ///   @param token - type token                                            
    ///   @return the module instance, or nullptr if not found                 
-   const ModuleList& Runtime::GetModulesToken(const Token& token) const noexcept {
+   auto Runtime::GetModulesToken(const Token& token) const noexcept -> const ModuleList& {
       return GetModules(RTTI::GetMetaData(token));
    }
 #endif
@@ -634,7 +634,7 @@ namespace Langulus::Entity
    /// Get a file interface, relying on external modules to find it           
    ///   @param path - the path for the file                                  
    ///   @return the file interface, or nullptr if file doesn't exist         
-   Ref<A::File> Runtime::GetFile(const Path& path) {
+   auto Runtime::GetFile(const Path& path) -> Ref<A::File> {
       auto& fileSystems = GetModules<A::FileSystem>();
       LANGULUS_ASSERT(fileSystems, Module,
          "Can't retrieve file `", path, "` - no file system module available");
@@ -644,7 +644,7 @@ namespace Langulus::Entity
    /// Get a folder interface, relying on external modules to find it         
    ///   @param path - the path for the folder                                
    ///   @return the folder interface, or nullptr if folder doesn't exist     
-   Ref<A::Folder> Runtime::GetFolder(const Path& path) {
+   auto Runtime::GetFolder(const Path& path) -> Ref<A::Folder> {
       auto& fileSystems = GetModules<A::FileSystem>();
       LANGULUS_ASSERT(fileSystems, Module,
          "Can't retrieve folder `", path, "` - no file system module available");
@@ -653,7 +653,7 @@ namespace Langulus::Entity
 
    /// Get the current working path (where the main exe was executed)         
    ///   @return the path                                                     
-   const Path& Runtime::GetWorkingPath() const {
+   auto Runtime::GetWorkingPath() const -> const Path& {
       auto& fileSystems = GetModules<A::FileSystem>();
       LANGULUS_ASSERT(fileSystems, Module,
          "Can't retrieve working path", " - no file system module available");
@@ -662,7 +662,7 @@ namespace Langulus::Entity
 
    /// Get the current data path, like GetWorkingPath() / "data"              
    ///   @return the path                                                     
-   const Path& Runtime::GetDataPath() const {
+   auto Runtime::GetDataPath() const -> const Path& {
       auto& fileSystems = GetModules<A::FileSystem>();
       LANGULUS_ASSERT(fileSystems, Module,
          "Can't retrieve data path", " - no file system module available");
