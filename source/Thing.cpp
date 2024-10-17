@@ -172,8 +172,8 @@ namespace Langulus::Entity
          for (auto& child : mChildren) {
             if (child->GetReferences() != 1) {
                Logger::Error(
-                  "Child can't be destroyed - it is still referenced ",
-                  child->GetReferences(), " times instead of once: ", child
+                  child, " can't be destroyed - it is still referenced ",
+                  child->GetReferences(), " times instead of once"
                );
             }
          }
@@ -181,8 +181,8 @@ namespace Langulus::Entity
          for (auto& unit : mUnitsList) {
             if (unit->GetReferences() > 3) {
                Logger::Error(
-                  "Unit can't be destroyed - it is still referenced ",
-                  unit->GetReferences(), " times instead of thrice (or lower): ", unit
+                  unit, " can't be destroyed - it is still referenced ",
+                  unit->GetReferences(), " times instead of 3 (or less)" 
                );
             }
          }
@@ -193,7 +193,9 @@ namespace Langulus::Entity
    /// circular dependencies. After this runs, there should be only one       
    /// reference remaining for this Thing                                     
    void Thing::Teardown() {
-      ENTITY_VERBOSE_SELF_TAB("Teardown initiated...");
+      ENTITY_VERBOSE_SELF_TAB(
+         "Teardown initiated at ", GetReferences(), " uses...");
+
       // Reset owner, so that only one reference to this Thing remains  
       // in the hierarchy: the owner's mChildren                        
       mOwner.Reset();
@@ -210,9 +212,9 @@ namespace Langulus::Entity
       // If they still have owners, they will attempt to Decouple in    
       // A::Unit::~Unit from already destroyed mUnitsList/Ambiguous     
       for (auto& unit : mUnitsList) {
-         ENTITY_VERBOSE_SELF("Tearing off unit: ", unit);
+         ENTITY_VERBOSE_SELF(
+            "Tearing off unit ", unit, " at ", unit->GetReferences(), " uses...");
          unit->mOwners.Remove(this);
-         ENTITY_VERBOSE_SELF("...", GetReferences(), " uses remain");
       }
 
       // Propagate Teardown through the hierarchy of Things             

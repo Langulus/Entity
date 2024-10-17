@@ -61,12 +61,12 @@ namespace Langulus::Entity
          /// Explicit abandon construction, for optimized containment         
          ///   @param other - the library to abandon                          
          SharedLibrary(Abandoned<SharedLibrary>&& other) noexcept
-            : mHandle {other->mHandle}
-            , mEntry {other->mEntry}
-            , mCreator {other->mCreator}
-            , mInfo {other->mInfo}
-            , mModuleType {other->mModuleType}
-            , mBoundary {other->mBoundary}
+            : mHandle          {other->mHandle}
+            , mEntry           {other->mEntry}
+            , mCreator         {other->mCreator}
+            , mInfo            {other->mInfo}
+            , mModuleType      {other->mModuleType}
+            , mBoundary        {other->mBoundary}
             , mMarkedForUnload {other->mMarkedForUnload} {}
 
          /// Check if the shared library handle is valid                      
@@ -98,7 +98,7 @@ namespace Langulus::Entity
 
    protected:
       NOD() LANGULUS_API(ENTITY)
-      SharedLibrary LoadSharedLibrary(const Token&);
+      auto LoadSharedLibrary(const Token&) -> SharedLibrary;
       NOD() bool UnloadSharedLibrary(const SharedLibrary&);
 
    public:
@@ -113,38 +113,38 @@ namespace Langulus::Entity
       NOD() auto GetOwner() const noexcept { return mOwner; }
 
       NOD() LANGULUS_API(ENTITY)
-      A::Module* InstantiateModule(const Token&, const Many& = {});
+      auto InstantiateModule(const Token&, const Many& = {}) -> A::Module*;
 
       NOD() LANGULUS_API(ENTITY)
-      A::Module* InstantiateModule(const SharedLibrary&, const Many& = {});
+      auto InstantiateModule(const SharedLibrary&, const Many& = {}) -> A::Module*;
 
       NOD() LANGULUS_API(ENTITY)
-      SharedLibrary GetDependency(DMeta) const noexcept;
+      auto GetDependency(DMeta) const noexcept -> SharedLibrary;
 
       NOD() LANGULUS_API(ENTITY)
-      const ModuleList& GetModules(DMeta) const noexcept;
+      auto GetModules(DMeta) const noexcept -> const ModuleList&;
 
-      template<CT::Module M>
-      NOD() const ModuleList& GetModules() const noexcept {
+      template<CT::Module M> NOD()
+      auto GetModules() const noexcept -> const ModuleList& {
          return GetModules(MetaDataOf<M>());
       }
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
          NOD() LANGULUS_API(ENTITY)
-         SharedLibrary GetDependencyToken(const Token&) const noexcept;
+         auto GetDependencyToken(const Token&) const noexcept -> SharedLibrary;
 
          NOD() LANGULUS_API(ENTITY)
-         const ModuleList& GetModulesToken(const Token&) const noexcept;
+         auto GetModulesToken(const Token&) const noexcept -> const ModuleList&;
       #endif
 
       NOD() LANGULUS_API(ENTITY)
-      Ref<A::File> GetFile(const Path&);
+      auto GetFile(const Path&) -> Ref<A::File>;
       NOD() LANGULUS_API(ENTITY)
-      Ref<A::Folder> GetFolder(const Path&);
+      auto GetFolder(const Path&) -> Ref<A::Folder>;
       NOD() LANGULUS_API(ENTITY)
-      const Path& GetWorkingPath() const;
+      auto GetWorkingPath() const -> const Path&;
       NOD() LANGULUS_API(ENTITY)
-      const Path& GetDataPath() const;
+      auto GetDataPath() const -> const Path&;
 
       LANGULUS_API(ENTITY)
       bool Update(Time);
