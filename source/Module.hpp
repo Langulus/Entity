@@ -59,17 +59,19 @@ namespace Langulus::A
    ///   External module interface                                            
    ///                                                                        
    class Module : public virtual Resolvable {
-      LANGULUS(PRODUCER) Entity::Runtime;
+   public:
+      using Runtime = Entity::Runtime;
+      LANGULUS(PRODUCER) Runtime;
       LANGULUS_BASES(Resolvable);
 
    private:
       // Runtime that owns the module instance                          
-      Entity::Runtime* mRuntime;
+      Runtime* mRuntime;
 
    public:
-      Module(Entity::Runtime* runtime) IF_UNSAFE(noexcept)
+      Module(Runtime* runtime) IF_UNSAFE(noexcept)
          : Resolvable {this}
-         , mRuntime {runtime} {}
+         , mRuntime   {runtime} {}
 
       Module() noexcept = delete;
       Module(const Module&) = delete;
@@ -93,14 +95,16 @@ namespace Langulus::A
       };
 
       using EntryFunction  = void(*)(DMeta&, MetaList&);
-      using CreateFunction = Module*(*)(Entity::Runtime*, const Many&);
+      using CreateFunction = Module*(*)(Runtime*, const Many&);
       using InfoFunction   = const Info*(*)();
 
-      NOD() Entity::Runtime* GetRuntime() const noexcept {
+      NOD() auto GetRuntime() const noexcept -> Runtime* {
          return mRuntime;
       }
 
    public:
+      virtual void Teardown() = 0;
+
       virtual bool Update(Langulus::Time) {
          return true;
       }

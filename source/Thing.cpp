@@ -168,21 +168,21 @@ namespace Langulus::Entity
       // Destroy the entire herarchy under this Thing                   
       ENTITY_VERBOSE_SELF_TAB("Destroying...");
 
-      #if LANGULUS(DEBUG)
+      #if ENTITY_VERBOSE_ENABLED()
          for (auto& child : mChildren) {
             if (child->GetReferences() != 1) {
-               Logger::Error(
-                  child, " can't be destroyed - it is still referenced ",
-                  child->GetReferences(), " times instead of once"
+               Logger::Warning(
+                  child, " can't be destroyed yet - has ",
+                  child->GetReferences(), " uses instead of 1"
                );
             }
          }
 
          for (auto& unit : mUnitsList) {
             if (unit->GetReferences() > 3) {
-               Logger::Error(
-                  unit, " can't be destroyed - it is still referenced ",
-                  unit->GetReferences(), " times instead of 3 (or less)" 
+               Logger::Warning(
+                  unit, " can't be destroyed yet - has ",
+                  unit->GetReferences(), " uses instead of 3 (or less)" 
                );
             }
          }
@@ -221,11 +221,13 @@ namespace Langulus::Entity
       for (auto& child : mChildren)
          child->Teardown();
 
+      if (not mFlow.IsLocked())
+         mFlow.Reset();
+
+      if (not mRuntime.IsLocked())
+         mRuntime.Reset();
+
       ENTITY_VERBOSE_SELF("Teardown complete: ", GetReferences(), " uses remain");
-      LANGULUS_ASSERT(GetReferences() <= 1, Destruct, "After teardown, "
-         "Thing should have one (or zero) references remaining, from "
-         "its former owner's mChildren container (if not a root)"
-      );
    }
 
    /// Compare two entities                                                   

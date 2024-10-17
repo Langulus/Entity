@@ -46,7 +46,7 @@
    //TODO
 #endif
 
-#if 0
+#if 1
    #define VERBOSE(...) Logger::Verbose(__VA_ARGS__)
 #else
    #define VERBOSE(...) LANGULUS(NOOP)
@@ -162,8 +162,15 @@ namespace Langulus::Entity
    Runtime::~Runtime() {
       VERBOSE(this, ": Shutting down...");
 
-      // Cycle through all libraries N^2 times, unloading anything      
-      // that is no longer in use each time                             
+      // First-stage destruction: tear down any potential circular      
+      // references                                                     
+      for (auto list : mModules) {
+         for (auto& mod : list.mValue)
+            mod->Teardown();
+      }
+
+      // Second-stage destruction: cycle through N libraries N^2        
+      // times, unloading anything that is no longer in use each time   
       auto attempts = mLibraries.GetCount();
       while (attempts) {
          for (auto library : KeepIterator(mLibraries)) {
@@ -176,7 +183,7 @@ namespace Langulus::Entity
 
       // If after all attempts there's still active libraries, then     
       // something is definitely not right. This will always result in  
-      // a crash, since we can't really throw inside a destructor       
+      // a crash, since we can't really throw inside a destructor.      
       if (mLibraries) {
          Logger::Error(this, ": Can't unload last module(s): ");
          for (auto library : mLibraries)
