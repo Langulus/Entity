@@ -122,7 +122,7 @@ namespace Langulus::Entity
             }
          }
       }
-      else LANGULUS_ERROR("Unsupported descriptor");
+      else static_assert(false, "Unsupported descriptor");
    }
 
    /// Add a child                                                            

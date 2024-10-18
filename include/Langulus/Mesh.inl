@@ -722,7 +722,7 @@ namespace Langulus::A
             else
                LANGULUS_OOPS(Access, "Unsupported index format");
          }
-         else LANGULUS_ERROR("Unsupported topology");
+         else static_assert(false, "Unsupported topology");
       }
       else LANGULUS_OOPS(Access, "Unsupported indexing strategy");
 

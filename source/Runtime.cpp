@@ -46,7 +46,7 @@
    //TODO
 #endif
 
-#if 1
+#if 0
    #define VERBOSE(...) Logger::Verbose(__VA_ARGS__)
 #else
    #define VERBOSE(...) LANGULUS(NOOP)
