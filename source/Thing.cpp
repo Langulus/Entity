@@ -215,6 +215,9 @@ namespace Langulus::Entity
          ENTITY_VERBOSE_SELF(
             "Tearing off unit ", unit, " at ", unit->GetReferences(), " uses...");
          unit->mOwners.Remove(this);
+
+         if (unit->mOwners.IsEmpty())
+            unit->mOwners.Reset();
       }
 
       // Propagate Teardown through the hierarchy of Things             
