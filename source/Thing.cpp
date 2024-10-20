@@ -211,6 +211,7 @@ namespace Langulus::Entity
       // the Units were created on the stack.                           
       // If they still have owners, they will attempt to Decouple in    
       // A::Unit::~Unit from already destroyed mUnitsList/Ambiguous     
+      mUnitsAmbiguous.Reset();
       for (auto& unit : mUnitsList) {
          ENTITY_VERBOSE_SELF(
             "Tearing off unit ", unit, " at ", unit->GetReferences(), " uses...");
