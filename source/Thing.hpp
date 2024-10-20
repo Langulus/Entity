@@ -23,7 +23,7 @@ namespace Langulus::Entity
 {
 
    using UnitList = TMany<A::Unit*>;
-   using UnitMap = TUnorderedMap<DMeta, TUnorderedSet<A::Unit*>>;
+   using UnitMap = TUnorderedMap<DMeta, TMany<A::Unit*>>;
    using TraitMap = TUnorderedMap<TMeta, TraitList>;
 
 
