@@ -8,6 +8,7 @@
 #include "Thing.hpp"
 #include "Thing.inl"
 #include <Flow/Verbs/Conjunct.hpp>
+#include <Langulus/AI.hpp>
 
 
 namespace Langulus::Entity
@@ -21,14 +22,29 @@ namespace Langulus::Entity
       if (not text)
          return {};
 
-      // Push and execute in the active flow                            
+      // Get minds from the current context                             
+      auto minds = GatherUnits<A::Mind, Seek::HereAndAbove>();
+      if (not minds) {
+         Logger::Error(this, ": No minds - can't interpret message: ", text);
+         return {};
+      }
+
+      // Get a flow for executing the interpreted messages              
       auto flow = GetFlow();
       if (not flow) {
          Logger::Error(this, ": No flow - can't execute message: ", text);
          return {};
       }
 
-      return flow->Push(Verbs::Do::In(this, text));
+      // Interpret by each mind and then execute in flow                
+      Many results;
+      for (auto& mind : minds) {
+         auto interpretation = mind->Interpret(text);
+         if (interpretation)
+            results << flow->Push(interpretation);
+      }
+
+      return Abandon(results);
    }
    
    /// Executes a piece of code in the current context                        

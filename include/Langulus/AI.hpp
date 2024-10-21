@@ -36,6 +36,8 @@ namespace Langulus::A
    struct Mind : virtual AIUnit {
       LANGULUS_BASES(AIUnit);
       Mind() : Resolvable {this} {}
+
+      virtual Many Interpret(const Langulus::Text&) = 0;
    };
 
 } // namespace Langulus::A
