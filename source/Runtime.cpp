@@ -26,7 +26,7 @@
    #include <Windows.h>
 #endif
 
-#if LANGULUS_OS(LINUX)
+#if LANGULUS_OS(LINUX) or LANGULUS_COMPILER(WASM)
    #include <dlfcn.h>
 #endif
 
@@ -64,12 +64,10 @@ namespace Langulus::Entity
       void UnloadSharedLibrary(HMODULE library) {
          FreeLibrary(library);
       }
-   #elif LANGULUS_OS(LINUX)
+   #else
       void UnloadSharedLibrary(void* library) {
          dlclose(library);
       }
-   #else
-      #error Unsupported OS
    #endif
 
    /// Runtime construction                                                   
@@ -356,6 +354,8 @@ namespace Langulus::Entity
          path += ".dll";
       #elif LANGULUS_OS(LINUX)
          path += ".so";
+      #elif LANGULUS_COMPILER(WASM)
+         path += ".wasm";
       #else
          #error Unsupported OS
       #endif
@@ -366,10 +366,8 @@ namespace Langulus::Entity
       // Load the library                                               
       #if LANGULUS_OS(WINDOWS)
          const auto dll = LoadLibraryA(path.GetRaw());
-      #elif LANGULUS_OS(LINUX)
+      #else
          const auto dll = dlopen(path.GetRaw(), RTLD_NOW);
-      #else 
-         #error Unsupported OS
       #endif
 
       if (not dll) {
@@ -395,35 +393,33 @@ namespace Langulus::Entity
             GetProcAddress(dll, LANGULUS_MODULE_CREATE_TOKEN()));
          library.mInfo = reinterpret_cast<A::Module::InfoFunction>(
             GetProcAddress(dll, LANGULUS_MODULE_INFO_TOKEN()));
-      #elif LANGULUS_OS(LINUX)
+      #else
          library.mEntry = reinterpret_cast<A::Module::EntryFunction>(
             dlsym(dll, LANGULUS_MODULE_ENTRY_TOKEN()));
          library.mCreator = reinterpret_cast<A::Module::CreateFunction>(
             dlsym(dll, LANGULUS_MODULE_CREATE_TOKEN()));
          library.mInfo = reinterpret_cast<A::Module::InfoFunction>(
             dlsym(dll, LANGULUS_MODULE_INFO_TOKEN()));
-      #else 
-         #error Unsupported OS
       #endif   
 
       if (not library.mEntry) {
          Logger::Error("Module `", path, "` has no valid entry point - ",
             "the function " LANGULUS_MODULE_ENTRY_TOKEN() " is missing");
-         (void)UnloadSharedLibrary(library);
+         (void) UnloadSharedLibrary(library);
          return {};
       }
 
       if (not library.mCreator) {
          Logger::Error("Module `", path, "` has no valid instantiation point - ",
             "the function " LANGULUS_MODULE_CREATE_TOKEN() " is missing");
-         (void)UnloadSharedLibrary(library);
+         (void) UnloadSharedLibrary(library);
          return {};
       }
 
       if (not library.mInfo) {
          Logger::Error("Module `", path, "` has no valid information point - ",
             "the function " LANGULUS_MODULE_INFO_TOKEN() " is missing");
-         (void)UnloadSharedLibrary(library);
+         (void) UnloadSharedLibrary(library);
          return {};
       }
 
@@ -568,11 +564,9 @@ namespace Langulus::Entity
       #if LANGULUS_OS(WINDOWS)
          Entity::UnloadSharedLibrary(
             reinterpret_cast<HMODULE>(library.mHandle));
-      #elif LANGULUS_OS(LINUX)
+      #else
          Entity::UnloadSharedLibrary(
             reinterpret_cast<void*>(library.mHandle));
-      #else 
-         #error Unsupported OS
       #endif
       return true;
    }
