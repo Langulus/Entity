@@ -32,7 +32,7 @@ file(GLOB_RECURSE
 )
 
 # Build and install Entity library                                          
-add_library(LangulusEntity ${LANGULUS_LIBRARY_TYPE}
+add_langulus_library(LangulusEntity
     $<TARGET_OBJECTS:LangulusLogger>
     $<TARGET_OBJECTS:LangulusRTTI>
     $<$<BOOL:${LANGULUS_FEATURE_MANAGED_MEMORY}>:$<TARGET_OBJECTS:LangulusFractalloc>>
