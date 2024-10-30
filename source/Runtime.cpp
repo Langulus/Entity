@@ -352,12 +352,8 @@ namespace Langulus::Entity
       // File postfix                                                   
       #if LANGULUS_OS(WINDOWS)
          path += ".dll";
-      #elif LANGULUS_OS(LINUX)
-         path += ".so";
-      #elif LANGULUS_COMPILER(WASM)
-         path += ".wasm";
       #else
-         #error Unsupported OS
+         path += ".so";
       #endif
 
       // Make sure string ends with terminator                          
