@@ -187,7 +187,7 @@ namespace Langulus::Entity
          for (auto library : mLibraries)
             Logger::Append(library.mKey, " ");
 
-         Logger::Error(this, ": This likely involves a memory leak, "
+         Logger::Error(this, ": This likely involves a memory leak "
             "that withholds managed data reflected by the given modules");
 
          IF_LANGULUS_MANAGED_MEMORY(Allocator::CollectGarbage());
