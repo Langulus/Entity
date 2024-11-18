@@ -39,6 +39,7 @@ namespace Langulus::Entity
       , public Referenced
       , public SeekInterface<Thing>
    {
+      LANGULUS(NAME) "Thing";
       LANGULUS(ABSTRACT) false;
       LANGULUS(PRODUCER) Thing;
       LANGULUS(POOL_TACTIC) RTTI::PoolTactic::Type;
