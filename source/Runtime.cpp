@@ -94,6 +94,8 @@ namespace Langulus::Entity
       // boundary, to avoid segfaults when unloading libraries from     
       // mModulesByType - it is indexed by a DMeta                      
       // So we make sure that the base modules are defined here         
+      (void)MetaDataOf<Thing>();
+
       (void)MetaDataOf<A::PlatformModule>();
       (void)MetaDataOf<A::Platform>();
       (void)MetaDataOf<A::Window>();
