@@ -143,6 +143,8 @@ namespace Langulus::Entity
 
       LANGULUS_API(ENTITY)
       auto LoadMod(const Token&, const Many& = {}) -> A::Module*;
+      LANGULUS_API(ENTITY)
+      auto LoadModPath(const Path&, const Many& = {}) -> A::Module*;
 
       NOD() LANGULUS_API(ENTITY)
       auto GetOwner() const noexcept -> const Ref<Thing>&;

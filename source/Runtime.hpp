@@ -90,7 +90,7 @@ namespace Langulus::Entity
       // Loaded shared libraries, indexed by filename                   
       // This is a static registry - all Runtimes use the same shared   
       // library objects, but manage their own module instantiations    
-      static TUnorderedMap<Token, SharedLibrary> mLibraries;
+      static TUnorderedMap<Path, SharedLibrary> mLibraries;
       // Instantiated modules, sorted by priority                       
       TOrderedMap<Real, ModuleList> mModules;
       // Instantiated modules, indexed by type                          
@@ -98,6 +98,7 @@ namespace Langulus::Entity
 
    protected:
       NOD() LANGULUS_API(ENTITY)
+      auto LoadSharedLibraryPath(Path) -> SharedLibrary;
       auto LoadSharedLibrary(const Token&) -> SharedLibrary;
       NOD() bool UnloadSharedLibrary(const SharedLibrary&);
 
@@ -111,6 +112,9 @@ namespace Langulus::Entity
       LANGULUS_API(ENTITY) ~Runtime();
 
       NOD() auto GetOwner() const noexcept { return mOwner; }
+
+      NOD() LANGULUS_API(ENTITY)
+      auto InstantiateModulePath(const Path&, const Many& = {}) -> A::Module*;
 
       NOD() LANGULUS_API(ENTITY)
       auto InstantiateModule(const Token&, const Many& = {}) -> A::Module*;
