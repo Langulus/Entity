@@ -47,7 +47,7 @@
 #endif
 
 #if 0
-   #define VERBOSE(...) Logger::Verbose(__VA_ARGS__)
+   #define VERBOSE(...) Logger::Info(__VA_ARGS__)
 #else
    #define VERBOSE(...) LANGULUS(NOOP)
 #endif
@@ -56,7 +56,7 @@
 namespace Langulus::Entity
 {
 
-   TUnorderedMap<Token, Runtime::SharedLibrary> Runtime::mLibraries;
+   TUnorderedMap<Path, Runtime::SharedLibrary> Runtime::mLibraries;
 
    /// Close a shared library handle, unloading it                            
    ///   @param library - the library handle                                  
@@ -199,6 +199,28 @@ namespace Langulus::Entity
    }
 
    /// Create a module instance or return an already instantiated one         
+   ///   @param path - explicit relative path                                 
+   ///   @param descriptor - module initialization descriptor                 
+   ///   @return the new module instance                                      
+   auto Runtime::InstantiateModulePath(const Path& path, const Many& descriptor) -> A::Module* {
+      // Load the library if not loaded yet                             
+      const auto library = LoadSharedLibraryPath(path);
+
+      // Check if module is already instantiated                        
+      auto& foundModules = GetModules(library.mModuleType);
+      if (foundModules)
+         return foundModules[0];
+
+      // A module instance doesn't exist yet, so instantiate it         
+      VERBOSE(this, ": Module `", path, "` is not instantiated yet"
+         ", so attempting to create it...");
+      const auto instance = InstantiateModule(library, descriptor);
+      if (not instance)
+         (void) UnloadSharedLibrary(library);
+      return instance;
+   }
+   
+   /// Create a module instance or return an already instantiated one         
    ///   @param name - module name                                            
    ///   @param descriptor - module initialization descriptor                 
    ///   @return the new module instance                                      
@@ -330,36 +352,18 @@ namespace Langulus::Entity
       return module;
    }
 
-   /// Load a shared library for a module                                     
-   ///   @param name - the name for the dynamic library - the filename will   
-   ///      be derived from it, by prefixing with `LangulusMod`, and          
-   ///      suffixing with `.so` or `.dll` the name also should correspond to 
-   ///      the RTTI::Boundary                                                
-   ///   @return the module handle (OS dependent)                             
+   /// Load a shared library for a module using explicit path                 
+   ///   @param path - the relative path to the library                       
+   ///   @return the shared library handle                                    
    LANGULUS(NOINLINE)
-   auto Runtime::LoadSharedLibrary(const Token& name) -> SharedLibrary {
-      // Check if this library is already loaded                        
-      const auto preloaded = mLibraries.FindIt(name);
-      if (preloaded)
-         return preloaded.GetValue();
-
-      // File prefix                                                    
-      Path path;
-      #if LANGULUS_OS(LINUX)
-         path += "./lib";
-      #endif
-      path += "LangulusMod";
-      path += name;
-
-      // File postfix                                                   
-      #if LANGULUS_OS(WINDOWS)
-         path += ".dll";
-      #else
-         path += ".so";
-      #endif
-
+   auto Runtime::LoadSharedLibraryPath(Path path) -> SharedLibrary {
       // Make sure string ends with terminator                          
       path = path.Terminate();
+
+      // Check if this library is already loaded                        
+      const auto preloaded = mLibraries.FindIt(path);
+      if (preloaded)
+         return preloaded.GetValue();
 
       // Load the library                                               
       #if LANGULUS_OS(WINDOWS)
@@ -467,7 +471,7 @@ namespace Langulus::Entity
          }
 
          // Library is properly registered                              
-         mLibraries.Insert(name, library);
+         mLibraries.Insert(path, library);
 
          // Do some info logging                                        
          Logger::Info("Module `", library.mInfo()->mName, 
@@ -483,7 +487,7 @@ namespace Langulus::Entity
          // Make sure we end up in an invariant state                   
          Logger::Error("Could not enter `", path, "` due to an exception");
          if (UnloadSharedLibrary(library))
-            mLibraries.RemoveKey(name);
+            mLibraries.RemoveKey(path);
          if (not mLibraries)
             mLibraries.Reset();
          return {};
@@ -492,6 +496,31 @@ namespace Langulus::Entity
       // Great success!                                                 
       Logger::Info("Module `", library.mInfo()->mName, "` loaded (", path, ')');
       return library;
+   }
+   
+   /// Load a shared library for a module by cross-platform name              
+   ///   @param name - the name for the dynamic library - the filename will   
+   ///      be derived from it, by prefixing with `LangulusMod`, and          
+   ///      suffixing with `.so` or `.dll` depending on platform              
+   ///   @attention the name should correspond to the RTTI::Boundary it uses  
+   ///   @return the shared library handle                                    
+   LANGULUS(NOINLINE)
+   auto Runtime::LoadSharedLibrary(const Token& name) -> SharedLibrary {
+      // File prefix                                                    
+      Path path;
+      #if LANGULUS_OS(LINUX)
+         path += "./lib";
+      #endif
+      path += "LangulusMod";
+      path += name;
+
+      // File postfix                                                   
+      #if LANGULUS_OS(WINDOWS)
+         path += ".dll";
+      #else
+         path += ".so";
+      #endif
+      return LoadSharedLibraryPath(Abandon(path));
    }
 
    /// Unload a DLL/SO extension module                                       

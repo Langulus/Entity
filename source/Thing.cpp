@@ -566,5 +566,20 @@ namespace Langulus::Entity
       LANGULUS_ASSERT(instance, Module, "Missing module");
       return instance;
    }
+   
+   /// Uses the current runtime to load a shared library module, and          
+   /// instantiate it for use, if not yet instantiated                        
+   ///   @attention assumes a runtime is available in the hierarchy           
+   ///   @param path - relative path to the module                            
+   ///   @param descriptor - instructions for module setup                    
+   ///   @return the instantiated module interface                            
+   auto Thing::LoadModPath(const Path& path, const Many& descriptor) -> A::Module* {
+      const auto runtime = GetRuntime();
+      LANGULUS_ASSUME(UserAssumes, runtime,
+         "No runtime available for loading a module");
+      const auto instance = runtime->InstantiateModulePath(path, descriptor);
+      LANGULUS_ASSERT(instance, Module, "Missing module");
+      return instance;
+   }
 
 } // namespace Langulus::Entry
