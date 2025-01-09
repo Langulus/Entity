@@ -129,7 +129,7 @@ namespace Langulus::A
          "Iterator type is not compatible with contained color data");
 
       // Iterate using the desired color type                           
-      UNUSED() Count counter = 0;
+      [[maybe_unused]] Count counter = 0;
       auto data = pixels->CastsTo<Bytes>()
          ? pixels->Get<Bytes>().GetRaw<A>()
          : pixels->GetRaw<A>();

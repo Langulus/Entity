@@ -76,7 +76,17 @@ void Unit::Refresh() {}
 auto Unit::GetRuntime() const noexcept -> Runtime* {
    if (not mOwners)
       return nullptr;
-   return &*mOwners[0]->GetRuntime();
+   return mOwners[0]->GetRuntime().Get();
+}
+
+/// Get the temporal flow                                                     
+///   @attention assumes units are correctly coupled and coupling to          
+///              different flows should be explicitly disallowed              
+///   @return a pointer to the flow, if available                             
+auto Unit::GetFlow() const noexcept -> Temporal* {
+   if (not mOwners)
+      return nullptr;
+   return mOwners[0]->GetFlow().Get();
 }
 
 /// Couple the component with an entity, extracted from a descriptor's        

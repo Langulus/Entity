@@ -50,12 +50,13 @@ namespace Langulus::A
       LANGULUS(PRODUCER) PlatformModule;
       LANGULUS_BASES(Platform);
       using Platform::Platform;
+
       using Scale2 = Math::Scale2;
 
-      NOD() virtual void*  GetNativeHandle() const noexcept = 0;
-      NOD() virtual Scale2 GetSize() const noexcept = 0;
-      NOD() virtual bool   IsMinimized() const noexcept = 0;
-      NOD() virtual bool   Draw(const Ref<Image>&) const { return false; }
+      virtual void* GetNativeHandle() const noexcept = 0;
+      virtual auto GetSize() const noexcept -> Scale2 = 0;
+      virtual bool IsMinimized() const noexcept = 0;
+      virtual bool Draw(const Ref<Image>&) const { return false; }
    };
    
    ///                                                                        

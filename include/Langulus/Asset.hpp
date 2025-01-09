@@ -57,23 +57,23 @@ namespace Langulus::A
       void Commit(auto&&);
 
       template<CT::TraitBased = Langulus::Trait>
-      NOD() auto GetData(Offset = 0)       noexcept -> Data*;
+      auto GetData(Offset = 0)       noexcept -> Data*;
       template<CT::TraitBased = Langulus::Trait>
-      NOD() auto GetData(Offset = 0) const noexcept -> Data const*;
+      auto GetData(Offset = 0) const noexcept -> Data const*;
 
-      NOD() auto GetData(TMeta, Offset = 0)       noexcept -> Data*;
-      NOD() auto GetData(TMeta, Offset = 0) const noexcept -> Data const*;
+      auto GetData(TMeta, Offset = 0)       noexcept -> Data*;
+      auto GetData(TMeta, Offset = 0) const noexcept -> Data const*;
 
       template<CT::TraitBased = Langulus::Trait>
-      NOD() auto GetDataList()       noexcept -> DataList*;
+      auto GetDataList()       noexcept -> DataList*;
       template<CT::TraitBased = Langulus::Trait>
-      NOD() auto GetDataList() const noexcept -> DataList const*;
+      auto GetDataList() const noexcept -> DataList const*;
 
-      NOD() auto GetDataList(TMeta)       noexcept -> DataList*;
-      NOD() auto GetDataList(TMeta) const noexcept -> DataList const*;
+      auto GetDataList(TMeta)       noexcept -> DataList*;
+      auto GetDataList(TMeta) const noexcept -> DataList const*;
 
-      NOD() auto GetDataListMap()       noexcept -> DataListMap&;
-      NOD() auto GetDataListMap() const noexcept -> DataListMap const&;
+      auto GetDataListMap()       noexcept -> DataListMap&;
+      auto GetDataListMap() const noexcept -> DataListMap const&;
    };
 
 } // namespace Langulus::A

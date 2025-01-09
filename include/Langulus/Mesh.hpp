@@ -39,8 +39,8 @@ namespace Langulus
 
       bool operator == (const MeshView&) const noexcept;
 
-      NOD() auto Decay() const -> MeshView;
-      NOD() Hash GetHash() const noexcept;
+      auto Decay() const -> MeshView;
+      Hash GetHash() const noexcept;
    };
    
 } // namespace Langulus
@@ -63,34 +63,34 @@ namespace Langulus::A
       Mesh() : Resolvable {this} {}
 
       template<CT::Topology, CT::Topology...>
-      NOD() bool CheckTopology()    const;
-      NOD() auto GetTopology()      const noexcept -> DMeta;
-      NOD() auto GetTextureMapper() const noexcept -> MapModeType;
+      bool CheckTopology()    const;
+      auto GetTopology()      const noexcept -> DMeta;
+      auto GetTextureMapper() const noexcept -> MapModeType;
 
-      NOD() auto GetView() const noexcept -> MeshView const&;
-      NOD() auto GetView()       noexcept -> MeshView&;
+      auto GetView() const noexcept -> MeshView const&;
+      auto GetView()       noexcept -> MeshView&;
 
-      NOD() virtual auto GetLOD(const Math::LOD&) const -> Ref<Mesh> = 0;
+      virtual auto GetLOD(const Math::LOD&) const -> Ref<Mesh> = 0;
 
       // Point utilities                                                
-      NOD() bool MadeOfPoints() const noexcept;
-      NOD() auto GetPointCount() const -> Count;
+      bool MadeOfPoints() const noexcept;
+      auto GetPointCount() const -> Count;
       template<CT::Trait>
-      NOD() Many GetPointTrait(Offset) const;
+      Many GetPointTrait(Offset) const;
 
       // Line utilities                                                 
-      NOD() bool MadeOfLines() const noexcept;
-      NOD() auto GetLineCount() const -> Count;
-      NOD() auto GetLineIndices(Offset) const -> Vec2u;
+      bool MadeOfLines() const noexcept;
+      auto GetLineCount() const -> Count;
+      auto GetLineIndices(Offset) const -> Vec2u;
       template<CT::Trait>
-      NOD() Many GetLineTrait(Offset) const;
+      Many GetLineTrait(Offset) const;
 
       // Triangle utilities                                             
-      NOD() bool MadeOfTriangles() const noexcept;
-      NOD() auto GetTriangleCount() const -> Count;
-      NOD() auto GetTriangleIndices(Offset) const -> Vec3u;
+      bool MadeOfTriangles() const noexcept;
+      auto GetTriangleCount() const -> Count;
+      auto GetTriangleIndices(Offset) const -> Vec3u;
       template<CT::Trait>
-      NOD() Many GetTriangleTrait(Offset) const;
+      Many GetTriangleTrait(Offset) const;
 
       ///                                                                     
       ///   Iteration                                                         
@@ -98,8 +98,8 @@ namespace Langulus::A
       Count ForEachVertex(auto&&) const;
 
    protected:
-      NOD() Vec2u InnerGetIndices(const Data*, const Vec2u&) const;
-      NOD() Vec3u InnerGetIndices(const Data*, const Vec3u&) const;
+      Vec2u InnerGetIndices(const Data*, const Vec2u&) const;
+      Vec3u InnerGetIndices(const Data*, const Vec3u&) const;
 
       template<bool INDEXED, class...T>
       Count ForEachVertexInner(Types<T...>, auto&& call) const;

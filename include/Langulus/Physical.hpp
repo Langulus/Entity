@@ -49,13 +49,18 @@ namespace Langulus::A
       LANGULUS_BASES(Physical);
       Instance() : Resolvable {this} {}
 
-      NOD() virtual bool        Cull(const Math::LOD&) const noexcept = 0;
-      NOD() virtual Math::Level GetLevel() const noexcept = 0;
-      NOD() virtual Math::Mat4  GetModelTransform(const Math::LOD&) const noexcept = 0;
-      NOD() virtual Math::Mat4  GetModelTransform(const Math::Level& = {}) const noexcept = 0;
-      NOD() virtual Math::Mat4  GetViewTransform(const Math::LOD&) const noexcept = 0;
-      NOD() virtual Math::Mat4  GetViewTransform(const Math::Level& = {}) const noexcept = 0;
-      NOD() virtual auto GetColor() const noexcept -> Math::RGBA = 0;
+      using LOD   = Math::LOD;
+      using Level = Math::Level;
+      using Mat4  = Math::Mat4;
+      using RGBA  = Math::RGBA;
+
+      virtual bool Cull(const LOD&) const noexcept = 0;
+      virtual auto GetLevel() const noexcept -> Level = 0;
+      virtual auto GetModelTransform(const LOD&) const noexcept -> Mat4 = 0;
+      virtual auto GetModelTransform(const Level& = {}) const noexcept -> Mat4 = 0;
+      virtual auto GetViewTransform(const LOD&) const noexcept -> Mat4 = 0;
+      virtual auto GetViewTransform(const Level& = {}) const noexcept -> Mat4 = 0;
+      virtual auto GetColor() const noexcept -> RGBA = 0;
    };
 
 } // namespace Langulus::A

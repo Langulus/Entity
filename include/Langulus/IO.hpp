@@ -32,11 +32,11 @@ namespace Langulus::A
       Path mMainDataPath;
 
    public:
-      NOD() virtual auto GetFile  (const Path&) -> Ref<File>   = 0;
-      NOD() virtual auto GetFolder(const Path&) -> Ref<Folder> = 0;
+      virtual auto GetFile  (const Path&) -> Ref<File>   = 0;
+      virtual auto GetFolder(const Path&) -> Ref<Folder> = 0;
 
-      NOD() auto GetWorkingPath() const noexcept -> const Path&;
-      NOD() auto GetDataPath()    const noexcept -> const Path&;
+      auto GetWorkingPath() const noexcept -> const Path&;
+      auto GetDataPath()    const noexcept -> const Path&;
    };
 
 
@@ -62,18 +62,18 @@ namespace Langulus::A
       Token mFileExtension;
 
    public:
-      NOD() virtual auto ReadAs        (DMeta)       const -> Many = 0;
-      NOD() virtual auto RelativeFile  (const Path&) const -> Ref<File> = 0;
-      NOD() virtual auto RelativeFolder(const Path&) const -> Ref<Folder> = 0;
+      virtual auto ReadAs        (DMeta)       const -> Many = 0;
+      virtual auto RelativeFile  (const Path&) const -> Ref<File> = 0;
+      virtual auto RelativeFolder(const Path&) const -> Ref<Folder> = 0;
       
-      NOD() auto Exists()      const noexcept -> bool;
-      NOD() auto IsReadOnly()  const noexcept -> bool;
-      NOD() auto GetFilePath() const noexcept -> const Path&;
-      NOD() auto GetFormat()   const noexcept -> DMeta;
-      NOD() auto GetBytesize() const noexcept -> Size;
+      auto Exists()      const noexcept -> bool;
+      auto IsReadOnly()  const noexcept -> bool;
+      auto GetFilePath() const noexcept -> const Path&;
+      auto GetFormat()   const noexcept -> DMeta;
+      auto GetBytesize() const noexcept -> Size;
 
       template<class T>
-      NOD() T ReadAs() const;
+      T ReadAs() const;
 
 
       ///                                                                     
@@ -121,8 +121,8 @@ namespace Langulus::A
          }
       };
 
-      NOD() virtual auto NewReader() const -> Ref<Reader> = 0;
-      NOD() virtual auto NewWriter(bool append) const -> Ref<Writer> = 0;
+      virtual auto NewReader() const -> Ref<Reader> = 0;
+      virtual auto NewWriter(bool append) const -> Ref<Writer> = 0;
    };
 
 
@@ -139,12 +139,12 @@ namespace Langulus::A
       bool mIsReadOnly = false;
 
    public:
-      NOD() virtual auto RelativeFile  (const Path&) const -> Ref<File> = 0;
-      NOD() virtual auto RelativeFolder(const Path&) const -> Ref<Folder> = 0;
+      virtual auto RelativeFile  (const Path&) const -> Ref<File> = 0;
+      virtual auto RelativeFolder(const Path&) const -> Ref<Folder> = 0;
 
-      NOD() auto Exists()        const noexcept -> bool;
-      NOD() auto IsReadOnly()    const noexcept -> bool;
-      NOD() auto GetFolderPath() const noexcept -> const Path&;
+      auto Exists()        const noexcept -> bool;
+      auto IsReadOnly()    const noexcept -> bool;
+      auto GetFolderPath() const noexcept -> const Path&;
    };
 
 } // namespace Langulus::A

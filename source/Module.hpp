@@ -98,7 +98,7 @@ namespace Langulus::A
       using CreateFunction = Module*(*)(Runtime*, const Many&);
       using InfoFunction   = const Info*(*)();
 
-      NOD() auto GetRuntime() const noexcept -> Runtime* {
+      auto GetRuntime() const noexcept -> Runtime* {
          return mRuntime;
       }
 

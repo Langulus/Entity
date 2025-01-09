@@ -73,13 +73,13 @@ namespace Langulus
          LANGULUS_BASES(Asset);
          using Asset::Asset;
 
-         NOD() virtual auto GetLOD(const Math::LOD&) const -> Ref<Material> = 0;
+         virtual auto GetLOD(const Math::LOD&) const -> Ref<Material> = 0;
 
-         NOD() auto GetInputs(RefreshRate) const -> const TraitList&;
-         NOD() auto GetInputs(Offset) const -> const TraitList&;
+         auto GetInputs(RefreshRate)  const -> const TraitList&;
+         auto GetInputs(Offset)       const -> const TraitList&;
 
-         NOD() auto GetOutputs(RefreshRate) const -> const TraitList&;
-         NOD() auto GetOutputs(Offset) const -> const TraitList&;
+         auto GetOutputs(RefreshRate) const -> const TraitList&;
+         auto GetOutputs(Offset)      const -> const TraitList&;
 
       protected:
          mutable TraitList mInputs[RefreshRate::InputCount];

@@ -16,7 +16,7 @@ namespace Langulus::A
    ///   @param rate - the rate                                               
    ///   @return the input trait list                                         
    LANGULUS(INLINED)
-   const TraitList& Material::GetInputs(RefreshRate rate) const {
+   auto Material::GetInputs(RefreshRate rate) const -> const TraitList& {
       return GetInputs(rate.GetInputIndex());
    }
 
@@ -25,7 +25,7 @@ namespace Langulus::A
    ///   @param rate - the input offset                                       
    ///   @return the input trait list                                         
    LANGULUS(INLINED)
-   const TraitList& Material::GetInputs(Offset rate) const {
+   auto Material::GetInputs(Offset rate) const -> const TraitList& {
       LANGULUS_ASSUME(DevAssumes, rate < RefreshRate::InputCount,
          "Input offset out of range");
       return mInputs[rate];
@@ -35,7 +35,7 @@ namespace Langulus::A
    ///   @param rate - the rate                                               
    ///   @return the output trait list                                        
    LANGULUS(INLINED)
-   const TraitList& Material::GetOutputs(RefreshRate rate) const {
+   auto Material::GetOutputs(RefreshRate rate) const -> const TraitList& {
       return GetOutputs(rate.GetInputIndex());
    }
 
@@ -44,7 +44,7 @@ namespace Langulus::A
    ///   @param rate - the input offset                                       
    ///   @return the output trait list                                        
    LANGULUS(INLINED)
-   const TraitList& Material::GetOutputs(Offset rate) const {
+   auto Material::GetOutputs(Offset rate) const -> const TraitList& {
       LANGULUS_ASSUME(DevAssumes, rate < RefreshRate::InputCount,
          "Input offset out of range");
       return mOutputs[rate];

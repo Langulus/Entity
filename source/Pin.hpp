@@ -94,7 +94,7 @@ namespace Langulus::Entity
       ///                                                                     
       ///   Capsulation                                                       
       ///                                                                     
-      NOD() bool IsLocked() const noexcept;
+      bool IsLocked() const noexcept;
 
       auto Get() -> T&;
       auto Get() const noexcept -> T const&;
