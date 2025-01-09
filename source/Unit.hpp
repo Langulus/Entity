@@ -64,6 +64,7 @@ namespace Langulus::A
       virtual void Refresh();
 
       auto GetRuntime() const noexcept -> Runtime*;
+      auto GetFlow() const noexcept -> Temporal*;
       auto GetOwners() const noexcept -> const Hierarchy&;
       bool CompareDescriptor(const Many&) const;
       
@@ -85,18 +86,18 @@ namespace Langulus::A
       using SeekInterface::SeekValue;
       using SeekInterface::SeekValueAux;
 
-      template<Seek = Seek::HereAndAbove> NOD()
+      template<Seek = Seek::HereAndAbove>
       auto SeekUnit(DMeta, Index = 0) -> Unit*;
-      template<Seek = Seek::HereAndAbove> NOD()
+      template<Seek = Seek::HereAndAbove>
       auto SeekUnitAux(const Many&, DMeta, Index = 0) -> Unit*;
-      template<Seek = Seek::HereAndAbove> NOD()
+      template<Seek = Seek::HereAndAbove>
       auto SeekUnitExt(DMeta, const Many&, Index = 0) -> Unit*;
-      template<Seek = Seek::HereAndAbove> NOD()
+      template<Seek = Seek::HereAndAbove>
       auto SeekUnitAuxExt(DMeta, const Many&, const Many&, Index = 0) -> Unit*;
 
-      template<Seek = Seek::HereAndAbove> NOD()
+      template<Seek = Seek::HereAndAbove>
       auto SeekTrait(TMeta, Index = 0) -> Langulus::Trait;
-      template<Seek = Seek::HereAndAbove> NOD()
+      template<Seek = Seek::HereAndAbove>
       auto SeekTraitAux(const Many&, TMeta, Index = 0) -> Langulus::Trait;
 
       template<Seek = Seek::HereAndAbove>
@@ -111,15 +112,15 @@ namespace Langulus::A
       using SeekInterface::GatherUnitsExt;
       using SeekInterface::GatherTraits;
 
-      template<Seek = Seek::HereAndAbove> NOD()
+      template<Seek = Seek::HereAndAbove>
       auto GatherUnits(DMeta) -> TMany<Unit*>;
-      template<Seek = Seek::HereAndAbove> NOD()
+      template<Seek = Seek::HereAndAbove>
       auto GatherUnitsExt(DMeta, const Many&) -> TMany<Unit*>;
 
-      template<Seek = Seek::HereAndAbove> NOD()
+      template<Seek = Seek::HereAndAbove>
       auto GatherTraits(TMeta) -> TraitList;
 
-      template<CT::Data D, Seek = Seek::HereAndAbove> NOD()
+      template<CT::Data D, Seek = Seek::HereAndAbove>
       auto GatherValues() const -> TMany<D>;
 
    protected:

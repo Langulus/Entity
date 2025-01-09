@@ -44,17 +44,17 @@ namespace Langulus
       explicit constexpr operator bool() const noexcept;
       constexpr bool operator == (const EventState&) const noexcept = default;
 
-      NOD() constexpr EventState operator + (const EventState&) const noexcept;
-      NOD() constexpr EventState operator - (const EventState&) const noexcept;
+      constexpr EventState  operator +  (const EventState&) const noexcept;
+      constexpr EventState  operator -  (const EventState&) const noexcept;
       constexpr EventState& operator += (const EventState&) noexcept;
       constexpr EventState& operator -= (const EventState&) noexcept;
 
-      NOD() constexpr bool operator & (const EventState&) const noexcept;
-      NOD() constexpr bool operator % (const EventState&) const noexcept;
+      constexpr bool operator & (const EventState&) const noexcept;
+      constexpr bool operator % (const EventState&) const noexcept;
 
-      NOD() constexpr bool IsPoint() const noexcept;
-      NOD() constexpr bool IsBegin() const noexcept;
-      NOD() constexpr bool IsEnd() const noexcept;
+      constexpr bool IsPoint() const noexcept;
+      constexpr bool IsBegin() const noexcept;
+      constexpr bool IsEnd() const noexcept;
 
       constexpr void Reset() noexcept;
    };

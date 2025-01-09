@@ -287,7 +287,7 @@ namespace Langulus::Entity
    ///   @param deltaTime - how much time passes for the simulation           
    ///   @return true if no exit was requested by any of the runtimes/flows   
    bool Thing::Update(Time deltaTime) {
-      // Refresh the hierarchy on any changes, before updating anything 
+      // Refresh the hierarchy on any changes before updating anything  
       Refresh();
 
       if (mFlow.IsLocked()) {

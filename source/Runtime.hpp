@@ -70,17 +70,17 @@ namespace Langulus::Entity
             , mMarkedForUnload {other->mMarkedForUnload} {}
 
          /// Check if the shared library handle is valid                      
-         NOD() constexpr bool IsValid() const noexcept {
+         constexpr bool IsValid() const noexcept {
             return mHandle != 0;
          }
 
          /// Compare shared libraries by handle only                          
-         NOD() constexpr bool operator == (const SharedLibrary& rhs) const noexcept {
+         constexpr bool operator == (const SharedLibrary& rhs) const noexcept {
             return mHandle == rhs.mHandle;
          }
 
          /// Hashing for to being able to contain it in a map                 
-         NOD() constexpr Hash GetHash() const noexcept {
+         constexpr Hash GetHash() const noexcept {
             return HashBytes(&mHandle, static_cast<int>(sizeof(mHandle)));
          }
       };
@@ -97,10 +97,10 @@ namespace Langulus::Entity
       TUnorderedMap<DMeta, ModuleList> mModulesByType;
 
    protected:
-      NOD() LANGULUS_API(ENTITY)
+      LANGULUS_API(ENTITY)
       auto LoadSharedLibraryPath(Path) -> SharedLibrary;
       auto LoadSharedLibrary(const Token&) -> SharedLibrary;
-      NOD() bool UnloadSharedLibrary(const SharedLibrary&);
+      bool UnloadSharedLibrary(const SharedLibrary&);
 
    public:
       LANGULUS_CONVERTS_TO(Text);
@@ -111,49 +111,49 @@ namespace Langulus::Entity
       LANGULUS_API(ENTITY)  Runtime(Thing*) noexcept;
       LANGULUS_API(ENTITY) ~Runtime();
 
-      NOD() auto GetOwner() const noexcept { return mOwner; }
+      auto GetOwner() const noexcept { return mOwner; }
 
-      NOD() LANGULUS_API(ENTITY)
+      LANGULUS_API(ENTITY)
       auto InstantiateModulePath(const Path&, const Many& = {}) -> A::Module*;
 
-      NOD() LANGULUS_API(ENTITY)
+      LANGULUS_API(ENTITY)
       auto InstantiateModule(const Token&, const Many& = {}) -> A::Module*;
 
-      NOD() LANGULUS_API(ENTITY)
+      LANGULUS_API(ENTITY)
       auto InstantiateModule(const SharedLibrary&, const Many& = {}) -> A::Module*;
 
-      NOD() LANGULUS_API(ENTITY)
+      LANGULUS_API(ENTITY)
       auto GetDependency(DMeta) const noexcept -> SharedLibrary;
 
-      NOD() LANGULUS_API(ENTITY)
+      LANGULUS_API(ENTITY)
       auto GetModules(DMeta) const noexcept -> const ModuleList&;
 
-      template<CT::Module M> NOD()
+      template<CT::Module M>
       auto GetModules() const noexcept -> const ModuleList& {
          return GetModules(MetaDataOf<M>());
       }
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
-         NOD() LANGULUS_API(ENTITY)
+         LANGULUS_API(ENTITY)
          auto GetDependencyToken(const Token&) const noexcept -> SharedLibrary;
 
-         NOD() LANGULUS_API(ENTITY)
+         LANGULUS_API(ENTITY)
          auto GetModulesToken(const Token&) const noexcept -> const ModuleList&;
       #endif
 
-      NOD() LANGULUS_API(ENTITY)
+      LANGULUS_API(ENTITY)
       auto GetFile(const Path&) -> Ref<A::File>;
-      NOD() LANGULUS_API(ENTITY)
+      LANGULUS_API(ENTITY)
       auto GetFolder(const Path&) -> Ref<A::Folder>;
-      NOD() LANGULUS_API(ENTITY)
+      LANGULUS_API(ENTITY)
       auto GetWorkingPath() const -> const Path&;
-      NOD() LANGULUS_API(ENTITY)
+      LANGULUS_API(ENTITY)
       auto GetDataPath() const -> const Path&;
 
       LANGULUS_API(ENTITY)
       bool Update(Time);
 
-      NOD() LANGULUS_API(ENTITY)
+      LANGULUS_API(ENTITY)
       explicit operator Text() const;
    };
 
