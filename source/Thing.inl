@@ -26,6 +26,7 @@ namespace Langulus::Entity
       if constexpr (CREATE_FLOW)
          root.CreateFlow();
       (root.LoadMod(modules), ...);
+      root.Reference(-1);
       return Abandon(root);
    }
 
