@@ -63,6 +63,33 @@ namespace Langulus::A
       virtual auto GetColor() const noexcept -> RGBA = 0;
    };
 
+   ///                                                                        
+   ///   Abstract physical bond unit                                          
+   ///                                                                        
+   struct Bond : virtual Physical {
+      LANGULUS(PRODUCER) World;
+      LANGULUS_BASES(Physical);
+      Bond() : Resolvable {this} {}
+   };
+
+   ///                                                                        
+   ///   Abstract physical particles unit                                     
+   ///                                                                        
+   struct Particles : virtual Physical {
+      LANGULUS(PRODUCER) World;
+      LANGULUS_BASES(Physical);
+      Particles() : Resolvable {this} {}
+   };
+
+   ///                                                                        
+   ///   Abstract physical field unit                                         
+   ///                                                                        
+   struct Field : virtual Physical {
+      LANGULUS(PRODUCER) World;
+      LANGULUS_BASES(Physical);
+      Field() : Resolvable {this} {}
+   };
+
 } // namespace Langulus::A
 
 namespace Langulus::CT
