@@ -31,8 +31,7 @@ namespace Langulus::Entity
       if constexpr (SEEK & Seek::Above) {
          // Seek in parents up to root, if requested                    
          if (mOwner) {
-            result = mOwner->template
-               SeekUnit<Seek::HereAndAbove>(meta, offset);
+            result = mOwner->template SeekUnit<Seek::HereAndAbove>(meta, offset);
             if (result)
                return result;
          }
@@ -41,8 +40,7 @@ namespace Langulus::Entity
       if constexpr (SEEK & Seek::Below) {
          // Seek children, if requested                                 
          for (auto child : mChildren) {
-            result = child->template
-               SeekUnit<Seek::HereAndBelow>(meta, offset);
+            result = child->template SeekUnit<Seek::HereAndBelow>(meta, offset);
             if (result)
                return result;
          }
@@ -101,8 +99,7 @@ namespace Langulus::Entity
       if constexpr (SEEK & Seek::Above) {
          // Seek in parents up to root, if requested                    
          if (mOwner) {
-            result = mOwner->template
-               SeekUnitExt<Seek::HereAndAbove>(type, ext, offset);
+            result = mOwner->template SeekUnitExt<Seek::HereAndAbove>(type, ext, offset);
             if (result)
                return result;
          }
@@ -111,8 +108,7 @@ namespace Langulus::Entity
       if constexpr (SEEK & Seek::Below) {
          // Seek children, if requested                                 
          for (auto child : mChildren) {
-            result = child->template
-               SeekUnitExt<Seek::HereAndBelow>(type, ext, offset);
+            result = child->template SeekUnitExt<Seek::HereAndBelow>(type, ext, offset);
             if (result)
                return result;
          }
@@ -171,8 +167,7 @@ namespace Langulus::Entity
       if constexpr (SEEK & Seek::Above) {
          // Seek in parents up to root, if requested                    
          if (mOwner) {
-            auto output = mOwner->template
-               SeekTrait<Seek::HereAndAbove>(meta, offset);
+            auto output = mOwner->template SeekTrait<Seek::HereAndAbove>(meta, offset);
             if (output)
                return Abandon(output);
          }
@@ -181,8 +176,7 @@ namespace Langulus::Entity
       if constexpr (SEEK & Seek::Below) {
          // Seek children, if requested                                 
          for (auto child : mChildren) {
-            auto output = child->template
-               SeekTrait<Seek::HereAndBelow>(meta, offset);
+            auto output = child->template SeekTrait<Seek::HereAndBelow>(meta, offset);
             if (output)
                return Abandon(output);
          }
@@ -242,28 +236,29 @@ namespace Langulus::Entity
       if constexpr (SEEK & Seek::Here) {
          // Seek here if requested                                      
          auto temp = GetTrait(meta, offset);
-         try {
-            if (CT::Pinnable<D> and temp.Is<TypeOf<D>>())
-               output = temp.As<TypeOf<D>>();
-            else if (not CT::Pinnable<D> and temp.Is<D>())
-               output = temp.As<D>();
-            else if constexpr (CT::DescriptorMakable<D>)
-               output = D {Describe(static_cast<const Many&>(temp))};
-            else if constexpr (CT::Pinnable<D>)
-               output = temp.template AsCast<TypeOf<D>>();
-            else
-               output = temp.template AsCast<D>();
+         if (temp) {
+            try {
+               if (CT::Pinnable<D> and temp.Is<TypeOf<D>>())
+                  output = temp.As<TypeOf<D>>();
+               else if (not CT::Pinnable<D> and temp.Is<D>())
+                  output = temp.As<D>();
+               else if constexpr (CT::DescriptorMakable<D>)
+                  output = D {Describe(static_cast<const Many&>(temp))};
+               else if constexpr (CT::Pinnable<D>)
+                  output = temp.template AsCast<TypeOf<D>>();
+               else
+                  output = temp.template AsCast<D>();
 
-            return true;
+               return true;
+            }
+            catch (...) {}
          }
-         catch (...) { }
       }
 
       if constexpr (SEEK & Seek::Above) {
          // Seek in parents up to root, if requested                    
          if (mOwner) {
-            if (mOwner->template
-               SeekValue<Seek::HereAndAbove>(meta, output, offset))
+            if (mOwner->template SeekValue<Seek::HereAndAbove>(meta, output, offset))
                return true;
          }
       }
@@ -271,8 +266,7 @@ namespace Langulus::Entity
       if constexpr (SEEK & Seek::Below) {
          // Seek children, if requested                                 
          for (auto child : mChildren) {
-            if (child->template
-               SeekValue<Seek::HereAndBelow>(meta, output, offset))
+            if (child->template SeekValue<Seek::HereAndBelow>(meta, output, offset))
                return true;
          }
       }
