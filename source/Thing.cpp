@@ -359,7 +359,9 @@ namespace Langulus::Entity
       if (id) {
          // Search a typed trait                                        
          const auto found = mUnitsAmbiguous.FindIt(id);
-         return found ? found.GetValue()[index] : nullptr;
+         return found
+            ? static_cast<A::Unit*>(found.GetValue()[index])
+            : static_cast<A::Unit*>(nullptr);
       }
 
       // Get unit by index only                                         
