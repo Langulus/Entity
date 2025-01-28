@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "../Entity/Thing.hpp"
+#include "Entity/Thing.hpp"
 
 LANGULUS_DEFINE_TRAIT(FOV,
    "Horizontal field of view angle, usually a real number");

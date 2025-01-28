@@ -7,7 +7,7 @@
 ///                                                                           
 #pragma once
 #include "Asset.hpp"
-#include <Math/Mapping.hpp>
+#include <Langulus/Math/Mapping.hpp>
 
 LANGULUS_DEFINE_TRAIT(Mesh, "Mesh unit");
 LANGULUS_EXCEPTION(Mesh);

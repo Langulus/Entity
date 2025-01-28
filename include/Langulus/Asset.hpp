@@ -7,8 +7,8 @@
 ///                                                                           
 #pragma once
 #include "IO.hpp"
-#include <Flow/Factory.hpp>
-#include <Math/LOD.hpp>
+#include <Langulus/Flow/Factory.hpp>
+#include <Langulus/Math/LOD.hpp>
 
 
 namespace Langulus::A

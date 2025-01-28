@@ -7,7 +7,7 @@
 ///                                                                           
 #pragma once
 #include "Common.hpp"
-#include <Flow/Time.hpp>
+#include <Langulus/Flow/Time.hpp>
 
 
 namespace Langulus

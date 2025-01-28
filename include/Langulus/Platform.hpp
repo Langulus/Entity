@@ -6,8 +6,8 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "../Entity/Thing.hpp"
-#include <Math/Scale.hpp>
+#include "Entity/Thing.hpp"
+#include <Langulus/Math/Scale.hpp>
 
 LANGULUS_DEFINE_TRAIT(Cursor,
    "Enables or disables cursor for window");

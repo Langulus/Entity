@@ -8,10 +8,10 @@
 #pragma once
 #include "Pin.hpp"
 #include "Unit.hpp"
-#include "../../source/Thing.hpp"
-#include "../../source/Thing.inl"
-#include "../../source/Thing-Gather.inl"
-#include "../../source/Thing-Seek.inl"
+#include "../../../source/Thing.hpp"
+#include "../../../source/Thing.inl"
+#include "../../../source/Thing-Gather.inl"
+#include "../../../source/Thing-Seek.inl"
 
 
 namespace Langulus
