@@ -6,13 +6,4 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "../../source/Pin.inl"
-
-
-namespace Langulus
-{
-
-   template<class T>
-   using Pin = Entity::Pin<T>;
-
-} // namespace Langulus
+#include "../../../source/Event.inl"

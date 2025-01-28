@@ -6,9 +6,9 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "Common.hpp"
-#include <Entity/Event.hpp>
-#include <Math/Vector.hpp>
-#include <Math/Verbs/Add.hpp>
+#include <Langulus/Entity/Event.hpp>
+#include <Langulus/Math/Vector.hpp>
+#include <Langulus/Verbs/Add.hpp>
 
 
 SCENARIO("Testing Event", "[event]") {

@@ -7,7 +7,7 @@
 ///                                                                           
 #pragma once
 #include "Mesh.hpp"
-#include <Math/Primitives.hpp>
+#include <Langulus/Math/Primitives.hpp>
 
 
 namespace Langulus

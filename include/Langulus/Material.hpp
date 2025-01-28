@@ -7,7 +7,7 @@
 ///                                                                           
 #pragma once
 #include "Asset.hpp"
-#include <Flow/Rate.hpp>
+#include <Langulus/Flow/Rate.hpp>
 
 LANGULUS_DEFINE_TRAIT(Material, "Material unit");
 LANGULUS_DEFINE_TRAIT(Shader,   "Shader unit");

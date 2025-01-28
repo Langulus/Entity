@@ -7,8 +7,8 @@
 ///                                                                           
 #pragma once
 #include "Asset.hpp"
-#include <Math/Color.hpp>
-#include <Math/Scale.hpp>
+#include <Langulus/Math/Color.hpp>
+#include <Langulus/Math/Scale.hpp>
 
 LANGULUS_DEFINE_TRAIT(Image, "Image unit");
 LANGULUS_EXCEPTION(Image);

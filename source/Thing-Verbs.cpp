@@ -7,7 +7,7 @@
 ///                                                                           
 #include "Thing.hpp"
 #include "Thing.inl"
-#include <Flow/Verbs/Conjunct.hpp>
+#include <Langulus/Verbs/Conjunct.hpp>
 #include <Langulus/AI.hpp>
 
 

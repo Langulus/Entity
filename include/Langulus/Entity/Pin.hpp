@@ -6,6 +6,13 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "../../source/Unit.hpp"
-#include "../../source/Unit-Gather.inl"
-#include "../../source/Unit-Seek.inl"
+#include "../../../source/Pin.inl"
+
+
+namespace Langulus
+{
+
+   template<class T>
+   using Pin = Entity::Pin<T>;
+
+} // namespace Langulus

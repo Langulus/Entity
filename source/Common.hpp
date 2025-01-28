@@ -6,14 +6,14 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include <Anyness/TSet.hpp>
-#include <Anyness/TMap.hpp>
-#include <Anyness/Many.hpp>
-#include <Anyness/Ref.hpp>
-#include <Anyness/Trait.hpp>
-#include <Anyness/Path.hpp>
-#include <Flow/Verb.hpp>
-#include <Flow/Resolvable.hpp>
+#include <Langulus/Anyness/TSet.hpp>
+#include <Langulus/Anyness/TMap.hpp>
+#include <Langulus/Anyness/Many.hpp>
+#include <Langulus/Anyness/Ref.hpp>
+#include <Langulus/Anyness/Trait.hpp>
+#include <Langulus/Anyness/Path.hpp>
+#include <Langulus/Flow/Verb.hpp>
+#include <Langulus/Flow/Resolvable.hpp>
 
 #if defined(LANGULUS_EXPORT_ALL) or defined(LANGULUS_EXPORT_ENTITY)
    #define LANGULUS_API_ENTITY() LANGULUS_EXPORT()

@@ -6,8 +6,8 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "../Entity/Thing.hpp"
-#include "../Entity/Event.hpp"
+#include "Entity/Thing.hpp"
+#include "Entity/Event.hpp"
 
 
 namespace Langulus::A

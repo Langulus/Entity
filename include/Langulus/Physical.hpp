@@ -6,11 +6,11 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "../Entity/Thing.hpp"
-#include <Math/LOD.hpp>
-#include <Math/Level.hpp>
-#include <Math/Matrix.hpp>
-#include <Math/Color.hpp>
+#include "Entity/Thing.hpp"
+#include <Langulus/Math/LOD.hpp>
+#include <Langulus/Math/Level.hpp>
+#include <Langulus/Math/Matrix.hpp>
+#include <Langulus/Math/Color.hpp>
 
 
 namespace Langulus::A
