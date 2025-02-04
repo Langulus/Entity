@@ -660,7 +660,7 @@ namespace Langulus::A
          if (indices.template IsExact<uint32_t>())
             return stream.Select(indices.template GetRaw<uint32_t>()[i], 1);
          else if (indices.template IsExact<uint64_t>())
-            return stream.Select(indices.template GetRaw<uint64_t>()[i], 1);
+            return stream.Select(static_cast<Offset>(indices.template GetRaw<uint64_t>()[i]), 1);
          else if (indices.template IsExact<uint16_t>())
             return stream.Select(indices.template GetRaw<uint16_t>()[i], 1);
          else if (indices.template IsExact<uint8_t>())
@@ -675,7 +675,7 @@ namespace Langulus::A
             if (indices.template IsExact<uint32_t>())
                return stream.Select(indices.template GetRaw<uint32_t>()[p_i], 1);
             else if (indices.template IsExact<uint64_t>())
-               return stream.Select(indices.template GetRaw<uint64_t>()[p_i], 1);
+               return stream.Select(static_cast<Offset>(indices.template GetRaw<uint64_t>()[p_i]), 1);
             else if (indices.template IsExact<uint16_t>())
                return stream.Select(indices.template GetRaw<uint16_t>()[p_i], 1);
             else if (indices.template IsExact<uint8_t>())
@@ -688,7 +688,7 @@ namespace Langulus::A
             if (indices.template IsExact<uint32_t>())
                return stream.Select(indices.template GetRaw<uint32_t>()[p_i], 1);
             else if (indices.template IsExact<uint64_t>())
-               return stream.Select(indices.template GetRaw<uint64_t>()[p_i], 1);
+               return stream.Select(static_cast<Offset>(indices.template GetRaw<uint64_t>()[p_i]), 1);
             else if (indices.template IsExact<uint16_t>())
                return stream.Select(indices.template GetRaw<uint16_t>()[p_i], 1);
             else if (indices.template IsExact<uint8_t>())
@@ -701,7 +701,7 @@ namespace Langulus::A
             if (indices.template IsExact<uint32_t>())
                return stream.Select(indices.template GetRaw<uint32_t>()[p_i], 1);
             else if (indices.template IsExact<uint64_t>())
-               return stream.Select(indices.template GetRaw<uint64_t>()[p_i], 1);
+               return stream.Select(static_cast<Offset>(indices.template GetRaw<uint64_t>()[p_i]), 1);
             else if (indices.template IsExact<uint16_t>())
                return stream.Select(indices.template GetRaw<uint16_t>()[p_i], 1);
             else if (indices.template IsExact<uint8_t>())
@@ -714,7 +714,7 @@ namespace Langulus::A
             if (indices.template IsExact<uint32_t>())
                return stream.Select(indices.template GetRaw<uint32_t>()[p_i], 1);
             else if (indices.template IsExact<uint64_t>())
-               return stream.Select(indices.template GetRaw<uint64_t>()[p_i], 1);
+               return stream.Select(static_cast<Offset>(indices.template GetRaw<uint64_t>()[p_i]), 1);
             else if (indices.template IsExact<uint16_t>())
                return stream.Select(indices.template GetRaw<uint16_t>()[p_i], 1);
             else if (indices.template IsExact<uint8_t>())
