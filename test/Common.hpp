@@ -8,38 +8,48 @@
 
 /// INTENTIONALLY NOT GUARDED                                                 
 /// Include this file once in each cpp file, after all other headers          
-#ifdef TWOBLUECUBES_SINGLE_INCLUDE_CATCH_HPP_INCLUDED
-   #error Catch has been included prior to this header
-#endif
+#include <Langulus/Entity/Thing.hpp>
+#include <Langulus/Testing.hpp>
 
-#define CATCH_CONFIG_ENABLE_BENCHMARKING
 
-#include "Main.hpp"
-#include <catch2/catch.hpp>
+/// A unit implementation for testing                                         
+class TestUnit1 final : public A::Unit {
+public:
+   LANGULUS(ABSTRACT) false;
+   LANGULUS_BASES(Unit);
+   LANGULUS(POOL_TACTIC) RTTI::PoolTactic::Type;
 
-/// See https://github.com/catchorg/Catch2/blob/devel/docs/tostring.md        
-CATCH_TRANSLATE_EXCEPTION(::Langulus::Exception const& ex) {
-   return fmt::format("{}", ex);
-}
+   TestUnit1() : Resolvable {this} {}
 
-namespace Catch
-{
-   template<CT::Stringifiable T>
-   struct StringMaker<T> {
-      static std::string convert(T const& value) {
-         return ::std::string {Token {static_cast<Text>(value)}};
-      }
-   };
+   TestUnit1(Describe&& describe)
+      : Resolvable {this} {
+      Couple(*describe);
+   }
 
-   /// Save catch2 from doing infinite recursions with Block types            
-   template<CT::Block T>
-   struct is_range<T> {
-      static const bool value = false;
-   };
+   ~TestUnit1() {
+      Logger::Verbose(this, ": destroying...");
+   }
 
-}
+   void Refresh() {}
+};
 
-using timer = Catch::Benchmark::Chronometer;
+/// A unit implementation for testing                                         
+class TestUnit2 final : public A::Unit {
+public:
+   LANGULUS(ABSTRACT) false;
+   LANGULUS_BASES(Unit);
+   LANGULUS(POOL_TACTIC) RTTI::PoolTactic::Type;
 
-template<class T>
-using uninitialized = Catch::Benchmark::storage_for<T>;
+   TestUnit2() : Resolvable {this} {}
+
+   TestUnit2(Describe&& describe)
+      : Resolvable {this} {
+      Couple(*describe);
+   }
+
+   ~TestUnit2() {
+      Logger::Verbose(this, ": destroying...");
+   }
+
+   void Refresh() {}
+};

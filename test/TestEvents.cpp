@@ -5,10 +5,10 @@
 ///                                                                           
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
-#include "Common.hpp"
 #include <Langulus/Entity/Event.hpp>
 #include <Langulus/Math/Vector.hpp>
 #include <Langulus/Verbs/Add.hpp>
+#include "Common.hpp"
 
 
 SCENARIO("Testing Event", "[event]") {

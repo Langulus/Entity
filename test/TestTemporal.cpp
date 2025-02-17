@@ -5,12 +5,14 @@
 ///                                                                           
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
-#include "Common.hpp"
 #include <Langulus/Flow/Temporal.hpp>
+#include "Common.hpp"
 
 
 SCENARIO("Temporal flow", "[temporal]") {
    static Allocator::State memoryState;
+
+   (void) MetaDataOf<Thing>();
 
    ///                                                                        
    /// The following tests rely on this ontology sequence                     
