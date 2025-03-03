@@ -261,7 +261,7 @@ namespace Langulus::Entity
          const auto tab2 = Logger::Section(Logger::White, Logger::Underline,
             "Traits (", mTraits.GetCount(), "):");
          for (auto traitpair : mTraits) {
-            for (auto& trait : traitpair.mValue)
+            for (auto& trait : traitpair.GetValue())
                Logger::Verbose(trait);
          }
       }

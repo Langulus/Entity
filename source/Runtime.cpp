@@ -21,6 +21,7 @@
 #include "../include/Langulus/Life.hpp"
 #include "../include/Langulus/Network.hpp"
 #include "../include/Langulus/User.hpp"
+#include "../include/Langulus/Economy.hpp"
 
 #if LANGULUS_OS(WINDOWS)
    #include <Windows.h>
@@ -146,6 +147,14 @@ namespace Langulus::Entity
       (void)MetaDataOf<A::Ecosystem>();
       (void)MetaDataOf<A::Organism>();
 
+      (void)MetaDataOf<A::Economy>();
+      (void)MetaDataOf<A::EconomyUnit>();
+      (void)MetaDataOf<A::Resource>();
+      (void)MetaDataOf<A::ResourceInstance>();
+      (void)MetaDataOf<A::Converter>();
+      (void)MetaDataOf<A::ConverterInstance>();
+      (void)MetaDataOf<A::Trader>();
+
       (void)MetaDataOf<A::Network>();
       (void)MetaDataOf<A::NetworkUnit>();
       (void)MetaDataOf<A::Client>();
@@ -165,7 +174,7 @@ namespace Langulus::Entity
       // First-stage destruction: tear down any potential circular      
       // references                                                     
       for (auto list : mModules) {
-         for (auto& mod : list.mValue)
+         for (auto& mod : list.GetValue())
             mod->Teardown();
       }
 
@@ -187,7 +196,7 @@ namespace Langulus::Entity
       if (mLibraries) {
          Logger::Error(this, ": Can't unload last module(s): ");
          for (auto library : mLibraries)
-            Logger::Append(library.mKey, " ");
+            Logger::Append(library.GetKey(), " ");
 
          Logger::Error(this, ": This likely involves a memory leak "
             "that withholds managed data reflected by the given modules");
@@ -459,11 +468,11 @@ namespace Langulus::Entity
          // Test if the boundary conflicts with any of the previously   
          // loaded libraries                                            
          for (auto lib : mLibraries) {
-            if (lib.mValue.mBoundary == library.mBoundary) {
+            if (lib.GetValue().mBoundary == library.mBoundary) {
                Logger::Error(
                   "The library `", path, "` boundary `", library.mBoundary,
-                  "` conflicts with already loaded library `", lib.mKey,
-                  "` boundary `", lib.mValue.mBoundary, '`'
+                  "` conflicts with already loaded library `", lib.GetKey(),
+                  "` boundary `", lib.GetValue().mBoundary, '`'
                );
                (void)UnloadSharedLibrary(library);
                return {};
@@ -606,8 +615,8 @@ namespace Langulus::Entity
          return {};
 
       for (auto library : mLibraries) {
-         if (library.mValue.mBoundary == type->mLibraryName)
-            return library.mValue;
+         if (library.GetValue().mBoundary == type->mLibraryName)
+            return library.GetValue();
       }
       return {};
    }
@@ -646,7 +655,7 @@ namespace Langulus::Entity
    ///   @return true if no exit was requested by any of the modules          
    bool Runtime::Update(Time dt) {
       for (auto pair : mModules) {
-         for (auto module : pair.mValue) {
+         for (auto module : pair.GetValue()) {
             if (not module->Update(dt))
                return false;
          }
