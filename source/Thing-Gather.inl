@@ -127,7 +127,7 @@ namespace Langulus::Entity
       if constexpr (SEEK & Seek::Here) {
          // Check dynamic traits in the entity                          
          for (auto traitGroup : mTraits) {
-            for (auto trait : traitGroup.mValue) {
+            for (auto trait : traitGroup.GetValue()) {
                try { results << trait.template AsCast<D>(); }
                catch (...) {}
             }
