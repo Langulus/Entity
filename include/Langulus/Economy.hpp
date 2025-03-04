@@ -30,6 +30,9 @@ namespace Langulus::A
       LANGULUS_BASES(Unit);
       EconomyUnit() : Resolvable {this} {}
    };
+   
+   struct ResourceInstance;
+   struct ConverterInstance;
 
    ///                                                                        
    ///   Abstract resource                                                    
@@ -39,11 +42,12 @@ namespace Langulus::A
       LANGULUS_BASES(EconomyUnit);
       Resource() : Resolvable {this} {}
 
-      using Real = Langulus::Real;
+      using Real  = Langulus::Real;
       using Place = Math::Vec3;
 
-      virtual Count GetQuantity() const noexcept = 0;
-      virtual Count GetQuantityLocal(const Place&, Real radius) const noexcept = 0;
+      virtual int GetQuantity() const noexcept = 0;
+      virtual int GetQuantityLocal(const Place&, Real radius) const noexcept = 0;
+
       virtual Count GetInstanceCount() const noexcept = 0;
       virtual Count GetInstanceCountLocal(const Place&, Real radius) const noexcept = 0;
 
@@ -52,6 +56,11 @@ namespace Langulus::A
 
       virtual Real GetDemand() const noexcept = 0;
       virtual Real GetDemandLocal(const Place&, Real radius) const noexcept = 0;
+
+      virtual Real GetConsumption() const noexcept = 0;
+      virtual Real GetConsumptionLocal(const Place&, Real radius) const noexcept = 0;
+
+      auto At(const Place&) const noexcept -> const ResourceInstance*;
    };
    
    ///                                                                        
@@ -62,8 +71,13 @@ namespace Langulus::A
       LANGULUS_BASES(EconomyUnit);
       ResourceInstance() : Resolvable {this} {}
 
-      virtual Count GetQuantity() const noexcept = 0;
-      virtual Count GetCapacity() const noexcept = 0;
+      using Real = Langulus::Real;
+
+      virtual int  GetQuantity()    const noexcept = 0;
+      virtual int  GetCapacity()    const noexcept = 0;
+      virtual Real GetSupply()      const noexcept = 0;
+      virtual Real GetDemand()      const noexcept = 0;
+      virtual Real GetConsumption() const noexcept = 0;
    };
    
    ///                                                                        
@@ -79,6 +93,8 @@ namespace Langulus::A
 
       virtual Count GetInstanceCount() const noexcept = 0;
       virtual Count GetInstanceCountLocal(const Place&, Real radius) const noexcept = 0;
+
+      auto At(const Place&) const noexcept -> const ConverterInstance*;
    };
 
    ///                                                                        
