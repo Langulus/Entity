@@ -14,12 +14,20 @@
 namespace Langulus::A
 {
 
+   struct Resource;
+   struct Converter;
+
    ///                                                                        
    ///   Abstract economy module                                              
    ///                                                                        
    struct Economy : virtual Module {
       LANGULUS_BASES(Module);
       Economy() : Resolvable {this}, Module {nullptr} {}
+
+      using Text = Anyness::Text;
+
+      virtual auto GetResource (const Text&) const -> const Resource*  = 0;
+      virtual auto GetConverter(const Text&) const -> const Converter* = 0;
    };
 
    ///                                                                        
@@ -60,7 +68,7 @@ namespace Langulus::A
       virtual Real GetConsumption() const noexcept = 0;
       virtual Real GetConsumptionLocal(const Place&, Real radius) const noexcept = 0;
 
-      auto At(const Place&) const noexcept -> const ResourceInstance*;
+      virtual auto At(const Place&) const noexcept -> const ResourceInstance* = 0;
    };
    
    ///                                                                        
@@ -94,7 +102,7 @@ namespace Langulus::A
       virtual Count GetInstanceCount() const noexcept = 0;
       virtual Count GetInstanceCountLocal(const Place&, Real radius) const noexcept = 0;
 
-      auto At(const Place&) const noexcept -> const ConverterInstance*;
+      virtual auto At(const Place&) const noexcept -> const ConverterInstance* = 0;
    };
 
    ///                                                                        
