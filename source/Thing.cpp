@@ -7,7 +7,6 @@
 ///                                                                           
 #include "Thing.hpp"
 #include "Thing.inl"
-#include <Langulus/Profiler.hpp>
 
 
 namespace Langulus::Entity

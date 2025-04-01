@@ -22,7 +22,6 @@
 #include "../include/Langulus/Network.hpp"
 #include "../include/Langulus/User.hpp"
 #include "../include/Langulus/Economy.hpp"
-#include <Langulus/Profiler.hpp>
 
 #if LANGULUS_OS(WINDOWS)
    #include <Windows.h>
