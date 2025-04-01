@@ -7,6 +7,7 @@
 ///                                                                           
 #include "Thing.hpp"
 #include "Thing.inl"
+#include <Langulus/Profiler.hpp>
 
 
 namespace Langulus::Entity
@@ -287,6 +288,8 @@ namespace Langulus::Entity
    ///   @param deltaTime - how much time passes for the simulation           
    ///   @return true if no exit was requested by any of the runtimes/flows   
    bool Thing::Update(Time deltaTime) {
+      LANGULUS(PROFILE);
+
       // Refresh the hierarchy on any changes before updating anything  
       Refresh();
 
@@ -319,6 +322,7 @@ namespace Langulus::Entity
    /// Refresh all units and children down the hierarchy                      
    ///   @param force - force refresh                                         
    void Thing::Refresh(bool force) {
+      LANGULUS(PROFILE);
       if (not force and not mRefreshRequired)
          return;
 

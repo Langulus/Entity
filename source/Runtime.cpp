@@ -22,6 +22,7 @@
 #include "../include/Langulus/Network.hpp"
 #include "../include/Langulus/User.hpp"
 #include "../include/Langulus/Economy.hpp"
+#include <Langulus/Profiler.hpp>
 
 #if LANGULUS_OS(WINDOWS)
    #include <Windows.h>
@@ -654,6 +655,7 @@ namespace Langulus::Entity
    ///   @param dt - delta time between update calls                          
    ///   @return true if no exit was requested by any of the modules          
    bool Runtime::Update(Time dt) {
+      LANGULUS(PROFILE);
       for (auto pair : mModules) {
          for (auto module : pair.GetValue()) {
             if (not module->Update(dt))
