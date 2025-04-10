@@ -78,6 +78,16 @@ namespace Langulus::A
       LANGULUS(PRODUCER) Layer;
       LANGULUS_BASES(Graphics);
       Light() : Resolvable {this} {}
+
+      enum Type {
+         Directional = 0,
+         Point,
+         Spot,
+         Domain
+      };
+
+      Type mType = Directional;
+      bool mCastShadows = true;
    };
 
 } // namespace Langulus::A
