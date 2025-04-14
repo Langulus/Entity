@@ -448,6 +448,11 @@ LANGULUS_DEFINE_KEY(LeftAlt,
 LANGULUS_DEFINE_KEY(RightAlt,
    "The event of pressing/releasing the right alt key")
 
+LANGULUS_DEFINE_KEY(LeftGUI,
+   "The event of pressing/releasing the left GUI key")
+LANGULUS_DEFINE_KEY(RightGUI,
+   "The event of pressing/releasing the right GUI key")
+
 LANGULUS_DEFINE_KEY(LeftMouse,
    "The event of pressing/releasing the left mouse key")
 LANGULUS_DEFINE_KEY(MiddleMouse,
