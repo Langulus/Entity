@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -37,7 +37,7 @@ namespace Langulus
 } // namespace Langulus
 
 
-namespace Langulus::Entity
+namespace Langulus::Things
 {
 
    ///                                                                        
@@ -123,4 +123,4 @@ namespace Langulus::Entity
       void Reset() noexcept;
    };
 
-} // namespace Langulus::Entity
+} // namespace Langulus::Things

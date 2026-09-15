@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -19,7 +19,7 @@ LANGULUS_DEFINE_TRAIT(Unit,
    "Accesses units (components) of Things");
 
 
-namespace Langulus::Entity
+namespace Langulus::Things
 {
 
    using UnitList = TMany<A::Unit*>;
@@ -47,9 +47,9 @@ namespace Langulus::Entity
       LANGULUS_VERBS(Verbs::Create, Verbs::Select);
 
    protected:
-      LANGULUS_API(ENTITY) void ResetRuntime(Runtime*);
-      LANGULUS_API(ENTITY) void ResetFlow(Temporal*);
-      LANGULUS_API(ENTITY) void Teardown();
+      LANGULUS_API(THINGS) void ResetRuntime(Runtime*);
+      LANGULUS_API(THINGS) void ResetFlow(Temporal*);
+      LANGULUS_API(THINGS) void Teardown();
 
       // The order of members is critical!                              
       // Runtime should be destroyed last, hence it is the first member 
@@ -76,13 +76,13 @@ namespace Langulus::Entity
       void CreateInner(Verb&, const T&);
 
    public:
-      LANGULUS_API(ENTITY) Thing();
-      LANGULUS_API(ENTITY) Thing(Describe&&);
-      LANGULUS_API(ENTITY) Thing(Thing*, const Many& = {});
-      LANGULUS_API(ENTITY) Thing(Thing&&) noexcept;
-      LANGULUS_API(ENTITY) Thing(Cloned<Thing>&&);
-      LANGULUS_API(ENTITY) Thing(Abandoned<Thing>&&);
-      LANGULUS_API(ENTITY)~Thing();
+      LANGULUS_API(THINGS) Thing();
+      LANGULUS_API(THINGS) Thing(Describe&&);
+      LANGULUS_API(THINGS) Thing(Thing*, const Many& = {});
+      LANGULUS_API(THINGS) Thing(Thing&&) noexcept;
+      LANGULUS_API(THINGS) Thing(Cloned<Thing>&&);
+      LANGULUS_API(THINGS) Thing(Abandoned<Thing>&&);
+      LANGULUS_API(THINGS)~Thing();
 
       template<bool CREATE_FLOW = true>
       static Thing Root(CT::String auto&&...);
@@ -92,45 +92,45 @@ namespace Langulus::Entity
       Thing(const Thing&) = delete;
       auto operator = (auto) = delete;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       bool RequiresRefresh() const noexcept;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetRuntime() const noexcept -> const Pin<Ref<Runtime>>&;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetFlow() const noexcept -> const Pin<Ref<Temporal>>&;
 
-      LANGULUS_API(ENTITY) void Do(Verb&);
-      LANGULUS_API(ENTITY) void Select(Verb&);
-      LANGULUS_API(ENTITY) void Create(Verb&);
+      LANGULUS_API(THINGS) void Do(Verb&);
+      LANGULUS_API(THINGS) void Select(Verb&);
+      LANGULUS_API(THINGS) void Create(Verb&);
 
       template<Seek = Seek::HereAndAbove, CT::VerbBased V>
       V& RunIn(V&);
       template<CT::VerbBased V>
       V& Run(V&);
 
-      LANGULUS_API(ENTITY) Many Say(const Text&);
-      LANGULUS_API(ENTITY) Many Run(const Code&);
+      LANGULUS_API(THINGS) Many Say(const Text&);
+      LANGULUS_API(THINGS) Many Run(const Code&);
 
-      LANGULUS_API(ENTITY) bool Update(Time);
-      LANGULUS_API(ENTITY) void Refresh(bool force = false);
-      LANGULUS_API(ENTITY) void Reset();
+      LANGULUS_API(THINGS) bool Update(Time);
+      LANGULUS_API(THINGS) void Refresh(bool force = false);
+      LANGULUS_API(THINGS) void Reset();
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       bool operator == (const Thing&) const;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       explicit operator Text() const;
 
    public:
       ///                                                                     
       ///   Hierarchy management                                              
       ///                                                                     
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto CreateRuntime() -> Runtime*;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto CreateFlow() -> Temporal*;
 
       template<class...T>
@@ -141,30 +141,30 @@ namespace Langulus::Entity
       template<bool TWOSIDED = true>
       Count RemoveChild(Thing*);
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto LoadMod(const Token&, const Many& = {}) -> A::Module*;
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto LoadModPath(const Path&, const Many& = {}) -> A::Module*;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetOwner() const noexcept -> const Ref<Thing>&;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetChildren() const noexcept -> const Hierarchy&;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetChild(Index = 0) -> Thing*;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetChild(Index = 0) const -> const Thing*;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetNamedChild(const Token&, Index = 0) -> Thing*;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetNamedChild(const Token&, Index = 0) const -> const Thing*;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       void DumpHierarchy() const;
 
    public:
@@ -189,24 +189,24 @@ namespace Langulus::Entity
       template<CT::Unit = A::Unit, bool TWOSIDED = true>
       Count RemoveUnits();
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto HasUnits(DMeta) const -> Count;
       template<CT::Unit>
       auto HasUnits() const -> Count;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetUnits() const noexcept -> const UnitList&;
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetUnitsMap() const noexcept -> const UnitMap&;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetUnitMeta(DMeta, Index = 0)       -> A::Unit*;
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetUnitMeta(DMeta, Index = 0) const -> A::Unit const*;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetUnitExt(DMeta, const Many&, Index = 0)       -> A::Unit*;
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetUnitExt(DMeta, const Many&, Index = 0) const -> A::Unit const*;
 
       template<CT::Unit T = A::Unit>
@@ -215,9 +215,9 @@ namespace Langulus::Entity
       auto GetUnit(Index = 0) const -> Decay<T> const*;
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
-         LANGULUS_API(ENTITY)
+         LANGULUS_API(THINGS)
          auto GetUnitMeta(const Token&, Index = 0) const -> A::Unit const*;
-         LANGULUS_API(ENTITY)
+         LANGULUS_API(THINGS)
          auto GetUnitMeta(const Token&, Index = 0)       -> A::Unit*;
 
          template<CT::Unit T>
@@ -225,49 +225,49 @@ namespace Langulus::Entity
       #endif
 
    private:
-      LANGULUS_API(ENTITY) void AddUnitBases(A::Unit*, DMeta);
-      LANGULUS_API(ENTITY) void RemoveUnitBases(A::Unit*, DMeta);
+      LANGULUS_API(THINGS) void AddUnitBases(A::Unit*, DMeta);
+      LANGULUS_API(THINGS) void RemoveUnitBases(A::Unit*, DMeta);
 
    public:
       ///                                                                     
       ///   Trait management                                                  
       ///                                                                     
-      LANGULUS_API(ENTITY) auto AddTrait(Trait) -> Trait*;
+      LANGULUS_API(THINGS) auto AddTrait(Trait) -> Trait*;
 
-      LANGULUS_API(ENTITY) Count RemoveTrait(TMeta);
-      LANGULUS_API(ENTITY) Count RemoveTrait(Trait);
+      LANGULUS_API(THINGS) Count RemoveTrait(TMeta);
+      LANGULUS_API(THINGS) Count RemoveTrait(Trait);
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       Count HasTraits(TMeta) const;
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       Count HasTraits(const Trait&) const;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetTraits() const noexcept -> const TraitMap&;
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetTrait(TMeta, Index = 0) const -> Trait;
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetTrait(TMeta, Index = 0)       -> Trait;
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetTrait(const Trait&, Index = 0) const -> Trait;
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetTrait(const Trait&, Index = 0)       -> Trait;
       template<CT::TraitBased = Trait>
       auto GetTrait(Index = 0) -> Trait;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetLocalTrait(TMeta, Index = 0) const -> Trait const*;
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetLocalTrait(TMeta, Index = 0)       -> Trait*;
       template<CT::TraitBased = Trait>
       auto GetLocalTrait(Index = 0)       -> Trait*;
       template<CT::TraitBased = Trait>
       auto GetLocalTrait(Index = 0) const -> Trait const*;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       void SetName(const Text&);
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       Text GetName() const;
 
       ///                                                                     
@@ -320,4 +320,4 @@ namespace Langulus::Entity
       auto GatherValues() const -> TMany<D>;
    };
 
-} // namespace Langulus::Entity
+} // namespace Langulus::Things

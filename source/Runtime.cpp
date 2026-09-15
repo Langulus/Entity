@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -54,7 +54,7 @@
 #endif
 
 
-namespace Langulus::Entity
+namespace Langulus::Things
 {
 
    TUnorderedMap<Path, Runtime::SharedLibrary> Runtime::mLibraries;
@@ -598,10 +598,10 @@ namespace Langulus::Entity
 
       // Unload the shared object                                       
       #if LANGULUS_OS(WINDOWS)
-         Entity::UnloadSharedLibrary(
+         Things::UnloadSharedLibrary(
             reinterpret_cast<HMODULE>(library.mHandle));
       #else
-         Entity::UnloadSharedLibrary(
+         Things::UnloadSharedLibrary(
             reinterpret_cast<void*>(library.mHandle));
       #endif
       return true;
@@ -707,4 +707,4 @@ namespace Langulus::Entity
       return fileSystems.template As<A::FileSystem*>()->GetDataPath();
    }
 
-} // namespace Langulus::Entity
+} // namespace Langulus::Things

@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -40,4 +40,4 @@ namespace Langulus::A
       return mOwners.template GatherValues<SEEK, D>();
    }
 
-} // namespace Langulus::Entity
+} // namespace Langulus::Things

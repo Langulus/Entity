@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -33,7 +33,7 @@ bool Unit::CompareDescriptor(const Many& descriptor) const {
    // First we compare traits only, all of them must be present         
    bool mismatch = false;
    Offset memberOffset = 0;
-   descriptor.ForEachDeep([&](const Anyness::Trait& trait) {
+   descriptor.ForEachDeep([&](const Annies::Trait& trait) {
       if (not GetMember(trait.GetTrait(), memberOffset)
       .Compare(static_cast<const Many&>(trait))) {
          mismatch = true;

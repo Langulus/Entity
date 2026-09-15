@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -15,7 +15,7 @@
 #define TME()        SeekInterface<THIS>
 
 
-namespace Langulus::Entity
+namespace Langulus::Things
 {
 
    /// Find a unit by type and optional offset                                
@@ -261,13 +261,13 @@ namespace Langulus::Entity
       }
    #endif
 
-} // namespace Langulus::Entity
+} // namespace Langulus::Things
 
 #undef TEMPLATE
 #undef TME
 
 
-namespace Langulus::Entity
+namespace Langulus::Things
 {
 
    /// Find a specific unit, searching into the hierarchy                     
@@ -601,4 +601,4 @@ namespace Langulus::Entity
       return done;
    }
 
-} // namespace Langulus::Entity
+} // namespace Langulus::Things

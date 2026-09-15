@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -10,7 +10,7 @@
 #include "Hierarchy-Gather.inl"
 
 
-namespace Langulus::Entity
+namespace Langulus::Things
 {
    
    /// Collects all units of the given type inside the hierarchy              
@@ -175,4 +175,4 @@ namespace Langulus::Entity
       return Abandon(results);
    }
 
-} // namespace Langulus::Entity
+} // namespace Langulus::Things

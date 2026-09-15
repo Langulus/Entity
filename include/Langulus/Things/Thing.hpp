@@ -1,9 +1,21 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "../../../source/Event.inl"
+#include "Pin.hpp"
+#include "Unit.hpp"
+#include "../../../source/Thing.hpp"
+#include "../../../source/Thing.inl"
+#include "../../../source/Thing-Gather.inl"
+#include "../../../source/Thing-Seek.inl"
+
+
+namespace Langulus
+{
+   using Thing   = Things::Thing;
+   using Runtime = Things::Runtime;
+}

@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -12,9 +12,9 @@
 namespace Langulus::A
 {
 
-   using Entity::Thing;
-   using Entity::Hierarchy;
-   using Entity::Runtime;
+   using Things::Thing;
+   using Things::Hierarchy;
+   using Things::Runtime;
 
 
    ///                                                                        
@@ -25,7 +25,7 @@ namespace Langulus::A
    /// inside external, dynamically loaded modules. There are units for       
    /// graphics, input, AI, content, and whatever extensions you make.        
    ///                                                                        
-   struct LANGULUS_API(ENTITY) Unit
+   struct LANGULUS_API(THINGS) Unit
       : virtual Resolvable
       #if LANGULUS_COMPILER(MSVC)
       #pragma warning(suppress: 4275)
@@ -33,7 +33,7 @@ namespace Langulus::A
       #else
       , virtual Referenced
       #endif
-      , Entity::SeekInterface<Unit>
+      , Things::SeekInterface<Unit>
    {
       LANGULUS_BASES(Resolvable);
 
@@ -129,7 +129,7 @@ namespace Langulus::A
       void ReplaceOwner(const Thing*, const Thing*);
    };
 
-} // namespace Langulus::Entity
+} // namespace Langulus::Things
 
 namespace Langulus::CT
 {

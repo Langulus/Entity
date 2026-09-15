@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -14,12 +14,12 @@ TEMPLATE_TEST_CASE("Testing Thing with different kidns of descriptors",
 ) {
    static Allocator::State memoryState;
 
-   static_assert(CT::Complete<Entity::Hierarchy>);
+   static_assert(CT::Complete<Things::Hierarchy>);
    static_assert(CT::Complete<A::Unit>);
    static_assert(CT::Complete<Temporal>);
    static_assert(CT::Complete<Thing>);
    static_assert(CT::Complete<Runtime>);
-   static_assert(CT::Deep<Entity::Hierarchy>);
+   static_assert(CT::Deep<Things::Hierarchy>);
 
    WHEN("Creating a default Thing") {
       Thing root;

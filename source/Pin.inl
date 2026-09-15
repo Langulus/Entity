@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -12,7 +12,7 @@
 #define PINNED()     Pin<T>
 
 
-namespace Langulus::Entity
+namespace Langulus::Things
 {
 
    /// Default construction                                                   
@@ -196,7 +196,7 @@ namespace Langulus::Entity
          return mValue;
    }
 
-} // namespace namespace Langulus::Entity
+} // namespace namespace Langulus::Things
 
 #undef TEMPLATE
 #undef PINNED

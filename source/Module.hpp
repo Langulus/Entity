@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -43,14 +43,11 @@ namespace Langulus
       (list << ... << MetaOf<T>());
    }
 
-   namespace Entity
+   namespace Things
    {
-
       class Runtime;
-
-   } // namespace Langulus::Entity
-
-} // namespace Langulus
+   }
+}
 
 namespace Langulus::A
 {
@@ -60,7 +57,7 @@ namespace Langulus::A
    ///                                                                        
    class Module : public virtual Resolvable {
    public:
-      using Runtime = Entity::Runtime;
+      using Runtime = Things::Runtime;
       LANGULUS(PRODUCER) Runtime;
       LANGULUS_BASES(Resolvable);
 
@@ -154,7 +151,7 @@ namespace Langulus::CT
       \
       LANGULUS_EXPORT() \
       ::Langulus::A::Module* LANGULUS_MODULE_CREATE() ( \
-         ::Langulus::Entity::Runtime* rt, const ::Langulus::Anyness::Many& desc) { \
+         ::Langulus::Things::Runtime* rt, const ::Langulus::Annies::Many& desc) { \
          static_assert(::Langulus::CT::DerivedFrom<m, ::Langulus::A::Module>, \
             "Langulus module class interface " \
             #m " doesn't inherit ::Langulus::A::Module"); \

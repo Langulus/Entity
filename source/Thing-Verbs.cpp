@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -11,7 +11,7 @@
 #include <Langulus/AI.hpp>
 
 
-namespace Langulus::Entity
+namespace Langulus::Things
 {
 
    /// Interpret and execute a natural message wherever possible in the       
@@ -190,19 +190,19 @@ namespace Langulus::Entity
       if (not mismatch) {
          // We're not seeking an entity, but components/traits          
          if (selectedTraits) {
-            ENTITY_SELECTION_VERBOSE_SELF(Logger::Green,
+            THINGS_SELECTION_VERBOSE_SELF(Logger::Green,
                "Trait(s) selected: ", selectedTraits);
             verb << selectedTraits;
          }
 
          if (selectedUnits) {
-            ENTITY_SELECTION_VERBOSE_SELF(Logger::Green,
+            THINGS_SELECTION_VERBOSE_SELF(Logger::Green,
                "Unit(s) selected: ", selectedUnits);
             verb << selectedUnits;
          }
 
          if (selectedEntities) {
-            ENTITY_SELECTION_VERBOSE_SELF(Logger::Green,
+            THINGS_SELECTION_VERBOSE_SELF(Logger::Green,
                "Entity(s) selected: ", selectedEntities);
             verb << selectedEntities;
          }

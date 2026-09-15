@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -10,7 +10,7 @@
 #include "Hierarchy-Seek.inl"
 
 
-namespace Langulus::Entity
+namespace Langulus::Things
 {
    
    /// Find a specific unit, searching into the hierarchy                     
@@ -353,4 +353,4 @@ namespace Langulus::Entity
       return SeekValue<SEEK>(meta, output, offset);
    }
 
-} // namespace Langulus::Entity
+} // namespace Langulus::Things

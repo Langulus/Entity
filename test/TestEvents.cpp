@@ -1,11 +1,11 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
-#include <Langulus/Entity/Event.hpp>
+#include <Langulus/Things/Event.hpp>
 #include <Langulus/Math/Vector.hpp>
 #include <Langulus/Verbs/Add.hpp>
 #include "Common.hpp"

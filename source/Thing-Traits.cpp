@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -10,7 +10,7 @@
 #include "Thing-Seek.inl"
 
 
-namespace Langulus::Entity
+namespace Langulus::Things
 {
 
    /// Get a trait by type (const)                                            
@@ -129,7 +129,7 @@ namespace Langulus::Entity
 
       mTraits.Insert(tmeta, trait);
       mRefreshRequired = true;
-      ENTITY_VERBOSE_SELF(trait, " added");
+      THINGS_VERBOSE_SELF(trait, " added");
       return &mTraits[tmeta].Last();
    }
 
@@ -141,7 +141,7 @@ namespace Langulus::Entity
       if (found) {
          const auto removed = found.GetValue().GetCount();
          mTraits.RemoveIt(found);
-         ENTITY_VERBOSE_SELF(trait, " removed");
+         THINGS_VERBOSE_SELF(trait, " removed");
          mRefreshRequired = true;
          return removed;
       }
@@ -157,7 +157,7 @@ namespace Langulus::Entity
       if (found) {
          const auto removed = found.GetValue().Remove(trait);
          if (removed) {
-            ENTITY_VERBOSE_SELF(trait, " removed");
+            THINGS_VERBOSE_SELF(trait, " removed");
             mRefreshRequired = true;
             return removed;
          }
@@ -192,7 +192,7 @@ namespace Langulus::Entity
    
    /// Get traits                                                             
    ///   @return the map of traits                                            
-   LANGULUS_API(ENTITY)
+   LANGULUS_API(THINGS)
    auto Thing::GetTraits() const noexcept -> const TraitMap& {
       return mTraits;
    }

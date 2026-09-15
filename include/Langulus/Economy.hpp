@@ -1,13 +1,13 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "Entity/Thing.hpp"
-#include "Entity/Module.hpp"
+#include "Things/Thing.hpp"
+#include "Things/Module.hpp"
 #include <Langulus/Math/Vector.hpp>
 
 
@@ -24,7 +24,7 @@ namespace Langulus::A
       LANGULUS_BASES(Module);
       Economy() : Resolvable {this}, Module {nullptr} {}
 
-      using Text = Anyness::Text;
+      using Text = Annies::Text;
 
       virtual auto GetResource (const Text&) const -> const Resource*  = 0;
       virtual auto GetConverter(const Text&) const -> const Converter* = 0;

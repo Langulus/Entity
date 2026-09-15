@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -8,7 +8,7 @@
 
 /// INTENTIONALLY NOT GUARDED                                                 
 /// Include this file once in each cpp file, after all other headers          
-#include <Langulus/Entity/Thing.hpp>
+#include <Langulus/Things/Thing.hpp>
 #include <Langulus/Testing.hpp>
 
 

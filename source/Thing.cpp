@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,18 +9,18 @@
 #include "Thing.inl"
 
 
-namespace Langulus::Entity
+namespace Langulus::Things
 {
 
    /// Default-constructor, always creates a parentless root thing            
    Thing::Thing() : Resolvable {this} {
-      ENTITY_VERBOSE_SELF("Created (root, ", GetReferences(), " references)");
+      THINGS_VERBOSE_SELF("Created (root, ", GetReferences(), " references)");
    }
    
    /// Descriptor-constructor                                                 
    ///   @param describe - instructions for creating the entity               
    Thing::Thing(Describe&& describe) : Resolvable {this} {
-      ENTITY_VERBOSE_SELF_TAB("Created from descriptor: ", *describe);
+      THINGS_VERBOSE_SELF_TAB("Created from descriptor: ", *describe);
 
       if (*describe) {
          Verbs::Create creator {&(*describe)};
@@ -28,14 +28,14 @@ namespace Langulus::Entity
       }
 
       if (mOwner) {
-         ENTITY_VERBOSE_SELF(
+         THINGS_VERBOSE_SELF(
             "Created as child to ", mOwner,
             " (", GetReferences(), " references; parent now has ",
             mOwner->GetReferences(), " references)"
          );
       }
       else {
-         ENTITY_VERBOSE_SELF(
+         THINGS_VERBOSE_SELF(
             "Created (root, ", GetReferences(), " references)"
          );
       }
@@ -48,7 +48,7 @@ namespace Langulus::Entity
       : Resolvable {this}
       , mOwner     {parent}
    {
-      ENTITY_VERBOSE_SELF_TAB("Created manually");
+      THINGS_VERBOSE_SELF_TAB("Created manually");
 
       if (parent) {
          parent->AddChild<false>(this);
@@ -63,14 +63,14 @@ namespace Langulus::Entity
       }
 
       if (mOwner) {
-         ENTITY_VERBOSE_SELF(
+         THINGS_VERBOSE_SELF(
             "Created as child to ", mOwner,
             " (", GetReferences(), " references; parent now has ",
             mOwner->GetReferences(), " references)"
          );
       }
       else {
-         ENTITY_VERBOSE_SELF(
+         THINGS_VERBOSE_SELF(
             "Created (root, ", GetReferences(), " references)"
          );
       }
@@ -103,7 +103,7 @@ namespace Langulus::Entity
       if (other.mOwner)
          other.mOwner->RemoveChild(&other);
 
-      ENTITY_VERBOSE_SELF("Moved from ", other);
+      THINGS_VERBOSE_SELF("Moved from ", other);
    }
    
    /// Abandon constructor                                                    
@@ -133,7 +133,7 @@ namespace Langulus::Entity
       if (other->mOwner)
          other->mOwner->RemoveChild(&*other);
 
-      ENTITY_VERBOSE_SELF("Abandoned from ", *other);
+      THINGS_VERBOSE_SELF("Abandoned from ", *other);
    }
 
    /// Clone constructor                                                      
@@ -149,7 +149,7 @@ namespace Langulus::Entity
       TODO();
       //TODO clone flow and runtime if pinned, recreate modules if new runtime, 
       // recreate units and traits, then recreate children
-      ENTITY_VERBOSE_SELF("Cloned from ", *other);
+      THINGS_VERBOSE_SELF("Cloned from ", *other);
    }
 
    /// Destroy the thing                                                      
@@ -166,9 +166,9 @@ namespace Langulus::Entity
       );
 
       // Destroy the entire herarchy under this Thing                   
-      ENTITY_VERBOSE_SELF_TAB("Destroying...");
+      THINGS_VERBOSE_SELF_TAB("Destroying...");
 
-      #if ENTITY_VERBOSE_ENABLED()
+      #if THINGS_VERBOSE_ENABLED()
          for (auto& child : mChildren) {
             if (child->GetReferences() != 1) {
                Logger::Warning(
@@ -193,7 +193,7 @@ namespace Langulus::Entity
    /// circular dependencies. After this runs, there should be only one       
    /// reference remaining for this Thing                                     
    void Thing::Teardown() {
-      ENTITY_VERBOSE_SELF_TAB(
+      THINGS_VERBOSE_SELF_TAB(
          "Teardown initiated at ", GetReferences(), " uses...");
 
       // Reset owner, so that only one reference to this Thing remains  
@@ -203,7 +203,7 @@ namespace Langulus::Entity
       // Traits might be exposing members in units. Make sure we        
       // dereference those first, so that units have as small number of 
       // references as possible                                         
-      ENTITY_VERBOSE_SELF("Tearing off traits (name might change)");
+      THINGS_VERBOSE_SELF("Tearing off traits (name might change)");
       mTraits.Reset();
 
       // Decouple all units from this owner because units might get     
@@ -213,7 +213,7 @@ namespace Langulus::Entity
       // A::Unit::~Unit from already destroyed mUnitsList/Ambiguous     
       mUnitsAmbiguous.Reset();
       for (auto& unit : mUnitsList) {
-         ENTITY_VERBOSE_SELF(
+         THINGS_VERBOSE_SELF(
             "Tearing off unit ", unit, " at ", unit->GetReferences(), " uses...");
          unit->mOwners.Remove(this);
 
@@ -231,7 +231,7 @@ namespace Langulus::Entity
       if (not mRuntime.IsLocked())
          mRuntime.Reset();
 
-      ENTITY_VERBOSE_SELF("Teardown complete: ", GetReferences(), " uses remain");
+      THINGS_VERBOSE_SELF("Teardown complete: ", GetReferences(), " uses remain");
    }
 
    /// Compare two entities                                                   
@@ -536,7 +536,7 @@ namespace Langulus::Entity
       for (auto& child : mChildren)
          child->ResetRuntime(&*mRuntime);
 
-      ENTITY_VERBOSE_SELF("New runtime: ", &*mRuntime);
+      THINGS_VERBOSE_SELF("New runtime: ", &*mRuntime);
       return &*mRuntime;
    }
 
@@ -553,7 +553,7 @@ namespace Langulus::Entity
       for (auto& child : mChildren)
          child->ResetFlow(&*mFlow);
 
-      ENTITY_VERBOSE_SELF("New flow: ", &*mFlow);
+      THINGS_VERBOSE_SELF("New flow: ", &*mFlow);
       return &*mFlow;
    }
 

@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -264,7 +264,7 @@ namespace Langulus::A
       // Get the values (and normalize them if we have to)              
       // Missing RGB channels are defaulted to 0, while missing Alpha   
       // channel is defaulted to 255 (or 1, if normalized)              
-      const Anyness::Block<> pixel {{}, from, 1, mValue, nullptr};
+      const Annies::Block<> pixel {{}, from, 1, mValue, nullptr};
       T result;
       using TT = TypeOf<T>;
 

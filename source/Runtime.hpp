@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -15,7 +15,7 @@ namespace Langulus::A
    struct Folder;
 }
 
-namespace Langulus::Entity
+namespace Langulus::Things
 {
 
    class Thing;
@@ -97,7 +97,7 @@ namespace Langulus::Entity
       TUnorderedMap<DMeta, ModuleList> mModulesByType;
 
    protected:
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto LoadSharedLibraryPath(Path) -> SharedLibrary;
       auto LoadSharedLibrary(const Token&) -> SharedLibrary;
       bool UnloadSharedLibrary(const SharedLibrary&);
@@ -108,24 +108,24 @@ namespace Langulus::Entity
       Runtime() = delete;
       Runtime(Runtime&&) noexcept = default;
 
-      LANGULUS_API(ENTITY)  Runtime(Thing*) noexcept;
-      LANGULUS_API(ENTITY) ~Runtime();
+      LANGULUS_API(THINGS)  Runtime(Thing*) noexcept;
+      LANGULUS_API(THINGS) ~Runtime();
 
       auto GetOwner() const noexcept { return mOwner; }
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto InstantiateModulePath(const Path&, const Many& = {}) -> A::Module*;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto InstantiateModule(const Token&, const Many& = {}) -> A::Module*;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto InstantiateModule(const SharedLibrary&, const Many& = {}) -> A::Module*;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetDependency(DMeta) const noexcept -> SharedLibrary;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetModules(DMeta) const noexcept -> const ModuleList&;
 
       template<CT::Module M>
@@ -134,27 +134,27 @@ namespace Langulus::Entity
       }
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
-         LANGULUS_API(ENTITY)
+         LANGULUS_API(THINGS)
          auto GetDependencyToken(const Token&) const noexcept -> SharedLibrary;
 
-         LANGULUS_API(ENTITY)
+         LANGULUS_API(THINGS)
          auto GetModulesToken(const Token&) const noexcept -> const ModuleList&;
       #endif
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetFile(const Path&) -> Ref<A::File>;
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetFolder(const Path&) -> Ref<A::Folder>;
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetWorkingPath() const -> const Path&;
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       auto GetDataPath() const -> const Path&;
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       bool Update(Time);
 
-      LANGULUS_API(ENTITY)
+      LANGULUS_API(THINGS)
       explicit operator Text() const;
    };
 
-} // namespace Langulus::Entity
+} // namespace Langulus::Things

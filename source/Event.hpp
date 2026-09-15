@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -13,7 +13,7 @@
 namespace Langulus
 {
 
-   LANGULUS_API(ENTITY) extern void RegisterEvents();
+   LANGULUS_API(THINGS) extern void RegisterEvents();
 
 
    ///                                                                        
@@ -69,9 +69,9 @@ namespace Langulus
    ///   Events are often used as arguments for Verbs::Interact               
    ///                                                                        
    struct Event {
-      using Many = Anyness::Many;
+      using Many = Annies::Many;
 
-      LANGULUS_CONVERTS_TO(Anyness::Text);
+      LANGULUS_CONVERTS_TO(Annies::Text);
 
       // Event type                                                     
       RTTI::DMeta mType {};
@@ -80,7 +80,7 @@ namespace Langulus
       // Event timestamp                                                
       TimePoint mTimestamp;
       // Payload, for additional data                                   
-      Anyness::Many mPayload;
+      Annies::Many mPayload;
 
       ///                                                                     
       ///   Construction                                                      
@@ -104,7 +104,7 @@ namespace Langulus
       ///                                                                     
       bool operator == (const Event&) const;
 
-      LANGULUS_API(ENTITY) operator Anyness::Text() const;
+      LANGULUS_API(THINGS) operator Annies::Text() const;
    };
 
    using EventList = TUnorderedMap<DMeta, TUnorderedMap<EventState, Event>>;

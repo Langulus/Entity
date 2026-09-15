@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Entity                                                          
+/// Langulus::Things                                                          
 /// Copyright (c) 2013 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -11,7 +11,7 @@
 #include "Thing-Seek.inl"
 
 
-namespace Langulus::Entity
+namespace Langulus::Things
 {
    
    /// Create a root thing (convenience function)                             
@@ -35,7 +35,7 @@ namespace Langulus::Entity
    ///   @return the new child instance                                       
    template<class...T>
    Ref<Thing> Thing::CreateChild(T&&...arguments) {
-      ENTITY_VERBOSE_SELF_TAB(
+      THINGS_VERBOSE_SELF_TAB(
          "Producing child (at ", GetReferences(), " references): ");
       Ref<Thing> newThing;
       newThing.New(this, Many {Forward<T>(arguments)...});
@@ -95,7 +95,7 @@ namespace Langulus::Entity
          const auto count = static_cast<int>(std::ceil(stuff.GetCharge().mMass));
          for (int i = 0; i < count; ++i) {
             if (count != 1) {
-               ENTITY_CREATION_VERBOSE_SELF(Logger::Yellow,
+               THINGS_CREATION_VERBOSE_SELF(Logger::Yellow,
                   "Charged creation - creating ", i + 1, " of ", count);
             }
 
@@ -145,10 +145,10 @@ namespace Langulus::Entity
 
                entity->mOwner = this;
                entity->mRefreshRequired = true;
-               ENTITY_VERBOSE_SELF(entity, "'s owner overwritten");
+               THINGS_VERBOSE_SELF(entity, "'s owner overwritten");
             }
 
-            ENTITY_VERBOSE_SELF(entity, " added as child");
+            THINGS_VERBOSE_SELF(entity, " added as child");
          }
       }
 
@@ -171,10 +171,10 @@ namespace Langulus::Entity
             if (entity->mOwner == this) {
                entity->mOwner = nullptr;
                entity->mRefreshRequired = true;
-               ENTITY_VERBOSE_SELF(entity, "'s owner overwritten");
+               THINGS_VERBOSE_SELF(entity, "'s owner overwritten");
             }
 
-            ENTITY_VERBOSE_SELF(entity, " removed from children");
+            THINGS_VERBOSE_SELF(entity, " removed from children");
          }
       }
 
@@ -311,7 +311,7 @@ namespace Langulus::Entity
       }
 
       // Log self before unit being added, it might change name         
-      ENTITY_VERBOSE_SELF("");
+      THINGS_VERBOSE_SELF("");
 
       if constexpr (TWOSIDED) {
          #if LANGULUS(SAFE)
@@ -325,7 +325,7 @@ namespace Langulus::Entity
       AddUnitBases(unit, meta);
       mRefreshRequired = true;
 
-      ENTITY_VERBOSE(
+      THINGS_VERBOSE(
          unit, " added as unit (now at ", GetReferences(), " references)");
       return 1;
    }
@@ -351,7 +351,7 @@ namespace Langulus::Entity
 
          // Notify all other units about the environment change         
          mRefreshRequired = true;
-         ENTITY_VERBOSE_SELF(unit, " removed from units");
+         THINGS_VERBOSE_SELF(unit, " removed from units");
 
          // Dereference (and eventually destroy) unit                   
          RemoveUnitBases(unit, meta);
@@ -382,7 +382,7 @@ namespace Langulus::Entity
          mUnitsList.Reset();
          mUnitsAmbiguous.Reset();
          mRefreshRequired = true;
-         ENTITY_VERBOSE_SELF("All ", removed, " units were removed");
+         THINGS_VERBOSE_SELF("All ", removed, " units were removed");
          return removed;
       }
       else {
@@ -559,7 +559,7 @@ namespace Langulus::Entity
          ? type->mProducerRetriever() : nullptr;
       Construct descriptor = construct;
 
-      ENTITY_VERBOSE_SELF(
+      THINGS_VERBOSE_SELF(
          "Acting as producer context for making `", 
          type, "` (at ", GetReferences(), " references)"
       );
@@ -572,7 +572,7 @@ namespace Langulus::Entity
          parent = this;
          parent.MakeMissing();
          descriptor << parent;
-         ENTITY_VERBOSE_SELF(
+         THINGS_VERBOSE_SELF(
             "Referenced as Traits::Parent (now at ",
             GetReferences(), " references)"
          );
@@ -665,7 +665,7 @@ namespace Langulus::Entity
       return {};
    }
 
-} // namespace Langulus::Entity
+} // namespace Langulus::Things
 
 namespace Langulus::A
 {
